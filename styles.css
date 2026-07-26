@@ -1,0 +1,457 @@
+/* Fellmise — V1 "living scene".
+   Palette is sampled from the art pack so the page and the sprites read as one
+   picture: grass, path, wood, roof, outline, cream. */
+
+:root {
+  --grass-1: #a8cb53;
+  --grass-2: #bdd85a;
+  --grass-3: #d1e276;
+  --path: #f2ca78;
+  --wood: #a6744a;
+  --wood-dark: #7c5233;
+  --roof: #88362b;
+  --ink: #383b2d;
+  --cream: #fdf6e0;
+
+  --sky-1: #7eb8e0;
+  --sky-2: #c7e6f2;
+
+  --border: 4px solid var(--ink);
+  --shadow: 6px 6px 0 var(--ink);
+  --shadow-sm: 4px 4px 0 var(--ink);
+
+  --pixel: "Press Start 2P", "PT Mono", monospace;
+  --body: "Alegreya", Georgia, serif;
+  --mono: "PT Mono", ui-monospace, monospace;
+
+  --wrap: 1180px;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 19px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+img { max-width: 100%; height: auto; display: block; }
+
+.skip {
+  position: absolute;
+  left: -9999px;
+  background: var(--cream);
+  border: var(--border);
+  padding: .6rem 1rem;
+  font-family: var(--mono);
+  z-index: 100;
+}
+.skip:focus { left: 1rem; top: 1rem; }
+
+/* ---------------------------------------------------------------- topbar */
+.topbar {
+  position: relative;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.1rem clamp(1rem, 4vw, 2.5rem);
+  background: var(--ink);
+}
+
+.logo {
+  font-family: var(--pixel);
+  font-size: clamp(1rem, 2.6vw, 1.6rem);
+  letter-spacing: .06em;
+  color: var(--cream);
+  text-decoration: none;
+  /* the "roof" the brief asks for: a hard offset shadow in roof red */
+  text-shadow: 3px 3px 0 var(--roof);
+}
+
+.lang {
+  display: flex;
+  align-items: center;
+  gap: .35rem;
+  font-family: var(--mono);
+  font-size: .8rem;
+}
+.lang a, .lang__current {
+  padding: .3rem .55rem;
+  border: 2px solid var(--cream);
+  text-decoration: none;
+  line-height: 1;
+}
+.lang__current { background: var(--cream); color: var(--ink); }
+.lang a { color: var(--cream); }
+.lang a:hover, .lang a:focus-visible { background: var(--grass-1); color: var(--ink); border-color: var(--grass-1); }
+
+/* ------------------------------------------------------------------ hero */
+.hero {
+  position: relative;
+  overflow: hidden;
+  min-height: min(88vh, 780px);
+  display: flex;
+  align-items: flex-end;
+  isolation: isolate;
+}
+
+.hero__sky {
+  position: absolute; inset: 0 0 38% 0;
+  background: linear-gradient(180deg, var(--sky-1) 0%, var(--sky-2) 100%);
+}
+
+.hero__ground {
+  position: absolute; inset: 62% 0 0 0;
+  background:
+    /* speckles */
+    radial-gradient(circle at 12% 22%, var(--grass-3) 0 3px, transparent 4px),
+    radial-gradient(circle at 47% 12%, var(--grass-3) 0 2px, transparent 3px),
+    radial-gradient(circle at 78% 30%, var(--grass-3) 0 3px, transparent 4px),
+    radial-gradient(circle at 33% 62%, var(--grass-1) 0 3px, transparent 4px),
+    radial-gradient(circle at 88% 72%, var(--grass-3) 0 2px, transparent 3px),
+    radial-gradient(circle at 62% 86%, var(--grass-1) 0 3px, transparent 4px),
+    linear-gradient(180deg, var(--grass-1) 0%, var(--grass-2) 45%, var(--grass-3) 100%);
+  background-size: 220px 180px, 300px 240px, 260px 200px, 340px 260px, 280px 210px, 240px 190px, 100% 100%;
+}
+
+/* the path runs along the bottom of the scene */
+.hero__path {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  height: 16%;
+  background: var(--path);
+  clip-path: polygon(0 38%, 100% 12%, 100% 100%, 0 100%);
+}
+
+/* time-of-day wash, driven by data-tod on .hero */
+.hero__tint {
+  position: absolute; inset: 0;
+  pointer-events: none;
+  transition: background .8s ease, backdrop-filter .8s ease;
+  z-index: 3;
+}
+.hero[data-tod="day"]   .hero__tint { background: transparent; }
+.hero[data-tod="dawn"]  .hero__tint { background: linear-gradient(180deg, rgba(255,178,120,.34), rgba(255,226,180,.12)); }
+.hero[data-tod="dusk"]  .hero__tint { background: linear-gradient(180deg, rgba(255,132,72,.36), rgba(120,60,90,.18)); }
+.hero[data-tod="night"] .hero__tint { background: linear-gradient(180deg, rgba(18,26,72,.52), rgba(20,34,74,.40)); }
+
+.hero__scene { position: absolute; inset: 0; z-index: 2; }
+
+.sprite {
+  position: absolute;
+  bottom: 0;
+  will-change: transform;
+}
+.sprite img { filter: drop-shadow(0 6px 0 rgba(56, 59, 45, .13)); }
+
+.sprite--tree-a  { left: 1%;  width: 20%; bottom: 12%; }
+.sprite--house-b { left: 15%; width: 27%; bottom: 15%; }
+.sprite--well    { left: 41%; width: 13%; bottom: 11%; }
+.sprite--house-a { left: 55%; width: 26%; bottom: 14%; }
+.sprite--tree-b  { left: 82%; width: 15%; bottom: 10%; }
+.sprite--cart    { left: 47%; width: 18%; bottom: 2%;  }
+.sprite--fence   { left: 4%;  width: 19%; bottom: 3%;  }
+
+/* trees breathe; disabled under prefers-reduced-motion below */
+.sprite--tree-a img, .sprite--tree-b img {
+  transform-origin: 50% 100%;
+  animation: sway 7s ease-in-out infinite alternate;
+}
+.sprite--tree-b img { animation-duration: 5.5s; animation-delay: -2s; }
+
+@keyframes sway {
+  from { transform: rotate(-1.1deg); }
+  to   { transform: rotate(1.1deg); }
+}
+
+/* "in Fellmise now: day" */
+.clock {
+  position: absolute;
+  top: 1.2rem; right: clamp(1rem, 4vw, 2.5rem);
+  z-index: 5;
+  margin: 0;
+  display: flex; align-items: center; gap: .5rem;
+  background: var(--cream);
+  border: 3px solid var(--ink);
+  box-shadow: var(--shadow-sm);
+  padding: .5rem .8rem;
+  font-family: var(--mono);
+  font-size: .78rem;
+}
+.clock__dot {
+  width: .7rem; height: .7rem; border-radius: 50%;
+  border: 2px solid var(--ink);
+  background: var(--path);
+}
+.hero[data-tod="night"] .clock__dot { background: #2c3a72; }
+.hero[data-tod="dusk"]  .clock__dot { background: #e8703c; }
+.hero[data-tod="dawn"]  .clock__dot { background: #ffc27a; }
+
+.hero__copy {
+  position: relative;
+  z-index: 4;
+  width: min(var(--wrap), 100%);
+  margin: 0 auto;
+  padding: 0 clamp(1rem, 4vw, 2.5rem) clamp(2rem, 6vw, 4rem);
+  text-align: center;
+}
+
+/* wooden sign board */
+.sign {
+  display: inline-block;
+  max-width: 46rem;
+  background:
+    repeating-linear-gradient(180deg, var(--wood) 0 14px, var(--wood-dark) 14px 17px);
+  border: var(--border);
+  box-shadow: var(--shadow);
+  padding: 1.4rem clamp(1rem, 3vw, 2.4rem);
+  transform: rotate(-.6deg);
+}
+.sign__text {
+  margin: 0;
+  font-family: var(--pixel);
+  font-size: clamp(.72rem, 1.9vw, 1.05rem);
+  line-height: 1.85;
+  color: var(--cream);
+  text-shadow: 2px 2px 0 rgba(0,0,0,.45);
+}
+
+.descriptor {
+  max-width: 44rem;
+  margin: 1.4rem auto 0;
+  background: var(--cream);
+  border: 3px solid var(--ink);
+  padding: .7rem 1.1rem;
+  font-size: 1.05rem;
+}
+
+.cta {
+  margin-top: 1.5rem;
+  display: flex; flex-wrap: wrap; gap: .9rem; justify-content: center;
+}
+
+.btn {
+  font-family: var(--pixel);
+  font-size: .72rem;
+  line-height: 1.5;
+  padding: .95rem 1.3rem;
+  border: var(--border);
+  box-shadow: var(--shadow-sm);
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform .08s ease, box-shadow .08s ease;
+}
+.btn:hover:not(:disabled), .btn:focus-visible:not(:disabled) {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 var(--ink);
+}
+.btn--steam {
+  background: #b9b6ab;
+  color: #52514a;
+  cursor: not-allowed;
+  opacity: .85;
+}
+.btn--discord { background: var(--grass-1); color: var(--ink); }
+
+/* -------------------------------------------------------------- features */
+.section-title {
+  font-family: var(--pixel);
+  font-size: clamp(.95rem, 2.4vw, 1.4rem);
+  text-align: center;
+  margin: 0 0 2.4rem;
+  line-height: 1.7;
+}
+
+.features {
+  max-width: var(--wrap);
+  margin: 0 auto;
+  padding: clamp(3rem, 7vw, 5rem) clamp(1rem, 4vw, 2.5rem) 1rem;
+}
+
+.features__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+  /* The resource strip spans both columns, which would otherwise strand an
+     empty cell beside the card before it. Dense packing backfills that one
+     cell with the next card; every other item is single-column, so nothing
+     else can be reordered by it. */
+  grid-auto-flow: dense;
+}
+
+.card {
+  background: var(--cream);
+  border: var(--border);
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* the tiled roof strip */
+.card__roof {
+  height: 26px;
+  background:
+    repeating-linear-gradient(90deg, var(--roof) 0 22px, #6f2b22 22px 26px);
+  border-bottom: var(--border);
+}
+
+.card__body {
+  position: relative;
+  padding: 1.6rem clamp(1.1rem, 2.5vw, 1.8rem) 1.8rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  flex: 1;
+}
+
+.card__art { display: block; }
+.card__art img { height: clamp(150px, 20vw, 210px); width: auto; margin: 0 auto; }
+
+/* the ghost ship tucked into the corner of the death card */
+.card__art--corner { position: absolute; top: .6rem; right: .6rem; opacity: .92; }
+.card__art--corner img { height: 74px; }
+
+.card__art--soon {
+  width: 100%;
+  height: clamp(150px, 20vw, 210px);
+  display: grid;
+  place-items: center;
+  border: 3px dashed rgba(56, 59, 45, .45);
+  background: repeating-linear-gradient(45deg, rgba(56,59,45,.05) 0 10px, transparent 10px 20px);
+}
+.card__art--soon span {
+  font-family: var(--mono);
+  font-size: .78rem;
+  color: rgba(56, 59, 45, .7);
+}
+
+.card__title {
+  font-family: var(--pixel);
+  font-size: .88rem;
+  line-height: 1.7;
+  margin: 1.3rem 0 .7rem;
+}
+
+.card__text { margin: 0; }
+
+/* ------------------------------------------------------------- resources */
+.resources {
+  grid-column: 1 / -1;
+  background: var(--grass-3);
+  border: var(--border);
+  box-shadow: var(--shadow);
+  padding: 1.5rem 1.2rem 1.2rem;
+}
+
+.resources__title {
+  font-family: var(--pixel);
+  font-size: .8rem;
+  text-align: center;
+  margin: 0 0 1.2rem;
+  line-height: 1.7;
+}
+
+.resources__strip {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 .4rem;
+  display: flex;
+  gap: 1.1rem;
+  justify-content: space-between;
+}
+
+.res figure { margin: 0; position: relative; }
+.res img {
+  height: 76px; width: auto; margin: 0 auto;
+  transition: transform .12s ease;
+}
+.res:hover img, .res:focus-within img { transform: translateY(-5px); }
+
+/* label behaves as a tooltip: hidden until hover/focus */
+.res figcaption {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: -1.9rem;
+  white-space: nowrap;
+  background: var(--ink);
+  color: var(--cream);
+  font-family: var(--mono);
+  font-size: .7rem;
+  padding: .25rem .5rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .12s ease;
+}
+.res:hover figcaption, .res:focus-within figcaption { opacity: 1; }
+
+/* ------------------------------------------------- disclaimer + footer */
+.disclaimer {
+  max-width: var(--wrap);
+  margin: clamp(2.5rem, 6vw, 4rem) auto clamp(2rem, 5vw, 3rem);
+  padding: 1rem clamp(1rem, 4vw, 2.5rem);
+  text-align: center;
+  font-family: var(--mono);
+  font-size: .82rem;
+  color: rgba(56, 59, 45, .8);
+}
+
+.footer {
+  background: var(--ink);
+  color: var(--cream);
+  padding: 2rem clamp(1rem, 4vw, 2.5rem);
+  display: flex;
+  flex-wrap: wrap;
+  gap: .8rem 2rem;
+  align-items: center;
+  justify-content: space-between;
+}
+.footer__brand { font-family: var(--pixel); font-size: .8rem; margin: 0; }
+.footer__rights { margin: 0; font-family: var(--mono); font-size: .78rem; opacity: .8; }
+.footer__links { display: flex; gap: 1.2rem; font-family: var(--mono); font-size: .8rem; }
+.footer__links a { color: var(--cream); }
+.footer__links a:hover, .footer__links a:focus-visible { color: var(--grass-2); }
+
+/* ----------------------------------------------------------- responsive */
+@media (max-width: 760px) {
+  body { font-size: 17px; }
+
+  .hero { min-height: 76vh; }
+  /* simplified scene: two houses, one tree, the well */
+  .sprite.is-mobile-hidden { display: none; }
+  .sprite--tree-a  { left: -2%; width: 30%; bottom: 14%; }
+  .sprite--house-b { left: 18%; width: 40%; bottom: 17%; }
+  .sprite--well    { left: 57%; width: 20%; bottom: 13%; }
+  .sprite--house-a { left: 70%; width: 36%; bottom: 16%; }
+
+  .features__grid { grid-template-columns: 1fr; }
+
+  .resources__strip {
+    justify-content: flex-start;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 2.2rem;
+  }
+  .res { scroll-snap-align: center; flex: 0 0 auto; }
+  /* no hover on touch — keep labels visible instead of tooltipping */
+  .res figcaption { opacity: 1; position: static; transform: none; background: none;
+                    color: var(--ink); text-align: center; padding: .35rem 0 0; }
+
+  .footer { justify-content: center; text-align: center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .sprite--tree-a img, .sprite--tree-b img { animation: none; }
+  .btn, .res img, .hero__tint { transition: none; }
+}

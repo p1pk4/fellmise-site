@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fellmise — top-down 2D sandbox MMO</title>
+<meta name="description" content="Top-down 2D sandbox MMO inspired by Ultima Online: skill-based progression, playable monster faction, PC+mobile crossplay">
+<link rel="canonical" href="https://fellmise.com/">
+<link rel="alternate" hreflang="en" href="https://fellmise.com/">
+<link rel="alternate" hreflang="ru" href="https://fellmise.com/ru/">
+<link rel="alternate" hreflang="x-default" href="https://fellmise.com/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Fellmise">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Fellmise — top-down 2D sandbox MMO">
+<meta property="og:description" content="Top-down 2D sandbox MMO inspired by Ultima Online: skill-based progression, playable monster faction, PC+mobile crossplay">
+<meta property="og:url" content="https://fellmise.com/">
+<meta property="og:image" content="https://fellmise.com/assets/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Fellmise — top-down 2D sandbox MMO">
+<meta name="twitter:description" content="Top-down 2D sandbox MMO inspired by Ultima Online: skill-based progression, playable monster faction, PC+mobile crossplay">
+<meta name="twitter:image" content="https://fellmise.com/assets/og.jpg">
+<meta name="theme-color" content="#a8cb53">
+<link rel="icon" href="assets/favicon-32.png" sizes="32x32">
+<link rel="icon" href="assets/icon-512.png" sizes="512x512">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Alegreya:ital,wght@0,400;0,700;1,400&family=PT+Mono&display=swap">
+<link rel="stylesheet" href="styles.css">
+<script>window.TOD_LABELS = {"dawn": "dawn", "day": "day", "dusk": "sunset", "night": "night", "prefix": "in Fellmise now:"};</script>
+</head>
+<body>
+<a class="skip" href="#features">Skip to content</a>
+
+<header class="topbar">
+  <a class="logo" href="/">FELLMISE</a>
+  <nav class="lang" aria-label="Language">
+    <span class="lang__current" aria-current="true">EN</span>
+    <a href="ru/" hreflang="ru">RU</a>
+  </nav>
+</header>
+
+<main>
+  <section class="hero" id="hero" data-tod="day">
+    <div class="hero__sky" aria-hidden="true"></div>
+    <div class="hero__ground" aria-hidden="true"></div>
+    <div class="hero__path" aria-hidden="true"></div>
+    <div class="hero__tint" aria-hidden="true"></div>
+
+    <div class="hero__scene" aria-hidden="true">
+        <div class="sprite sprite--tree-a" data-depth="0.1"><picture><source srcset="assets/hero_tree_a.webp" type="image/webp"><img src="assets/hero_tree_a.png" alt="" loading="eager" decoding="async"></picture></div>
+        <div class="sprite sprite--house-b" data-depth="0.05"><picture><source srcset="assets/hero_house_b.webp" type="image/webp"><img src="assets/hero_house_b.png" alt="" loading="eager" decoding="async"></picture></div>
+        <div class="sprite sprite--well" data-depth="0.07"><picture><source srcset="assets/hero_well.webp" type="image/webp"><img src="assets/hero_well.png" alt="" loading="eager" decoding="async"></picture></div>
+        <div class="sprite sprite--house-a" data-depth="0.05"><picture><source srcset="assets/hero_house_a.webp" type="image/webp"><img src="assets/hero_house_a.png" alt="" loading="lazy" decoding="async"></picture></div>
+        <div class="sprite sprite--tree-b is-mobile-hidden" data-depth="0.12"><picture><source srcset="assets/hero_tree_b.webp" type="image/webp"><img src="assets/hero_tree_b.png" alt="" loading="lazy" decoding="async"></picture></div>
+        <div class="sprite sprite--cart is-mobile-hidden" data-depth="0.16"><picture><source srcset="assets/hero_cart.webp" type="image/webp"><img src="assets/hero_cart.png" alt="" loading="lazy" decoding="async"></picture></div>
+        <div class="sprite sprite--fence is-mobile-hidden" data-depth="0.18"><picture><source srcset="assets/hero_fence.webp" type="image/webp"><img src="assets/hero_fence.png" alt="" loading="lazy" decoding="async"></picture></div>
+    </div>
+
+    <p class="clock" id="clock"><span class="clock__dot"></span><span id="clock-text"></span></p>
+
+    <div class="hero__copy">
+      <div class="sign">
+        <p class="sign__text">You killed them by the hundreds. Now they've come for you.</p>
+      </div>
+      <p class="descriptor">Skills instead of levels. Death with consequences. A living world. No pay-to-win.</p>
+      <div class="cta">
+        <button class="btn btn--steam" disabled>Wishlist on Steam — soon</button>
+        <!-- TODO: подставить инвайт, когда создан сервер Discord -->
+        <a class="btn btn--discord" href="#">Discord</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="features" id="features" aria-labelledby="features-h">
+    <h2 class="section-title" id="features-h">What Fellmise is</h2>
+    <div class="features__grid">
+        <article class="card" id="f-skills">
+          <div class="card__roof" aria-hidden="true"></div>
+          <div class="card__body">
+            <picture class="card__art"><source srcset="assets/feat_skills.webp" type="image/webp"><img src="assets/feat_skills.png" alt="Skills, no levels" loading="lazy" decoding="async"></picture>
+            <h3 class="card__title">Skills, no levels</h3>
+            <p class="card__text">There is no level next to your name. You get better at what you actually do — swing a blade and the arm remembers, fumble a lock and try it again. The character is the one you played into being, not the one a class menu handed you.</p>
+          </div>
+        </article>
+        <article class="card" id="f-mining">
+          <div class="card__roof" aria-hidden="true"></div>
+          <div class="card__body">
+            <picture class="card__art"><source srcset="assets/feat_mining.webp" type="image/webp"><img src="assets/feat_mining.png" alt="Mining &amp; gathering" loading="lazy" decoding="async"></picture>
+            <h3 class="card__title">Mining &amp; gathering</h3>
+            <p class="card__text">Everything the world is made of, somebody pulled out of it by hand. Veins run dry, and the richest ground is always where it is least safe to stand. What you carry home is exactly what you were willing to risk going out for.</p>
+          </div>
+        </article>
+        <article class="card" id="f-craft">
+          <div class="card__roof" aria-hidden="true"></div>
+          <div class="card__body">
+            <picture class="card__art"><source srcset="assets/feat_craft.webp" type="image/webp"><img src="assets/feat_craft.png" alt="Crafting" loading="lazy" decoding="async"></picture>
+            <h3 class="card__title">Crafting</h3>
+            <p class="card__text">Gear is made by players, at an anvil, out of what someone else dug up. A good smith's name travels further than most swordsmen's. Nothing worth wearing falls out of a menu.</p>
+          </div>
+        </article>
+        <section class="resources" aria-labelledby="res-h">
+          <h3 class="resources__title" id="res-h">Dug up, chopped down, forged</h3>
+          <ul class="resources__strip">
+            <li class="res"><figure><picture><source srcset="assets/res_iron.webp" type="image/webp"><img src="assets/res_iron.png" alt="Iron ore" loading="lazy" decoding="async"></picture><figcaption>Iron ore</figcaption></figure></li>
+            <li class="res"><figure><picture><source srcset="assets/res_gold.webp" type="image/webp"><img src="assets/res_gold.png" alt="Gold ore" loading="lazy" decoding="async"></picture><figcaption>Gold ore</figcaption></figure></li>
+            <li class="res"><figure><picture><source srcset="assets/res_diamond.webp" type="image/webp"><img src="assets/res_diamond.png" alt="Crystals" loading="lazy" decoding="async"></picture><figcaption>Crystals</figcaption></figure></li>
+            <li class="res"><figure><picture><source srcset="assets/res_wood.webp" type="image/webp"><img src="assets/res_wood.png" alt="Logs" loading="lazy" decoding="async"></picture><figcaption>Logs</figcaption></figure></li>
+            <li class="res"><figure><picture><source srcset="assets/res_herbs.webp" type="image/webp"><img src="assets/res_herbs.png" alt="Herbs" loading="lazy" decoding="async"></picture><figcaption>Herbs</figcaption></figure></li>
+            <li class="res"><figure><picture><source srcset="assets/res_fish.webp" type="image/webp"><img src="assets/res_fish.png" alt="Fish" loading="lazy" decoding="async"></picture><figcaption>Fish</figcaption></figure></li>
+            <li class="res"><figure><picture><source srcset="assets/res_pickaxe.webp" type="image/webp"><img src="assets/res_pickaxe.png" alt="Pickaxe" loading="lazy" decoding="async"></picture><figcaption>Pickaxe</figcaption></figure></li>
+            <li class="res"><figure><picture><source srcset="assets/res_sword.webp" type="image/webp"><img src="assets/res_sword.png" alt="Sword" loading="lazy" decoding="async"></picture><figcaption>Sword</figcaption></figure></li>
+            <li class="res"><figure><picture><source srcset="assets/res_bow.webp" type="image/webp"><img src="assets/res_bow.png" alt="Bow" loading="lazy" decoding="async"></picture><figcaption>Bow</figcaption></figure></li>
+            <li class="res"><figure><picture><source srcset="assets/res_potion.webp" type="image/webp"><img src="assets/res_potion.png" alt="Potion" loading="lazy" decoding="async"></picture><figcaption>Potion</figcaption></figure></li>
+          </ul>
+        </section>
+        <article class="card" id="f-pvp">
+          <div class="card__roof" aria-hidden="true"></div>
+          <div class="card__body">
+            <picture class="card__art"><source srcset="assets/feat_pvp.webp" type="image/webp"><img src="assets/feat_pvp.png" alt="High-TTK PvP" loading="lazy" decoding="async"></picture>
+            <h3 class="card__title">High-TTK PvP</h3>
+            <p class="card__text">Fights last long enough to actually be fights — long enough to reposition, to shout for help, to decide you would rather run. Nobody bursts down in one hit from off-screen. You keep choosing the win, you don't get handed it.</p>
+          </div>
+        </article>
+        <article class="card" id="f-death">
+          <div class="card__roof" aria-hidden="true"></div>
+          <div class="card__body">
+            <picture class="card__art"><source srcset="assets/feat_death.webp" type="image/webp"><img src="assets/feat_death.png" alt="Death is a place" loading="lazy" decoding="async"></picture><picture class="card__art card__art--corner"><source srcset="assets/feat_death_alt.webp" type="image/webp"><img src="assets/feat_death_alt.png" alt="" loading="lazy" decoding="async"></picture>
+            <h3 class="card__title">Death is a place</h3>
+            <p class="card__text">Dying does not reload — it moves you. The other side has its own geography, its own routes back, and its own residents who never found one. Go deep enough and you may return knowing necromancy.</p>
+          </div>
+        </article>
+        <article class="card" id="f-nemesis">
+          <div class="card__roof" aria-hidden="true"></div>
+          <div class="card__body">
+            <picture class="card__art"><source srcset="assets/feat_nemesis.webp" type="image/webp"><img src="assets/feat_nemesis.png" alt="Nemesis" loading="lazy" decoding="async"></picture>
+            <h3 class="card__title">Nemesis</h3>
+            <p class="card__text">The world remembers who did it. Kill without witnesses and nothing follows you home; leave someone breathing and the story gets told, and the people who loved them come looking. Your enemies are the ones you made.</p>
+          </div>
+        </article>
+        <article class="card" id="f-world">
+          <div class="card__roof" aria-hidden="true"></div>
+          <div class="card__body">
+            <picture class="card__art"><source srcset="assets/feat_world.webp" type="image/webp"><img src="assets/feat_world.png" alt="A world that plays itself" loading="lazy" decoding="async"></picture><picture class="card__art card__art--corner"><source srcset="assets/feat_tavern.webp" type="image/webp"><img src="assets/feat_tavern.png" alt="" loading="lazy" decoding="async"></picture>
+            <h3 class="card__title">A world that plays itself</h3>
+            <p class="card__text">Log out and the world keeps its appointments. NPCs run dungeons, haul cargo, argue over prices and drink in taverns whether or not anyone is watching. You are joining a place that was already busy.</p>
+          </div>
+        </article>
+        <article class="card" id="f-factions">
+          <div class="card__roof" aria-hidden="true"></div>
+          <div class="card__body">
+            <div class="card__art card__art--soon" role="img" aria-label="art coming soon"><span>art coming soon</span></div>
+            <h3 class="card__title">Two factions: humans and monsters</h3>
+            <p class="card__text">Play the people behind the walls, or the things outside them. Both sides are playable, and both sides are somebody's home.</p>
+          </div>
+        </article>
+    </div>
+  </section>
+
+  <p class="disclaimer">Fellmise is in early development. Everything you see is work in progress and subject to change.</p>
+</main>
+
+<footer class="footer">
+  <p class="footer__brand">fellmise.com</p>
+  <p class="footer__rights">© 2026 Fellmise</p>
+  <nav class="footer__links" aria-label="Links">
+    <!-- TODO: подставить реальные ссылки Discord / Steam -->
+    <a href="#">Discord</a>
+    <a href="#">Steam</a>
+    <a href="ru/">RU</a>
+  </nav>
+</footer>
+
+<script src="main.js" defer></script>
+</body>
+</html>

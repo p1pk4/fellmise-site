@@ -25,7 +25,7 @@
   TBT 0 ms, CLS 0.034 — резать параллакс не потребовалось ✓ · дефринж: кант 2px
   относительно внутренности по паку **+53.3 → −8.4** ✓ · live https://fellmise.com
   отдаёт `styles.css?v=4`, 5 биомов, 4 гейта ✓ · runClient n/a
-- **Commit:** 814749f, HEAD
+- **Commit:** 814749f, 8106d59
 
 **Impact trace**
 

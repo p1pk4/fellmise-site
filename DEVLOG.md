@@ -26,7 +26,7 @@
   вес первого экрана **532 KB** (цель <700) ✓ · сайт **2.45 MB** (цель <3.5) ✓ ·
   CLS 0.22 → **0.01** ✓ · **Lighthouse mobile 71–73 при цели ≥75 ✗** (см. ниже) ·
   live https://fellmise.com отдаёт `styles.css?v=5`, 4 гейта, 2 двери ✓ · runClient n/a
-- **Commit:** f7459a7, HEAD
+- **Commit:** f7459a7, f5c8bdd
 
 **Impact trace**
 

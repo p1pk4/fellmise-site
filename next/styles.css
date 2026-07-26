@@ -1,0 +1,635 @@
+/* Fellmise — V1 "living scene".
+   Palette is sampled from the art pack so the page and the sprites read as one
+   picture: grass, path, wood, roof, outline, cream.
+
+   Type: Podkova 700 for the logo, slogan and headings; Vollkorn for body copy
+   and buttons; PT Mono only for the utility chrome (clock badge, tooltips). */
+
+:root {
+  --grass-1: #a8cb53;
+  --grass-2: #bdd85a;
+  --grass-3: #d1e276;
+  --path: #f2ca78;
+  --wood: #a6744a;
+  --wood-dark: #7c5233;
+  --roof: #88362b;
+  --ink: #383b2d;
+  --cream: #fdf6e0;
+
+  --sky-1: #7eb8e0;
+  --sky-2: #c7e6f2;
+
+  --border: 4px solid var(--ink);
+  --shadow: 6px 6px 0 var(--ink);
+  --shadow-sm: 4px 4px 0 var(--ink);
+
+  --display: "Podkova", Georgia, serif;
+  --body: "Vollkorn", Georgia, serif;
+  --mono: "PT Mono", ui-monospace, monospace;
+
+  --wrap: 1180px;
+  --topbar-h: 62px;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; scroll-padding-top: calc(var(--topbar-h) + 12px); }
+
+body {
+  margin: 0;
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--body);
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+img { max-width: 100%; height: auto; display: block; }
+
+h2, h3 { font-family: var(--display); font-weight: 700; }
+
+.skip {
+  position: absolute;
+  left: -9999px;
+  background: var(--cream);
+  border: var(--border);
+  padding: .6rem 1rem;
+  font-family: var(--mono);
+  z-index: 100;
+}
+.skip:focus { left: 1rem; top: 1rem; }
+
+/* ---------------------------------------------------------------- topbar */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  min-height: var(--topbar-h);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: .7rem clamp(1rem, 4vw, 2.5rem);
+  background: var(--ink);
+}
+
+.logo {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: clamp(1.15rem, 2.4vw, 1.5rem);
+  letter-spacing: .12em;
+  color: var(--cream);
+  text-decoration: none;
+  text-shadow: 2px 2px 0 var(--roof);
+  white-space: nowrap;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: clamp(.6rem, 1.8vw, 1.5rem);
+}
+
+.nav__link {
+  font-family: var(--body);
+  font-weight: 600;
+  font-size: .95rem;
+  color: var(--cream);
+  text-decoration: none;
+  background: none;
+  border: 0;
+  padding: .3rem 0;
+  cursor: pointer;
+  white-space: nowrap;
+  border-bottom: 2px solid transparent;
+}
+.nav__link:hover, .nav__link:focus-visible { border-bottom-color: var(--grass-2); }
+
+.nav__devlog-wrap { position: relative; display: inline-flex; }
+
+.devlog-tip {
+  position: absolute;
+  top: calc(100% + .55rem);
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  background: var(--cream);
+  color: var(--ink);
+  border: 3px solid var(--ink);
+  box-shadow: var(--shadow-sm);
+  font-family: var(--mono);
+  font-size: .72rem;
+  padding: .35rem .6rem;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .12s ease;
+  z-index: 30;
+}
+.nav__devlog-wrap.is-open .devlog-tip { opacity: 1; visibility: visible; }
+
+.lang {
+  display: flex;
+  align-items: center;
+  gap: .3rem;
+  font-family: var(--mono);
+  font-size: .75rem;
+}
+.lang a, .lang__current {
+  padding: .28rem .5rem;
+  border: 2px solid var(--cream);
+  text-decoration: none;
+  line-height: 1;
+}
+.lang__current { background: var(--cream); color: var(--ink); }
+.lang a { color: var(--cream); }
+.lang a:hover, .lang a:focus-visible { background: var(--grass-1); color: var(--ink); border-color: var(--grass-1); }
+
+/* burger — hidden until the mobile breakpoint */
+.nav-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 44px; height: 38px;
+  padding: 0 8px;
+  background: none;
+  border: 2px solid var(--cream);
+  cursor: pointer;
+}
+.nav-toggle span { display: block; height: 3px; background: var(--cream); }
+
+/* --------------------------------------------------------- canvas + DOM */
+/* The renderer paints biome scenes on a fixed full-screen canvas BEHIND the
+   document. The DOM keeps every word, so search engines and the RU/EN split are
+   untouched by the renderer, and the same markup is the fallback. */
+
+#stage {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  display: none;
+  z-index: 0;
+}
+body.is-pixi #stage { display: block; }
+
+#dom { position: relative; z-index: 1; }
+
+.sec {
+  position: relative;
+  min-height: 100vh;
+  padding-bottom: clamp(2rem, 6vw, 4.5rem);
+  background: var(--ground);
+  color: var(--ink);
+}
+
+.sec--village { --ground: #a8cb53; --sky-a: #7eb8e0; --sky-b: #c7e6f2; }
+.sec--forest  { --ground: #6b8f43; --sky-a: #8fbcd6; --sky-b: #cfe4d6; }
+.sec--mine    { --ground: #3d3a45; --sky-a: #221f2a; --sky-b: #3a3542; }
+.sec--spirit  { --ground: #1e3d3d; --sky-a: #10222a; --sky-b: #21454a; }
+.sec--home    { --ground: #a8cb53; --sky-a: #e78b4a; --sky-b: #f4c98a; }
+
+/* With the renderer on, the section is a transparent scroll track over canvas */
+body.is-pixi .sec { background: transparent; }
+body.is-pixi .sec__scene { display: none; }
+/* the canvas draws the scene full-bleed behind, so the copy starts below it
+   instead of sitting on top of the houses */
+body.is-pixi .sec { padding-top: 58vh; }
+body.is-pixi .sec .pitch { padding-top: 0; }
+body.is-pixi .gatezone { height: 220vh; }
+
+/* Gate zones only exist to give the tunnel scroll length */
+.gatezone { height: 0; }
+
+/* --- the DOM scene: the fallback, and what a crawler sees ---------------- */
+.sec__scene {
+  position: relative;
+  height: clamp(260px, 52vh, 560px);
+}
+.dsprite { position: absolute; bottom: 0; }
+.dsprite img { display: block; height: 100%; width: auto; }
+.dsprite::after {
+  content: "";
+  position: absolute; left: 50%; bottom: 0;
+  transform: translate(-50%, 6%);
+  width: 66%; height: clamp(9px, 1.5vw, 20px);
+  background: rgba(0, 0, 0, .28);
+  border-radius: 50%;
+  filter: blur(7px);
+  z-index: -1;
+}
+.dsprite.is-iso::after { transform: translate(-52%, 10%) skewX(-18deg); width: 74%; }
+
+.sec__cards {
+  position: relative;
+  z-index: 2;
+  max-width: var(--wrap);
+  margin: 0 auto;
+  padding: clamp(1.6rem, 4vw, 3rem) clamp(1rem, 4vw, 2.5rem) 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+  grid-auto-flow: dense;
+}
+.sec__cards > * { min-width: 0; }
+
+.sec__outro { position: relative; z-index: 2; text-align: center;
+              padding: clamp(1.6rem, 4vw, 2.6rem) clamp(1rem, 4vw, 2.5rem) 0; }
+
+.pitch { position: relative; z-index: 2; text-align: center;
+         padding: clamp(1.5rem, 4vw, 2.6rem) clamp(1rem, 4vw, 2.5rem) 0; }
+
+/* next/ puts the class on the <img> itself (no <picture> wrapper), so the
+   sizing rule needs to match the element, not a descendant */
+img.card__art { height: clamp(150px, 20vw, 210px); width: auto; margin: 0 auto; display: block; }
+img.card__art--corner { position: absolute; top: .6rem; right: .6rem; height: 74px; }
+.res img { height: 104px; width: auto; margin: 0 auto; }
+
+/* --- contrast on the dark biomes ---------------------------------------- */
+/* Cards keep their cream panel, but anything drawn straight on the biome
+   colour has to flip, or it fails contrast on mine/spirit. */
+.sec--mine, .sec--spirit { color: #f4efe2; }
+.sec--mine .card, .sec--spirit .card { color: var(--ink); }
+.sec--mine .resources__title, .sec--spirit .resources__title { color: var(--ink); }
+.sec--mine .res figcaption, .sec--spirit .res figcaption { color: var(--cream); }
+
+/* --- fallback scene layout (mirrors the Pixi rows) ----------------------- */
+.dsprite[data-row="0"] { bottom: 34%; }
+.dsprite[data-row="1"] { bottom: 22%; }
+.dsprite[data-row="2"] { bottom: 8%; }
+
+.sec--village .dsprite--house-b { left: 3%;  height: 53%; }
+.sec--village .dsprite--tree-a  { left: 26%; height: 52%; }
+.sec--village .dsprite--well    { left: 41%; height: 38%; }
+.sec--village .dsprite--house-a { left: 52%; height: 64%; }
+.sec--village .dsprite--tree-b  { left: 81%; height: 20%; }
+.sec--village .dsprite--crates  { left: 74%; height: 24%; }
+.sec--village .dsprite--lantern { left: 46%; height: 34%; }
+.sec--village .dsprite--signpost{ left: 2%;  height: 30%; }
+.sec--village .dsprite--stones-verge { left: 34%; height: 11%; }
+
+.sec--forest .dsprite--pine-b   { left: 3%;  height: 56%; }
+.sec--forest .dsprite--deadtree { left: 33%; height: 46%; }
+.sec--forest .dsprite--pine-a   { left: 63%; height: 68%; }
+.sec--forest .dsprite--stump    { left: 41%; height: 25%; }
+
+.sec--mine .dsprite--orevein  { left: 2%;  height: 54%; }
+.sec--mine .dsprite--crystals { left: 64%; height: 50%; }
+.sec--mine .dsprite--mining   { left: 36%; height: 42%; }
+.sec--mine .dsprite--brazier  { left: 24%; height: 32%; }
+
+/* the ship used to be cropped by the frame edge — it starts inside now */
+.sec--spirit .dsprite--ship      { left: 13%; height: 48%; }
+.sec--spirit .dsprite--deadtree2 { left: 30%; height: 37%; }
+.sec--spirit .dsprite--vendetta  { left: 48%; height: 54%; }
+.sec--spirit .dsprite--crypt     { left: 75%; height: 56%; }
+.sec--spirit .dsprite--brazier2  { left: 62%; height: 30%; }
+
+.sec--home .dsprite--house-b2 { left: 18%; height: 51%; }
+.sec--home .dsprite--tree-a2  { left: 42%; height: 41%; }
+.sec--home .dsprite--house-a2 { left: 66%; height: 62%; }
+.sec--home .dsprite--lantern2 { left: 47%; height: 32%; }
+
+/* ------------------------------------------------------------ clock badge */
+.clock {
+  position: absolute;
+  /* clear the sticky header, which overlaps the top of the biome */
+  top: calc(var(--topbar-h) + .7rem); right: clamp(.75rem, 4vw, 2.5rem);
+  z-index: 6;
+  margin: 0;
+  display: flex; align-items: center; gap: .5rem;
+  background: var(--cream);
+  color: var(--ink);
+  border: 3px solid var(--ink);
+  box-shadow: var(--shadow-sm);
+  padding: .45rem .7rem;
+  font-family: var(--mono);
+  font-size: .72rem;
+  max-width: calc(100vw - 1.5rem);
+}
+.clock__dot {
+  width: .65rem; height: .65rem; border-radius: 50%;
+  border: 2px solid var(--ink);
+  background: var(--path);
+  flex: 0 0 auto;
+}
+.biome[data-tod="night"] .clock__dot { background: #2c3a72; }
+.biome[data-tod="dusk"]  .clock__dot { background: #e8703c; }
+.biome[data-tod="dawn"]  .clock__dot { background: #ffc27a; }
+
+/* ------------------------------------------------------- pitch (sign+CTA) */
+.pitch {
+  position: relative;
+  z-index: 4;
+  padding: clamp(1.5rem, 4vw, 2.6rem) clamp(1rem, 4vw, 2.5rem) 0;
+  text-align: center;
+}
+
+/* one wooden board carrying both the slogan and the descriptor */
+.sign {
+  display: inline-block;
+  max-width: min(52rem, calc(100vw - 32px));
+  background: repeating-linear-gradient(180deg, var(--wood) 0 16px, var(--wood-dark) 16px 19px);
+  border: var(--border);
+  box-shadow: var(--shadow);
+  padding: clamp(1.1rem, 3vw, 2rem) clamp(1rem, 3.5vw, 2.4rem);
+  transform: rotate(-.5deg);
+}
+
+.sign__text {
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: clamp(24px, 4.5vw, 44px);
+  line-height: 1.22;
+  color: var(--cream);
+  text-shadow: 2px 3px 0 rgba(0,0,0,.5);
+  /* wrap between words only — auto hyphenation split "Теперь" mid-word, which
+     reads as a typo in a headline */
+  overflow-wrap: break-word;
+}
+
+.sign__sub {
+  margin: .9rem 0 0;
+  padding-top: .85rem;
+  border-top: 3px solid rgba(253, 246, 224, .35);
+  font-family: var(--body);
+  font-weight: 600;
+  font-size: clamp(15px, 1.9vw, 19px);
+  line-height: 1.5;
+  color: var(--cream);
+  text-shadow: 1px 2px 0 rgba(0,0,0,.4);
+  overflow-wrap: break-word;
+}
+
+.cta {
+  margin-top: clamp(1.2rem, 3vw, 1.8rem);
+  display: flex; flex-wrap: wrap; gap: .9rem; justify-content: center;
+}
+
+.btn {
+  font-family: var(--body);
+  font-weight: 700;
+  font-size: 1.05rem;
+  line-height: 1.3;
+  padding: .85rem 1.4rem;
+  border: var(--border);
+  box-shadow: var(--shadow-sm);
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform .08s ease, box-shadow .08s ease;
+  max-width: 100%;
+}
+.btn:hover:not(:disabled), .btn:focus-visible:not(:disabled) {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 var(--ink);
+}
+.btn--steam { background: #b9b6ab; color: #4a4942; cursor: not-allowed; opacity: .9; }
+.btn--discord { background: var(--grass-1); color: var(--ink); }
+
+/* -------------------------------------------------------------- features */
+.section-title {
+  font-size: clamp(1.6rem, 3.4vw, 2.4rem);
+  text-align: center;
+  margin: 0 0 2.4rem;
+  line-height: 1.25;
+}
+
+.features {
+  max-width: var(--wrap);
+  margin: 0 auto;
+  padding: clamp(2.5rem, 6vw, 4.5rem) clamp(1rem, 4vw, 2.5rem) 1rem;
+}
+
+.features__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+  /* The resource strip spans both columns, which would otherwise strand an
+     empty cell beside the card before it. Dense packing backfills that one
+     cell with the next card; every other item is single-column, so nothing
+     else can be reordered by it. */
+  grid-auto-flow: dense;
+}
+
+.card {
+  background: var(--cream);
+  border: var(--border);
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  scroll-margin-top: calc(var(--topbar-h) + 16px);
+}
+
+.card__roof {
+  height: 26px;
+  background: repeating-linear-gradient(90deg, var(--roof) 0 22px, #6f2b22 22px 26px);
+  border-bottom: var(--border);
+}
+
+.card__body {
+  position: relative;
+  padding: 1.6rem clamp(1.1rem, 2.5vw, 1.8rem) 1.8rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  flex: 1;
+}
+
+.card__art { display: block; }
+.card__art img { height: clamp(150px, 20vw, 210px); width: auto; margin: 0 auto; }
+
+.card__art--corner { position: absolute; top: .6rem; right: .6rem; opacity: .92; }
+.card__art--corner img { height: 74px; }
+
+.card__art--soon {
+  width: 100%;
+  height: clamp(150px, 20vw, 210px);
+  display: grid;
+  place-items: center;
+  border: 3px dashed rgba(56, 59, 45, .45);
+  background: repeating-linear-gradient(45deg, rgba(56,59,45,.05) 0 10px, transparent 10px 20px);
+}
+.card__art--soon span { font-family: var(--mono); font-size: .78rem; color: rgba(56, 59, 45, .7); }
+
+.card__title { font-size: 1.45rem; line-height: 1.25; margin: 1.2rem 0 .6rem; }
+.card__text { margin: 0; }
+
+/* ------------------------------------------------------------- resources */
+.resources {
+  grid-column: 1 / -1;
+  min-width: 0;
+  background: var(--grass-3);
+  border: var(--border);
+  box-shadow: var(--shadow);
+  padding: 1.5rem 1.2rem 1.2rem;
+}
+
+.resources__title { font-size: 1.3rem; text-align: center; margin: 0 0 1.4rem; }
+
+.resources__strip {
+  min-width: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0 0 .4rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.4rem 1.1rem;
+  justify-content: center;
+}
+
+.res figure { margin: 0; position: relative; }
+.res { min-width: 66px; }
+.res img { height: 104px; width: auto; margin: 0 auto; transition: transform .12s ease; }
+.res:hover img, .res:focus-within img { transform: translateY(-5px); }
+
+.res figcaption {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: -1.6rem;
+  white-space: nowrap;
+  background: var(--ink);
+  color: var(--cream);
+  font-family: var(--mono);
+  font-size: .68rem;
+  padding: .22rem .45rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .12s ease;
+}
+.res:hover figcaption, .res:focus-within figcaption { opacity: 1; }
+
+/* ------------------------------------------------- disclaimer + footer */
+.disclaimer {
+  max-width: var(--wrap);
+  margin: clamp(2.5rem, 6vw, 4rem) auto clamp(2rem, 5vw, 3rem);
+  padding: 1rem clamp(1rem, 4vw, 2.5rem);
+  text-align: center;
+  font-family: var(--mono);
+  font-size: .8rem;
+  color: rgba(56, 59, 45, .8);
+}
+
+.footer {
+  background: var(--ink);
+  color: var(--cream);
+  padding: 2rem clamp(1rem, 4vw, 2.5rem);
+  display: flex;
+  flex-wrap: wrap;
+  gap: .8rem 2rem;
+  align-items: center;
+  justify-content: space-between;
+}
+.footer__brand { font-family: var(--display); font-weight: 700; font-size: 1.1rem; margin: 0; }
+.footer__rights { margin: 0; font-family: var(--mono); font-size: .76rem; opacity: .8; }
+.footer__links { display: flex; gap: 1.2rem; font-family: var(--body); font-weight: 600; font-size: .95rem; }
+.footer__links a { color: var(--cream); }
+.footer__links a:hover, .footer__links a:focus-visible { color: var(--grass-2); }
+
+
+/* ----------------------------------------------------------- responsive */
+@media (max-width: 760px) {
+  body { font-size: 17px; }
+
+  .nav-toggle { display: flex; }
+
+  /* menu collapses under the bar; the bar itself stays sticky */
+  .nav {
+    position: absolute;
+    top: 100%; left: 0; right: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    background: var(--ink);
+    border-top: 3px solid rgba(253, 246, 224, .18);
+    padding: .4rem clamp(1rem, 4vw, 2.5rem) .9rem;
+    display: none;
+  }
+  .nav.is-open { display: flex; }
+  .nav__link { padding: .7rem 0; border-bottom: 1px solid rgba(253,246,224,.12); }
+  .nav__devlog-wrap { display: block; }
+  .nav__devlog { width: 100%; text-align: left; }
+  .devlog-tip { position: static; transform: none; display: none; margin: .2rem 0 .5rem; box-shadow: none; }
+  .nav__devlog-wrap.is-open .devlog-tip { display: inline-block; }
+  .lang { padding-top: .7rem; }
+
+  /* Below this width the journey is off (see .is-static): biomes are plain
+     stacked sections. The scene band shrinks and each biome keeps a reduced
+     cast so nothing is cramped — the content itself is unchanged. */
+  :root { --scene-h: clamp(210px, 38vh, 320px); }
+
+  .biome { min-height: auto; padding-bottom: clamp(1.5rem, 6vw, 2.5rem); }
+  .dsprite--tree-b, .dsprite--crates, .dsprite--lantern,
+  .dsprite--stones-verge, .dsprite--deadtree, .dsprite--deadtree2,
+  .dsprite--ship, .dsprite--mining, .dsprite--tree-a2 { display: none; }
+  .sprite::after { filter: blur(5px); }
+
+  /* no per-sprite overrides needed: heights are a share of the scene band,
+     so the whole composition scales with it */
+  .sec__cards { grid-template-columns: 1fr; gap: 1.5rem; }
+
+  .clock { font-size: .64rem; padding: .32rem .5rem; }
+
+  .sign { transform: none; }
+  .cta { flex-direction: column; align-items: stretch; }
+  .btn { width: 100%; text-align: center; }
+
+
+  /* a horizontal rail, never a stack of full-width rows */
+  .resources__strip {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(84px, 110px);
+    gap: 1rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: .5rem;
+  }
+  .res img { height: clamp(72px, 22vw, 120px); width: auto; }
+  .res { scroll-snap-align: center; flex: 0 0 auto; }
+  /* no hover on touch — keep the labels visible instead of tooltipping */
+  .res img { height: 92px; }
+  .res figcaption {
+    opacity: 1; position: static; transform: none; background: none;
+    color: var(--ink); text-align: center; padding: .3rem 0 0; font-size: .66rem;
+  }
+
+  .footer { justify-content: center; text-align: center; }
+}
+
+/* very narrow phones — keep the board and buttons inside the viewport */
+@media (max-width: 400px) {
+  .sign { padding: 1rem .85rem; }
+  .sign__text { font-size: clamp(22px, 6.2vw, 26px); }
+  .logo { font-size: 1.05rem; letter-spacing: .08em; }
+}
+
+/* Journey off — set by main.js for prefers-reduced-motion or width < 760px.
+   The gates and their black curtains are purely transitional, so dropping them
+   leaves every biome and all of its content reachable by plain scrolling. */
+.is-static .gatezone { height: 0; }
+/* under 760px keep the glows, drop the particle layers (perf) */
+@media (max-width: 760px) {
+  .fx { display: none; }
+  /* smaller ground tiles on phones — same look at that size, fewer bytes */
+  .biome--village, .biome--forest, .biome--home { --tile: url("assets/tile_grass-480.webp"); }
+  .biome--mine { --tile: url("assets/tile_dirt-480.webp"); }
+  .biome--spirit { --tile: url("assets/tile_spirit-480.webp"); }
+  .biome__road { background-image: url("assets/tile_road-480.webp"); }
+}
+
+
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .dsprite img { animation: none !important; }
+  .fx { display: none; }
+  .gatezone { height: 0 !important; }
+  .btn, .res img, .hero__tint { transition: none; }
+}

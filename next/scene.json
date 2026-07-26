@@ -1,0 +1,410 @@
+{
+ "rows": [
+  {
+   "bottom": 34,
+   "scale": 0.85,
+   "z": 1
+  },
+  {
+   "bottom": 22,
+   "scale": 1.0,
+   "z": 3
+  },
+  {
+   "bottom": 8,
+   "scale": 1.15,
+   "z": 5
+  }
+ ],
+ "biomes": [
+  {
+   "id": "village",
+   "look": {
+    "tile": "tile_grass",
+    "ground": 11062099,
+    "sky": [
+     8304864,
+     13100786
+    ],
+    "road": "tile_road"
+   },
+   "particles": [
+    {
+     "kind": "smoke",
+     "n": 5,
+     "box": [
+      0.16,
+      0.2,
+      0.26,
+      0.3
+     ]
+    },
+    {
+     "kind": "smoke",
+     "n": 5,
+     "box": [
+      0.6,
+      0.16,
+      0.7,
+      0.26
+     ]
+    }
+   ],
+   "sprites": [
+    {
+     "name": "hero_house_b",
+     "row": 0,
+     "h": 62,
+     "iso": false,
+     "x": 0.14,
+     "cls": "house-b"
+    },
+    {
+     "name": "hero_tree_a",
+     "row": 1,
+     "h": 52,
+     "iso": false,
+     "x": 0.33,
+     "cls": "tree-a"
+    },
+    {
+     "name": "hero_well",
+     "row": 1,
+     "h": 38,
+     "iso": false,
+     "x": 0.455,
+     "cls": "well"
+    },
+    {
+     "name": "hero_house_a",
+     "row": 1,
+     "h": 64,
+     "iso": true,
+     "x": 0.66,
+     "cls": "house-a"
+    },
+    {
+     "name": "hero_tree_b",
+     "row": 0,
+     "h": 24,
+     "iso": false,
+     "x": 0.86,
+     "cls": "tree-b"
+    },
+    {
+     "name": "prop_crates",
+     "row": 1,
+     "h": 24,
+     "iso": true,
+     "x": 0.79,
+     "cls": "crates"
+    },
+    {
+     "name": "prop_lantern",
+     "row": 2,
+     "h": 30,
+     "iso": false,
+     "x": 0.5,
+     "cls": "lantern"
+    },
+    {
+     "name": "prop_signpost",
+     "row": 2,
+     "h": 26,
+     "iso": false,
+     "x": 0.07,
+     "cls": "signpost"
+    },
+    {
+     "name": "prop_stones",
+     "row": 1,
+     "h": 11,
+     "iso": false,
+     "x": 0.38,
+     "cls": "stones-verge"
+    }
+   ]
+  },
+  {
+   "id": "forest",
+   "look": {
+    "tile": "tile_grass",
+    "ground": 7049027,
+    "sky": [
+     9419990,
+     13624534
+    ]
+   },
+   "particles": [
+    {
+     "kind": "fly",
+     "n": 14,
+     "box": [
+      0.05,
+      0.35,
+      0.95,
+      0.8
+     ]
+    }
+   ],
+   "sprites": [
+    {
+     "name": "biome_pine_b",
+     "row": 0,
+     "h": 66,
+     "iso": false,
+     "x": 0.16,
+     "cls": "pine-b"
+    },
+    {
+     "name": "biome_deadtree",
+     "row": 0,
+     "h": 54,
+     "iso": false,
+     "x": 0.4,
+     "cls": "deadtree"
+    },
+    {
+     "name": "biome_pine_a",
+     "row": 1,
+     "h": 68,
+     "iso": false,
+     "x": 0.72,
+     "cls": "pine-a"
+    },
+    {
+     "name": "biome_stump",
+     "row": 2,
+     "h": 22,
+     "iso": false,
+     "x": 0.46,
+     "cls": "stump"
+    }
+   ]
+  },
+  {
+   "id": "mine",
+   "look": {
+    "tile": "tile_dirt",
+    "ground": 4012613,
+    "sky": [
+     2236202,
+     3814722
+    ],
+    "dark": true
+   },
+   "particles": [
+    {
+     "kind": "flame",
+     "n": 26,
+     "box": [
+      0.235,
+      0.8,
+      0.265,
+      0.84
+     ]
+    },
+    {
+     "kind": "spark",
+     "n": 10,
+     "box": [
+      0.22,
+      0.62,
+      0.3,
+      0.8
+     ]
+    }
+   ],
+   "sprites": [
+    {
+     "name": "biome_orevein",
+     "row": 0,
+     "h": 64,
+     "iso": false,
+     "x": 0.16,
+     "cls": "orevein"
+    },
+    {
+     "name": "biome_crystals",
+     "row": 1,
+     "h": 50,
+     "iso": false,
+     "x": 0.72,
+     "cls": "crystals"
+    },
+    {
+     "name": "feat_mining",
+     "row": 1,
+     "h": 42,
+     "iso": true,
+     "x": 0.44,
+     "cls": "mining"
+    },
+    {
+     "name": "biome_brazier",
+     "row": 2,
+     "h": 28,
+     "iso": false,
+     "x": 0.28,
+     "cls": "brazier"
+    }
+   ]
+  },
+  {
+   "id": "spirit",
+   "look": {
+    "tile": "tile_spirit",
+    "ground": 1981757,
+    "sky": [
+     1057322,
+     2180426
+    ],
+    "dark": true
+   },
+   "particles": [
+    {
+     "kind": "soul",
+     "n": 10,
+     "box": [
+      0.08,
+      0.3,
+      0.94,
+      0.82
+     ]
+    }
+   ],
+   "sprites": [
+    {
+     "name": "feat_death_alt",
+     "row": 0,
+     "h": 56,
+     "iso": true,
+     "x": 0.13,
+     "cls": "ship"
+    },
+    {
+     "name": "biome_deadtree",
+     "row": 0,
+     "h": 44,
+     "iso": false,
+     "x": 0.3,
+     "cls": "deadtree2"
+    },
+    {
+     "name": "feat_vendetta",
+     "row": 1,
+     "h": 54,
+     "iso": false,
+     "x": 0.48,
+     "cls": "vendetta"
+    },
+    {
+     "name": "feat_death",
+     "row": 1,
+     "h": 56,
+     "iso": true,
+     "x": 0.75,
+     "cls": "crypt"
+    },
+    {
+     "name": "biome_brazier",
+     "row": 2,
+     "h": 26,
+     "iso": false,
+     "x": 0.62,
+     "cls": "brazier2"
+    }
+   ]
+  },
+  {
+   "id": "home",
+   "look": {
+    "tile": "tile_grass",
+    "ground": 11062099,
+    "sky": [
+     15174474,
+     16042378
+    ],
+    "dusk": true
+   },
+   "particles": [
+    {
+     "kind": "smoke",
+     "n": 4,
+     "box": [
+      0.14,
+      0.2,
+      0.24,
+      0.3
+     ]
+    }
+   ],
+   "sprites": [
+    {
+     "name": "hero_house_b",
+     "row": 0,
+     "h": 60,
+     "iso": false,
+     "x": 0.18,
+     "cls": "house-b2"
+    },
+    {
+     "name": "hero_tree_a",
+     "row": 0,
+     "h": 48,
+     "iso": false,
+     "x": 0.42,
+     "cls": "tree-a2"
+    },
+    {
+     "name": "hero_house_a",
+     "row": 1,
+     "h": 62,
+     "iso": true,
+     "x": 0.66,
+     "cls": "house-a2"
+    },
+    {
+     "name": "prop_lantern",
+     "row": 2,
+     "h": 28,
+     "iso": false,
+     "x": 0.47,
+     "cls": "lantern2"
+    }
+   ]
+  }
+ ],
+ "gates": [
+  {
+   "art": "hero_house_b",
+   "door": true,
+   "fx": 0.47,
+   "fy": 0.8,
+   "warm": 16760430,
+   "from": "village"
+  },
+  {
+   "art": "biome_orevein",
+   "fx": 0.5,
+   "fy": 0.52,
+   "warm": 9884415,
+   "from": "forest"
+  },
+  {
+   "art": "biome_portal",
+   "fx": 0.5,
+   "fy": 0.46,
+   "warm": 7929832,
+   "from": "mine"
+  },
+  {
+   "art": "feat_death",
+   "door": true,
+   "fx": 0.56,
+   "fy": 0.36,
+   "warm": 16766614,
+   "from": "spirit"
+  }
+ ]
+}

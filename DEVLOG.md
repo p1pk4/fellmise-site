@@ -22,7 +22,7 @@
   — 0 совпадений, на живой странице 0 ✓ · вес страницы 1.09 MB при цели <1.5 MB ✓ ·
   live https://fellmise.com отдаёт `styles.css?v=3`, 9 карточек, 13 ресурсов ✓ ·
   runClient n/a
-- **Commit:** 0abce01, HEAD
+- **Commit:** 0abce01, 3e01189
 
 **Impact trace**
 

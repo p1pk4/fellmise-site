@@ -10,6 +10,7 @@ the page, not its source size:
     feat_*  640px   the largest single element of a feature card
     res_*   224px   pictogram in the resource strip
     prop_*  360px   small dressing on the hero road (~120-180px on screen)
+    biome_* 560px   scenery in the journey biomes (up to ~450px on screen)
 
 Also emits the favicon set from res_diamond and the 1200x630 og:image.
 Everything lands in assets/; the site never reads out/.
@@ -27,7 +28,7 @@ _GRADED = ROOT / "out" / "site_assets" / "final_web"
 FINAL = _GRADED if _GRADED.is_dir() else _MASTER
 ASSETS = ROOT / "assets"
 
-WIDTHS = {"hero_": 560, "feat_": 640, "res_": 224, "prop_": 360}
+WIDTHS = {"hero_": 560, "feat_": 640, "res_": 224, "prop_": 360, "biome_": 560}
 QUALITY = 85
 
 # Sprites the page needs at a second size under a second name. The housing card

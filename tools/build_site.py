@@ -10,9 +10,11 @@ stamped from the same template. Edit this file, re-run, commit the HTML.
 
 import pathlib
 
+from biomes import BIOMES
+
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 
-CSS_V = "3"          # cache-buster on styles.css / main.js
+CSS_V = "4"          # cache-buster on styles.css / main.js
 
 # --------------------------------------------------------------------------
 # copy
@@ -136,6 +138,7 @@ I18N = {
                    "built and will change.",
         rights="© 2026 Fellmise", steam="Steam", discord="Discord",
         skip="Skip to content",
+        journey="Journey",
     ),
     "ru": dict(
         lang="ru", href="/ru/", other_href="../", other_label="EN", self_label="RU",
@@ -157,6 +160,7 @@ I18N = {
         disclaimer="Игра в ранней разработке. Всё, что видишь, ещё поменяется.",
         rights="© 2026 Fellmise", steam="Steam", discord="Discord",
         skip="К содержимому",
+        journey="Путешествие",
     ),
 }
 
@@ -198,20 +202,17 @@ def pic(a, name, alt, cls="", loading="lazy", extra_attr=""):
             f'decoding="async"{extra_attr}></picture>')
 
 
+FEAT_BY_ID = {f["id"]: f for f in FEATURES}
+
+
 def build(lang):
     t = I18N[lang]
     a = "assets/" if lang == "en" else "../assets/"
     root = "" if lang == "en" else "../"
     tk, pk = ("en_t", "en_p") if lang == "en" else ("ru_t", "ru_p")
 
-    hero = "\n".join(
-        f'        <div class="sprite sprite--{cls}{" is-mobile-hidden" if hide else ""}" '
-        f'data-depth="{depth}">'
-        + pic(a, name, "", loading="eager" if i < 3 else "lazy") + "</div>"
-        for i, (cls, name, depth, hide) in enumerate(HERO_SPRITES))
-
-    cards = []
-    for f in FEATURES:
+    def card_html(fid):
+        f = FEAT_BY_ID[fid]
         if f["sprite"]:
             art = pic(a, f["sprite"], f[tk], cls="card__art")
             if f.get("extra"):
@@ -220,27 +221,87 @@ def build(lang):
             art = (f'<div class="card__art card__art--soon" role="img" '
                    f'aria-label="{att(t["soon"])}"><span>{esc(t["soon"])}</span></div>')
         anchor = f' id="{f["anchor"]}"' if f.get("anchor") else ""
-        cards.append(
-            f'        <article class="card" id="f-{f["id"]}"{anchor}>\n'
-            f'          <div class="card__roof" aria-hidden="true"></div>\n'
-            f'          <div class="card__body">\n'
-            f'            {art}\n'
-            f'            <h3 class="card__title">{esc(f[tk])}</h3>\n'
-            f'            <p class="card__text">{esc(f[pk])}</p>\n'
-            f'          </div>\n'
-            f'        </article>')
-        if f["id"] == "craft":
-            items = "\n".join(
-                f'            <li class="res"><figure>'
-                + pic(a, rid, label if lang == "en" else label_ru)
-                + f'<figcaption>{esc(label if lang == "en" else label_ru)}</figcaption>'
-                f'</figure></li>'
-                for rid, label, label_ru in RESOURCES)
-            cards.append(
-                f'        <section class="resources" aria-labelledby="res-h">\n'
-                f'          <h3 class="resources__title" id="res-h">{esc(t["res_title"])}</h3>\n'
-                f'          <ul class="resources__strip">\n{items}\n          </ul>\n'
-                f'        </section>')
+        return ('        <article class="card" id="f-' + f["id"] + '"' + anchor + '>\n'
+                '          <div class="card__roof" aria-hidden="true"></div>\n'
+                '          <div class="card__body">\n'
+                '            ' + art + '\n'
+                '            <h3 class="card__title">' + esc(f[tk]) + '</h3>\n'
+                '            <p class="card__text">' + esc(f[pk]) + '</p>\n'
+                '          </div>\n'
+                '        </article>')
+
+    resources_html = (
+        '        <section class="resources" aria-labelledby="res-h">\n'
+        '          <h3 class="resources__title" id="res-h">' + esc(t["res_title"]) + '</h3>\n'
+        '          <ul class="resources__strip">\n'
+        + "\n".join(
+            '            <li class="res"><figure>'
+            + pic(a, rid, label if lang == "en" else label_ru)
+            + '<figcaption>' + esc(label if lang == "en" else label_ru) + '</figcaption>'
+            + '</figure></li>'
+            for rid, label, label_ru in RESOURCES)
+        + '\n          </ul>\n        </section>')
+
+    cta_html = (
+        '      <div class="cta">\n'
+        '        <button class="btn btn--steam" disabled>' + esc(t["cta_steam"]) + '</button>\n'
+        '        <!-- TODO: подставить инвайт, когда создан сервер Discord -->\n'
+        '        <a class="btn btn--discord" href="#">' + esc(t["cta_discord"]) + '</a>\n'
+        '      </div>')
+
+    sections = []
+    for bi, b in enumerate(BIOMES):
+        first = bi == 0
+        # Biome 1 is the first screen and loads eagerly; everything below is
+        # lazy, and main.js promotes the next biome to eager one section ahead.
+        load = "eager" if first else "lazy"
+        scene = "\n".join(
+            '        <div class="sprite sprite--' + cls
+            + (' is-mobile-hidden' if hide else '')
+            + (' is-iso' if iso else '')
+            + '" data-depth="' + str(depth) + '">' + pic(a, name, "", loading=load) + '</div>'
+            for cls, name, depth, hide, iso in b["sprites"])
+
+        parts = ['  <section class="biome biome--' + b["id"] + '" id="b-' + b["id"] + '"\n'
+                 '           data-biome="' + b["id"] + '" aria-label="' + att(b[lang]) + '">']
+        parts.append('    <div class="biome__sky" aria-hidden="true"></div>')
+        parts.append('    <div class="biome__ground" aria-hidden="true"></div>')
+        if b.get("road"):
+            parts.append('    <div class="biome__road" aria-hidden="true"></div>')
+        if b.get("clock"):
+            parts.append('    <div class="biome__tint" aria-hidden="true"></div>')
+        parts.append('    <div class="biome__scene" aria-hidden="true">\n' + scene + '\n    </div>')
+        if b.get("clock"):
+            parts.append('    <p class="clock" id="clock"><span class="clock__dot"></span>'
+                         '<span id="clock-text"></span></p>')
+        if first:
+            parts.append(
+                '    <div class="pitch">\n'
+                '      <div class="sign">\n'
+                '        <p class="sign__text">' + esc(t["tagline"]) + '</p>\n'
+                '        <p class="sign__sub">' + esc(t["descriptor"]) + '</p>\n'
+                '      </div>\n' + cta_html + '\n    </div>')
+        body = [card_html(c) for c in b["cards"]]
+        if b.get("resources"):
+            body.append(resources_html)
+        parts.append('    <div class="biome__cards">\n' + "\n".join(body) + '\n    </div>')
+        if b.get("cta") and not first:
+            parts.append('    <div class="biome__outro">\n' + cta_html + '\n    </div>')
+        parts.append('    <div class="biome__reveal" aria-hidden="true"></div>')
+        parts.append('  </section>')
+        sections.append("\n".join(parts))
+
+        if b.get("gate"):
+            g = b["gate"]
+            sections.append(
+                '  <div class="gate" data-gate="' + b["id"] + '" aria-hidden="true">\n'
+                '    <div class="gate__stage">\n'
+                '      <div class="gate__art">' + pic(a, g["art"], "", loading="lazy") + '</div>\n'
+                '      <div class="gate__veil"></div>\n'
+                '    </div>\n'
+                '  </div>')
+
+    biomes_html = "\n".join(sections)
 
     tod_json = ("{" + ", ".join(f'"{k}": "{v}"' for k, v in t["tod"].items())
                 + f', "prefix": "{t["tod_prefix"]}"' + "}")
@@ -280,7 +341,7 @@ def build(lang):
 <script>window.TOD_LABELS = {tod_json};</script>
 </head>
 <body>
-<a class="skip" href="#features">{esc(t['skip'])}</a>
+<a class="skip" href="#b-village">{esc(t['skip'])}</a>
 
 <header class="topbar">
   <a class="logo" href="{root or '/'}">FELLMISE</a>
@@ -289,7 +350,7 @@ def build(lang):
           aria-label="{att(t['menu'])}"><span></span><span></span><span></span></button>
 
   <nav class="nav" id="nav" aria-label="{att(t['menu'])}">
-    <a class="nav__link" href="#features">{esc(t['nav_features'])}</a>
+    <a class="nav__link" href="#b-forest">{esc(t['nav_features'])}</a>
     <a class="nav__link" href="#world">{esc(t['nav_world'])}</a>
     <span class="nav__devlog-wrap">
       <button class="nav__link nav__devlog" id="devlog-btn" type="button"
@@ -304,40 +365,7 @@ def build(lang):
 </header>
 
 <main>
-  <section class="hero" id="hero" data-tod="day">
-    <div class="hero__sky" aria-hidden="true"></div>
-    <div class="hero__ground" aria-hidden="true"></div>
-    <div class="hero__path" aria-hidden="true"></div>
-    <div class="hero__tint" aria-hidden="true"></div>
-
-    <div class="hero__scene" aria-hidden="true">
-{hero}
-    </div>
-
-    <p class="clock" id="clock"><span class="clock__dot"></span><span id="clock-text"></span></p>
-  </section>
-
-  <!-- Pitch + CTA live BELOW the scene on their own grass band: on narrow
-       screens anything overlaid on the hero either clipped or covered the
-       sprites. -->
-  <section class="pitch">
-    <div class="sign">
-      <p class="sign__text">{esc(t['tagline'])}</p>
-      <p class="sign__sub">{esc(t['descriptor'])}</p>
-    </div>
-    <div class="cta">
-      <button class="btn btn--steam" disabled>{esc(t['cta_steam'])}</button>
-      <!-- TODO: подставить инвайт, когда создан сервер Discord -->
-      <a class="btn btn--discord" href="#">{esc(t['cta_discord'])}</a>
-    </div>
-  </section>
-
-  <section class="features" id="features" aria-labelledby="features-h">
-    <h2 class="section-title" id="features-h">{esc(t['features_title'])}</h2>
-    <div class="features__grid">
-{chr(10).join(cards)}
-    </div>
-  </section>
+{biomes_html}
 
   <p class="disclaimer">{esc(t['disclaimer'])}</p>
 </main>

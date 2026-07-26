@@ -22,12 +22,14 @@ the operation idempotent and reversible.
    outline. Measured on the masters, that outer ring averages 128-181 luma
    while the ring behind it (the intended outline) averages 62-143.
 
-   So the fix targets the outermost ring of OPAQUE pixels, and only those that
-   are lighter than the pixel just inside them (this style outlines everything
-   dark, so "lighter than its neighbour" is what contamination looks like — and
-   the test spares genuinely bright edges like a sword blade). Their colour is
-   replaced with the nearest clean opaque colour. ALPHA IS STILL NEVER TOUCHED,
-   as asked: the silhouette is bit-for-bit identical, only colour changes.
+   The bleed is ~3px deep, so the fix repaints every opaque ring outside that
+   depth from the clean interior — see defringe(). A first attempt that treated
+   only the outermost ring made it worse: it sourced replacement colour from
+   ring 2, which is contaminated too, and simply moved the halo outward.
+   ALPHA IS NEVER TOUCHED, as asked: the silhouette is bit-for-bit identical,
+   only colour changes. Measured over the pack, the 2px rim sat +53.3 luma
+   above the interior before and -8.4 after (i.e. the rim is now the art's own
+   dark outline, which is what it should be).
 
 2. GRADE. One shared set of parameters for every sprite:
      * warm shift  — per-channel gain interpolated by luminance, lifting reds
@@ -62,16 +64,25 @@ SAT_CAP = (0.88, 1.12)  # per-sprite saturation gain is clamped to this
 LUMA = np.array([0.2126, 0.7152, 0.0722])
 
 
-FRINGE_MARGIN = 8.0     # luma a rim pixel must exceed its neighbour by to count as fringe
+FRINGE_MARGIN = 12.0    # luma a rim pixel must exceed the clean interior by
+FRINGE_DEPTH = 3        # how many pixels in the background bleed reaches
 
 
 def defringe(rgba):
-    """Recolour the contaminated outer rim. Alpha is returned untouched.
+    """Recolour the contaminated rim. Alpha is returned untouched.
 
-    Handles both cases: any genuinely semi-transparent pixels are recoloured
-    from the nearest opaque neighbour (the textbook path), and the opaque
-    outer ring is recoloured where it is lighter than the pixel behind it
-    (the case this pack actually has — see the module docstring).
+    The bleed is about three pixels deep, not one. A single-ring pass sourced
+    its replacement colour from ring 2 — which is contaminated too — so it
+    propagated the halo outward instead of removing it (measured: after a
+    one-ring pass, rings 1 and 2 sat at 157 and 154 luma against an interior of
+    118). So the clean source is taken from FRINGE_DEPTH pixels in, and every
+    ring outside that is repainted from it in one go.
+
+    Only pixels LIGHTER than that clean interior by FRINGE_MARGIN are touched:
+    this style outlines everything dark, so "lighter than the art behind it" is
+    what background bleed looks like, and the test spares genuinely bright edges
+    such as a sword blade. On sprites too thin to erode that far the depth backs
+    off automatically rather than eating the art.
     """
     rgb = rgba[..., :3].astype(np.float32)
     alpha = rgba[..., 3]
@@ -79,26 +90,25 @@ def defringe(rgba):
     if not obj.any():
         return rgba.copy()
 
-    # --- textbook path: soft alpha, if this pack ever gains any -------------
+    # textbook path, kept for any sprite that ever ships with soft alpha
     solid = alpha == 255
     if solid.any() and not solid.all():
         _, (iy, ix) = ndimage.distance_transform_edt(~solid, return_indices=True)
         rgb = np.where(solid[..., None], rgb, rgb[iy, ix])
 
-    # --- the rim that actually carries the background bleed -----------------
-    inner = ndimage.binary_erosion(obj, iterations=1)
-    rim = obj & ~inner
-    if not (rim.any() and inner.any()):
+    depth = FRINGE_DEPTH
+    inner = ndimage.binary_erosion(obj, iterations=depth)
+    while depth > 1 and not inner.any():          # thin sprite: back off
+        depth -= 1
+        inner = ndimage.binary_erosion(obj, iterations=depth)
+    if not inner.any():
         return np.dstack([rgb.astype(np.uint8), alpha])
 
-    # colour of the nearest pixel that is NOT on the rim
     _, (jy, jx) = ndimage.distance_transform_edt(~inner, return_indices=True)
     clean = rgb[jy, jx]
 
-    lum_rim = rgb @ LUMA
-    lum_clean = clean @ LUMA
-    contaminated = rim & (lum_rim > lum_clean + FRINGE_MARGIN)
-
+    rim = obj & ~inner
+    contaminated = rim & ((rgb @ LUMA) > (clean @ LUMA) + FRINGE_MARGIN)
     rgb = np.where(contaminated[..., None], clean, rgb)
     return np.dstack([rgb.astype(np.uint8), alpha])
 

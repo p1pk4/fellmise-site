@@ -1,16 +1,56 @@
-/* Fellmise — hero scene behaviour.
-   Two jobs: tint the scene to the visitor's local time of day, and drift the
-   sprite layers on scroll. Both are skipped when the visitor asked for reduced
-   motion (the tint stays, the movement does not — a colour wash is not motion). */
+/* Fellmise — hero scene behaviour and header chrome.
+   Jobs: tint the scene to the visitor's local time of day, drift the sprite
+   layers on scroll, run the mobile menu, and pop the Devlog placeholder.
+   Motion is skipped when the visitor asked for reduced motion (the colour wash
+   stays — a tint is not movement). */
 
 (function () {
   'use strict';
 
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ------------------------------------------------ mobile menu ---------- */
+  var toggle = document.getElementById('nav-toggle');
+  var nav = document.getElementById('nav');
+  if (toggle && nav) {
+    toggle.addEventListener('click', function () {
+      var open = nav.classList.toggle('is-open');
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    // Following an anchor should close the menu, not leave it covering the page.
+    nav.addEventListener('click', function (e) {
+      if (e.target.classList.contains('nav__link') && e.target.tagName === 'A') {
+        nav.classList.remove('is-open');
+        toggle.setAttribute('aria-expanded', 'false');
+      }
+    });
+  }
+
+  /* ------------------------------------------------ devlog placeholder --- */
+  var devBtn = document.getElementById('devlog-btn');
+  if (devBtn) {
+    var wrap = devBtn.parentNode;
+    var close = function () {
+      wrap.classList.remove('is-open');
+      devBtn.setAttribute('aria-expanded', 'false');
+    };
+    devBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var open = wrap.classList.toggle('is-open');
+      devBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    document.addEventListener('click', function (e) {
+      if (!wrap.contains(e.target)) close();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') close();
+    });
+  }
+
+  /* ------------------------------------------------ time of day ---------- */
   var hero = document.getElementById('hero');
   if (!hero) return;
 
-  /* ------------------------------------------------ time of day ---------- */
   function partOfDay(h) {
     if (h >= 5 && h < 8) return 'dawn';
     if (h >= 8 && h < 18) return 'day';

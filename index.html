@@ -28,8 +28,8 @@
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Alegreya:ital,wght@0,400;0,700;1,400&family=PT+Mono&display=swap">
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Podkova:wght@500;700&family=Nunito:wght@400;600;800&family=PT+Mono&display=swap">
+<link rel="stylesheet" href="styles.css?v=2">
 <script>window.TOD_LABELS = {"dawn": "dawn", "day": "day", "dusk": "sunset", "night": "night", "prefix": "in Fellmise now:"};</script>
 </head>
 <body>
@@ -37,9 +37,22 @@
 
 <header class="topbar">
   <a class="logo" href="/">FELLMISE</a>
-  <nav class="lang" aria-label="Language">
-    <span class="lang__current" aria-current="true">EN</span>
-    <a href="ru/" hreflang="ru">RU</a>
+
+  <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav"
+          aria-label="Menu"><span></span><span></span><span></span></button>
+
+  <nav class="nav" id="nav" aria-label="Menu">
+    <a class="nav__link" href="#features">Features</a>
+    <a class="nav__link" href="#world">World</a>
+    <span class="nav__devlog-wrap">
+      <button class="nav__link nav__devlog" id="devlog-btn" type="button"
+              aria-expanded="false" aria-describedby="devlog-tip">Devlog</button>
+      <span class="devlog-tip" id="devlog-tip" role="status">Devlog starts soon</span>
+    </span>
+    <span class="lang">
+      <span class="lang__current" aria-current="true">EN</span>
+      <a href="ru/" hreflang="ru">RU</a>
+    </span>
   </nav>
 </header>
 
@@ -61,17 +74,20 @@
     </div>
 
     <p class="clock" id="clock"><span class="clock__dot"></span><span id="clock-text"></span></p>
+  </section>
 
-    <div class="hero__copy">
-      <div class="sign">
-        <p class="sign__text">You killed them by the hundreds. Now they've come for you.</p>
-      </div>
-      <p class="descriptor">Skills instead of levels. Death with consequences. A living world. No pay-to-win.</p>
-      <div class="cta">
-        <button class="btn btn--steam" disabled>Wishlist on Steam — soon</button>
-        <!-- TODO: подставить инвайт, когда создан сервер Discord -->
-        <a class="btn btn--discord" href="#">Discord</a>
-      </div>
+  <!-- Pitch + CTA live BELOW the scene on their own grass band: on narrow
+       screens anything overlaid on the hero either clipped or covered the
+       sprites. -->
+  <section class="pitch">
+    <div class="sign">
+      <p class="sign__text">You killed them by the hundreds. Now they've come for you.</p>
+      <p class="sign__sub">Skills instead of levels. Death with consequences. A living world. No pay-to-win.</p>
+    </div>
+    <div class="cta">
+      <button class="btn btn--steam" disabled>Wishlist on Steam — soon</button>
+      <!-- TODO: подставить инвайт, когда создан сервер Discord -->
+      <a class="btn btn--discord" href="#">Discord</a>
     </div>
   </section>
 
@@ -113,7 +129,13 @@
             <li class="res"><figure><picture><source srcset="assets/res_fish.webp" type="image/webp"><img src="assets/res_fish.png" alt="Fish" loading="lazy" decoding="async"></picture><figcaption>Fish</figcaption></figure></li>
             <li class="res"><figure><picture><source srcset="assets/res_pickaxe.webp" type="image/webp"><img src="assets/res_pickaxe.png" alt="Pickaxe" loading="lazy" decoding="async"></picture><figcaption>Pickaxe</figcaption></figure></li>
             <li class="res"><figure><picture><source srcset="assets/res_sword.webp" type="image/webp"><img src="assets/res_sword.png" alt="Sword" loading="lazy" decoding="async"></picture><figcaption>Sword</figcaption></figure></li>
+            <li class="res"><figure><picture><source srcset="assets/res_axe.webp" type="image/webp"><img src="assets/res_axe.png" alt="Battle axe" loading="lazy" decoding="async"></picture><figcaption>Battle axe</figcaption></figure></li>
+            <li class="res"><figure><picture><source srcset="assets/res_dagger.webp" type="image/webp"><img src="assets/res_dagger.png" alt="Dagger" loading="lazy" decoding="async"></picture><figcaption>Dagger</figcaption></figure></li>
             <li class="res"><figure><picture><source srcset="assets/res_bow.webp" type="image/webp"><img src="assets/res_bow.png" alt="Bow" loading="lazy" decoding="async"></picture><figcaption>Bow</figcaption></figure></li>
+            <li class="res"><figure><picture><source srcset="assets/res_shield.webp" type="image/webp"><img src="assets/res_shield.png" alt="Shield" loading="lazy" decoding="async"></picture><figcaption>Shield</figcaption></figure></li>
+            <li class="res"><figure><picture><source srcset="assets/res_staff.webp" type="image/webp"><img src="assets/res_staff.png" alt="Staff" loading="lazy" decoding="async"></picture><figcaption>Staff</figcaption></figure></li>
+            <li class="res"><figure><picture><source srcset="assets/res_spellbook.webp" type="image/webp"><img src="assets/res_spellbook.png" alt="Spellbook" loading="lazy" decoding="async"></picture><figcaption>Spellbook</figcaption></figure></li>
+            <li class="res"><figure><picture><source srcset="assets/res_runes.webp" type="image/webp"><img src="assets/res_runes.png" alt="Runes" loading="lazy" decoding="async"></picture><figcaption>Runes</figcaption></figure></li>
             <li class="res"><figure><picture><source srcset="assets/res_potion.webp" type="image/webp"><img src="assets/res_potion.png" alt="Potion" loading="lazy" decoding="async"></picture><figcaption>Potion</figcaption></figure></li>
           </ul>
         </section>
@@ -141,7 +163,7 @@
             <p class="card__text">The world remembers who did it. Kill without witnesses and nothing follows you home; leave someone breathing and the story gets told, and the people who loved them come looking. Your enemies are the ones you made.</p>
           </div>
         </article>
-        <article class="card" id="f-world">
+        <article class="card" id="f-world" id="world">
           <div class="card__roof" aria-hidden="true"></div>
           <div class="card__body">
             <picture class="card__art"><source srcset="assets/feat_world.webp" type="image/webp"><img src="assets/feat_world.png" alt="A world that plays itself" loading="lazy" decoding="async"></picture><picture class="card__art card__art--corner"><source srcset="assets/feat_tavern.webp" type="image/webp"><img src="assets/feat_tavern.png" alt="" loading="lazy" decoding="async"></picture>
@@ -155,6 +177,14 @@
             <div class="card__art card__art--soon" role="img" aria-label="art coming soon"><span>art coming soon</span></div>
             <h3 class="card__title">Two factions: humans and monsters</h3>
             <p class="card__text">Play the people behind the walls, or the things outside them. Both sides are playable, and both sides are somebody's home.</p>
+          </div>
+        </article>
+        <article class="card" id="f-home">
+          <div class="card__roof" aria-hidden="true"></div>
+          <div class="card__body">
+            <picture class="card__art"><source srcset="assets/feat_home.webp" type="image/webp"><img src="assets/feat_home.png" alt="A home to come back to" loading="lazy" decoding="async"></picture>
+            <h3 class="card__title">A home to come back to</h3>
+            <p class="card__text">Everything you mine, hunt and loot needs somewhere to go. Your house is your base: storage, trophies, a place that's yours in a world that doesn't pause. Housing is in early design — details will change.</p>
           </div>
         </article>
     </div>
@@ -174,6 +204,6 @@
   </nav>
 </footer>
 
-<script src="main.js" defer></script>
+<script src="main.js?v=2" defer></script>
 </body>
 </html>

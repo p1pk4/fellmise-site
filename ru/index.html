@@ -28,8 +28,8 @@
 <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Alegreya:ital,wght@0,400;0,700;1,400&family=PT+Mono&display=swap">
-<link rel="stylesheet" href="../styles.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Podkova:wght@500;700&family=Nunito:wght@400;600;800&family=PT+Mono&display=swap">
+<link rel="stylesheet" href="../styles.css?v=2">
 <script>window.TOD_LABELS = {"dawn": "рассвет", "day": "день", "dusk": "закат", "night": "ночь", "prefix": "в Fellmise сейчас:"};</script>
 </head>
 <body>
@@ -37,9 +37,22 @@
 
 <header class="topbar">
   <a class="logo" href="../">FELLMISE</a>
-  <nav class="lang" aria-label="Language">
-    <span class="lang__current" aria-current="true">RU</span>
-    <a href="../" hreflang="en">EN</a>
+
+  <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav"
+          aria-label="Меню"><span></span><span></span><span></span></button>
+
+  <nav class="nav" id="nav" aria-label="Меню">
+    <a class="nav__link" href="#features">Особенности</a>
+    <a class="nav__link" href="#world">Мир</a>
+    <span class="nav__devlog-wrap">
+      <button class="nav__link nav__devlog" id="devlog-btn" type="button"
+              aria-expanded="false" aria-describedby="devlog-tip">Devlog</button>
+      <span class="devlog-tip" id="devlog-tip" role="status">Скоро</span>
+    </span>
+    <span class="lang">
+      <span class="lang__current" aria-current="true">RU</span>
+      <a href="../" hreflang="en">EN</a>
+    </span>
   </nav>
 </header>
 
@@ -61,17 +74,20 @@
     </div>
 
     <p class="clock" id="clock"><span class="clock__dot"></span><span id="clock-text"></span></p>
+  </section>
 
-    <div class="hero__copy">
-      <div class="sign">
-        <p class="sign__text">Ты убивал их сотнями. Теперь они пришли за тобой.</p>
-      </div>
-      <p class="descriptor">Скиллы вместо уровней, смерть с последствиями, живой мир. Без доната.</p>
-      <div class="cta">
-        <button class="btn btn--steam" disabled>Wishlist в Steam — скоро</button>
-        <!-- TODO: подставить инвайт, когда создан сервер Discord -->
-        <a class="btn btn--discord" href="#">Discord</a>
-      </div>
+  <!-- Pitch + CTA live BELOW the scene on their own grass band: on narrow
+       screens anything overlaid on the hero either clipped or covered the
+       sprites. -->
+  <section class="pitch">
+    <div class="sign">
+      <p class="sign__text">Ты убивал их сотнями. Теперь они пришли за тобой.</p>
+      <p class="sign__sub">Скиллы вместо уровней, смерть с последствиями, живой мир. Без доната.</p>
+    </div>
+    <div class="cta">
+      <button class="btn btn--steam" disabled>Wishlist в Steam — скоро</button>
+      <!-- TODO: подставить инвайт, когда создан сервер Discord -->
+      <a class="btn btn--discord" href="#">Discord</a>
     </div>
   </section>
 
@@ -113,7 +129,13 @@
             <li class="res"><figure><picture><source srcset="../assets/res_fish.webp" type="image/webp"><img src="../assets/res_fish.png" alt="Рыба" loading="lazy" decoding="async"></picture><figcaption>Рыба</figcaption></figure></li>
             <li class="res"><figure><picture><source srcset="../assets/res_pickaxe.webp" type="image/webp"><img src="../assets/res_pickaxe.png" alt="Кирка" loading="lazy" decoding="async"></picture><figcaption>Кирка</figcaption></figure></li>
             <li class="res"><figure><picture><source srcset="../assets/res_sword.webp" type="image/webp"><img src="../assets/res_sword.png" alt="Меч" loading="lazy" decoding="async"></picture><figcaption>Меч</figcaption></figure></li>
+            <li class="res"><figure><picture><source srcset="../assets/res_axe.webp" type="image/webp"><img src="../assets/res_axe.png" alt="Секира" loading="lazy" decoding="async"></picture><figcaption>Секира</figcaption></figure></li>
+            <li class="res"><figure><picture><source srcset="../assets/res_dagger.webp" type="image/webp"><img src="../assets/res_dagger.png" alt="Кинжал" loading="lazy" decoding="async"></picture><figcaption>Кинжал</figcaption></figure></li>
             <li class="res"><figure><picture><source srcset="../assets/res_bow.webp" type="image/webp"><img src="../assets/res_bow.png" alt="Лук" loading="lazy" decoding="async"></picture><figcaption>Лук</figcaption></figure></li>
+            <li class="res"><figure><picture><source srcset="../assets/res_shield.webp" type="image/webp"><img src="../assets/res_shield.png" alt="Щит" loading="lazy" decoding="async"></picture><figcaption>Щит</figcaption></figure></li>
+            <li class="res"><figure><picture><source srcset="../assets/res_staff.webp" type="image/webp"><img src="../assets/res_staff.png" alt="Посох" loading="lazy" decoding="async"></picture><figcaption>Посох</figcaption></figure></li>
+            <li class="res"><figure><picture><source srcset="../assets/res_spellbook.webp" type="image/webp"><img src="../assets/res_spellbook.png" alt="Гримуар" loading="lazy" decoding="async"></picture><figcaption>Гримуар</figcaption></figure></li>
+            <li class="res"><figure><picture><source srcset="../assets/res_runes.webp" type="image/webp"><img src="../assets/res_runes.png" alt="Руны" loading="lazy" decoding="async"></picture><figcaption>Руны</figcaption></figure></li>
             <li class="res"><figure><picture><source srcset="../assets/res_potion.webp" type="image/webp"><img src="../assets/res_potion.png" alt="Зелье" loading="lazy" decoding="async"></picture><figcaption>Зелье</figcaption></figure></li>
           </ul>
         </section>
@@ -141,7 +163,7 @@
             <p class="card__text">Мир помнит, кто это сделал. Убивай без свидетелей — и за тобой никто не придёт; оставь кого-то в живых — историю расскажут, и придут те, кому он был дорог. Врагов ты делаешь сам.</p>
           </div>
         </article>
-        <article class="card" id="f-world">
+        <article class="card" id="f-world" id="world">
           <div class="card__roof" aria-hidden="true"></div>
           <div class="card__body">
             <picture class="card__art"><source srcset="../assets/feat_world.webp" type="image/webp"><img src="../assets/feat_world.png" alt="Мир, который играет сам" loading="lazy" decoding="async"></picture><picture class="card__art card__art--corner"><source srcset="../assets/feat_tavern.webp" type="image/webp"><img src="../assets/feat_tavern.png" alt="" loading="lazy" decoding="async"></picture>
@@ -155,6 +177,14 @@
             <div class="card__art card__art--soon" role="img" aria-label="арт скоро"><span>арт скоро</span></div>
             <h3 class="card__title">Две фракции: люди и монстры</h3>
             <p class="card__text">Играй за тех, кто за стеной, или за тех, кто снаружи. Обе стороны играбельны, и обе — чей-то дом.</p>
+          </div>
+        </article>
+        <article class="card" id="f-home">
+          <div class="card__roof" aria-hidden="true"></div>
+          <div class="card__body">
+            <picture class="card__art"><source srcset="../assets/feat_home.webp" type="image/webp"><img src="../assets/feat_home.png" alt="Дом, куда возвращаешься" loading="lazy" decoding="async"></picture>
+            <h3 class="card__title">Дом, куда возвращаешься</h3>
+            <p class="card__text">Всё, что ты добыл, нафармил и налутал, должно где-то жить. Дом — твоя база: хранение, трофеи, свой угол в мире, который не ставится на паузу. Система жилья в ранней проработке — детали изменятся.</p>
           </div>
         </article>
     </div>
@@ -174,6 +204,6 @@
   </nav>
 </footer>
 
-<script src="../main.js" defer></script>
+<script src="../main.js?v=2" defer></script>
 </body>
 </html>

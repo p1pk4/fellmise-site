@@ -1,6 +1,9 @@
 /* Fellmise — V1 "living scene".
    Palette is sampled from the art pack so the page and the sprites read as one
-   picture: grass, path, wood, roof, outline, cream. */
+   picture: grass, path, wood, roof, outline, cream.
+
+   Type: Podkova 700 for the logo, slogan and headings; Nunito for body copy and
+   buttons; PT Mono only for the utility chrome (clock badge, tooltips). */
 
 :root {
   --grass-1: #a8cb53;
@@ -20,28 +23,32 @@
   --shadow: 6px 6px 0 var(--ink);
   --shadow-sm: 4px 4px 0 var(--ink);
 
-  --pixel: "Press Start 2P", "PT Mono", monospace;
-  --body: "Alegreya", Georgia, serif;
+  --display: "Podkova", Georgia, serif;
+  --body: "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono: "PT Mono", ui-monospace, monospace;
 
   --wrap: 1180px;
+  --topbar-h: 62px;
 }
 
 * { box-sizing: border-box; }
 
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; scroll-padding-top: calc(var(--topbar-h) + 12px); }
 
 body {
   margin: 0;
   background: var(--cream);
   color: var(--ink);
   font-family: var(--body);
-  font-size: 19px;
-  line-height: 1.6;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 1.65;
   -webkit-font-smoothing: antialiased;
 }
 
 img { max-width: 100%; height: auto; display: block; }
+
+h2, h3 { font-family: var(--display); font-weight: 700; }
 
 .skip {
   position: absolute;
@@ -56,35 +63,81 @@ img { max-width: 100%; height: auto; display: block; }
 
 /* ---------------------------------------------------------------- topbar */
 .topbar {
-  position: relative;
-  z-index: 6;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  min-height: var(--topbar-h);
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding: 1.1rem clamp(1rem, 4vw, 2.5rem);
+  padding: .7rem clamp(1rem, 4vw, 2.5rem);
   background: var(--ink);
 }
 
 .logo {
-  font-family: var(--pixel);
-  font-size: clamp(1rem, 2.6vw, 1.6rem);
-  letter-spacing: .06em;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: clamp(1.15rem, 2.4vw, 1.5rem);
+  letter-spacing: .12em;
   color: var(--cream);
   text-decoration: none;
-  /* the "roof" the brief asks for: a hard offset shadow in roof red */
-  text-shadow: 3px 3px 0 var(--roof);
+  text-shadow: 2px 2px 0 var(--roof);
+  white-space: nowrap;
 }
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: clamp(.6rem, 1.8vw, 1.5rem);
+}
+
+.nav__link {
+  font-family: var(--body);
+  font-weight: 600;
+  font-size: .95rem;
+  color: var(--cream);
+  text-decoration: none;
+  background: none;
+  border: 0;
+  padding: .3rem 0;
+  cursor: pointer;
+  white-space: nowrap;
+  border-bottom: 2px solid transparent;
+}
+.nav__link:hover, .nav__link:focus-visible { border-bottom-color: var(--grass-2); }
+
+.nav__devlog-wrap { position: relative; display: inline-flex; }
+
+.devlog-tip {
+  position: absolute;
+  top: calc(100% + .55rem);
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  background: var(--cream);
+  color: var(--ink);
+  border: 3px solid var(--ink);
+  box-shadow: var(--shadow-sm);
+  font-family: var(--mono);
+  font-size: .72rem;
+  padding: .35rem .6rem;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .12s ease;
+  z-index: 30;
+}
+.nav__devlog-wrap.is-open .devlog-tip { opacity: 1; visibility: visible; }
 
 .lang {
   display: flex;
   align-items: center;
-  gap: .35rem;
+  gap: .3rem;
   font-family: var(--mono);
-  font-size: .8rem;
+  font-size: .75rem;
 }
 .lang a, .lang__current {
-  padding: .3rem .55rem;
+  padding: .28rem .5rem;
   border: 2px solid var(--cream);
   text-decoration: none;
   line-height: 1;
@@ -93,13 +146,26 @@ img { max-width: 100%; height: auto; display: block; }
 .lang a { color: var(--cream); }
 .lang a:hover, .lang a:focus-visible { background: var(--grass-1); color: var(--ink); border-color: var(--grass-1); }
 
+/* burger — hidden until the mobile breakpoint */
+.nav-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 44px; height: 38px;
+  padding: 0 8px;
+  background: none;
+  border: 2px solid var(--cream);
+  cursor: pointer;
+}
+.nav-toggle span { display: block; height: 3px; background: var(--cream); }
+
 /* ------------------------------------------------------------------ hero */
 .hero {
   position: relative;
   overflow: hidden;
-  min-height: min(88vh, 780px);
-  display: flex;
-  align-items: flex-end;
+  height: min(70vh, 620px);
+  min-height: 340px;
   isolation: isolate;
 }
 
@@ -111,7 +177,6 @@ img { max-width: 100%; height: auto; display: block; }
 .hero__ground {
   position: absolute; inset: 62% 0 0 0;
   background:
-    /* speckles */
     radial-gradient(circle at 12% 22%, var(--grass-3) 0 3px, transparent 4px),
     radial-gradient(circle at 47% 12%, var(--grass-3) 0 2px, transparent 3px),
     radial-gradient(circle at 78% 30%, var(--grass-3) 0 3px, transparent 4px),
@@ -122,7 +187,6 @@ img { max-width: 100%; height: auto; display: block; }
   background-size: 220px 180px, 300px 240px, 260px 200px, 340px 260px, 280px 210px, 240px 190px, 100% 100%;
 }
 
-/* the path runs along the bottom of the scene */
 .hero__path {
   position: absolute; left: 0; right: 0; bottom: 0;
   height: 16%;
@@ -130,11 +194,10 @@ img { max-width: 100%; height: auto; display: block; }
   clip-path: polygon(0 38%, 100% 12%, 100% 100%, 0 100%);
 }
 
-/* time-of-day wash, driven by data-tod on .hero */
 .hero__tint {
   position: absolute; inset: 0;
   pointer-events: none;
-  transition: background .8s ease, backdrop-filter .8s ease;
+  transition: background .8s ease;
   z-index: 3;
 }
 .hero[data-tod="day"]   .hero__tint { background: transparent; }
@@ -144,11 +207,7 @@ img { max-width: 100%; height: auto; display: block; }
 
 .hero__scene { position: absolute; inset: 0; z-index: 2; }
 
-.sprite {
-  position: absolute;
-  bottom: 0;
-  will-change: transform;
-}
+.sprite { position: absolute; bottom: 0; will-change: transform; }
 .sprite img { filter: drop-shadow(0 6px 0 rgba(56, 59, 45, .13)); }
 
 .sprite--tree-a  { left: 1%;  width: 20%; bottom: 12%; }
@@ -159,7 +218,6 @@ img { max-width: 100%; height: auto; display: block; }
 .sprite--cart    { left: 47%; width: 18%; bottom: 2%;  }
 .sprite--fence   { left: 4%;  width: 19%; bottom: 3%;  }
 
-/* trees breathe; disabled under prefers-reduced-motion below */
 .sprite--tree-a img, .sprite--tree-b img {
   transform-origin: 50% 100%;
   animation: sway 7s ease-in-out infinite alternate;
@@ -171,108 +229,113 @@ img { max-width: 100%; height: auto; display: block; }
   to   { transform: rotate(1.1deg); }
 }
 
-/* "in Fellmise now: day" */
 .clock {
   position: absolute;
-  top: 1.2rem; right: clamp(1rem, 4vw, 2.5rem);
+  top: .9rem; right: clamp(.75rem, 4vw, 2.5rem);
   z-index: 5;
   margin: 0;
   display: flex; align-items: center; gap: .5rem;
   background: var(--cream);
   border: 3px solid var(--ink);
   box-shadow: var(--shadow-sm);
-  padding: .5rem .8rem;
+  padding: .45rem .7rem;
   font-family: var(--mono);
-  font-size: .78rem;
+  font-size: .72rem;
+  max-width: calc(100vw - 1.5rem);
 }
 .clock__dot {
-  width: .7rem; height: .7rem; border-radius: 50%;
+  width: .65rem; height: .65rem; border-radius: 50%;
   border: 2px solid var(--ink);
   background: var(--path);
+  flex: 0 0 auto;
 }
 .hero[data-tod="night"] .clock__dot { background: #2c3a72; }
 .hero[data-tod="dusk"]  .clock__dot { background: #e8703c; }
 .hero[data-tod="dawn"]  .clock__dot { background: #ffc27a; }
 
-.hero__copy {
-  position: relative;
-  z-index: 4;
-  width: min(var(--wrap), 100%);
-  margin: 0 auto;
-  padding: 0 clamp(1rem, 4vw, 2.5rem) clamp(2rem, 6vw, 4rem);
+/* ------------------------------------------------------- pitch (sign+CTA) */
+.pitch {
+  background: linear-gradient(180deg, var(--grass-3) 0%, var(--grass-2) 100%);
+  border-top: var(--border);
+  border-bottom: var(--border);
+  padding: clamp(1.75rem, 5vw, 3rem) clamp(1rem, 4vw, 2.5rem);
   text-align: center;
 }
 
-/* wooden sign board */
+/* one wooden board carrying both the slogan and the descriptor */
 .sign {
   display: inline-block;
-  max-width: 46rem;
-  background:
-    repeating-linear-gradient(180deg, var(--wood) 0 14px, var(--wood-dark) 14px 17px);
+  max-width: min(52rem, calc(100vw - 32px));
+  background: repeating-linear-gradient(180deg, var(--wood) 0 16px, var(--wood-dark) 16px 19px);
   border: var(--border);
   box-shadow: var(--shadow);
-  padding: 1.4rem clamp(1rem, 3vw, 2.4rem);
-  transform: rotate(-.6deg);
-}
-.sign__text {
-  margin: 0;
-  font-family: var(--pixel);
-  font-size: clamp(.72rem, 1.9vw, 1.05rem);
-  line-height: 1.85;
-  color: var(--cream);
-  text-shadow: 2px 2px 0 rgba(0,0,0,.45);
+  padding: clamp(1.1rem, 3vw, 2rem) clamp(1rem, 3.5vw, 2.4rem);
+  transform: rotate(-.5deg);
 }
 
-.descriptor {
-  max-width: 44rem;
-  margin: 1.4rem auto 0;
-  background: var(--cream);
-  border: 3px solid var(--ink);
-  padding: .7rem 1.1rem;
-  font-size: 1.05rem;
+.sign__text {
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: clamp(24px, 4.5vw, 44px);
+  line-height: 1.22;
+  color: var(--cream);
+  text-shadow: 2px 3px 0 rgba(0,0,0,.5);
+  /* wrap between words only — auto hyphenation split "Теперь" mid-word, which
+     reads as a typo in a headline */
+  overflow-wrap: break-word;
+}
+
+.sign__sub {
+  margin: .9rem 0 0;
+  padding-top: .85rem;
+  border-top: 3px solid rgba(253, 246, 224, .35);
+  font-family: var(--body);
+  font-weight: 600;
+  font-size: clamp(15px, 1.9vw, 19px);
+  line-height: 1.5;
+  color: var(--cream);
+  text-shadow: 1px 2px 0 rgba(0,0,0,.4);
+  overflow-wrap: break-word;
 }
 
 .cta {
-  margin-top: 1.5rem;
+  margin-top: clamp(1.2rem, 3vw, 1.8rem);
   display: flex; flex-wrap: wrap; gap: .9rem; justify-content: center;
 }
 
 .btn {
-  font-family: var(--pixel);
-  font-size: .72rem;
-  line-height: 1.5;
-  padding: .95rem 1.3rem;
+  font-family: var(--body);
+  font-weight: 800;
+  font-size: 1rem;
+  line-height: 1.3;
+  padding: .85rem 1.4rem;
   border: var(--border);
   box-shadow: var(--shadow-sm);
   text-decoration: none;
   cursor: pointer;
   transition: transform .08s ease, box-shadow .08s ease;
+  max-width: 100%;
 }
 .btn:hover:not(:disabled), .btn:focus-visible:not(:disabled) {
   transform: translate(2px, 2px);
   box-shadow: 2px 2px 0 var(--ink);
 }
-.btn--steam {
-  background: #b9b6ab;
-  color: #52514a;
-  cursor: not-allowed;
-  opacity: .85;
-}
+.btn--steam { background: #b9b6ab; color: #4a4942; cursor: not-allowed; opacity: .9; }
 .btn--discord { background: var(--grass-1); color: var(--ink); }
 
 /* -------------------------------------------------------------- features */
 .section-title {
-  font-family: var(--pixel);
-  font-size: clamp(.95rem, 2.4vw, 1.4rem);
+  font-size: clamp(1.6rem, 3.4vw, 2.4rem);
   text-align: center;
   margin: 0 0 2.4rem;
-  line-height: 1.7;
+  line-height: 1.25;
 }
 
 .features {
   max-width: var(--wrap);
   margin: 0 auto;
-  padding: clamp(3rem, 7vw, 5rem) clamp(1rem, 4vw, 2.5rem) 1rem;
+  padding: clamp(2.5rem, 6vw, 4.5rem) clamp(1rem, 4vw, 2.5rem) 1rem;
 }
 
 .features__grid {
@@ -286,6 +349,8 @@ img { max-width: 100%; height: auto; display: block; }
   grid-auto-flow: dense;
 }
 
+.features__grid > * { min-width: 0; }
+
 .card {
   background: var(--cream);
   border: var(--border);
@@ -293,13 +358,12 @@ img { max-width: 100%; height: auto; display: block; }
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  scroll-margin-top: calc(var(--topbar-h) + 16px);
 }
 
-/* the tiled roof strip */
 .card__roof {
   height: 26px;
-  background:
-    repeating-linear-gradient(90deg, var(--roof) 0 22px, #6f2b22 22px 26px);
+  background: repeating-linear-gradient(90deg, var(--roof) 0 22px, #6f2b22 22px 26px);
   border-bottom: var(--border);
 }
 
@@ -316,7 +380,6 @@ img { max-width: 100%; height: auto; display: block; }
 .card__art { display: block; }
 .card__art img { height: clamp(150px, 20vw, 210px); width: auto; margin: 0 auto; }
 
-/* the ghost ship tucked into the corner of the death card */
 .card__art--corner { position: absolute; top: .6rem; right: .6rem; opacity: .92; }
 .card__art--corner img { height: 74px; }
 
@@ -328,66 +391,50 @@ img { max-width: 100%; height: auto; display: block; }
   border: 3px dashed rgba(56, 59, 45, .45);
   background: repeating-linear-gradient(45deg, rgba(56,59,45,.05) 0 10px, transparent 10px 20px);
 }
-.card__art--soon span {
-  font-family: var(--mono);
-  font-size: .78rem;
-  color: rgba(56, 59, 45, .7);
-}
+.card__art--soon span { font-family: var(--mono); font-size: .78rem; color: rgba(56, 59, 45, .7); }
 
-.card__title {
-  font-family: var(--pixel);
-  font-size: .88rem;
-  line-height: 1.7;
-  margin: 1.3rem 0 .7rem;
-}
-
+.card__title { font-size: 1.45rem; line-height: 1.25; margin: 1.2rem 0 .6rem; }
 .card__text { margin: 0; }
 
 /* ------------------------------------------------------------- resources */
 .resources {
   grid-column: 1 / -1;
+  min-width: 0;
   background: var(--grass-3);
   border: var(--border);
   box-shadow: var(--shadow);
   padding: 1.5rem 1.2rem 1.2rem;
 }
 
-.resources__title {
-  font-family: var(--pixel);
-  font-size: .8rem;
-  text-align: center;
-  margin: 0 0 1.2rem;
-  line-height: 1.7;
-}
+.resources__title { font-size: 1.3rem; text-align: center; margin: 0 0 1.4rem; }
 
 .resources__strip {
+  min-width: 0;
   list-style: none;
   margin: 0;
   padding: 0 0 .4rem;
   display: flex;
-  gap: 1.1rem;
-  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1.4rem 1.1rem;
+  justify-content: center;
 }
 
 .res figure { margin: 0; position: relative; }
-.res img {
-  height: 76px; width: auto; margin: 0 auto;
-  transition: transform .12s ease;
-}
+.res { min-width: 58px; }
+.res img { height: 84px; width: auto; margin: 0 auto; transition: transform .12s ease; }
 .res:hover img, .res:focus-within img { transform: translateY(-5px); }
 
-/* label behaves as a tooltip: hidden until hover/focus */
 .res figcaption {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  bottom: -1.9rem;
+  bottom: -1.6rem;
   white-space: nowrap;
   background: var(--ink);
   color: var(--cream);
   font-family: var(--mono);
-  font-size: .7rem;
-  padding: .25rem .5rem;
+  font-size: .68rem;
+  padding: .22rem .45rem;
   opacity: 0;
   pointer-events: none;
   transition: opacity .12s ease;
@@ -401,7 +448,7 @@ img { max-width: 100%; height: auto; display: block; }
   padding: 1rem clamp(1rem, 4vw, 2.5rem);
   text-align: center;
   font-family: var(--mono);
-  font-size: .82rem;
+  font-size: .8rem;
   color: rgba(56, 59, 45, .8);
 }
 
@@ -415,9 +462,9 @@ img { max-width: 100%; height: auto; display: block; }
   align-items: center;
   justify-content: space-between;
 }
-.footer__brand { font-family: var(--pixel); font-size: .8rem; margin: 0; }
-.footer__rights { margin: 0; font-family: var(--mono); font-size: .78rem; opacity: .8; }
-.footer__links { display: flex; gap: 1.2rem; font-family: var(--mono); font-size: .8rem; }
+.footer__brand { font-family: var(--display); font-weight: 700; font-size: 1.1rem; margin: 0; }
+.footer__rights { margin: 0; font-family: var(--mono); font-size: .76rem; opacity: .8; }
+.footer__links { display: flex; gap: 1.2rem; font-family: var(--body); font-weight: 600; font-size: .9rem; }
 .footer__links a { color: var(--cream); }
 .footer__links a:hover, .footer__links a:focus-visible { color: var(--grass-2); }
 
@@ -425,29 +472,67 @@ img { max-width: 100%; height: auto; display: block; }
 @media (max-width: 760px) {
   body { font-size: 17px; }
 
-  .hero { min-height: 76vh; }
+  .nav-toggle { display: flex; }
+
+  /* menu collapses under the bar; the bar itself stays sticky */
+  .nav {
+    position: absolute;
+    top: 100%; left: 0; right: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    background: var(--ink);
+    border-top: 3px solid rgba(253, 246, 224, .18);
+    padding: .4rem clamp(1rem, 4vw, 2.5rem) .9rem;
+    display: none;
+  }
+  .nav.is-open { display: flex; }
+  .nav__link { padding: .7rem 0; border-bottom: 1px solid rgba(253,246,224,.12); }
+  .nav__devlog-wrap { display: block; }
+  .nav__devlog { width: 100%; text-align: left; }
+  .devlog-tip { position: static; transform: none; display: none; margin: .2rem 0 .5rem; box-shadow: none; }
+  .nav__devlog-wrap.is-open .devlog-tip { display: inline-block; }
+  .lang { padding-top: .7rem; }
+
+  .hero { height: 46vh; min-height: 260px; }
   /* simplified scene: two houses, one tree, the well */
   .sprite.is-mobile-hidden { display: none; }
-  .sprite--tree-a  { left: -2%; width: 30%; bottom: 14%; }
-  .sprite--house-b { left: 18%; width: 40%; bottom: 17%; }
-  .sprite--well    { left: 57%; width: 20%; bottom: 13%; }
-  .sprite--house-a { left: 70%; width: 36%; bottom: 16%; }
+  .sprite--tree-a  { left: -2%; width: 30%; bottom: 12%; }
+  .sprite--house-b { left: 16%; width: 38%; bottom: 15%; }
+  .sprite--well    { left: 50%; width: 18%; bottom: 11%; }
+  .sprite--house-a { left: 64%; width: 34%; bottom: 14%; }
+
+  .clock { font-size: .66rem; padding: .35rem .55rem; }
+
+  .sign { transform: none; }
+  .cta { flex-direction: column; align-items: stretch; }
+  .btn { width: 100%; text-align: center; }
 
   .features__grid { grid-template-columns: 1fr; }
 
   .resources__strip {
+    flex-wrap: nowrap;
     justify-content: flex-start;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
-    padding-bottom: 2.2rem;
+    padding-bottom: .5rem;
   }
   .res { scroll-snap-align: center; flex: 0 0 auto; }
-  /* no hover on touch — keep labels visible instead of tooltipping */
-  .res figcaption { opacity: 1; position: static; transform: none; background: none;
-                    color: var(--ink); text-align: center; padding: .35rem 0 0; }
+  /* no hover on touch — keep the labels visible instead of tooltipping */
+  .res figcaption {
+    opacity: 1; position: static; transform: none; background: none;
+    color: var(--ink); text-align: center; padding: .3rem 0 0; font-size: .66rem;
+  }
 
   .footer { justify-content: center; text-align: center; }
+}
+
+/* very narrow phones — keep the board and buttons inside the viewport */
+@media (max-width: 400px) {
+  .sign { padding: 1rem .85rem; }
+  .sign__text { font-size: clamp(22px, 6.2vw, 26px); }
+  .logo { font-size: 1.05rem; letter-spacing: .08em; }
 }
 
 @media (prefers-reduced-motion: reduce) {

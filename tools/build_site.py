@@ -12,6 +12,8 @@ import pathlib
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 
+CSS_V = "2"          # cache-buster on styles.css / main.js
+
 # --------------------------------------------------------------------------
 # copy
 # --------------------------------------------------------------------------
@@ -74,7 +76,8 @@ FEATURES = [
          ru_p="Мир помнит, кто это сделал. Убивай без свидетелей — и за тобой никто "
               "не придёт; оставь кого-то в живых — историю расскажут, и придут те, "
               "кому он был дорог. Врагов ты делаешь сам."),
-    dict(id="world", sprite="feat_world", extra="feat_tavern",
+    # anchor target for the "World" nav link
+    dict(id="world", anchor="world", sprite="feat_world", extra="feat_tavern",
          en_t="A world that plays itself",
          en_p="Log out and the world keeps its appointments. NPCs run dungeons, "
               "haul cargo, argue over prices and drink in taverns whether or not "
@@ -90,8 +93,23 @@ FEATURES = [
          ru_t="Две фракции: люди и монстры",
          ru_p="Играй за тех, кто за стеной, или за тех, кто снаружи. Обе стороны "
               "играбельны, и обе — чей-то дом."),
+    # Housing is an OPEN design question in the GDD — this copy deliberately
+    # promises only "base + storage" and carries its own early-design caveat.
+    # Do not extend it (buying/renting, crafting stations at home, open-world
+    # placement) until the GDD block is resolved.
+    dict(id="home", sprite="feat_home",
+         en_t="A home to come back to",
+         en_p="Everything you mine, hunt and loot needs somewhere to go. Your "
+              "house is your base: storage, trophies, a place that's yours in a "
+              "world that doesn't pause. Housing is in early design — details "
+              "will change.",
+         ru_t="Дом, куда возвращаешься",
+         ru_p="Всё, что ты добыл, нафармил и налутал, должно где-то жить. Дом — "
+              "твоя база: хранение, трофеи, свой угол в мире, который не ставится "
+              "на паузу. Система жилья в ранней проработке — детали изменятся."),
 ]
 
+# Ordered by role: gathering, tools, weapons, magic.
 RESOURCES = [
     ("res_iron", "Iron ore", "Железная руда"),
     ("res_gold", "Gold ore", "Золотая руда"),
@@ -101,7 +119,13 @@ RESOURCES = [
     ("res_fish", "Fish", "Рыба"),
     ("res_pickaxe", "Pickaxe", "Кирка"),
     ("res_sword", "Sword", "Меч"),
+    ("res_axe", "Battle axe", "Секира"),
+    ("res_dagger", "Dagger", "Кинжал"),
     ("res_bow", "Bow", "Лук"),
+    ("res_shield", "Shield", "Щит"),
+    ("res_staff", "Staff", "Посох"),
+    ("res_spellbook", "Spellbook", "Гримуар"),
+    ("res_runes", "Runes", "Руны"),
     ("res_potion", "Potion", "Зелье"),
 ]
 
@@ -116,6 +140,9 @@ I18N = {
                    "world. No pay-to-win.",
         cta_steam="Wishlist on Steam — soon",
         cta_discord="Discord",
+        nav_features="Features", nav_world="World", nav_devlog="Devlog",
+        devlog_tip="Devlog starts soon",
+        menu="Menu",
         tod_prefix="in Fellmise now:",
         tod=dict(dawn="dawn", day="day", dusk="sunset", night="night"),
         features_title="What Fellmise is",
@@ -136,6 +163,9 @@ I18N = {
                    "Без доната.",
         cta_steam="Wishlist в Steam — скоро",
         cta_discord="Discord",
+        nav_features="Особенности", nav_world="Мир", nav_devlog="Devlog",
+        devlog_tip="Скоро",
+        menu="Меню",
         tod_prefix="в Fellmise сейчас:",
         tod=dict(dawn="рассвет", day="день", dusk="закат", night="ночь"),
         features_title="Что такое Fellmise",
@@ -199,8 +229,9 @@ def build(lang):
         else:
             art = (f'<div class="card__art card__art--soon" role="img" '
                    f'aria-label="{att(t["soon"])}"><span>{esc(t["soon"])}</span></div>')
+        anchor = f' id="{f["anchor"]}"' if f.get("anchor") else ""
         cards.append(
-            f'        <article class="card" id="f-{f["id"]}">\n'
+            f'        <article class="card" id="f-{f["id"]}"{anchor}>\n'
             f'          <div class="card__roof" aria-hidden="true"></div>\n'
             f'          <div class="card__body">\n'
             f'            {art}\n'
@@ -254,8 +285,8 @@ def build(lang):
 <link rel="apple-touch-icon" href="{a}apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Alegreya:ital,wght@0,400;0,700;1,400&family=PT+Mono&display=swap">
-<link rel="stylesheet" href="{root}styles.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Podkova:wght@500;700&family=Nunito:wght@400;600;800&family=PT+Mono&display=swap">
+<link rel="stylesheet" href="{root}styles.css?v={CSS_V}">
 <script>window.TOD_LABELS = {tod_json};</script>
 </head>
 <body>
@@ -263,9 +294,22 @@ def build(lang):
 
 <header class="topbar">
   <a class="logo" href="{root or '/'}">FELLMISE</a>
-  <nav class="lang" aria-label="Language">
-    <span class="lang__current" aria-current="true">{esc(t['self_label'])}</span>
-    <a href="{t['other_href']}" hreflang="{'ru' if lang == 'en' else 'en'}">{esc(t['other_label'])}</a>
+
+  <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav"
+          aria-label="{att(t['menu'])}"><span></span><span></span><span></span></button>
+
+  <nav class="nav" id="nav" aria-label="{att(t['menu'])}">
+    <a class="nav__link" href="#features">{esc(t['nav_features'])}</a>
+    <a class="nav__link" href="#world">{esc(t['nav_world'])}</a>
+    <span class="nav__devlog-wrap">
+      <button class="nav__link nav__devlog" id="devlog-btn" type="button"
+              aria-expanded="false" aria-describedby="devlog-tip">{esc(t['nav_devlog'])}</button>
+      <span class="devlog-tip" id="devlog-tip" role="status">{esc(t['devlog_tip'])}</span>
+    </span>
+    <span class="lang">
+      <span class="lang__current" aria-current="true">{esc(t['self_label'])}</span>
+      <a href="{t['other_href']}" hreflang="{'ru' if lang == 'en' else 'en'}">{esc(t['other_label'])}</a>
+    </span>
   </nav>
 </header>
 
@@ -281,17 +325,20 @@ def build(lang):
     </div>
 
     <p class="clock" id="clock"><span class="clock__dot"></span><span id="clock-text"></span></p>
+  </section>
 
-    <div class="hero__copy">
-      <div class="sign">
-        <p class="sign__text">{esc(t['tagline'])}</p>
-      </div>
-      <p class="descriptor">{esc(t['descriptor'])}</p>
-      <div class="cta">
-        <button class="btn btn--steam" disabled>{esc(t['cta_steam'])}</button>
-        <!-- TODO: подставить инвайт, когда создан сервер Discord -->
-        <a class="btn btn--discord" href="#">{esc(t['cta_discord'])}</a>
-      </div>
+  <!-- Pitch + CTA live BELOW the scene on their own grass band: on narrow
+       screens anything overlaid on the hero either clipped or covered the
+       sprites. -->
+  <section class="pitch">
+    <div class="sign">
+      <p class="sign__text">{esc(t['tagline'])}</p>
+      <p class="sign__sub">{esc(t['descriptor'])}</p>
+    </div>
+    <div class="cta">
+      <button class="btn btn--steam" disabled>{esc(t['cta_steam'])}</button>
+      <!-- TODO: подставить инвайт, когда создан сервер Discord -->
+      <a class="btn btn--discord" href="#">{esc(t['cta_discord'])}</a>
     </div>
   </section>
 
@@ -316,7 +363,7 @@ def build(lang):
   </nav>
 </footer>
 
-<script src="{root}main.js" defer></script>
+<script src="{root}main.js?v={CSS_V}" defer></script>
 </body>
 </html>
 """

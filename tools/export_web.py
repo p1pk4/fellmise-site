@@ -25,6 +25,11 @@ ASSETS = ROOT / "assets"
 WIDTHS = {"hero_": 560, "feat_": 640, "res_": 224}
 QUALITY = 85
 
+# Sprites the page needs at a second size under a second name. The housing card
+# reuses the hero farmhouse, but as a feature card it wants the 640px feature
+# width, and a file can only carry one width per name.
+ALIASES = {"feat_home": "hero_house_b"}
+
 # Hero scene layout for the og:image: (sprite, centre x, baseline y, width).
 # Mirrors the on-page composition closely enough to read as the same scene.
 OG_LAYOUT = [
@@ -56,15 +61,17 @@ def sprites():
 def export_sprites():
     ASSETS.mkdir(parents=True, exist_ok=True)
     rows = []
-    for p in sprites():
-        w = width_for(p.stem)
+    jobs = [(p.stem, p) for p in sprites()]
+    jobs += [(alias, FINAL / f"{src}.png") for alias, src in ALIASES.items()]
+    for stem, p in jobs:
+        w = width_for(stem)
         im = Image.open(p).convert("RGBA")
         h = max(1, round(im.height * w / im.width))
         im = im.resize((w, h), Image.LANCZOS)
-        png, webp = ASSETS / f"{p.stem}.png", ASSETS / f"{p.stem}.webp"
+        png, webp = ASSETS / f"{stem}.png", ASSETS / f"{stem}.webp"
         im.save(png, optimize=True)
         im.save(webp, quality=QUALITY, method=6)
-        rows.append((p.stem, w, h, png.stat().st_size, webp.stat().st_size))
+        rows.append((stem, w, h, png.stat().st_size, webp.stat().st_size))
     return rows
 
 

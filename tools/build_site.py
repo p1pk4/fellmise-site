@@ -241,6 +241,9 @@ def pic(a, name, alt, cls="", loading="lazy", extra_attr="", kind="scene"):
             f'decoding="async"{dims}{extra_attr}></picture>')
 
 
+FEAT_BY_ID = {f["id"]: f for f in FEATURES}
+
+
 def build(lang):
     t = I18N[lang]
     a = "assets/" if lang == "en" else "../assets/"

@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Fellmise — 2D-песочница MMO с видом сверху — preview</title>
+<meta name="description" content="Хардкорная 2D-песочница MMO с видом сверху в духе Ultima Online: скиллы вместо уровней, играбельная фракция монстров, кроссплей PC и мобайл">
+<link rel="icon" href="../assets/favicon-32.png" sizes="32x32">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" media="print" onload="this.media='all'"
+      href="https://fonts.googleapis.com/css2?family=Podkova:wght@500;700&family=Vollkorn:wght@400;600;700&family=PT+Mono&display=swap">
+<noscript><link rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Podkova:wght@500;700&family=Vollkorn:wght@400;600;700&family=PT+Mono&display=swap"></noscript>
+<link rel="stylesheet" href="../styles.css?v=1">
+<script>window.TOD_LABELS = {"dawn": "рассвет", "day": "день", "dusk": "закат", "night": "ночь", "prefix": "в Fellmise сейчас:"}; window.SCENE_URL = "../scene.json";
+        window.ASSET_BASE = "../assets/";</script>
+</head>
+<body>
+<canvas id="stage" aria-hidden="true"></canvas>
+
+<div id="dom">
+<a class="skip" href="#b-village">К содержимому</a>
+
+<header class="topbar">
+  <a class="logo" href="../">FELLMISE</a>
+  <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav"
+          aria-label="Меню"><span></span><span></span><span></span></button>
+  <nav class="nav" id="nav" aria-label="Меню">
+    <a class="nav__link" href="#b-forest">Механики</a>
+    <a class="nav__link" href="#b-spirit">Мир</a>
+    <span class="nav__devlog-wrap">
+      <button class="nav__link nav__devlog" id="devlog-btn" type="button"
+              aria-expanded="false">Devlog</button>
+      <span class="devlog-tip" id="devlog-tip" role="status">Скоро</span>
+    </span>
+    <span class="lang">
+      <span class="lang__current" aria-current="true">RU</span>
+      <a href="../">EN</a>
+    </span>
+  </nav>
+</header>
+
+<main>
+  <section class="sec sec--village" id="b-village"
+           data-scene="village" aria-label="Деревня">
+    <div class="sec__scene" aria-hidden="true">
+        <div class="dsprite dsprite--house-b" data-row="0"><img src="../assets/hero_house_b-768.webp" srcset="../assets/hero_house_b-480.webp 480w, ../assets/hero_house_b-768.webp 768w" sizes="(max-width: 760px) 46vw, 34vw" alt="" width="768" height="742" loading="eager" decoding="async"></div>
+        <div class="dsprite dsprite--tree-a" data-row="1"><img src="../assets/hero_tree_a-768.webp" srcset="../assets/hero_tree_a-480.webp 480w, ../assets/hero_tree_a-768.webp 768w" sizes="(max-width: 760px) 46vw, 34vw" alt="" width="768" height="774" loading="eager" decoding="async"></div>
+        <div class="dsprite dsprite--well" data-row="1"><img src="../assets/hero_well-480.webp" srcset="../assets/hero_well-480.webp 480w" sizes="(max-width: 760px) 46vw, 34vw" alt="" width="480" height="638" loading="eager" decoding="async"></div>
+        <div class="dsprite dsprite--house-a is-iso" data-row="1"><img src="../assets/hero_house_a-768.webp" srcset="../assets/hero_house_a-480.webp 480w, ../assets/hero_house_a-768.webp 768w" sizes="(max-width: 760px) 46vw, 34vw" alt="" width="768" height="779" loading="eager" decoding="async"></div>
+        <div class="dsprite dsprite--tree-b" data-row="0"><img src="../assets/hero_tree_b-480.webp" srcset="../assets/hero_tree_b-480.webp 480w" sizes="(max-width: 760px) 46vw, 34vw" alt="" width="480" height="428" loading="eager" decoding="async"></div>
+        <div class="dsprite dsprite--crates is-iso" data-row="1"><img src="../assets/prop_crates-480.webp" srcset="../assets/prop_crates-480.webp 480w" sizes="(max-width: 760px) 46vw, 34vw" alt="" width="480" height="585" loading="eager" decoding="async"></div>
+        <div class="dsprite dsprite--lantern" data-row="2"><img src="../assets/prop_lantern-286.webp" srcset="../assets/prop_lantern-286.webp 286w" sizes="(max-width: 760px) 46vw, 34vw" alt="" width="286" height="914" loading="eager" decoding="async"></div>
+        <div class="dsprite dsprite--signpost" data-row="2"><img src="../assets/prop_signpost-480.webp" srcset="../assets/prop_signpost-480.webp 480w" sizes="(max-width: 760px) 46vw, 34vw" alt="" width="480" height="685" loading="eager" decoding="async"></div>
+        <div class="dsprite dsprite--stones-verge" data-row="1"><img src="../assets/prop_stones-480.webp" srcset="../assets/prop_stones-480.webp 480w" sizes="(max-width: 760px) 46vw, 34vw" alt="" width="480" height="373" loading="eager" decoding="async"></div>
+    </div>
+    <p class="clock" id="clock"><span class="clock__dot"></span><span id="clock-text"></span></p>
+    <div class="pitch">
+      <div class="sign">
+        <p class="sign__text">Ты убивал их сотнями. Теперь они пришли за тобой.</p>
+        <p class="sign__sub">Качаешь то, чем играешь. Смерть уносит вещи. Мир живёт без тебя. Доната нет.</p>
+      </div>
+      <div class="cta">
+        <button class="btn btn--steam" disabled>Wishlist в Steam — скоро</button>
+        <a class="btn btn--discord" href="#">Discord</a>
+      </div>
+    </div>
+    <div class="sec__cards">
+        <article class="card" id="f-world">
+          <div class="card__roof" aria-hidden="true"></div>
+          <div class="card__body">
+            <img class="card__art" src="../assets/feat_world-480.webp" srcset="../assets/feat_world-480.webp 480w" sizes="(max-width: 760px) 46vw, 34vw" alt="Мир играет сам" width="480" height="433" loading="lazy" decoding="async"><img class="card__art card__art--corner" src="../assets/feat_tavern-768.webp" srcset="../assets/feat_tavern-480.webp 480w, ../assets/feat_tavern-768.webp 768w" sizes="(max-width: 760px) 46vw, 34vw" alt="" width="768" height="803" loading="lazy" decoding="async">
+            <h3 class="card__title">Мир играет сам</h3>
+            <p class="card__text">Вышел из игры — мир остался. NPC лезут в данжи, возят товар, торгуются и пьют в таверне. Ты приходишь не на пустую карту.</p>
+          </div>
+        </article>
+    </div>
+  </section>
+  <div class="gatezone" data-gate="village" aria-hidden="true"></div>
+  <section class="sec sec--forest" id="b-forest"
+           data-scene="forest" aria-label="Лес">
+    <div class="sec__scene" aria-hidden="true">
+        <div class="dsprite dsprite--pine-b" data-row="0"><img src="../assets/biome_pine_b-768.webp" srcset="../assets/biome_pine_b-480.webp 480w, ../assets/biome_pine_b-768.webp 768w" sizes="(max-width: 760px) 46vw, 34vw" alt="" width="768" height="740" loading="lazy" decoding="async"></div>
+        <div class="dsprite dsprite--deadtree" data-row="0"><img src="../assets/biome_deadtree-480.webp" srcset="../assets/biome_deadtree-480.webp 480w" sizes="(max-width: 760px) 46vw, 34vw" alt="" width="480" height="581" loading="lazy" decoding="async"></div>
+        <div class="dsprite dsprite--pine-a" data-row="1"><img src="../assets/biome_pine_a-480.webp" srcset="../assets/biome_pine_a-480.webp 480w" sizes="(max-width: 760px) 46vw, 34vw" alt="" width="480" height="839" loading="lazy" decoding="async"></div>
+        <div class="dsprite dsprite--stump" data-row="2"><img src="../assets/biome_stump-768.webp" srcset="../assets/biome_stump-480.webp 480w, ../assets/biome_stump-768.webp 768w" sizes="(max-width: 760px) 46vw, 34vw" alt="" width="768" height="628" loading="lazy" decoding="async"></div>
+    </div>
+    <div class="sec__cards">
+        <article class="card" id="f-skills">
+          <div class="card__roof" aria-hidden="true"></div>
+          <div class="card__body">
+            <img class="card__art" src="../assets/feat_skills-768.webp" srcset="../assets/feat_skills-480.webp 480w, ../assets/feat_skills-768.webp 768w" sizes="(max-width: 760px) 46vw, 34vw" alt="Скиллы вместо уровней" width="768" height="744" loading="lazy" decoding="async">
+            <h3 class="card__title">Скиллы вместо уровней</h3>
+            <p class="card__text">Уровня нет. Машешь мечом — растёт меч, лезешь по замкам — растёт взлом. Нужен другой персонаж — играй по-другому, а не создавай нового.</p>
+          </div>
+        </article>
+        <article class="card" id="f-craft">
+          <div class="card__roof" aria-hidden="true"></div>
+          <div class="card__body">
+            <img class="card__art" src="../assets/feat_craft-768.webp" srcset="../assets/feat_craft-480.webp 480w, ../assets/feat_craft-768.webp 768w" sizes="(max-width: 760px) 46vw, 34vw" alt="Крафт" width="768" height="760" loading="lazy" decoding="async">
+            <h3 class="card__title">Крафт</h3>
+            <p class="card__text">Всё стоящее делают игроки у наковальни. Кузнеца с именем знают на весь шард. Из меню не падает ничего.</p>
+          </div>
+        </article>
+    </div>
+  </section>
+  <div class="gatezone" data-gate="forest" aria-hidden="true"></div>
+  <section class="sec sec--mine" id="b-mine"
+           data-scene="mine" aria-label="Шахта">
+    <div class="sec__scene" aria-hidden="true">
+        <div class="dsprite dsprite--orevein" data-row="0"><img src="../assets/biome_orevein-768.webp" srcset="../assets/biome_orevein-480.webp 480w, ../assets/biome_orevein-768.webp 768w" sizes="(max-width: 760px) 46vw, 34vw" alt="" width="768" height="693" loading="lazy" decoding="async"></div>
+        <div class="dsprite dsprite--crystals" data-row="1"><img src="../assets/biome_crystals-768.webp" srcset="../assets/biome_crystals-480.webp 480w, ../assets/biome_crystals-768.webp 768w" sizes="(max-width: 760px) 46vw, 34vw" alt="" width="768" height="824" loading="lazy" decoding="async"></div>
+        <div class="dsprite dsprite--mining is-iso" data-row="1"><img src="../assets/feat_mining-768.webp" srcset="../assets/feat_mining-480.webp 480w, ../assets/feat_mining-768.webp 768w" sizes="(max-width: 760px) 46vw, 34vw" alt="" width="768" height="757" loading="lazy" decoding="async"></div>
+        <div class="dsprite dsprite--brazier" data-row="2"><img src="../assets/biome_brazier-480.webp" srcset="../assets/biome_brazier-480.webp 480w" sizes="(max-width: 760px) 46vw, 34vw" alt="" width="480" height="505" loading="lazy" decoding="async"></div>
+    </div>
+    <div class="sec__cards">
+        <article class="card" id="f-pvp">
+          <div class="card__roof" aria-hidden="true"></div>
+          <div class="card__body">
+            <img class="card__art" src="../assets/feat_pvp-480.webp" srcset="../assets/feat_pvp-480.webp 480w" sizes="(max-width: 760px) 46vw, 34vw" alt="Долгий бой" width="480" height="703" loading="lazy" decoding="async">
+            <h3 class="card__title">Долгий бой</h3>
+            <p class="card__text">С одного удара не убивают. Успеешь развернуться, позвать своих или уйти ногами. Кто победил — тот дожал, а не прокнул.</p>
+          </div>
+        </article>
+        <article class="card" id="f-mining">
+          <div class="card__roof" aria-hidden="true"></div>
+          <div class="card__body">
+            <img class="card__art" src="../assets/feat_mining-768.webp" srcset="../assets/feat_mining-480.webp 480w, ../assets/feat_mining-768.webp 768w" sizes="(max-width: 760px) 46vw, 34vw" alt="Добыча" width="768" height="757" loading="lazy" decoding="async">
+            <h3 class="card__title">Добыча</h3>
+            <p class="card__text">Руду, дерево, траву и рыбу кто-то вытащил руками. Жилы кончаются, лучшее лежит там, где убивают. Сколько дотащил — столько и твоё.</p>
+          </div>
+        </article>
+    </div>
+  </section>
+  <div class="gatezone" data-gate="mine" aria-hidden="true"></div>
+  <section class="sec sec--spirit" id="b-spirit"
+           data-scene="spirit" aria-label="Мир духов">
+    <div class="sec__scene" aria-hidden="true">
+        <div class="dsprite dsprite--ship is-iso" data-row="0"><img src="../assets/feat_death_alt-480.webp" srcset="../assets/feat_death_alt-480.webp 480w" sizes="(max-width: 760px) 46vw, 34vw" alt="" width="480" height="597" loading="lazy" decoding="async"></div>
+        <div class="dsprite dsprite--deadtree2" data-row="0"><img src="../assets/biome_deadtree-480.webp" srcset="../assets/biome_deadtree-480.webp 480w" sizes="(max-width: 760px) 46vw, 34vw" alt="" width="480" height="581" loading="lazy" decoding="async"></div>
+        <div class="dsprite dsprite--vendetta" data-row="1"><img src="../assets/feat_vendetta-480.webp" srcset="../assets/feat_vendetta-480.webp 480w" sizes="(max-width: 760px) 46vw, 34vw" alt="" width="480" height="610" loading="lazy" decoding="async"></div>
+        <div class="dsprite dsprite--crypt is-iso" data-row="1"><img src="../assets/feat_death-768.webp" srcset="../assets/feat_death-480.webp 480w, ../assets/feat_death-768.webp 768w" sizes="(max-width: 760px) 46vw, 34vw" alt="" width="768" height="840" loading="lazy" decoding="async"></div>
+        <div class="dsprite dsprite--brazier2" data-row="2"><img src="../assets/biome_brazier-480.webp" srcset="../assets/biome_brazier-480.webp 480w" sizes="(max-width: 760px) 46vw, 34vw" alt="" width="480" height="505" loading="lazy" decoding="async"></div>
+    </div>
+    <div class="sec__cards">
+        <article class="card" id="f-death">
+          <div class="card__roof" aria-hidden="true"></div>
+          <div class="card__body">
+            <img class="card__art" src="../assets/feat_death-768.webp" srcset="../assets/feat_death-480.webp 480w, ../assets/feat_death-768.webp 768w" sizes="(max-width: 760px) 46vw, 34vw" alt="Смерть — это место" width="768" height="840" loading="lazy" decoding="async"><img class="card__art card__art--corner" src="../assets/feat_death_alt-480.webp" srcset="../assets/feat_death_alt-480.webp 480w" sizes="(max-width: 760px) 46vw, 34vw" alt="" width="480" height="597" loading="lazy" decoding="async">
+            <h3 class="card__title">Смерть — это место</h3>
+            <p class="card__text">Некромантию не учат живые. Умри, сядь духом на корабль мёртвых — и вернись другим.</p>
+          </div>
+        </article>
+        <article class="card" id="f-vendetta">
+          <div class="card__roof" aria-hidden="true"></div>
+          <div class="card__body">
+            <img class="card__art" src="../assets/feat_vendetta-480.webp" srcset="../assets/feat_vendetta-480.webp 480w" sizes="(max-width: 760px) 46vw, 34vw" alt="Кровная месть" width="480" height="610" loading="lazy" decoding="async">
+            <h3 class="card__title">Кровная месть</h3>
+            <p class="card__text">Убил при свидетелях — родня запомнила. Мститель найдёт тебя хоть на другом конце карты. Работай чисто.</p>
+          </div>
+        </article>
+    </div>
+  </section>
+  <div class="gatezone" data-gate="spirit" aria-hidden="true"></div>
+  <section class="sec sec--home" id="b-home"
+           data-scene="home" aria-label="Дом">
+    <div class="sec__scene" aria-hidden="true">
+        <div class="dsprite dsprite--house-b2" data-row="0"><img src="../assets/hero_house_b-768.webp" srcset="../assets/hero_house_b-480.webp 480w, ../assets/hero_house_b-768.webp 768w" sizes="(max-width: 760px) 46vw, 34vw" alt="" width="768" height="742" loading="lazy" decoding="async"></div>
+        <div class="dsprite dsprite--tree-a2" data-row="0"><img src="../assets/hero_tree_a-768.webp" srcset="../assets/hero_tree_a-480.webp 480w, ../assets/hero_tree_a-768.webp 768w" sizes="(max-width: 760px) 46vw, 34vw" alt="" width="768" height="774" loading="lazy" decoding="async"></div>
+        <div class="dsprite dsprite--house-a2 is-iso" data-row="1"><img src="../assets/hero_house_a-768.webp" srcset="../assets/hero_house_a-480.webp 480w, ../assets/hero_house_a-768.webp 768w" sizes="(max-width: 760px) 46vw, 34vw" alt="" width="768" height="779" loading="lazy" decoding="async"></div>
+        <div class="dsprite dsprite--lantern2" data-row="2"><img src="../assets/prop_lantern-286.webp" srcset="../assets/prop_lantern-286.webp 286w" sizes="(max-width: 760px) 46vw, 34vw" alt="" width="286" height="914" loading="lazy" decoding="async"></div>
+    </div>
+    <div class="sec__cards">
+        <article class="card" id="f-home">
+          <div class="card__roof" aria-hidden="true"></div>
+          <div class="card__body">
+            <img class="card__art" src="../assets/feat_home-768.webp" srcset="../assets/feat_home-480.webp 480w, ../assets/feat_home-768.webp 768w" sizes="(max-width: 760px) 46vw, 34vw" alt="Дом, куда возвращаешься" width="768" height="742" loading="lazy" decoding="async">
+            <h3 class="card__title">Дом, куда возвращаешься</h3>
+            <p class="card__text">Займи свободный клочок земли и строй слоями: фундамент, стены, дверь, крыша. В сундуках — всё нажитое. Ночью монстры проверят стены на прочность.</p>
+          </div>
+        </article>
+        <article class="card" id="f-factions">
+          <div class="card__roof" aria-hidden="true"></div>
+          <div class="card__body">
+            <div class="card__art card__art--soon" role="img" aria-label="арт будет"><span>арт будет</span></div>
+            <h3 class="card__title">Люди и монстры</h3>
+            <p class="card__text">Играй за людей за стеной или за тех, кто ломится снаружи. Обе стороны живые, у обеих свой дом.</p>
+          </div>
+        </article>
+        <section class="resources" aria-labelledby="res-h">
+          <h3 class="resources__title" id="res-h">Копай, руби, куй</h3>
+          <ul class="resources__strip">
+            <li class="res"><figure><img src="../assets/res_iron-768.webp" srcset="../assets/res_iron-480.webp 480w, ../assets/res_iron-768.webp 768w" sizes="(max-width: 760px) 46vw, 34vw" alt="Руда" width="768" height="796" loading="lazy" decoding="async"><figcaption>Руда</figcaption></figure></li>
+            <li class="res"><figure><img src="../assets/res_gold-768.webp" srcset="../assets/res_gold-480.webp 480w, ../assets/res_gold-768.webp 768w" sizes="(max-width: 760px) 46vw, 34vw" alt="Золото" width="768" height="688" loading="lazy" decoding="async"><figcaption>Золото</figcaption></figure></li>
+            <li class="res"><figure><img src="../assets/res_diamond-768.webp" srcset="../assets/res_diamond-480.webp 480w, ../assets/res_diamond-768.webp 768w" sizes="(max-width: 760px) 46vw, 34vw" alt="Кристаллы" width="768" height="774" loading="lazy" decoding="async"><figcaption>Кристаллы</figcaption></figure></li>
+            <li class="res"><figure><img src="../assets/res_wood-480.webp" srcset="../assets/res_wood-480.webp 480w" sizes="(max-width: 760px) 46vw, 34vw" alt="Брёвна" width="480" height="809" loading="lazy" decoding="async"><figcaption>Брёвна</figcaption></figure></li>
+            <li class="res"><figure><img src="../assets/res_herbs-480.webp" srcset="../assets/res_herbs-480.webp 480w" sizes="(max-width: 760px) 46vw, 34vw" alt="Травы" width="480" height="712" loading="lazy" decoding="async"><figcaption>Травы</figcaption></figure></li>
+            <li class="res"><figure><img src="../assets/res_fish-480.webp" srcset="../assets/res_fish-480.webp 480w" sizes="(max-width: 760px) 46vw, 34vw" alt="Рыба" width="480" height="557" loading="lazy" decoding="async"><figcaption>Рыба</figcaption></figure></li>
+            <li class="res"><figure><img src="../assets/res_pickaxe-480.webp" srcset="../assets/res_pickaxe-480.webp 480w" sizes="(max-width: 760px) 46vw, 34vw" alt="Кирка" width="480" height="805" loading="lazy" decoding="async"><figcaption>Кирка</figcaption></figure></li>
+            <li class="res"><figure><img src="../assets/res_sword-142.webp" srcset="../assets/res_sword-142.webp 142w" sizes="(max-width: 760px) 46vw, 34vw" alt="Меч" width="142" height="559" loading="lazy" decoding="async"><figcaption>Меч</figcaption></figure></li>
+            <li class="res"><figure><img src="../assets/res_bow-363.webp" srcset="../assets/res_bow-363.webp 363w" sizes="(max-width: 760px) 46vw, 34vw" alt="Лук" width="363" height="499" loading="lazy" decoding="async"><figcaption>Лук</figcaption></figure></li>
+            <li class="res"><figure><img src="../assets/res_staff-147.webp" srcset="../assets/res_staff-147.webp 147w" sizes="(max-width: 760px) 46vw, 34vw" alt="Посох" width="147" height="929" loading="lazy" decoding="async"><figcaption>Посох</figcaption></figure></li>
+            <li class="res"><figure><img src="../assets/res_spellbook-768.webp" srcset="../assets/res_spellbook-480.webp 480w, ../assets/res_spellbook-768.webp 768w" sizes="(max-width: 760px) 46vw, 34vw" alt="Книга заклинаний" width="768" height="664" loading="lazy" decoding="async"><figcaption>Книга заклинаний</figcaption></figure></li>
+            <li class="res"><figure><img src="../assets/res_runes-480.webp" srcset="../assets/res_runes-480.webp 480w" sizes="(max-width: 760px) 46vw, 34vw" alt="Руны" width="480" height="525" loading="lazy" decoding="async"><figcaption>Руны</figcaption></figure></li>
+            <li class="res"><figure><img src="../assets/res_potion-449.webp" srcset="../assets/res_potion-449.webp 449w" sizes="(max-width: 760px) 46vw, 34vw" alt="Зелье" width="449" height="728" loading="lazy" decoding="async"><figcaption>Зелье</figcaption></figure></li>
+          </ul>
+        </section>
+    </div>
+    <div class="sec__outro">
+      <div class="cta">
+        <button class="btn btn--steam" disabled>Wishlist в Steam — скоро</button>
+        <a class="btn btn--discord" href="#">Discord</a>
+      </div>
+    </div>
+  </section>
+
+  <p class="disclaimer">Игра в ранней разработке. Всё, что видишь, ещё поменяется.</p>
+</main>
+
+<footer class="footer">
+  <p class="footer__brand">fellmise.com</p>
+  <p class="footer__rights">© 2026 Fellmise</p>
+  <nav class="footer__links" aria-label="Links">
+    <a href="#">Discord</a>
+    <a href="#">Steam</a>
+    <a href="../">EN</a>
+  </nav>
+</footer>
+</div>
+
+<script src="../vendor/gsap.min.js" defer></script>
+<script src="../vendor/ScrollTrigger.min.js" defer></script>
+<!-- module, so the dynamic import of journey.js resolves against this
+     file rather than about:blank (which is what a classic script does) -->
+<script type="module" src="../main.js?v=1"></script>
+</body>
+</html>

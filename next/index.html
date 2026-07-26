@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Fellmise — top-down 2D sandbox MMO — preview</title>
+<meta name="description" content="Top-down 2D sandbox MMO inspired by Ultima Online: skill-based progression, playable monster faction, PC+mobile crossplay">
+<link rel="icon" href="assets/favicon-32.png" sizes="32x32">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" media="print" onload="this.media='all'"
+      href="https://fonts.googleapis.com/css2?family=Podkova:wght@500;700&family=Vollkorn:wght@400;600;700&family=PT+Mono&display=swap">
+<noscript><link rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Podkova:wght@500;700&family=Vollkorn:wght@400;600;700&family=PT+Mono&display=swap"></noscript>
+<link rel="stylesheet" href="styles.css?v=1">
+<script>window.TOD_LABELS = {"dawn": "dawn", "day": "day", "dusk": "sunset", "night": "night", "prefix": "in Fellmise now:"}; window.SCENE_URL = "scene.json";
+        window.ASSET_BASE = "assets/";</script>
+</head>
+<body>
+<canvas id="stage" aria-hidden="true"></canvas>
+
+<div id="dom">
+<a class="skip" href="#b-village">Skip to content</a>
+
+<header class="topbar">
+  <a class="logo" href="./">FELLMISE</a>
+  <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav"
+          aria-label="Menu"><span></span><span></span><span></span></button>
+  <nav class="nav" id="nav" aria-label="Menu">
+    <a class="nav__link" href="#b-forest">Features</a>
+    <a class="nav__link" href="#b-spirit">World</a>
+    <span class="nav__devlog-wrap">
+      <button class="nav__link nav__devlog" id="devlog-btn" type="button"
+              aria-expanded="false">Devlog</button>
+      <span class="devlog-tip" id="devlog-tip" role="status">Devlog starts soon</span>
+    </span>
+    <span class="lang">
+      <span class="lang__current" aria-current="true">EN</span>
+      <a href="ru/">RU</a>
+    </span>
+  </nav>
+</header>
+
+<main>
+  <section class="sec sec--village" id="b-village"
+           data-scene="village" aria-label="The village">
+    <div class="sec__scene" aria-hidden="true">
+        <div class="dsprite dsprite--house-b" data-row="0"><img src="assets/hero_house_b-768.webp" srcset="assets/hero_house_b-480.webp 480w, assets/hero_house_b-768.webp 768w" sizes="(max-width: 760px) 46vw, 34vw" alt="" width="768" height="742" loading="eager" decoding="async"></div>
+        <div class="dsprite dsprite--tree-a" data-row="1"><img src="assets/hero_tree_a-768.webp" srcset="assets/hero_tree_a-480.webp 480w, assets/hero_tree_a-768.webp 768w" sizes="(max-width: 760px) 46vw, 34vw" alt="" width="768" height="774" loading="eager" decoding="async"></div>
+        <div class="dsprite dsprite--well" data-row="1"><img src="assets/hero_well-480.webp" srcset="assets/hero_well-480.webp 480w" sizes="(max-width: 760px) 46vw, 34vw" alt="" width="480" height="638" loading="eager" decoding="async"></div>
+        <div class="dsprite dsprite--house-a is-iso" data-row="1"><img src="assets/hero_house_a-768.webp" srcset="assets/hero_house_a-480.webp 480w, assets/hero_house_a-768.webp 768w" sizes="(max-width: 760px) 46vw, 34vw" alt="" width="768" height="779" loading="eager" decoding="async"></div>
+        <div class="dsprite dsprite--tree-b" data-row="0"><img src="assets/hero_tree_b-480.webp" srcset="assets/hero_tree_b-480.webp 480w" sizes="(max-width: 760px) 46vw, 34vw" alt="" width="480" height="428" loading="eager" decoding="async"></div>
+        <div class="dsprite dsprite--crates is-iso" data-row="1"><img src="assets/prop_crates-480.webp" srcset="assets/prop_crates-480.webp 480w" sizes="(max-width: 760px) 46vw, 34vw" alt="" width="480" height="585" loading="eager" decoding="async"></div>
+        <div class="dsprite dsprite--lantern" data-row="2"><img src="assets/prop_lantern-286.webp" srcset="assets/prop_lantern-286.webp 286w" sizes="(max-width: 760px) 46vw, 34vw" alt="" width="286" height="914" loading="eager" decoding="async"></div>
+        <div class="dsprite dsprite--signpost" data-row="2"><img src="assets/prop_signpost-480.webp" srcset="assets/prop_signpost-480.webp 480w" sizes="(max-width: 760px) 46vw, 34vw" alt="" width="480" height="685" loading="eager" decoding="async"></div>
+        <div class="dsprite dsprite--stones-verge" data-row="1"><img src="assets/prop_stones-480.webp" srcset="assets/prop_stones-480.webp 480w" sizes="(max-width: 760px) 46vw, 34vw" alt="" width="480" height="373" loading="eager" decoding="async"></div>
+    </div>
+    <p class="clock" id="clock"><span class="clock__dot"></span><span id="clock-text"></span></p>
+    <div class="pitch">
+      <div class="sign">
+        <p class="sign__text">You killed them by the hundreds. Now they've come for you.</p>
+        <p class="sign__sub">Skills instead of levels. Death costs you. A world that runs without you. No pay-to-win.</p>
+      </div>
+      <div class="cta">
+        <button class="btn btn--steam" disabled>Wishlist on Steam — soon</button>
+        <a class="btn btn--discord" href="#">Discord</a>
+      </div>
+    </div>
+    <div class="sec__cards">
+        <article class="card" id="f-world">
+          <div class="card__roof" aria-hidden="true"></div>
+          <div class="card__body">
+            <img class="card__art" src="assets/feat_world-480.webp" srcset="assets/feat_world-480.webp 480w" sizes="(max-width: 760px) 46vw, 34vw" alt="A world that plays itself" width="480" height="433" loading="lazy" decoding="async"><img class="card__art card__art--corner" src="assets/feat_tavern-768.webp" srcset="assets/feat_tavern-480.webp 480w, assets/feat_tavern-768.webp 768w" sizes="(max-width: 760px) 46vw, 34vw" alt="" width="768" height="803" loading="lazy" decoding="async">
+            <h3 class="card__title">A world that plays itself</h3>
+            <p class="card__text">Log off and the world stays. NPCs run dungeons, haul goods, haggle and drink in taverns. You are not arriving at an empty map.</p>
+          </div>
+        </article>
+    </div>
+  </section>
+  <div class="gatezone" data-gate="village" aria-hidden="true"></div>
+  <section class="sec sec--forest" id="b-forest"
+           data-scene="forest" aria-label="The forest">
+    <div class="sec__scene" aria-hidden="true">
+        <div class="dsprite dsprite--pine-b" data-row="0"><img src="assets/biome_pine_b-768.webp" srcset="assets/biome_pine_b-480.webp 480w, assets/biome_pine_b-768.webp 768w" sizes="(max-width: 760px) 46vw, 34vw" alt="" width="768" height="740" loading="lazy" decoding="async"></div>
+        <div class="dsprite dsprite--deadtree" data-row="0"><img src="assets/biome_deadtree-480.webp" srcset="assets/biome_deadtree-480.webp 480w" sizes="(max-width: 760px) 46vw, 34vw" alt="" width="480" height="581" loading="lazy" decoding="async"></div>
+        <div class="dsprite dsprite--pine-a" data-row="1"><img src="assets/biome_pine_a-480.webp" srcset="assets/biome_pine_a-480.webp 480w" sizes="(max-width: 760px) 46vw, 34vw" alt="" width="480" height="839" loading="lazy" decoding="async"></div>
+        <div class="dsprite dsprite--stump" data-row="2"><img src="assets/biome_stump-768.webp" srcset="assets/biome_stump-480.webp 480w, assets/biome_stump-768.webp 768w" sizes="(max-width: 760px) 46vw, 34vw" alt="" width="768" height="628" loading="lazy" decoding="async"></div>
+    </div>
+    <div class="sec__cards">
+        <article class="card" id="f-skills">
+          <div class="card__roof" aria-hidden="true"></div>
+          <div class="card__body">
+            <img class="card__art" src="assets/feat_skills-768.webp" srcset="assets/feat_skills-480.webp 480w, assets/feat_skills-768.webp 768w" sizes="(max-width: 760px) 46vw, 34vw" alt="Skills, no levels" width="768" height="744" loading="lazy" decoding="async">
+            <h3 class="card__title">Skills, no levels</h3>
+            <p class="card__text">No level next to your name. Swing a sword and your sword skill grows; pick locks and your lockpicking does. Want a different character — play differently, don't roll a new one.</p>
+          </div>
+        </article>
+        <article class="card" id="f-craft">
+          <div class="card__roof" aria-hidden="true"></div>
+          <div class="card__body">
+            <img class="card__art" src="assets/feat_craft-768.webp" srcset="assets/feat_craft-480.webp 480w, assets/feat_craft-768.webp 768w" sizes="(max-width: 760px) 46vw, 34vw" alt="Crafting" width="768" height="760" loading="lazy" decoding="async">
+            <h3 class="card__title">Crafting</h3>
+            <p class="card__text">Anything worth wearing is made by a player at an anvil. A good smith's name is known across the shard. Nothing drops out of a menu.</p>
+          </div>
+        </article>
+    </div>
+  </section>
+  <div class="gatezone" data-gate="forest" aria-hidden="true"></div>
+  <section class="sec sec--mine" id="b-mine"
+           data-scene="mine" aria-label="The mine">
+    <div class="sec__scene" aria-hidden="true">
+        <div class="dsprite dsprite--orevein" data-row="0"><img src="assets/biome_orevein-768.webp" srcset="assets/biome_orevein-480.webp 480w, assets/biome_orevein-768.webp 768w" sizes="(max-width: 760px) 46vw, 34vw" alt="" width="768" height="693" loading="lazy" decoding="async"></div>
+        <div class="dsprite dsprite--crystals" data-row="1"><img src="assets/biome_crystals-768.webp" srcset="assets/biome_crystals-480.webp 480w, assets/biome_crystals-768.webp 768w" sizes="(max-width: 760px) 46vw, 34vw" alt="" width="768" height="824" loading="lazy" decoding="async"></div>
+        <div class="dsprite dsprite--mining is-iso" data-row="1"><img src="assets/feat_mining-768.webp" srcset="assets/feat_mining-480.webp 480w, assets/feat_mining-768.webp 768w" sizes="(max-width: 760px) 46vw, 34vw" alt="" width="768" height="757" loading="lazy" decoding="async"></div>
+        <div class="dsprite dsprite--brazier" data-row="2"><img src="assets/biome_brazier-480.webp" srcset="assets/biome_brazier-480.webp 480w" sizes="(max-width: 760px) 46vw, 34vw" alt="" width="480" height="505" loading="lazy" decoding="async"></div>
+    </div>
+    <div class="sec__cards">
+        <article class="card" id="f-pvp">
+          <div class="card__roof" aria-hidden="true"></div>
+          <div class="card__body">
+            <img class="card__art" src="assets/feat_pvp-480.webp" srcset="assets/feat_pvp-480.webp 480w" sizes="(max-width: 760px) 46vw, 34vw" alt="Fights that last" width="480" height="703" loading="lazy" decoding="async">
+            <h3 class="card__title">Fights that last</h3>
+            <p class="card__text">Nobody dies in one hit. There is time to turn around, call your people, or leave on foot. Whoever won ground it out — they didn't get a lucky proc.</p>
+          </div>
+        </article>
+        <article class="card" id="f-mining">
+          <div class="card__roof" aria-hidden="true"></div>
+          <div class="card__body">
+            <img class="card__art" src="assets/feat_mining-768.webp" srcset="assets/feat_mining-480.webp 480w, assets/feat_mining-768.webp 768w" sizes="(max-width: 760px) 46vw, 34vw" alt="Mining and gathering" width="768" height="757" loading="lazy" decoding="async">
+            <h3 class="card__title">Mining and gathering</h3>
+            <p class="card__text">Every ore, log, herb and fish was pulled out of the ground by somebody's hands. Veins run out. The best ground is where people get killed. What you haul back is what you keep.</p>
+          </div>
+        </article>
+    </div>
+  </section>
+  <div class="gatezone" data-gate="mine" aria-hidden="true"></div>
+  <section class="sec sec--spirit" id="b-spirit"
+           data-scene="spirit" aria-label="The spirit world">
+    <div class="sec__scene" aria-hidden="true">
+        <div class="dsprite dsprite--ship is-iso" data-row="0"><img src="assets/feat_death_alt-480.webp" srcset="assets/feat_death_alt-480.webp 480w" sizes="(max-width: 760px) 46vw, 34vw" alt="" width="480" height="597" loading="lazy" decoding="async"></div>
+        <div class="dsprite dsprite--deadtree2" data-row="0"><img src="assets/biome_deadtree-480.webp" srcset="assets/biome_deadtree-480.webp 480w" sizes="(max-width: 760px) 46vw, 34vw" alt="" width="480" height="581" loading="lazy" decoding="async"></div>
+        <div class="dsprite dsprite--vendetta" data-row="1"><img src="assets/feat_vendetta-480.webp" srcset="assets/feat_vendetta-480.webp 480w" sizes="(max-width: 760px) 46vw, 34vw" alt="" width="480" height="610" loading="lazy" decoding="async"></div>
+        <div class="dsprite dsprite--crypt is-iso" data-row="1"><img src="assets/feat_death-768.webp" srcset="assets/feat_death-480.webp 480w, assets/feat_death-768.webp 768w" sizes="(max-width: 760px) 46vw, 34vw" alt="" width="768" height="840" loading="lazy" decoding="async"></div>
+        <div class="dsprite dsprite--brazier2" data-row="2"><img src="assets/biome_brazier-480.webp" srcset="assets/biome_brazier-480.webp 480w" sizes="(max-width: 760px) 46vw, 34vw" alt="" width="480" height="505" loading="lazy" decoding="async"></div>
+    </div>
+    <div class="sec__cards">
+        <article class="card" id="f-death">
+          <div class="card__roof" aria-hidden="true"></div>
+          <div class="card__body">
+            <img class="card__art" src="assets/feat_death-768.webp" srcset="assets/feat_death-480.webp 480w, assets/feat_death-768.webp 768w" sizes="(max-width: 760px) 46vw, 34vw" alt="Death is a place" width="768" height="840" loading="lazy" decoding="async"><img class="card__art card__art--corner" src="assets/feat_death_alt-480.webp" srcset="assets/feat_death_alt-480.webp 480w" sizes="(max-width: 760px) 46vw, 34vw" alt="" width="480" height="597" loading="lazy" decoding="async">
+            <h3 class="card__title">Death is a place</h3>
+            <p class="card__text">The living don't teach necromancy. Die, ride the ship of the dead as a ghost, and come back changed.</p>
+          </div>
+        </article>
+        <article class="card" id="f-vendetta">
+          <div class="card__roof" aria-hidden="true"></div>
+          <div class="card__body">
+            <img class="card__art" src="assets/feat_vendetta-480.webp" srcset="assets/feat_vendetta-480.webp 480w" sizes="(max-width: 760px) 46vw, 34vw" alt="Vendetta" width="480" height="610" loading="lazy" decoding="async">
+            <h3 class="card__title">Vendetta</h3>
+            <p class="card__text">Kill in front of witnesses and the family remembers. An avenger will find you on the far side of the map. Work clean.</p>
+          </div>
+        </article>
+    </div>
+  </section>
+  <div class="gatezone" data-gate="spirit" aria-hidden="true"></div>
+  <section class="sec sec--home" id="b-home"
+           data-scene="home" aria-label="Home">
+    <div class="sec__scene" aria-hidden="true">
+        <div class="dsprite dsprite--house-b2" data-row="0"><img src="assets/hero_house_b-768.webp" srcset="assets/hero_house_b-480.webp 480w, assets/hero_house_b-768.webp 768w" sizes="(max-width: 760px) 46vw, 34vw" alt="" width="768" height="742" loading="lazy" decoding="async"></div>
+        <div class="dsprite dsprite--tree-a2" data-row="0"><img src="assets/hero_tree_a-768.webp" srcset="assets/hero_tree_a-480.webp 480w, assets/hero_tree_a-768.webp 768w" sizes="(max-width: 760px) 46vw, 34vw" alt="" width="768" height="774" loading="lazy" decoding="async"></div>
+        <div class="dsprite dsprite--house-a2 is-iso" data-row="1"><img src="assets/hero_house_a-768.webp" srcset="assets/hero_house_a-480.webp 480w, assets/hero_house_a-768.webp 768w" sizes="(max-width: 760px) 46vw, 34vw" alt="" width="768" height="779" loading="lazy" decoding="async"></div>
+        <div class="dsprite dsprite--lantern2" data-row="2"><img src="assets/prop_lantern-286.webp" srcset="assets/prop_lantern-286.webp 286w" sizes="(max-width: 760px) 46vw, 34vw" alt="" width="286" height="914" loading="lazy" decoding="async"></div>
+    </div>
+    <div class="sec__cards">
+        <article class="card" id="f-home">
+          <div class="card__roof" aria-hidden="true"></div>
+          <div class="card__body">
+            <img class="card__art" src="assets/feat_home-768.webp" srcset="assets/feat_home-480.webp 480w, assets/feat_home-768.webp 768w" sizes="(max-width: 760px) 46vw, 34vw" alt="A home to come back to" width="768" height="742" loading="lazy" decoding="async">
+            <h3 class="card__title">A home to come back to</h3>
+            <p class="card__text">Claim an empty patch of land and build it in layers: foundation, walls, door, roof. Your chests hold everything you have earned. At night the monsters test the walls.</p>
+          </div>
+        </article>
+        <article class="card" id="f-factions">
+          <div class="card__roof" aria-hidden="true"></div>
+          <div class="card__body">
+            <div class="card__art card__art--soon" role="img" aria-label="art coming soon"><span>art coming soon</span></div>
+            <h3 class="card__title">Humans and monsters</h3>
+            <p class="card__text">Play the people behind the wall, or the ones hammering on it. Both sides are alive, and both sides have a home.</p>
+          </div>
+        </article>
+        <section class="resources" aria-labelledby="res-h">
+          <h3 class="resources__title" id="res-h">Dug up, chopped down, forged</h3>
+          <ul class="resources__strip">
+            <li class="res"><figure><img src="assets/res_iron-768.webp" srcset="assets/res_iron-480.webp 480w, assets/res_iron-768.webp 768w" sizes="(max-width: 760px) 46vw, 34vw" alt="Iron ore" width="768" height="796" loading="lazy" decoding="async"><figcaption>Iron ore</figcaption></figure></li>
+            <li class="res"><figure><img src="assets/res_gold-768.webp" srcset="assets/res_gold-480.webp 480w, assets/res_gold-768.webp 768w" sizes="(max-width: 760px) 46vw, 34vw" alt="Gold ore" width="768" height="688" loading="lazy" decoding="async"><figcaption>Gold ore</figcaption></figure></li>
+            <li class="res"><figure><img src="assets/res_diamond-768.webp" srcset="assets/res_diamond-480.webp 480w, assets/res_diamond-768.webp 768w" sizes="(max-width: 760px) 46vw, 34vw" alt="Crystals" width="768" height="774" loading="lazy" decoding="async"><figcaption>Crystals</figcaption></figure></li>
+            <li class="res"><figure><img src="assets/res_wood-480.webp" srcset="assets/res_wood-480.webp 480w" sizes="(max-width: 760px) 46vw, 34vw" alt="Logs" width="480" height="809" loading="lazy" decoding="async"><figcaption>Logs</figcaption></figure></li>
+            <li class="res"><figure><img src="assets/res_herbs-480.webp" srcset="assets/res_herbs-480.webp 480w" sizes="(max-width: 760px) 46vw, 34vw" alt="Herbs" width="480" height="712" loading="lazy" decoding="async"><figcaption>Herbs</figcaption></figure></li>
+            <li class="res"><figure><img src="assets/res_fish-480.webp" srcset="assets/res_fish-480.webp 480w" sizes="(max-width: 760px) 46vw, 34vw" alt="Fish" width="480" height="557" loading="lazy" decoding="async"><figcaption>Fish</figcaption></figure></li>
+            <li class="res"><figure><img src="assets/res_pickaxe-480.webp" srcset="assets/res_pickaxe-480.webp 480w" sizes="(max-width: 760px) 46vw, 34vw" alt="Pickaxe" width="480" height="805" loading="lazy" decoding="async"><figcaption>Pickaxe</figcaption></figure></li>
+            <li class="res"><figure><img src="assets/res_sword-142.webp" srcset="assets/res_sword-142.webp 142w" sizes="(max-width: 760px) 46vw, 34vw" alt="Sword" width="142" height="559" loading="lazy" decoding="async"><figcaption>Sword</figcaption></figure></li>
+            <li class="res"><figure><img src="assets/res_bow-363.webp" srcset="assets/res_bow-363.webp 363w" sizes="(max-width: 760px) 46vw, 34vw" alt="Bow" width="363" height="499" loading="lazy" decoding="async"><figcaption>Bow</figcaption></figure></li>
+            <li class="res"><figure><img src="assets/res_staff-147.webp" srcset="assets/res_staff-147.webp 147w" sizes="(max-width: 760px) 46vw, 34vw" alt="Staff" width="147" height="929" loading="lazy" decoding="async"><figcaption>Staff</figcaption></figure></li>
+            <li class="res"><figure><img src="assets/res_spellbook-768.webp" srcset="assets/res_spellbook-480.webp 480w, assets/res_spellbook-768.webp 768w" sizes="(max-width: 760px) 46vw, 34vw" alt="Spellbook" width="768" height="664" loading="lazy" decoding="async"><figcaption>Spellbook</figcaption></figure></li>
+            <li class="res"><figure><img src="assets/res_runes-480.webp" srcset="assets/res_runes-480.webp 480w" sizes="(max-width: 760px) 46vw, 34vw" alt="Runes" width="480" height="525" loading="lazy" decoding="async"><figcaption>Runes</figcaption></figure></li>
+            <li class="res"><figure><img src="assets/res_potion-449.webp" srcset="assets/res_potion-449.webp 449w" sizes="(max-width: 760px) 46vw, 34vw" alt="Potion" width="449" height="728" loading="lazy" decoding="async"><figcaption>Potion</figcaption></figure></li>
+          </ul>
+        </section>
+    </div>
+    <div class="sec__outro">
+      <div class="cta">
+        <button class="btn btn--steam" disabled>Wishlist on Steam — soon</button>
+        <a class="btn btn--discord" href="#">Discord</a>
+      </div>
+    </div>
+  </section>
+
+  <p class="disclaimer">Fellmise is in early development. Everything here is still being built and will change.</p>
+</main>
+
+<footer class="footer">
+  <p class="footer__brand">fellmise.com</p>
+  <p class="footer__rights">© 2026 Fellmise</p>
+  <nav class="footer__links" aria-label="Links">
+    <a href="#">Discord</a>
+    <a href="#">Steam</a>
+    <a href="ru/">RU</a>
+  </nav>
+</footer>
+</div>
+
+<script src="vendor/gsap.min.js" defer></script>
+<script src="vendor/ScrollTrigger.min.js" defer></script>
+<!-- module, so the dynamic import of journey.js resolves against this
+     file rather than about:blank (which is what a classic script does) -->
+<script type="module" src="main.js?v=1"></script>
+</body>
+</html>

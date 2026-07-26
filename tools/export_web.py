@@ -116,8 +116,10 @@ def export_sprites():
             out = ASSETS / f"{tile}-{small}.webp"
             im.resize((small, round(im.height * small / im.width)), Image.LANCZOS) \
               .save(out, quality=82, method=6)
-            manifest[tile] = {"w": [small, im.width], "fallback": im.width,
-                              "width": im.width, "height": im.height}
+            # the full-size tile keeps its plain name, so record it explicitly
+            # rather than letting a consumer guess "<tile>-<width>.webp"
+            manifest[tile] = {"w": [small], "full": f"{tile}.webp",
+                              "fallback": small, "width": im.width, "height": im.height}
 
     (ASSETS / "manifest.json").write_text(json.dumps(manifest, indent=1), encoding="utf-8")
     return manifest, tot_w, tot_p

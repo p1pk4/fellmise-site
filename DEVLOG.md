@@ -24,7 +24,7 @@
   вес страницы 1.16 MB при цели <1.5 MB ✓ · live https://fellmise.com отдаёт новую
   версию (9 карточек, `styles.css?v=2`, Podkova), www и http редиректят на HTTPS ✓ ·
   runClient n/a
-- **Commit:** 47ea42c, HEAD
+- **Commit:** 47ea42c, 9802475
 
 **Impact trace**
 

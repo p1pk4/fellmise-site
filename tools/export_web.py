@@ -9,6 +9,7 @@ the page, not its source size:
     hero_*  560px   composed into the hero scene
     feat_*  640px   the largest single element of a feature card
     res_*   224px   pictogram in the resource strip
+    prop_*  360px   small dressing on the hero road (~120-180px on screen)
 
 Also emits the favicon set from res_diamond and the 1200x630 og:image.
 Everything lands in assets/; the site never reads out/.
@@ -19,10 +20,14 @@ import pathlib
 from PIL import Image
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-FINAL = ROOT / "out" / "site_assets" / "final"
+# Package the graded copies (defringed + colour-graded by grade_sprites.py);
+# fall back to the ungraded masters if that pass has not been run.
+_MASTER = ROOT / "out" / "site_assets" / "final"
+_GRADED = ROOT / "out" / "site_assets" / "final_web"
+FINAL = _GRADED if _GRADED.is_dir() else _MASTER
 ASSETS = ROOT / "assets"
 
-WIDTHS = {"hero_": 560, "feat_": 640, "res_": 224}
+WIDTHS = {"hero_": 560, "feat_": 640, "res_": 224, "prop_": 360}
 QUALITY = 85
 
 # Sprites the page needs at a second size under a second name. The housing card

@@ -67,7 +67,8 @@ PICK_OVERRIDE = {
     "res_bow": 2002,
     # every seed leans architectural (the known exotic risk), but 3003 carries a
     # door AND a window while 4004 is a horned, bone-studded totem with neither.
-    "feat_nemesis": 4004,
+    # (id renamed from its original name in iteration 3.)
+    "feat_vendetta": 4004,
 }
 
 

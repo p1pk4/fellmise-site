@@ -12,7 +12,7 @@ import pathlib
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 
-CSS_V = "2"          # cache-buster on styles.css / main.js
+CSS_V = "3"          # cache-buster on styles.css / main.js
 
 # --------------------------------------------------------------------------
 # copy
@@ -20,111 +20,95 @@ CSS_V = "2"          # cache-buster on styles.css / main.js
 FEATURES = [
     dict(id="skills", sprite="feat_skills",
          en_t="Skills, no levels",
-         en_p="There is no level next to your name. You get better at what you "
-              "actually do — swing a blade and the arm remembers, fumble a lock "
-              "and try it again. The character is the one you played into being, "
-              "not the one a class menu handed you.",
+         en_p="No level next to your name. Swing a sword and your sword skill "
+              "grows; pick locks and your lockpicking does. Want a different "
+              "character — play differently, don't roll a new one.",
          ru_t="Скиллы вместо уровней",
-         ru_p="Рядом с именем нет уровня. Ты становишься лучше в том, что делаешь "
-              "руками: машешь клинком — рука запоминает, не открыл замок — пробуешь "
-              "снова. Персонаж вырастает из твоей игры, а не из меню классов."),
+         ru_p="Уровня нет. Машешь мечом — растёт меч, лезешь по замкам — растёт "
+              "взлом. Нужен другой персонаж — играй по-другому, а не создавай "
+              "нового."),
     dict(id="mining", sprite="feat_mining",
-         en_t="Mining & gathering",
-         en_p="Everything the world is made of, somebody pulled out of it by hand. "
-              "Veins run dry, and the richest ground is always where it is least "
-              "safe to stand. What you carry home is exactly what you were willing "
-              "to risk going out for.",
+         en_t="Mining and gathering",
+         en_p="Every ore, log, herb and fish was pulled out of the ground by "
+              "somebody's hands. Veins run out. The best ground is where people "
+              "get killed. What you haul back is what you keep.",
          ru_t="Добыча",
-         ru_p="Всё, из чего сделан мир, кто-то вытащил из него руками. Жилы "
-              "истощаются, а самое богатое всегда лежит там, где стоять опаснее "
-              "всего. Домой приносишь ровно то, чем рискнул."),
+         ru_p="Руду, дерево, траву и рыбу кто-то вытащил руками. Жилы кончаются, "
+              "лучшее лежит там, где убивают. Сколько дотащил — столько и твоё."),
     dict(id="craft", sprite="feat_craft",
          en_t="Crafting",
-         en_p="Gear is made by players, at an anvil, out of what someone else dug "
-              "up. A good smith's name travels further than most swordsmen's. "
-              "Nothing worth wearing falls out of a menu.",
+         en_p="Anything worth wearing is made by a player at an anvil. A good "
+              "smith's name is known across the shard. Nothing drops out of a menu.",
          ru_t="Крафт",
-         ru_p="Снаряжение делают игроки — у наковальни, из того, что кто-то выкопал. "
-              "Имя хорошего кузнеца расходится дальше, чем имя иного мечника. "
-              "Ничего стоящего не выпадает из меню."),
+         ru_p="Всё стоящее делают игроки у наковальни. Кузнеца с именем знают на "
+              "весь шард. Из меню не падает ничего."),
     dict(id="pvp", sprite="feat_pvp",
-         en_t="High-TTK PvP",
-         en_p="Fights last long enough to actually be fights — long enough to "
-              "reposition, to shout for help, to decide you would rather run. "
-              "Nobody bursts down in one hit from off-screen. You keep choosing "
-              "the win, you don't get handed it.",
-         ru_t="PvP с высоким TTK",
-         ru_p="Бой длится достаточно, чтобы быть боем: перестроиться, позвать на "
-              "помощь, решить, что лучше бежать. Никто не рассыпается от одного "
-              "удара из-за края экрана. Победу удерживают, а не выигрывают вспышкой."),
+         en_t="Fights that last",
+         en_p="Nobody dies in one hit. There is time to turn around, call your "
+              "people, or leave on foot. Whoever won ground it out — they didn't "
+              "get a lucky proc.",
+         ru_t="Долгий бой",
+         ru_p="С одного удара не убивают. Успеешь развернуться, позвать своих или "
+              "уйти ногами. Кто победил — тот дожал, а не прокнул."),
     dict(id="death", sprite="feat_death", extra="feat_death_alt",
          en_t="Death is a place",
-         en_p="Dying does not reload — it moves you. The other side has its own "
-              "geography, its own routes back, and its own residents who never "
-              "found one. Go deep enough and you may return knowing necromancy.",
+         en_p="The living don't teach necromancy. Die, ride the ship of the dead "
+              "as a ghost, and come back changed.",
          ru_t="Смерть — это место",
-         ru_p="Смерть не перезагружает, а переносит. У той стороны своя география, "
-              "свои дороги обратно и свои жители, которые их не нашли. Зайди "
-              "достаточно глубоко — и вернёшься, зная некромантию."),
-    dict(id="nemesis", sprite="feat_nemesis",
-         en_t="Nemesis",
-         en_p="The world remembers who did it. Kill without witnesses and nothing "
-              "follows you home; leave someone breathing and the story gets told, "
-              "and the people who loved them come looking. Your enemies are the "
-              "ones you made.",
-         ru_t="Немезида",
-         ru_p="Мир помнит, кто это сделал. Убивай без свидетелей — и за тобой никто "
-              "не придёт; оставь кого-то в живых — историю расскажут, и придут те, "
-              "кому он был дорог. Врагов ты делаешь сам."),
+         ru_p="Некромантию не учат живые. Умри, сядь духом на корабль мёртвых — "
+              "и вернись другим."),
+    dict(id="vendetta", sprite="feat_vendetta",
+         en_t="Vendetta",
+         en_p="Kill in front of witnesses and the family remembers. An avenger "
+              "will find you on the far side of the map. Work clean.",
+         ru_t="Кровная месть",
+         ru_p="Убил при свидетелях — родня запомнила. Мститель найдёт тебя хоть "
+              "на другом конце карты. Работай чисто."),
     # anchor target for the "World" nav link
     dict(id="world", anchor="world", sprite="feat_world", extra="feat_tavern",
          en_t="A world that plays itself",
-         en_p="Log out and the world keeps its appointments. NPCs run dungeons, "
-              "haul cargo, argue over prices and drink in taverns whether or not "
-              "anyone is watching. You are joining a place that was already busy.",
-         ru_t="Мир, который играет сам",
-         ru_p="Ты вышел — мир остался при делах. NPC ходят в данжи, возят груз, "
-              "торгуются и пьют в тавернах, смотришь ты или нет. Ты приходишь туда, "
-              "где уже давно занято."),
+         en_p="Log off and the world stays. NPCs run dungeons, haul goods, haggle "
+              "and drink in taverns. You are not arriving at an empty map.",
+         ru_t="Мир играет сам",
+         ru_p="Вышел из игры — мир остался. NPC лезут в данжи, возят товар, "
+              "торгуются и пьют в таверне. Ты приходишь не на пустую карту."),
     dict(id="factions", sprite=None,
-         en_t="Two factions: humans and monsters",
-         en_p="Play the people behind the walls, or the things outside them. Both "
-              "sides are playable, and both sides are somebody's home.",
-         ru_t="Две фракции: люди и монстры",
-         ru_p="Играй за тех, кто за стеной, или за тех, кто снаружи. Обе стороны "
-              "играбельны, и обе — чей-то дом."),
-    # Housing is an OPEN design question in the GDD — this copy deliberately
-    # promises only "base + storage" and carries its own early-design caveat.
-    # Do not extend it (buying/renting, crafting stations at home, open-world
-    # placement) until the GDD block is resolved.
+         en_t="Humans and monsters",
+         en_p="Play the people behind the wall, or the ones hammering on it. "
+              "Both sides are alive, and both sides have a home.",
+         ru_t="Люди и монстры",
+         ru_p="Играй за людей за стеной или за тех, кто ломится снаружи. Обе "
+              "стороны живые, у обеих свой дом."),
+    # NB: housing is an OPEN block in the GDD, and this copy names open-world
+    # placement and layered building on purpose (both are in the GDD's own
+    # "Строительство (решено)" section). See DEVLOG — the caution line added to
+    # the GDD last batch is now narrower than what the site says.
     dict(id="home", sprite="feat_home",
          en_t="A home to come back to",
-         en_p="Everything you mine, hunt and loot needs somewhere to go. Your "
-              "house is your base: storage, trophies, a place that's yours in a "
-              "world that doesn't pause. Housing is in early design — details "
-              "will change.",
+         en_p="Claim an empty patch of land and build it in layers: foundation, "
+              "walls, door, roof. Your chests hold everything you have earned. "
+              "At night the monsters test the walls.",
          ru_t="Дом, куда возвращаешься",
-         ru_p="Всё, что ты добыл, нафармил и налутал, должно где-то жить. Дом — "
-              "твоя база: хранение, трофеи, свой угол в мире, который не ставится "
-              "на паузу. Система жилья в ранней проработке — детали изменятся."),
+         ru_p="Займи свободный клочок земли и строй слоями: фундамент, стены, "
+              "дверь, крыша. В сундуках — всё нажитое. Ночью монстры проверят "
+              "стены на прочность."),
 ]
 
-# Ordered by role: gathering, tools, weapons, magic.
 RESOURCES = [
-    ("res_iron", "Iron ore", "Железная руда"),
-    ("res_gold", "Gold ore", "Золотая руда"),
+    # Ordered by role: gathering, tools, weapons, magic.
+    # res_axe / res_dagger / res_shield stay in assets/ but are off the page —
+    # they are held back for devlog posts.
+    ("res_iron", "Iron ore", "Руда"),
+    ("res_gold", "Gold ore", "Золото"),
     ("res_diamond", "Crystals", "Кристаллы"),
     ("res_wood", "Logs", "Брёвна"),
     ("res_herbs", "Herbs", "Травы"),
     ("res_fish", "Fish", "Рыба"),
     ("res_pickaxe", "Pickaxe", "Кирка"),
     ("res_sword", "Sword", "Меч"),
-    ("res_axe", "Battle axe", "Секира"),
-    ("res_dagger", "Dagger", "Кинжал"),
     ("res_bow", "Bow", "Лук"),
-    ("res_shield", "Shield", "Щит"),
     ("res_staff", "Staff", "Посох"),
-    ("res_spellbook", "Spellbook", "Гримуар"),
+    ("res_spellbook", "Spellbook", "Книга заклинаний"),
     ("res_runes", "Runes", "Руны"),
     ("res_potion", "Potion", "Зелье"),
 ]
@@ -136,8 +120,8 @@ I18N = {
         desc="Top-down 2D sandbox MMO inspired by Ultima Online: skill-based "
              "progression, playable monster faction, PC+mobile crossplay",
         tagline="You killed them by the hundreds. Now they've come for you.",
-        descriptor="Skills instead of levels. Death with consequences. A living "
-                   "world. No pay-to-win.",
+        descriptor="Skills instead of levels. Death costs you. A world that runs "
+                   "without you. No pay-to-win.",
         cta_steam="Wishlist on Steam — soon",
         cta_discord="Discord",
         nav_features="Features", nav_world="World", nav_devlog="Devlog",
@@ -148,44 +132,50 @@ I18N = {
         features_title="What Fellmise is",
         res_title="Dug up, chopped down, forged",
         soon="art coming soon",
-        disclaimer="Fellmise is in early development. Everything you see is work "
-                   "in progress and subject to change.",
+        disclaimer="Fellmise is in early development. Everything here is still being "
+                   "built and will change.",
         rights="© 2026 Fellmise", steam="Steam", discord="Discord",
         skip="Skip to content",
     ),
     "ru": dict(
         lang="ru", href="/ru/", other_href="../", other_label="EN", self_label="RU",
         title="Fellmise — 2D-песочница MMO с видом сверху",
-        desc="2D-песочница MMO с видом сверху в духе Ultima Online: прокачка через "
-             "навыки, играбельная фракция монстров, кроссплей PC и мобайл",
+        desc="Хардкорная 2D-песочница MMO с видом сверху в духе Ultima Online: скиллы вместо уровней, играбельная фракция монстров, кроссплей PC и мобайл",
         tagline="Ты убивал их сотнями. Теперь они пришли за тобой.",
-        descriptor="Скиллы вместо уровней, смерть с последствиями, живой мир. "
-                   "Без доната.",
+        descriptor="Качаешь то, чем играешь. Смерть уносит вещи. Мир живёт без тебя. "
+                   "Доната нет.",
         cta_steam="Wishlist в Steam — скоро",
         cta_discord="Discord",
-        nav_features="Особенности", nav_world="Мир", nav_devlog="Devlog",
+        nav_features="Механики", nav_world="Мир", nav_devlog="Devlog",
         devlog_tip="Скоро",
         menu="Меню",
         tod_prefix="в Fellmise сейчас:",
         tod=dict(dawn="рассвет", day="день", dusk="закат", night="ночь"),
-        features_title="Что такое Fellmise",
-        res_title="Добыто, срублено, выковано",
-        soon="арт скоро",
-        disclaimer="Игра в ранней разработке, всё может измениться.",
+        features_title="Что это за игра",
+        res_title="Копай, руби, куй",
+        soon="арт будет",
+        disclaimer="Игра в ранней разработке. Всё, что видишь, ещё поменяется.",
         rights="© 2026 Fellmise", steam="Steam", discord="Discord",
         skip="К содержимому",
     ),
 }
 
 HERO_SPRITES = [
-    # class suffix, sprite, parallax depth, hidden on mobile
-    ("tree-a", "hero_tree_a", 0.10, False),
-    ("house-b", "hero_house_b", 0.05, False),
-    ("well", "hero_well", 0.07, False),
+    # class suffix, sprite, parallax depth, hidden on mobile.
+    # Order here is DOM order = paint order: earlier entries sit behind later
+    # ones, which is what puts tree crowns over the houses. Sizes and positions
+    # live in styles.css so one file owns the composition.
+    ("house-b", "hero_house_b", 0.04, False),
+    ("tree-a", "hero_tree_a", 0.09, False),
+    ("well", "hero_well", 0.06, False),
     ("house-a", "hero_house_a", 0.05, False),
-    ("tree-b", "hero_tree_b", 0.12, True),
-    ("cart", "hero_cart", 0.16, True),
-    ("fence", "hero_fence", 0.18, True),
+    ("tree-b", "hero_tree_b", 0.11, True),
+    ("crates", "prop_crates", 0.13, True),
+    ("lantern", "prop_lantern", 0.14, True),
+    ("signpost", "prop_signpost", 0.15, False),
+    ("stones-a", "prop_stones", 0.18, False),
+    ("stones-b", "prop_stones", 0.20, True),
+    ("stones-c", "prop_stones", 0.22, True),
 ]
 
 
@@ -285,7 +275,7 @@ def build(lang):
 <link rel="apple-touch-icon" href="{a}apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Podkova:wght@500;700&family=Nunito:wght@400;600;800&family=PT+Mono&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Podkova:wght@500;700&family=Vollkorn:wght@400;600;700&family=PT+Mono&display=swap">
 <link rel="stylesheet" href="{root}styles.css?v={CSS_V}">
 <script>window.TOD_LABELS = {tod_json};</script>
 </head>

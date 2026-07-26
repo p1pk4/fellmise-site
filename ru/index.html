@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Fellmise — 2D-песочница MMO с видом сверху</title>
-<meta name="description" content="2D-песочница MMO с видом сверху в духе Ultima Online: прокачка через навыки, играбельная фракция монстров, кроссплей PC и мобайл">
+<meta name="description" content="Хардкорная 2D-песочница MMO с видом сверху в духе Ultima Online: скиллы вместо уровней, играбельная фракция монстров, кроссплей PC и мобайл">
 <link rel="canonical" href="https://fellmise.com/ru/">
 <link rel="alternate" hreflang="en" href="https://fellmise.com/">
 <link rel="alternate" hreflang="ru" href="https://fellmise.com/ru/">
@@ -13,14 +13,14 @@
 <meta property="og:site_name" content="Fellmise">
 <meta property="og:locale" content="ru_RU">
 <meta property="og:title" content="Fellmise — 2D-песочница MMO с видом сверху">
-<meta property="og:description" content="2D-песочница MMO с видом сверху в духе Ultima Online: прокачка через навыки, играбельная фракция монстров, кроссплей PC и мобайл">
+<meta property="og:description" content="Хардкорная 2D-песочница MMO с видом сверху в духе Ultima Online: скиллы вместо уровней, играбельная фракция монстров, кроссплей PC и мобайл">
 <meta property="og:url" content="https://fellmise.com/ru/">
 <meta property="og:image" content="https://fellmise.com/assets/og.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Fellmise — 2D-песочница MMO с видом сверху">
-<meta name="twitter:description" content="2D-песочница MMO с видом сверху в духе Ultima Online: прокачка через навыки, играбельная фракция монстров, кроссплей PC и мобайл">
+<meta name="twitter:description" content="Хардкорная 2D-песочница MMO с видом сверху в духе Ultima Online: скиллы вместо уровней, играбельная фракция монстров, кроссплей PC и мобайл">
 <meta name="twitter:image" content="https://fellmise.com/assets/og.jpg">
 <meta name="theme-color" content="#a8cb53">
 <link rel="icon" href="../assets/favicon-32.png" sizes="32x32">
@@ -28,8 +28,8 @@
 <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Podkova:wght@500;700&family=Nunito:wght@400;600;800&family=PT+Mono&display=swap">
-<link rel="stylesheet" href="../styles.css?v=2">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Podkova:wght@500;700&family=Vollkorn:wght@400;600;700&family=PT+Mono&display=swap">
+<link rel="stylesheet" href="../styles.css?v=3">
 <script>window.TOD_LABELS = {"dawn": "рассвет", "day": "день", "dusk": "закат", "night": "ночь", "prefix": "в Fellmise сейчас:"};</script>
 </head>
 <body>
@@ -42,7 +42,7 @@
           aria-label="Меню"><span></span><span></span><span></span></button>
 
   <nav class="nav" id="nav" aria-label="Меню">
-    <a class="nav__link" href="#features">Особенности</a>
+    <a class="nav__link" href="#features">Механики</a>
     <a class="nav__link" href="#world">Мир</a>
     <span class="nav__devlog-wrap">
       <button class="nav__link nav__devlog" id="devlog-btn" type="button"
@@ -64,13 +64,17 @@
     <div class="hero__tint" aria-hidden="true"></div>
 
     <div class="hero__scene" aria-hidden="true">
-        <div class="sprite sprite--tree-a" data-depth="0.1"><picture><source srcset="../assets/hero_tree_a.webp" type="image/webp"><img src="../assets/hero_tree_a.png" alt="" loading="eager" decoding="async"></picture></div>
-        <div class="sprite sprite--house-b" data-depth="0.05"><picture><source srcset="../assets/hero_house_b.webp" type="image/webp"><img src="../assets/hero_house_b.png" alt="" loading="eager" decoding="async"></picture></div>
-        <div class="sprite sprite--well" data-depth="0.07"><picture><source srcset="../assets/hero_well.webp" type="image/webp"><img src="../assets/hero_well.png" alt="" loading="eager" decoding="async"></picture></div>
+        <div class="sprite sprite--house-b" data-depth="0.04"><picture><source srcset="../assets/hero_house_b.webp" type="image/webp"><img src="../assets/hero_house_b.png" alt="" loading="eager" decoding="async"></picture></div>
+        <div class="sprite sprite--tree-a" data-depth="0.09"><picture><source srcset="../assets/hero_tree_a.webp" type="image/webp"><img src="../assets/hero_tree_a.png" alt="" loading="eager" decoding="async"></picture></div>
+        <div class="sprite sprite--well" data-depth="0.06"><picture><source srcset="../assets/hero_well.webp" type="image/webp"><img src="../assets/hero_well.png" alt="" loading="eager" decoding="async"></picture></div>
         <div class="sprite sprite--house-a" data-depth="0.05"><picture><source srcset="../assets/hero_house_a.webp" type="image/webp"><img src="../assets/hero_house_a.png" alt="" loading="lazy" decoding="async"></picture></div>
-        <div class="sprite sprite--tree-b is-mobile-hidden" data-depth="0.12"><picture><source srcset="../assets/hero_tree_b.webp" type="image/webp"><img src="../assets/hero_tree_b.png" alt="" loading="lazy" decoding="async"></picture></div>
-        <div class="sprite sprite--cart is-mobile-hidden" data-depth="0.16"><picture><source srcset="../assets/hero_cart.webp" type="image/webp"><img src="../assets/hero_cart.png" alt="" loading="lazy" decoding="async"></picture></div>
-        <div class="sprite sprite--fence is-mobile-hidden" data-depth="0.18"><picture><source srcset="../assets/hero_fence.webp" type="image/webp"><img src="../assets/hero_fence.png" alt="" loading="lazy" decoding="async"></picture></div>
+        <div class="sprite sprite--tree-b is-mobile-hidden" data-depth="0.11"><picture><source srcset="../assets/hero_tree_b.webp" type="image/webp"><img src="../assets/hero_tree_b.png" alt="" loading="lazy" decoding="async"></picture></div>
+        <div class="sprite sprite--crates is-mobile-hidden" data-depth="0.13"><picture><source srcset="../assets/prop_crates.webp" type="image/webp"><img src="../assets/prop_crates.png" alt="" loading="lazy" decoding="async"></picture></div>
+        <div class="sprite sprite--lantern is-mobile-hidden" data-depth="0.14"><picture><source srcset="../assets/prop_lantern.webp" type="image/webp"><img src="../assets/prop_lantern.png" alt="" loading="lazy" decoding="async"></picture></div>
+        <div class="sprite sprite--signpost" data-depth="0.15"><picture><source srcset="../assets/prop_signpost.webp" type="image/webp"><img src="../assets/prop_signpost.png" alt="" loading="lazy" decoding="async"></picture></div>
+        <div class="sprite sprite--stones-a" data-depth="0.18"><picture><source srcset="../assets/prop_stones.webp" type="image/webp"><img src="../assets/prop_stones.png" alt="" loading="lazy" decoding="async"></picture></div>
+        <div class="sprite sprite--stones-b is-mobile-hidden" data-depth="0.2"><picture><source srcset="../assets/prop_stones.webp" type="image/webp"><img src="../assets/prop_stones.png" alt="" loading="lazy" decoding="async"></picture></div>
+        <div class="sprite sprite--stones-c is-mobile-hidden" data-depth="0.22"><picture><source srcset="../assets/prop_stones.webp" type="image/webp"><img src="../assets/prop_stones.png" alt="" loading="lazy" decoding="async"></picture></div>
     </div>
 
     <p class="clock" id="clock"><span class="clock__dot"></span><span id="clock-text"></span></p>
@@ -82,7 +86,7 @@
   <section class="pitch">
     <div class="sign">
       <p class="sign__text">Ты убивал их сотнями. Теперь они пришли за тобой.</p>
-      <p class="sign__sub">Скиллы вместо уровней, смерть с последствиями, живой мир. Без доната.</p>
+      <p class="sign__sub">Качаешь то, чем играешь. Смерть уносит вещи. Мир живёт без тебя. Доната нет.</p>
     </div>
     <div class="cta">
       <button class="btn btn--steam" disabled>Wishlist в Steam — скоро</button>
@@ -92,14 +96,14 @@
   </section>
 
   <section class="features" id="features" aria-labelledby="features-h">
-    <h2 class="section-title" id="features-h">Что такое Fellmise</h2>
+    <h2 class="section-title" id="features-h">Что это за игра</h2>
     <div class="features__grid">
         <article class="card" id="f-skills">
           <div class="card__roof" aria-hidden="true"></div>
           <div class="card__body">
             <picture class="card__art"><source srcset="../assets/feat_skills.webp" type="image/webp"><img src="../assets/feat_skills.png" alt="Скиллы вместо уровней" loading="lazy" decoding="async"></picture>
             <h3 class="card__title">Скиллы вместо уровней</h3>
-            <p class="card__text">Рядом с именем нет уровня. Ты становишься лучше в том, что делаешь руками: машешь клинком — рука запоминает, не открыл замок — пробуешь снова. Персонаж вырастает из твоей игры, а не из меню классов.</p>
+            <p class="card__text">Уровня нет. Машешь мечом — растёт меч, лезешь по замкам — растёт взлом. Нужен другой персонаж — играй по-другому, а не создавай нового.</p>
           </div>
         </article>
         <article class="card" id="f-mining">
@@ -107,7 +111,7 @@
           <div class="card__body">
             <picture class="card__art"><source srcset="../assets/feat_mining.webp" type="image/webp"><img src="../assets/feat_mining.png" alt="Добыча" loading="lazy" decoding="async"></picture>
             <h3 class="card__title">Добыча</h3>
-            <p class="card__text">Всё, из чего сделан мир, кто-то вытащил из него руками. Жилы истощаются, а самое богатое всегда лежит там, где стоять опаснее всего. Домой приносишь ровно то, чем рискнул.</p>
+            <p class="card__text">Руду, дерево, траву и рыбу кто-то вытащил руками. Жилы кончаются, лучшее лежит там, где убивают. Сколько дотащил — столько и твоё.</p>
           </div>
         </article>
         <article class="card" id="f-craft">
@@ -115,26 +119,23 @@
           <div class="card__body">
             <picture class="card__art"><source srcset="../assets/feat_craft.webp" type="image/webp"><img src="../assets/feat_craft.png" alt="Крафт" loading="lazy" decoding="async"></picture>
             <h3 class="card__title">Крафт</h3>
-            <p class="card__text">Снаряжение делают игроки — у наковальни, из того, что кто-то выкопал. Имя хорошего кузнеца расходится дальше, чем имя иного мечника. Ничего стоящего не выпадает из меню.</p>
+            <p class="card__text">Всё стоящее делают игроки у наковальни. Кузнеца с именем знают на весь шард. Из меню не падает ничего.</p>
           </div>
         </article>
         <section class="resources" aria-labelledby="res-h">
-          <h3 class="resources__title" id="res-h">Добыто, срублено, выковано</h3>
+          <h3 class="resources__title" id="res-h">Копай, руби, куй</h3>
           <ul class="resources__strip">
-            <li class="res"><figure><picture><source srcset="../assets/res_iron.webp" type="image/webp"><img src="../assets/res_iron.png" alt="Железная руда" loading="lazy" decoding="async"></picture><figcaption>Железная руда</figcaption></figure></li>
-            <li class="res"><figure><picture><source srcset="../assets/res_gold.webp" type="image/webp"><img src="../assets/res_gold.png" alt="Золотая руда" loading="lazy" decoding="async"></picture><figcaption>Золотая руда</figcaption></figure></li>
+            <li class="res"><figure><picture><source srcset="../assets/res_iron.webp" type="image/webp"><img src="../assets/res_iron.png" alt="Руда" loading="lazy" decoding="async"></picture><figcaption>Руда</figcaption></figure></li>
+            <li class="res"><figure><picture><source srcset="../assets/res_gold.webp" type="image/webp"><img src="../assets/res_gold.png" alt="Золото" loading="lazy" decoding="async"></picture><figcaption>Золото</figcaption></figure></li>
             <li class="res"><figure><picture><source srcset="../assets/res_diamond.webp" type="image/webp"><img src="../assets/res_diamond.png" alt="Кристаллы" loading="lazy" decoding="async"></picture><figcaption>Кристаллы</figcaption></figure></li>
             <li class="res"><figure><picture><source srcset="../assets/res_wood.webp" type="image/webp"><img src="../assets/res_wood.png" alt="Брёвна" loading="lazy" decoding="async"></picture><figcaption>Брёвна</figcaption></figure></li>
             <li class="res"><figure><picture><source srcset="../assets/res_herbs.webp" type="image/webp"><img src="../assets/res_herbs.png" alt="Травы" loading="lazy" decoding="async"></picture><figcaption>Травы</figcaption></figure></li>
             <li class="res"><figure><picture><source srcset="../assets/res_fish.webp" type="image/webp"><img src="../assets/res_fish.png" alt="Рыба" loading="lazy" decoding="async"></picture><figcaption>Рыба</figcaption></figure></li>
             <li class="res"><figure><picture><source srcset="../assets/res_pickaxe.webp" type="image/webp"><img src="../assets/res_pickaxe.png" alt="Кирка" loading="lazy" decoding="async"></picture><figcaption>Кирка</figcaption></figure></li>
             <li class="res"><figure><picture><source srcset="../assets/res_sword.webp" type="image/webp"><img src="../assets/res_sword.png" alt="Меч" loading="lazy" decoding="async"></picture><figcaption>Меч</figcaption></figure></li>
-            <li class="res"><figure><picture><source srcset="../assets/res_axe.webp" type="image/webp"><img src="../assets/res_axe.png" alt="Секира" loading="lazy" decoding="async"></picture><figcaption>Секира</figcaption></figure></li>
-            <li class="res"><figure><picture><source srcset="../assets/res_dagger.webp" type="image/webp"><img src="../assets/res_dagger.png" alt="Кинжал" loading="lazy" decoding="async"></picture><figcaption>Кинжал</figcaption></figure></li>
             <li class="res"><figure><picture><source srcset="../assets/res_bow.webp" type="image/webp"><img src="../assets/res_bow.png" alt="Лук" loading="lazy" decoding="async"></picture><figcaption>Лук</figcaption></figure></li>
-            <li class="res"><figure><picture><source srcset="../assets/res_shield.webp" type="image/webp"><img src="../assets/res_shield.png" alt="Щит" loading="lazy" decoding="async"></picture><figcaption>Щит</figcaption></figure></li>
             <li class="res"><figure><picture><source srcset="../assets/res_staff.webp" type="image/webp"><img src="../assets/res_staff.png" alt="Посох" loading="lazy" decoding="async"></picture><figcaption>Посох</figcaption></figure></li>
-            <li class="res"><figure><picture><source srcset="../assets/res_spellbook.webp" type="image/webp"><img src="../assets/res_spellbook.png" alt="Гримуар" loading="lazy" decoding="async"></picture><figcaption>Гримуар</figcaption></figure></li>
+            <li class="res"><figure><picture><source srcset="../assets/res_spellbook.webp" type="image/webp"><img src="../assets/res_spellbook.png" alt="Книга заклинаний" loading="lazy" decoding="async"></picture><figcaption>Книга заклинаний</figcaption></figure></li>
             <li class="res"><figure><picture><source srcset="../assets/res_runes.webp" type="image/webp"><img src="../assets/res_runes.png" alt="Руны" loading="lazy" decoding="async"></picture><figcaption>Руны</figcaption></figure></li>
             <li class="res"><figure><picture><source srcset="../assets/res_potion.webp" type="image/webp"><img src="../assets/res_potion.png" alt="Зелье" loading="lazy" decoding="async"></picture><figcaption>Зелье</figcaption></figure></li>
           </ul>
@@ -142,9 +143,9 @@
         <article class="card" id="f-pvp">
           <div class="card__roof" aria-hidden="true"></div>
           <div class="card__body">
-            <picture class="card__art"><source srcset="../assets/feat_pvp.webp" type="image/webp"><img src="../assets/feat_pvp.png" alt="PvP с высоким TTK" loading="lazy" decoding="async"></picture>
-            <h3 class="card__title">PvP с высоким TTK</h3>
-            <p class="card__text">Бой длится достаточно, чтобы быть боем: перестроиться, позвать на помощь, решить, что лучше бежать. Никто не рассыпается от одного удара из-за края экрана. Победу удерживают, а не выигрывают вспышкой.</p>
+            <picture class="card__art"><source srcset="../assets/feat_pvp.webp" type="image/webp"><img src="../assets/feat_pvp.png" alt="Долгий бой" loading="lazy" decoding="async"></picture>
+            <h3 class="card__title">Долгий бой</h3>
+            <p class="card__text">С одного удара не убивают. Успеешь развернуться, позвать своих или уйти ногами. Кто победил — тот дожал, а не прокнул.</p>
           </div>
         </article>
         <article class="card" id="f-death">
@@ -152,31 +153,31 @@
           <div class="card__body">
             <picture class="card__art"><source srcset="../assets/feat_death.webp" type="image/webp"><img src="../assets/feat_death.png" alt="Смерть — это место" loading="lazy" decoding="async"></picture><picture class="card__art card__art--corner"><source srcset="../assets/feat_death_alt.webp" type="image/webp"><img src="../assets/feat_death_alt.png" alt="" loading="lazy" decoding="async"></picture>
             <h3 class="card__title">Смерть — это место</h3>
-            <p class="card__text">Смерть не перезагружает, а переносит. У той стороны своя география, свои дороги обратно и свои жители, которые их не нашли. Зайди достаточно глубоко — и вернёшься, зная некромантию.</p>
+            <p class="card__text">Некромантию не учат живые. Умри, сядь духом на корабль мёртвых — и вернись другим.</p>
           </div>
         </article>
-        <article class="card" id="f-nemesis">
+        <article class="card" id="f-vendetta">
           <div class="card__roof" aria-hidden="true"></div>
           <div class="card__body">
-            <picture class="card__art"><source srcset="../assets/feat_nemesis.webp" type="image/webp"><img src="../assets/feat_nemesis.png" alt="Немезида" loading="lazy" decoding="async"></picture>
-            <h3 class="card__title">Немезида</h3>
-            <p class="card__text">Мир помнит, кто это сделал. Убивай без свидетелей — и за тобой никто не придёт; оставь кого-то в живых — историю расскажут, и придут те, кому он был дорог. Врагов ты делаешь сам.</p>
+            <picture class="card__art"><source srcset="../assets/feat_vendetta.webp" type="image/webp"><img src="../assets/feat_vendetta.png" alt="Кровная месть" loading="lazy" decoding="async"></picture>
+            <h3 class="card__title">Кровная месть</h3>
+            <p class="card__text">Убил при свидетелях — родня запомнила. Мститель найдёт тебя хоть на другом конце карты. Работай чисто.</p>
           </div>
         </article>
         <article class="card" id="f-world" id="world">
           <div class="card__roof" aria-hidden="true"></div>
           <div class="card__body">
-            <picture class="card__art"><source srcset="../assets/feat_world.webp" type="image/webp"><img src="../assets/feat_world.png" alt="Мир, который играет сам" loading="lazy" decoding="async"></picture><picture class="card__art card__art--corner"><source srcset="../assets/feat_tavern.webp" type="image/webp"><img src="../assets/feat_tavern.png" alt="" loading="lazy" decoding="async"></picture>
-            <h3 class="card__title">Мир, который играет сам</h3>
-            <p class="card__text">Ты вышел — мир остался при делах. NPC ходят в данжи, возят груз, торгуются и пьют в тавернах, смотришь ты или нет. Ты приходишь туда, где уже давно занято.</p>
+            <picture class="card__art"><source srcset="../assets/feat_world.webp" type="image/webp"><img src="../assets/feat_world.png" alt="Мир играет сам" loading="lazy" decoding="async"></picture><picture class="card__art card__art--corner"><source srcset="../assets/feat_tavern.webp" type="image/webp"><img src="../assets/feat_tavern.png" alt="" loading="lazy" decoding="async"></picture>
+            <h3 class="card__title">Мир играет сам</h3>
+            <p class="card__text">Вышел из игры — мир остался. NPC лезут в данжи, возят товар, торгуются и пьют в таверне. Ты приходишь не на пустую карту.</p>
           </div>
         </article>
         <article class="card" id="f-factions">
           <div class="card__roof" aria-hidden="true"></div>
           <div class="card__body">
-            <div class="card__art card__art--soon" role="img" aria-label="арт скоро"><span>арт скоро</span></div>
-            <h3 class="card__title">Две фракции: люди и монстры</h3>
-            <p class="card__text">Играй за тех, кто за стеной, или за тех, кто снаружи. Обе стороны играбельны, и обе — чей-то дом.</p>
+            <div class="card__art card__art--soon" role="img" aria-label="арт будет"><span>арт будет</span></div>
+            <h3 class="card__title">Люди и монстры</h3>
+            <p class="card__text">Играй за людей за стеной или за тех, кто ломится снаружи. Обе стороны живые, у обеих свой дом.</p>
           </div>
         </article>
         <article class="card" id="f-home">
@@ -184,13 +185,13 @@
           <div class="card__body">
             <picture class="card__art"><source srcset="../assets/feat_home.webp" type="image/webp"><img src="../assets/feat_home.png" alt="Дом, куда возвращаешься" loading="lazy" decoding="async"></picture>
             <h3 class="card__title">Дом, куда возвращаешься</h3>
-            <p class="card__text">Всё, что ты добыл, нафармил и налутал, должно где-то жить. Дом — твоя база: хранение, трофеи, свой угол в мире, который не ставится на паузу. Система жилья в ранней проработке — детали изменятся.</p>
+            <p class="card__text">Займи свободный клочок земли и строй слоями: фундамент, стены, дверь, крыша. В сундуках — всё нажитое. Ночью монстры проверят стены на прочность.</p>
           </div>
         </article>
     </div>
   </section>
 
-  <p class="disclaimer">Игра в ранней разработке, всё может измениться.</p>
+  <p class="disclaimer">Игра в ранней разработке. Всё, что видишь, ещё поменяется.</p>
 </main>
 
 <footer class="footer">
@@ -204,6 +205,6 @@
   </nav>
 </footer>
 
-<script src="../main.js?v=2" defer></script>
+<script src="../main.js?v=3" defer></script>
 </body>
 </html>

@@ -28,8 +28,8 @@
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Podkova:wght@500;700&family=Nunito:wght@400;600;800&family=PT+Mono&display=swap">
-<link rel="stylesheet" href="styles.css?v=2">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Podkova:wght@500;700&family=Vollkorn:wght@400;600;700&family=PT+Mono&display=swap">
+<link rel="stylesheet" href="styles.css?v=3">
 <script>window.TOD_LABELS = {"dawn": "dawn", "day": "day", "dusk": "sunset", "night": "night", "prefix": "in Fellmise now:"};</script>
 </head>
 <body>
@@ -64,13 +64,17 @@
     <div class="hero__tint" aria-hidden="true"></div>
 
     <div class="hero__scene" aria-hidden="true">
-        <div class="sprite sprite--tree-a" data-depth="0.1"><picture><source srcset="assets/hero_tree_a.webp" type="image/webp"><img src="assets/hero_tree_a.png" alt="" loading="eager" decoding="async"></picture></div>
-        <div class="sprite sprite--house-b" data-depth="0.05"><picture><source srcset="assets/hero_house_b.webp" type="image/webp"><img src="assets/hero_house_b.png" alt="" loading="eager" decoding="async"></picture></div>
-        <div class="sprite sprite--well" data-depth="0.07"><picture><source srcset="assets/hero_well.webp" type="image/webp"><img src="assets/hero_well.png" alt="" loading="eager" decoding="async"></picture></div>
+        <div class="sprite sprite--house-b" data-depth="0.04"><picture><source srcset="assets/hero_house_b.webp" type="image/webp"><img src="assets/hero_house_b.png" alt="" loading="eager" decoding="async"></picture></div>
+        <div class="sprite sprite--tree-a" data-depth="0.09"><picture><source srcset="assets/hero_tree_a.webp" type="image/webp"><img src="assets/hero_tree_a.png" alt="" loading="eager" decoding="async"></picture></div>
+        <div class="sprite sprite--well" data-depth="0.06"><picture><source srcset="assets/hero_well.webp" type="image/webp"><img src="assets/hero_well.png" alt="" loading="eager" decoding="async"></picture></div>
         <div class="sprite sprite--house-a" data-depth="0.05"><picture><source srcset="assets/hero_house_a.webp" type="image/webp"><img src="assets/hero_house_a.png" alt="" loading="lazy" decoding="async"></picture></div>
-        <div class="sprite sprite--tree-b is-mobile-hidden" data-depth="0.12"><picture><source srcset="assets/hero_tree_b.webp" type="image/webp"><img src="assets/hero_tree_b.png" alt="" loading="lazy" decoding="async"></picture></div>
-        <div class="sprite sprite--cart is-mobile-hidden" data-depth="0.16"><picture><source srcset="assets/hero_cart.webp" type="image/webp"><img src="assets/hero_cart.png" alt="" loading="lazy" decoding="async"></picture></div>
-        <div class="sprite sprite--fence is-mobile-hidden" data-depth="0.18"><picture><source srcset="assets/hero_fence.webp" type="image/webp"><img src="assets/hero_fence.png" alt="" loading="lazy" decoding="async"></picture></div>
+        <div class="sprite sprite--tree-b is-mobile-hidden" data-depth="0.11"><picture><source srcset="assets/hero_tree_b.webp" type="image/webp"><img src="assets/hero_tree_b.png" alt="" loading="lazy" decoding="async"></picture></div>
+        <div class="sprite sprite--crates is-mobile-hidden" data-depth="0.13"><picture><source srcset="assets/prop_crates.webp" type="image/webp"><img src="assets/prop_crates.png" alt="" loading="lazy" decoding="async"></picture></div>
+        <div class="sprite sprite--lantern is-mobile-hidden" data-depth="0.14"><picture><source srcset="assets/prop_lantern.webp" type="image/webp"><img src="assets/prop_lantern.png" alt="" loading="lazy" decoding="async"></picture></div>
+        <div class="sprite sprite--signpost" data-depth="0.15"><picture><source srcset="assets/prop_signpost.webp" type="image/webp"><img src="assets/prop_signpost.png" alt="" loading="lazy" decoding="async"></picture></div>
+        <div class="sprite sprite--stones-a" data-depth="0.18"><picture><source srcset="assets/prop_stones.webp" type="image/webp"><img src="assets/prop_stones.png" alt="" loading="lazy" decoding="async"></picture></div>
+        <div class="sprite sprite--stones-b is-mobile-hidden" data-depth="0.2"><picture><source srcset="assets/prop_stones.webp" type="image/webp"><img src="assets/prop_stones.png" alt="" loading="lazy" decoding="async"></picture></div>
+        <div class="sprite sprite--stones-c is-mobile-hidden" data-depth="0.22"><picture><source srcset="assets/prop_stones.webp" type="image/webp"><img src="assets/prop_stones.png" alt="" loading="lazy" decoding="async"></picture></div>
     </div>
 
     <p class="clock" id="clock"><span class="clock__dot"></span><span id="clock-text"></span></p>
@@ -82,7 +86,7 @@
   <section class="pitch">
     <div class="sign">
       <p class="sign__text">You killed them by the hundreds. Now they've come for you.</p>
-      <p class="sign__sub">Skills instead of levels. Death with consequences. A living world. No pay-to-win.</p>
+      <p class="sign__sub">Skills instead of levels. Death costs you. A world that runs without you. No pay-to-win.</p>
     </div>
     <div class="cta">
       <button class="btn btn--steam" disabled>Wishlist on Steam — soon</button>
@@ -99,15 +103,15 @@
           <div class="card__body">
             <picture class="card__art"><source srcset="assets/feat_skills.webp" type="image/webp"><img src="assets/feat_skills.png" alt="Skills, no levels" loading="lazy" decoding="async"></picture>
             <h3 class="card__title">Skills, no levels</h3>
-            <p class="card__text">There is no level next to your name. You get better at what you actually do — swing a blade and the arm remembers, fumble a lock and try it again. The character is the one you played into being, not the one a class menu handed you.</p>
+            <p class="card__text">No level next to your name. Swing a sword and your sword skill grows; pick locks and your lockpicking does. Want a different character — play differently, don't roll a new one.</p>
           </div>
         </article>
         <article class="card" id="f-mining">
           <div class="card__roof" aria-hidden="true"></div>
           <div class="card__body">
-            <picture class="card__art"><source srcset="assets/feat_mining.webp" type="image/webp"><img src="assets/feat_mining.png" alt="Mining &amp; gathering" loading="lazy" decoding="async"></picture>
-            <h3 class="card__title">Mining &amp; gathering</h3>
-            <p class="card__text">Everything the world is made of, somebody pulled out of it by hand. Veins run dry, and the richest ground is always where it is least safe to stand. What you carry home is exactly what you were willing to risk going out for.</p>
+            <picture class="card__art"><source srcset="assets/feat_mining.webp" type="image/webp"><img src="assets/feat_mining.png" alt="Mining and gathering" loading="lazy" decoding="async"></picture>
+            <h3 class="card__title">Mining and gathering</h3>
+            <p class="card__text">Every ore, log, herb and fish was pulled out of the ground by somebody's hands. Veins run out. The best ground is where people get killed. What you haul back is what you keep.</p>
           </div>
         </article>
         <article class="card" id="f-craft">
@@ -115,7 +119,7 @@
           <div class="card__body">
             <picture class="card__art"><source srcset="assets/feat_craft.webp" type="image/webp"><img src="assets/feat_craft.png" alt="Crafting" loading="lazy" decoding="async"></picture>
             <h3 class="card__title">Crafting</h3>
-            <p class="card__text">Gear is made by players, at an anvil, out of what someone else dug up. A good smith's name travels further than most swordsmen's. Nothing worth wearing falls out of a menu.</p>
+            <p class="card__text">Anything worth wearing is made by a player at an anvil. A good smith's name is known across the shard. Nothing drops out of a menu.</p>
           </div>
         </article>
         <section class="resources" aria-labelledby="res-h">
@@ -129,10 +133,7 @@
             <li class="res"><figure><picture><source srcset="assets/res_fish.webp" type="image/webp"><img src="assets/res_fish.png" alt="Fish" loading="lazy" decoding="async"></picture><figcaption>Fish</figcaption></figure></li>
             <li class="res"><figure><picture><source srcset="assets/res_pickaxe.webp" type="image/webp"><img src="assets/res_pickaxe.png" alt="Pickaxe" loading="lazy" decoding="async"></picture><figcaption>Pickaxe</figcaption></figure></li>
             <li class="res"><figure><picture><source srcset="assets/res_sword.webp" type="image/webp"><img src="assets/res_sword.png" alt="Sword" loading="lazy" decoding="async"></picture><figcaption>Sword</figcaption></figure></li>
-            <li class="res"><figure><picture><source srcset="assets/res_axe.webp" type="image/webp"><img src="assets/res_axe.png" alt="Battle axe" loading="lazy" decoding="async"></picture><figcaption>Battle axe</figcaption></figure></li>
-            <li class="res"><figure><picture><source srcset="assets/res_dagger.webp" type="image/webp"><img src="assets/res_dagger.png" alt="Dagger" loading="lazy" decoding="async"></picture><figcaption>Dagger</figcaption></figure></li>
             <li class="res"><figure><picture><source srcset="assets/res_bow.webp" type="image/webp"><img src="assets/res_bow.png" alt="Bow" loading="lazy" decoding="async"></picture><figcaption>Bow</figcaption></figure></li>
-            <li class="res"><figure><picture><source srcset="assets/res_shield.webp" type="image/webp"><img src="assets/res_shield.png" alt="Shield" loading="lazy" decoding="async"></picture><figcaption>Shield</figcaption></figure></li>
             <li class="res"><figure><picture><source srcset="assets/res_staff.webp" type="image/webp"><img src="assets/res_staff.png" alt="Staff" loading="lazy" decoding="async"></picture><figcaption>Staff</figcaption></figure></li>
             <li class="res"><figure><picture><source srcset="assets/res_spellbook.webp" type="image/webp"><img src="assets/res_spellbook.png" alt="Spellbook" loading="lazy" decoding="async"></picture><figcaption>Spellbook</figcaption></figure></li>
             <li class="res"><figure><picture><source srcset="assets/res_runes.webp" type="image/webp"><img src="assets/res_runes.png" alt="Runes" loading="lazy" decoding="async"></picture><figcaption>Runes</figcaption></figure></li>
@@ -142,9 +143,9 @@
         <article class="card" id="f-pvp">
           <div class="card__roof" aria-hidden="true"></div>
           <div class="card__body">
-            <picture class="card__art"><source srcset="assets/feat_pvp.webp" type="image/webp"><img src="assets/feat_pvp.png" alt="High-TTK PvP" loading="lazy" decoding="async"></picture>
-            <h3 class="card__title">High-TTK PvP</h3>
-            <p class="card__text">Fights last long enough to actually be fights — long enough to reposition, to shout for help, to decide you would rather run. Nobody bursts down in one hit from off-screen. You keep choosing the win, you don't get handed it.</p>
+            <picture class="card__art"><source srcset="assets/feat_pvp.webp" type="image/webp"><img src="assets/feat_pvp.png" alt="Fights that last" loading="lazy" decoding="async"></picture>
+            <h3 class="card__title">Fights that last</h3>
+            <p class="card__text">Nobody dies in one hit. There is time to turn around, call your people, or leave on foot. Whoever won ground it out — they didn't get a lucky proc.</p>
           </div>
         </article>
         <article class="card" id="f-death">
@@ -152,15 +153,15 @@
           <div class="card__body">
             <picture class="card__art"><source srcset="assets/feat_death.webp" type="image/webp"><img src="assets/feat_death.png" alt="Death is a place" loading="lazy" decoding="async"></picture><picture class="card__art card__art--corner"><source srcset="assets/feat_death_alt.webp" type="image/webp"><img src="assets/feat_death_alt.png" alt="" loading="lazy" decoding="async"></picture>
             <h3 class="card__title">Death is a place</h3>
-            <p class="card__text">Dying does not reload — it moves you. The other side has its own geography, its own routes back, and its own residents who never found one. Go deep enough and you may return knowing necromancy.</p>
+            <p class="card__text">The living don't teach necromancy. Die, ride the ship of the dead as a ghost, and come back changed.</p>
           </div>
         </article>
-        <article class="card" id="f-nemesis">
+        <article class="card" id="f-vendetta">
           <div class="card__roof" aria-hidden="true"></div>
           <div class="card__body">
-            <picture class="card__art"><source srcset="assets/feat_nemesis.webp" type="image/webp"><img src="assets/feat_nemesis.png" alt="Nemesis" loading="lazy" decoding="async"></picture>
-            <h3 class="card__title">Nemesis</h3>
-            <p class="card__text">The world remembers who did it. Kill without witnesses and nothing follows you home; leave someone breathing and the story gets told, and the people who loved them come looking. Your enemies are the ones you made.</p>
+            <picture class="card__art"><source srcset="assets/feat_vendetta.webp" type="image/webp"><img src="assets/feat_vendetta.png" alt="Vendetta" loading="lazy" decoding="async"></picture>
+            <h3 class="card__title">Vendetta</h3>
+            <p class="card__text">Kill in front of witnesses and the family remembers. An avenger will find you on the far side of the map. Work clean.</p>
           </div>
         </article>
         <article class="card" id="f-world" id="world">
@@ -168,15 +169,15 @@
           <div class="card__body">
             <picture class="card__art"><source srcset="assets/feat_world.webp" type="image/webp"><img src="assets/feat_world.png" alt="A world that plays itself" loading="lazy" decoding="async"></picture><picture class="card__art card__art--corner"><source srcset="assets/feat_tavern.webp" type="image/webp"><img src="assets/feat_tavern.png" alt="" loading="lazy" decoding="async"></picture>
             <h3 class="card__title">A world that plays itself</h3>
-            <p class="card__text">Log out and the world keeps its appointments. NPCs run dungeons, haul cargo, argue over prices and drink in taverns whether or not anyone is watching. You are joining a place that was already busy.</p>
+            <p class="card__text">Log off and the world stays. NPCs run dungeons, haul goods, haggle and drink in taverns. You are not arriving at an empty map.</p>
           </div>
         </article>
         <article class="card" id="f-factions">
           <div class="card__roof" aria-hidden="true"></div>
           <div class="card__body">
             <div class="card__art card__art--soon" role="img" aria-label="art coming soon"><span>art coming soon</span></div>
-            <h3 class="card__title">Two factions: humans and monsters</h3>
-            <p class="card__text">Play the people behind the walls, or the things outside them. Both sides are playable, and both sides are somebody's home.</p>
+            <h3 class="card__title">Humans and monsters</h3>
+            <p class="card__text">Play the people behind the wall, or the ones hammering on it. Both sides are alive, and both sides have a home.</p>
           </div>
         </article>
         <article class="card" id="f-home">
@@ -184,13 +185,13 @@
           <div class="card__body">
             <picture class="card__art"><source srcset="assets/feat_home.webp" type="image/webp"><img src="assets/feat_home.png" alt="A home to come back to" loading="lazy" decoding="async"></picture>
             <h3 class="card__title">A home to come back to</h3>
-            <p class="card__text">Everything you mine, hunt and loot needs somewhere to go. Your house is your base: storage, trophies, a place that's yours in a world that doesn't pause. Housing is in early design — details will change.</p>
+            <p class="card__text">Claim an empty patch of land and build it in layers: foundation, walls, door, roof. Your chests hold everything you have earned. At night the monsters test the walls.</p>
           </div>
         </article>
     </div>
   </section>
 
-  <p class="disclaimer">Fellmise is in early development. Everything you see is work in progress and subject to change.</p>
+  <p class="disclaimer">Fellmise is in early development. Everything here is still being built and will change.</p>
 </main>
 
 <footer class="footer">
@@ -204,6 +205,6 @@
   </nav>
 </footer>
 
-<script src="main.js?v=2" defer></script>
+<script src="main.js?v=3" defer></script>
 </body>
 </html>

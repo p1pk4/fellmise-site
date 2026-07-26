@@ -30,7 +30,7 @@ TASKS = [
     ("feat_pvp", "war banner on wooden pole with torn red flag", False),
     ("feat_death", "old stone gravestone with candles and moss", False),
     ("feat_death_alt", "ghostly wooden ship with tattered sails", True),
-    ("feat_nemesis", "dark monster totem with bones and horns", True),
+    ("feat_vendetta", "dark monster totem with bones and horns", True),
     ("feat_world", "market stall with awning, crates and barrels", False),
     ("feat_tavern", "tavern building with hanging sign and warm windows", False),
 

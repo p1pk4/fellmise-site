@@ -26,10 +26,17 @@
 <link rel="icon" href="assets/favicon-32.png" sizes="32x32">
 <link rel="icon" href="assets/icon-512.png" sizes="512x512">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<!-- LCP is the ground band, which paints from a CSS background tile; without
+     this the tile is only discovered after the stylesheet parses. -->
+<link rel="preload" as="image" type="image/webp" href="assets/tile_grass.webp" fetchpriority="high">
+<link rel="preload" as="image" type="image/webp" href="assets/hero_house_a.webp">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Podkova:wght@500;700&family=Vollkorn:wght@400;600;700&family=PT+Mono&display=swap">
-<link rel="stylesheet" href="styles.css?v=4">
+<link rel="stylesheet" media="print" onload="this.media='all'"
+      href="https://fonts.googleapis.com/css2?family=Podkova:wght@500;700&family=Vollkorn:wght@400;600;700&family=PT+Mono&display=swap">
+<noscript><link rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Podkova:wght@500;700&family=Vollkorn:wght@400;600;700&family=PT+Mono&display=swap"></noscript>
+<link rel="stylesheet" href="styles.css?v=5">
 <script>window.TOD_LABELS = {"dawn": "dawn", "day": "day", "dusk": "sunset", "night": "night", "prefix": "in Fellmise now:"};</script>
 </head>
 <body>
@@ -56,6 +63,7 @@
   </nav>
 </header>
 
+<div id="smooth-wrapper"><div id="smooth-content">
 <main>
   <section class="biome biome--village" id="b-village"
            data-biome="village" aria-label="The village">
@@ -64,15 +72,15 @@
     <div class="biome__road" aria-hidden="true"></div>
     <div class="biome__tint" aria-hidden="true"></div>
     <div class="biome__scene" aria-hidden="true">
-        <div class="sprite sprite--house-b" data-depth="0.04"><picture><source srcset="assets/hero_house_b.webp" type="image/webp"><img src="assets/hero_house_b.png" alt="" loading="eager" decoding="async"></picture></div>
-        <div class="sprite sprite--tree-a" data-depth="0.09"><picture><source srcset="assets/hero_tree_a.webp" type="image/webp"><img src="assets/hero_tree_a.png" alt="" loading="eager" decoding="async"></picture></div>
-        <div class="sprite sprite--well" data-depth="0.06"><picture><source srcset="assets/hero_well.webp" type="image/webp"><img src="assets/hero_well.png" alt="" loading="eager" decoding="async"></picture></div>
-        <div class="sprite sprite--house-a is-iso" data-depth="0.05"><picture><source srcset="assets/hero_house_a.webp" type="image/webp"><img src="assets/hero_house_a.png" alt="" loading="eager" decoding="async"></picture></div>
-        <div class="sprite sprite--tree-b is-mobile-hidden" data-depth="0.11"><picture><source srcset="assets/hero_tree_b.webp" type="image/webp"><img src="assets/hero_tree_b.png" alt="" loading="eager" decoding="async"></picture></div>
-        <div class="sprite sprite--crates is-mobile-hidden is-iso" data-depth="0.13"><picture><source srcset="assets/prop_crates.webp" type="image/webp"><img src="assets/prop_crates.png" alt="" loading="eager" decoding="async"></picture></div>
-        <div class="sprite sprite--lantern is-mobile-hidden" data-depth="0.14"><picture><source srcset="assets/prop_lantern.webp" type="image/webp"><img src="assets/prop_lantern.png" alt="" loading="eager" decoding="async"></picture></div>
-        <div class="sprite sprite--signpost" data-depth="0.16"><picture><source srcset="assets/prop_signpost.webp" type="image/webp"><img src="assets/prop_signpost.png" alt="" loading="eager" decoding="async"></picture></div>
-        <div class="sprite sprite--stones-verge is-mobile-hidden" data-depth="0.18"><picture><source srcset="assets/prop_stones.webp" type="image/webp"><img src="assets/prop_stones.png" alt="" loading="eager" decoding="async"></picture></div>
+        <div class="sprite sprite--house-b" data-row="0" style="bottom:34%;height:52.7%;z-index:1;"><picture><source srcset="assets/hero_house_b.webp" type="image/webp"><img src="assets/hero_house_b.png" alt="" loading="eager" decoding="async" width="1024" height="989"></picture></div>
+        <div class="sprite sprite--tree-a" data-row="1" style="bottom:22%;height:52.0%;z-index:3;"><picture><source srcset="assets/hero_tree_a.webp" type="image/webp"><img src="assets/hero_tree_a.png" alt="" loading="eager" decoding="async" width="1024" height="1032"></picture></div>
+        <div class="sprite sprite--well" data-row="1" style="bottom:22%;height:38.0%;z-index:3;"><picture><source srcset="assets/hero_well.webp" type="image/webp"><img src="assets/hero_well.png" alt="" loading="eager" decoding="async" width="560" height="744"></picture></div>
+        <div class="sprite sprite--house-a is-iso" data-row="1" style="bottom:22%;height:64.0%;z-index:3;"><picture><source srcset="assets/hero_house_a.webp" type="image/webp"><img src="assets/hero_house_a.png" alt="" loading="eager" decoding="async" width="1024" height="1039"></picture></div>
+        <div class="sprite sprite--tree-b is-mobile-hidden" data-row="0" style="bottom:34%;height:20.4%;z-index:1;"><picture><source srcset="assets/hero_tree_b.webp" type="image/webp"><img src="assets/hero_tree_b.png" alt="" loading="lazy" decoding="async" width="560" height="499"></picture></div>
+        <div class="sprite sprite--crates is-mobile-hidden is-iso" data-row="1" style="bottom:22%;height:24.0%;z-index:3;"><picture><source srcset="assets/prop_crates.webp" type="image/webp"><img src="assets/prop_crates.png" alt="" loading="lazy" decoding="async" width="360" height="439"></picture></div>
+        <div class="sprite sprite--lantern is-mobile-hidden" data-row="2" style="bottom:8%;height:34.5%;z-index:5;"><picture><source srcset="assets/prop_lantern.webp" type="image/webp"><img src="assets/prop_lantern.png" alt="" loading="lazy" decoding="async" width="360" height="1150"></picture></div>
+        <div class="sprite sprite--signpost" data-row="2" style="bottom:8%;height:29.9%;z-index:5;"><picture><source srcset="assets/prop_signpost.webp" type="image/webp"><img src="assets/prop_signpost.png" alt="" loading="eager" decoding="async" width="360" height="514"></picture></div>
+        <div class="sprite sprite--stones-verge is-mobile-hidden" data-row="1" style="bottom:22%;height:11.0%;z-index:3;"><picture><source srcset="assets/prop_stones.webp" type="image/webp"><img src="assets/prop_stones.png" alt="" loading="lazy" decoding="async" width="360" height="280"></picture></div>
     </div>
     <p class="clock" id="clock"><span class="clock__dot"></span><span id="clock-text"></span></p>
     <div class="pitch">
@@ -90,7 +98,7 @@
         <article class="card" id="f-world" id="world">
           <div class="card__roof" aria-hidden="true"></div>
           <div class="card__body">
-            <picture class="card__art"><source srcset="assets/feat_world.webp" type="image/webp"><img src="assets/feat_world.png" alt="A world that plays itself" loading="lazy" decoding="async"></picture><picture class="card__art card__art--corner"><source srcset="assets/feat_tavern.webp" type="image/webp"><img src="assets/feat_tavern.png" alt="" loading="lazy" decoding="async"></picture>
+            <picture class="card__art"><source srcset="assets/feat_world.webp" type="image/webp"><img src="assets/feat_world.png" alt="A world that plays itself" loading="lazy" decoding="async" width="640" height="577"></picture><picture class="card__art card__art--corner"><source srcset="assets/feat_tavern.webp" type="image/webp"><img src="assets/feat_tavern.png" alt="" loading="lazy" decoding="async" width="1024" height="1071"></picture>
             <h3 class="card__title">A world that plays itself</h3>
             <p class="card__text">Log off and the world stays. NPCs run dungeons, haul goods, haggle and drink in taverns. You are not arriving at an empty map.</p>
           </div>
@@ -98,10 +106,15 @@
     </div>
     <div class="biome__reveal" aria-hidden="true"></div>
   </section>
-  <div class="gate" data-gate="village" aria-hidden="true">
+  <div class="gate" data-gate="village" data-door="1" aria-hidden="true">
     <div class="gate__stage">
-      <div class="gate__art"><picture><source srcset="assets/hero_house_b.webp" type="image/webp"><img src="assets/hero_house_b.png" alt="" loading="lazy" decoding="async"></picture></div>
-      <div class="gate__veil"></div>
+      <div class="gate__zoom">
+        <div class="gate__art"><picture><source srcset="assets/hero_house_b_open.webp" type="image/webp"><img src="assets/hero_house_b_open.png" alt="" loading="lazy" decoding="async" width="1024" height="989"></picture></div>
+        <div class="gate__door"><picture><source srcset="assets/hero_house_b_door.webp" type="image/webp"><img src="assets/hero_house_b_door.png" alt="" loading="lazy" decoding="async" width="1024" height="989"></picture></div>
+        <div class="gate__light"></div>
+      </div>
+      <div class="gate__glow"></div>
+      <div class="gate__vignette"></div>
     </div>
   </div>
   <section class="biome biome--forest" id="b-forest"
@@ -109,16 +122,16 @@
     <div class="biome__sky" aria-hidden="true"></div>
     <div class="biome__ground" aria-hidden="true"></div>
     <div class="biome__scene" aria-hidden="true">
-        <div class="sprite sprite--pine-b" data-depth="0.05"><picture><source srcset="assets/biome_pine_b.webp" type="image/webp"><img src="assets/biome_pine_b.png" alt="" loading="lazy" decoding="async"></picture></div>
-        <div class="sprite sprite--deadtree is-mobile-hidden" data-depth="0.08"><picture><source srcset="assets/biome_deadtree.webp" type="image/webp"><img src="assets/biome_deadtree.png" alt="" loading="lazy" decoding="async"></picture></div>
-        <div class="sprite sprite--pine-a" data-depth="0.1"><picture><source srcset="assets/biome_pine_a.webp" type="image/webp"><img src="assets/biome_pine_a.png" alt="" loading="lazy" decoding="async"></picture></div>
-        <div class="sprite sprite--stump" data-depth="0.15"><picture><source srcset="assets/biome_stump.webp" type="image/webp"><img src="assets/biome_stump.png" alt="" loading="lazy" decoding="async"></picture></div>
+        <div class="sprite sprite--pine-b" data-row="0" style="bottom:34%;height:56.1%;z-index:1;"><picture><source srcset="assets/biome_pine_b.webp" type="image/webp"><img src="assets/biome_pine_b.png" alt="" loading="lazy" decoding="async" width="1024" height="987"></picture></div>
+        <div class="sprite sprite--deadtree is-mobile-hidden" data-row="0" style="bottom:34%;height:45.9%;z-index:1;"><picture><source srcset="assets/biome_deadtree.webp" type="image/webp"><img src="assets/biome_deadtree.png" alt="" loading="lazy" decoding="async" width="1024" height="1239"></picture></div>
+        <div class="sprite sprite--pine-a" data-row="1" style="bottom:22%;height:68.0%;z-index:3;"><picture><source srcset="assets/biome_pine_a.webp" type="image/webp"><img src="assets/biome_pine_a.png" alt="" loading="lazy" decoding="async" width="1024" height="1790"></picture></div>
+        <div class="sprite sprite--stump" data-row="2" style="bottom:8%;height:25.3%;z-index:5;"><picture><source srcset="assets/biome_stump.webp" type="image/webp"><img src="assets/biome_stump.png" alt="" loading="lazy" decoding="async" width="1024" height="955"></picture></div>
     </div>
     <div class="biome__cards">
         <article class="card" id="f-skills">
           <div class="card__roof" aria-hidden="true"></div>
           <div class="card__body">
-            <picture class="card__art"><source srcset="assets/feat_skills.webp" type="image/webp"><img src="assets/feat_skills.png" alt="Skills, no levels" loading="lazy" decoding="async"></picture>
+            <picture class="card__art"><source srcset="assets/feat_skills.webp" type="image/webp"><img src="assets/feat_skills.png" alt="Skills, no levels" loading="lazy" decoding="async" width="640" height="620"></picture>
             <h3 class="card__title">Skills, no levels</h3>
             <p class="card__text">No level next to your name. Swing a sword and your sword skill grows; pick locks and your lockpicking does. Want a different character — play differently, don't roll a new one.</p>
           </div>
@@ -126,7 +139,7 @@
         <article class="card" id="f-craft">
           <div class="card__roof" aria-hidden="true"></div>
           <div class="card__body">
-            <picture class="card__art"><source srcset="assets/feat_craft.webp" type="image/webp"><img src="assets/feat_craft.png" alt="Crafting" loading="lazy" decoding="async"></picture>
+            <picture class="card__art"><source srcset="assets/feat_craft.webp" type="image/webp"><img src="assets/feat_craft.png" alt="Crafting" loading="lazy" decoding="async" width="640" height="634"></picture>
             <h3 class="card__title">Crafting</h3>
             <p class="card__text">Anything worth wearing is made by a player at an anvil. A good smith's name is known across the shard. Nothing drops out of a menu.</p>
           </div>
@@ -136,8 +149,12 @@
   </section>
   <div class="gate" data-gate="forest" aria-hidden="true">
     <div class="gate__stage">
-      <div class="gate__art"><picture><source srcset="assets/biome_orevein.webp" type="image/webp"><img src="assets/biome_orevein.png" alt="" loading="lazy" decoding="async"></picture></div>
-      <div class="gate__veil"></div>
+      <div class="gate__zoom">
+        <div class="gate__art"><picture><source srcset="assets/biome_orevein.webp" type="image/webp"><img src="assets/biome_orevein.png" alt="" loading="lazy" decoding="async" width="1024" height="1018"></picture></div>
+        <div class="gate__light"></div>
+      </div>
+      <div class="gate__glow"></div>
+      <div class="gate__vignette"></div>
     </div>
   </div>
   <section class="biome biome--mine" id="b-mine"
@@ -145,16 +162,16 @@
     <div class="biome__sky" aria-hidden="true"></div>
     <div class="biome__ground" aria-hidden="true"></div>
     <div class="biome__scene" aria-hidden="true">
-        <div class="sprite sprite--orevein" data-depth="0.05"><picture><source srcset="assets/biome_orevein.webp" type="image/webp"><img src="assets/biome_orevein.png" alt="" loading="lazy" decoding="async"></picture></div>
-        <div class="sprite sprite--crystals" data-depth="0.09"><picture><source srcset="assets/biome_crystals.webp" type="image/webp"><img src="assets/biome_crystals.png" alt="" loading="lazy" decoding="async"></picture></div>
-        <div class="sprite sprite--mining is-mobile-hidden is-iso" data-depth="0.07"><picture><source srcset="assets/feat_mining.webp" type="image/webp"><img src="assets/feat_mining.png" alt="" loading="lazy" decoding="async"></picture></div>
-        <div class="sprite sprite--brazier" data-depth="0.16"><picture><source srcset="assets/biome_brazier.webp" type="image/webp"><img src="assets/biome_brazier.png" alt="" loading="lazy" decoding="async"></picture></div>
+        <div class="sprite sprite--orevein" data-row="0" style="bottom:34%;height:54.4%;z-index:1;"><picture><source srcset="assets/biome_orevein.webp" type="image/webp"><img src="assets/biome_orevein.png" alt="" loading="lazy" decoding="async" width="1024" height="1018"></picture></div>
+        <div class="sprite sprite--crystals" data-row="1" style="bottom:22%;height:50.0%;z-index:3;"><picture><source srcset="assets/biome_crystals.webp" type="image/webp"><img src="assets/biome_crystals.png" alt="" loading="lazy" decoding="async" width="1024" height="1068"></picture></div>
+        <div class="sprite sprite--mining is-mobile-hidden is-iso" data-row="1" style="bottom:22%;height:42.0%;z-index:3;"><picture><source srcset="assets/feat_mining.webp" type="image/webp"><img src="assets/feat_mining.png" alt="" loading="lazy" decoding="async" width="640" height="631"></picture></div>
+        <div class="sprite sprite--brazier" data-row="2" style="bottom:8%;height:32.2%;z-index:5;"><picture><source srcset="assets/biome_brazier.webp" type="image/webp"><img src="assets/biome_brazier.png" alt="" loading="lazy" decoding="async" width="1024" height="1077"></picture></div>
     </div>
     <div class="biome__cards">
         <article class="card" id="f-pvp">
           <div class="card__roof" aria-hidden="true"></div>
           <div class="card__body">
-            <picture class="card__art"><source srcset="assets/feat_pvp.webp" type="image/webp"><img src="assets/feat_pvp.png" alt="Fights that last" loading="lazy" decoding="async"></picture>
+            <picture class="card__art"><source srcset="assets/feat_pvp.webp" type="image/webp"><img src="assets/feat_pvp.png" alt="Fights that last" loading="lazy" decoding="async" width="640" height="776"></picture>
             <h3 class="card__title">Fights that last</h3>
             <p class="card__text">Nobody dies in one hit. There is time to turn around, call your people, or leave on foot. Whoever won ground it out — they didn't get a lucky proc.</p>
           </div>
@@ -162,7 +179,7 @@
         <article class="card" id="f-mining">
           <div class="card__roof" aria-hidden="true"></div>
           <div class="card__body">
-            <picture class="card__art"><source srcset="assets/feat_mining.webp" type="image/webp"><img src="assets/feat_mining.png" alt="Mining and gathering" loading="lazy" decoding="async"></picture>
+            <picture class="card__art"><source srcset="assets/feat_mining.webp" type="image/webp"><img src="assets/feat_mining.png" alt="Mining and gathering" loading="lazy" decoding="async" width="640" height="631"></picture>
             <h3 class="card__title">Mining and gathering</h3>
             <p class="card__text">Every ore, log, herb and fish was pulled out of the ground by somebody's hands. Veins run out. The best ground is where people get killed. What you haul back is what you keep.</p>
           </div>
@@ -172,8 +189,12 @@
   </section>
   <div class="gate" data-gate="mine" aria-hidden="true">
     <div class="gate__stage">
-      <div class="gate__art"><picture><source srcset="assets/biome_portal.webp" type="image/webp"><img src="assets/biome_portal.png" alt="" loading="lazy" decoding="async"></picture></div>
-      <div class="gate__veil"></div>
+      <div class="gate__zoom">
+        <div class="gate__art"><picture><source srcset="assets/biome_portal.webp" type="image/webp"><img src="assets/biome_portal.png" alt="" loading="lazy" decoding="async" width="1024" height="983"></picture></div>
+        <div class="gate__light"></div>
+      </div>
+      <div class="gate__glow"></div>
+      <div class="gate__vignette"></div>
     </div>
   </div>
   <section class="biome biome--spirit" id="b-spirit"
@@ -181,17 +202,17 @@
     <div class="biome__sky" aria-hidden="true"></div>
     <div class="biome__ground" aria-hidden="true"></div>
     <div class="biome__scene" aria-hidden="true">
-        <div class="sprite sprite--ship is-mobile-hidden is-iso" data-depth="0.05"><picture><source srcset="assets/feat_death_alt.webp" type="image/webp"><img src="assets/feat_death_alt.png" alt="" loading="lazy" decoding="async"></picture></div>
-        <div class="sprite sprite--vendetta" data-depth="0.08"><picture><source srcset="assets/feat_vendetta.webp" type="image/webp"><img src="assets/feat_vendetta.png" alt="" loading="lazy" decoding="async"></picture></div>
-        <div class="sprite sprite--crypt is-iso" data-depth="0.06"><picture><source srcset="assets/feat_death.webp" type="image/webp"><img src="assets/feat_death.png" alt="" loading="lazy" decoding="async"></picture></div>
-        <div class="sprite sprite--deadtree2 is-mobile-hidden" data-depth="0.12"><picture><source srcset="assets/biome_deadtree.webp" type="image/webp"><img src="assets/biome_deadtree.png" alt="" loading="lazy" decoding="async"></picture></div>
-        <div class="sprite sprite--brazier2" data-depth="0.17"><picture><source srcset="assets/biome_brazier.webp" type="image/webp"><img src="assets/biome_brazier.png" alt="" loading="lazy" decoding="async"></picture></div>
+        <div class="sprite sprite--ship is-mobile-hidden is-iso" data-row="0" style="bottom:34%;height:47.6%;z-index:1;"><picture><source srcset="assets/feat_death_alt.webp" type="image/webp"><img src="assets/feat_death_alt.png" alt="" loading="lazy" decoding="async" width="1024" height="1273"></picture></div>
+        <div class="sprite sprite--deadtree2 is-mobile-hidden" data-row="0" style="bottom:34%;height:37.4%;z-index:1;"><picture><source srcset="assets/biome_deadtree.webp" type="image/webp"><img src="assets/biome_deadtree.png" alt="" loading="lazy" decoding="async" width="1024" height="1239"></picture></div>
+        <div class="sprite sprite--vendetta" data-row="1" style="bottom:22%;height:54.0%;z-index:3;"><picture><source srcset="assets/feat_vendetta.webp" type="image/webp"><img src="assets/feat_vendetta.png" alt="" loading="lazy" decoding="async" width="640" height="813"></picture></div>
+        <div class="sprite sprite--crypt is-iso" data-row="1" style="bottom:22%;height:56.0%;z-index:3;"><picture><source srcset="assets/feat_death.webp" type="image/webp"><img src="assets/feat_death.png" alt="" loading="lazy" decoding="async" width="1024" height="1120"></picture></div>
+        <div class="sprite sprite--brazier2" data-row="2" style="bottom:8%;height:29.9%;z-index:5;"><picture><source srcset="assets/biome_brazier.webp" type="image/webp"><img src="assets/biome_brazier.png" alt="" loading="lazy" decoding="async" width="1024" height="1077"></picture></div>
     </div>
     <div class="biome__cards">
         <article class="card" id="f-death">
           <div class="card__roof" aria-hidden="true"></div>
           <div class="card__body">
-            <picture class="card__art"><source srcset="assets/feat_death.webp" type="image/webp"><img src="assets/feat_death.png" alt="Death is a place" loading="lazy" decoding="async"></picture><picture class="card__art card__art--corner"><source srcset="assets/feat_death_alt.webp" type="image/webp"><img src="assets/feat_death_alt.png" alt="" loading="lazy" decoding="async"></picture>
+            <picture class="card__art"><source srcset="assets/feat_death.webp" type="image/webp"><img src="assets/feat_death.png" alt="Death is a place" loading="lazy" decoding="async" width="1024" height="1120"></picture><picture class="card__art card__art--corner"><source srcset="assets/feat_death_alt.webp" type="image/webp"><img src="assets/feat_death_alt.png" alt="" loading="lazy" decoding="async" width="1024" height="1273"></picture>
             <h3 class="card__title">Death is a place</h3>
             <p class="card__text">The living don't teach necromancy. Die, ride the ship of the dead as a ghost, and come back changed.</p>
           </div>
@@ -199,7 +220,7 @@
         <article class="card" id="f-vendetta">
           <div class="card__roof" aria-hidden="true"></div>
           <div class="card__body">
-            <picture class="card__art"><source srcset="assets/feat_vendetta.webp" type="image/webp"><img src="assets/feat_vendetta.png" alt="Vendetta" loading="lazy" decoding="async"></picture>
+            <picture class="card__art"><source srcset="assets/feat_vendetta.webp" type="image/webp"><img src="assets/feat_vendetta.png" alt="Vendetta" loading="lazy" decoding="async" width="640" height="813"></picture>
             <h3 class="card__title">Vendetta</h3>
             <p class="card__text">Kill in front of witnesses and the family remembers. An avenger will find you on the far side of the map. Work clean.</p>
           </div>
@@ -207,10 +228,15 @@
     </div>
     <div class="biome__reveal" aria-hidden="true"></div>
   </section>
-  <div class="gate" data-gate="spirit" aria-hidden="true">
+  <div class="gate" data-gate="spirit" data-door="1" aria-hidden="true">
     <div class="gate__stage">
-      <div class="gate__art"><picture><source srcset="assets/feat_death.webp" type="image/webp"><img src="assets/feat_death.png" alt="" loading="lazy" decoding="async"></picture></div>
-      <div class="gate__veil"></div>
+      <div class="gate__zoom">
+        <div class="gate__art"><picture><source srcset="assets/feat_death_open.webp" type="image/webp"><img src="assets/feat_death_open.png" alt="" loading="lazy" decoding="async" width="1024" height="1120"></picture></div>
+        <div class="gate__door"><picture><source srcset="assets/feat_death_door.webp" type="image/webp"><img src="assets/feat_death_door.png" alt="" loading="lazy" decoding="async" width="1024" height="1120"></picture></div>
+        <div class="gate__light"></div>
+      </div>
+      <div class="gate__glow"></div>
+      <div class="gate__vignette"></div>
     </div>
   </div>
   <section class="biome biome--home" id="b-home"
@@ -218,16 +244,16 @@
     <div class="biome__sky" aria-hidden="true"></div>
     <div class="biome__ground" aria-hidden="true"></div>
     <div class="biome__scene" aria-hidden="true">
-        <div class="sprite sprite--house-b2" data-depth="0.05"><picture><source srcset="assets/hero_house_b.webp" type="image/webp"><img src="assets/hero_house_b.png" alt="" loading="lazy" decoding="async"></picture></div>
-        <div class="sprite sprite--tree-a2 is-mobile-hidden" data-depth="0.09"><picture><source srcset="assets/hero_tree_a.webp" type="image/webp"><img src="assets/hero_tree_a.png" alt="" loading="lazy" decoding="async"></picture></div>
-        <div class="sprite sprite--house-a2 is-iso" data-depth="0.04"><picture><source srcset="assets/hero_house_a.webp" type="image/webp"><img src="assets/hero_house_a.png" alt="" loading="lazy" decoding="async"></picture></div>
-        <div class="sprite sprite--lantern2" data-depth="0.14"><picture><source srcset="assets/prop_lantern.webp" type="image/webp"><img src="assets/prop_lantern.png" alt="" loading="lazy" decoding="async"></picture></div>
+        <div class="sprite sprite--house-b2" data-row="0" style="bottom:34%;height:51.0%;z-index:1;"><picture><source srcset="assets/hero_house_b.webp" type="image/webp"><img src="assets/hero_house_b.png" alt="" loading="lazy" decoding="async" width="1024" height="989"></picture></div>
+        <div class="sprite sprite--tree-a2 is-mobile-hidden" data-row="0" style="bottom:34%;height:40.8%;z-index:1;"><picture><source srcset="assets/hero_tree_a.webp" type="image/webp"><img src="assets/hero_tree_a.png" alt="" loading="lazy" decoding="async" width="1024" height="1032"></picture></div>
+        <div class="sprite sprite--house-a2 is-iso" data-row="1" style="bottom:22%;height:62.0%;z-index:3;"><picture><source srcset="assets/hero_house_a.webp" type="image/webp"><img src="assets/hero_house_a.png" alt="" loading="lazy" decoding="async" width="1024" height="1039"></picture></div>
+        <div class="sprite sprite--lantern2" data-row="2" style="bottom:8%;height:32.2%;z-index:5;"><picture><source srcset="assets/prop_lantern.webp" type="image/webp"><img src="assets/prop_lantern.png" alt="" loading="lazy" decoding="async" width="360" height="1150"></picture></div>
     </div>
     <div class="biome__cards">
         <article class="card" id="f-home">
           <div class="card__roof" aria-hidden="true"></div>
           <div class="card__body">
-            <picture class="card__art"><source srcset="assets/feat_home.webp" type="image/webp"><img src="assets/feat_home.png" alt="A home to come back to" loading="lazy" decoding="async"></picture>
+            <picture class="card__art"><source srcset="assets/feat_home.webp" type="image/webp"><img src="assets/feat_home.png" alt="A home to come back to" loading="lazy" decoding="async" width="640" height="618"></picture>
             <h3 class="card__title">A home to come back to</h3>
             <p class="card__text">Claim an empty patch of land and build it in layers: foundation, walls, door, roof. Your chests hold everything you have earned. At night the monsters test the walls.</p>
           </div>
@@ -243,19 +269,19 @@
         <section class="resources" aria-labelledby="res-h">
           <h3 class="resources__title" id="res-h">Dug up, chopped down, forged</h3>
           <ul class="resources__strip">
-            <li class="res"><figure><picture><source srcset="assets/res_iron.webp" type="image/webp"><img src="assets/res_iron.png" alt="Iron ore" loading="lazy" decoding="async"></picture><figcaption>Iron ore</figcaption></figure></li>
-            <li class="res"><figure><picture><source srcset="assets/res_gold.webp" type="image/webp"><img src="assets/res_gold.png" alt="Gold ore" loading="lazy" decoding="async"></picture><figcaption>Gold ore</figcaption></figure></li>
-            <li class="res"><figure><picture><source srcset="assets/res_diamond.webp" type="image/webp"><img src="assets/res_diamond.png" alt="Crystals" loading="lazy" decoding="async"></picture><figcaption>Crystals</figcaption></figure></li>
-            <li class="res"><figure><picture><source srcset="assets/res_wood.webp" type="image/webp"><img src="assets/res_wood.png" alt="Logs" loading="lazy" decoding="async"></picture><figcaption>Logs</figcaption></figure></li>
-            <li class="res"><figure><picture><source srcset="assets/res_herbs.webp" type="image/webp"><img src="assets/res_herbs.png" alt="Herbs" loading="lazy" decoding="async"></picture><figcaption>Herbs</figcaption></figure></li>
-            <li class="res"><figure><picture><source srcset="assets/res_fish.webp" type="image/webp"><img src="assets/res_fish.png" alt="Fish" loading="lazy" decoding="async"></picture><figcaption>Fish</figcaption></figure></li>
-            <li class="res"><figure><picture><source srcset="assets/res_pickaxe.webp" type="image/webp"><img src="assets/res_pickaxe.png" alt="Pickaxe" loading="lazy" decoding="async"></picture><figcaption>Pickaxe</figcaption></figure></li>
-            <li class="res"><figure><picture><source srcset="assets/res_sword.webp" type="image/webp"><img src="assets/res_sword.png" alt="Sword" loading="lazy" decoding="async"></picture><figcaption>Sword</figcaption></figure></li>
-            <li class="res"><figure><picture><source srcset="assets/res_bow.webp" type="image/webp"><img src="assets/res_bow.png" alt="Bow" loading="lazy" decoding="async"></picture><figcaption>Bow</figcaption></figure></li>
-            <li class="res"><figure><picture><source srcset="assets/res_staff.webp" type="image/webp"><img src="assets/res_staff.png" alt="Staff" loading="lazy" decoding="async"></picture><figcaption>Staff</figcaption></figure></li>
-            <li class="res"><figure><picture><source srcset="assets/res_spellbook.webp" type="image/webp"><img src="assets/res_spellbook.png" alt="Spellbook" loading="lazy" decoding="async"></picture><figcaption>Spellbook</figcaption></figure></li>
-            <li class="res"><figure><picture><source srcset="assets/res_runes.webp" type="image/webp"><img src="assets/res_runes.png" alt="Runes" loading="lazy" decoding="async"></picture><figcaption>Runes</figcaption></figure></li>
-            <li class="res"><figure><picture><source srcset="assets/res_potion.webp" type="image/webp"><img src="assets/res_potion.png" alt="Potion" loading="lazy" decoding="async"></picture><figcaption>Potion</figcaption></figure></li>
+            <li class="res"><figure><picture><source srcset="assets/res_iron.webp" type="image/webp"><img src="assets/res_iron.png" alt="Iron ore" loading="lazy" decoding="async" width="224" height="232"></picture><figcaption>Iron ore</figcaption></figure></li>
+            <li class="res"><figure><picture><source srcset="assets/res_gold.webp" type="image/webp"><img src="assets/res_gold.png" alt="Gold ore" loading="lazy" decoding="async" width="224" height="201"></picture><figcaption>Gold ore</figcaption></figure></li>
+            <li class="res"><figure><picture><source srcset="assets/res_diamond.webp" type="image/webp"><img src="assets/res_diamond.png" alt="Crystals" loading="lazy" decoding="async" width="224" height="226"></picture><figcaption>Crystals</figcaption></figure></li>
+            <li class="res"><figure><picture><source srcset="assets/res_wood.webp" type="image/webp"><img src="assets/res_wood.png" alt="Logs" loading="lazy" decoding="async" width="224" height="378"></picture><figcaption>Logs</figcaption></figure></li>
+            <li class="res"><figure><picture><source srcset="assets/res_herbs.webp" type="image/webp"><img src="assets/res_herbs.png" alt="Herbs" loading="lazy" decoding="async" width="224" height="332"></picture><figcaption>Herbs</figcaption></figure></li>
+            <li class="res"><figure><picture><source srcset="assets/res_fish.webp" type="image/webp"><img src="assets/res_fish.png" alt="Fish" loading="lazy" decoding="async" width="224" height="260"></picture><figcaption>Fish</figcaption></figure></li>
+            <li class="res"><figure><picture><source srcset="assets/res_pickaxe.webp" type="image/webp"><img src="assets/res_pickaxe.png" alt="Pickaxe" loading="lazy" decoding="async" width="224" height="376"></picture><figcaption>Pickaxe</figcaption></figure></li>
+            <li class="res"><figure><picture><source srcset="assets/res_sword.webp" type="image/webp"><img src="assets/res_sword.png" alt="Sword" loading="lazy" decoding="async" width="224" height="882"></picture><figcaption>Sword</figcaption></figure></li>
+            <li class="res"><figure><picture><source srcset="assets/res_bow.webp" type="image/webp"><img src="assets/res_bow.png" alt="Bow" loading="lazy" decoding="async" width="224" height="308"></picture><figcaption>Bow</figcaption></figure></li>
+            <li class="res"><figure><picture><source srcset="assets/res_staff.webp" type="image/webp"><img src="assets/res_staff.png" alt="Staff" loading="lazy" decoding="async" width="224" height="1416"></picture><figcaption>Staff</figcaption></figure></li>
+            <li class="res"><figure><picture><source srcset="assets/res_spellbook.webp" type="image/webp"><img src="assets/res_spellbook.png" alt="Spellbook" loading="lazy" decoding="async" width="224" height="194"></picture><figcaption>Spellbook</figcaption></figure></li>
+            <li class="res"><figure><picture><source srcset="assets/res_runes.webp" type="image/webp"><img src="assets/res_runes.png" alt="Runes" loading="lazy" decoding="async" width="224" height="245"></picture><figcaption>Runes</figcaption></figure></li>
+            <li class="res"><figure><picture><source srcset="assets/res_potion.webp" type="image/webp"><img src="assets/res_potion.png" alt="Potion" loading="lazy" decoding="async" width="224" height="363"></picture><figcaption>Potion</figcaption></figure></li>
           </ul>
         </section>
     </div>
@@ -282,7 +308,10 @@
     <a href="ru/">RU</a>
   </nav>
 </footer>
+</div></div>
 
-<script src="main.js?v=4" defer></script>
+<!-- GSAP is fetched by main.js only when the journey will run (desktop, motion
+     allowed). On phones the journey is off, so 127 KB is never downloaded. -->
+<script src="main.js?v=5" defer></script>
 </body>
 </html>

@@ -8,24 +8,15 @@ posts — stays opaque and shows up as a grey blob on any non-grey page. This
 fills those cavities with the same tolerance as the cut (+-12 around the corner
 median), then re-exports the sprite.
 
-GUARDS (protecting against punching a hole through the object itself)
+RULE. An enclosed region is background if its MEDIAN colour sits within
+BG_TOL_MEDIAN of the backdrop, regardless of how large it is. The earlier
+version carried a 5%-of-frame cap and an outline-contrast heuristic; both were
+proxies, and the cap in particular left genuinely open areas opaque — the sky
+between pine branches is far more than 5% of the frame. Colour is the direct
+question, so colour is what is asked.
 
-  area      a region larger than 5% of the frame is not treated as a cavity.
-
-  border    the spec asked to skip a region whose perimeter borders object
-            pixels on >60%. That test cannot discriminate here: a region is
-            "enclosed" precisely because it is NOT connected to the outer
-            flood, so every neighbouring pixel is an object pixel and the
-            figure is ~100% for every genuine cavity — applying it literally
-            would skip all of them and disable the fix. The number is still
-            computed and logged (obj% column) so the degeneracy is visible.
-            What actually distinguishes a real cavity from a background-grey
-            patch OF the object is the outline: this style draws a dark, high
-            contrast border around every shape, so a true cavity is ringed by
-            pixels far from the background colour, while a grey facet of a grey
-            object fades into it. So the guard applied is: at least 60% of the
-            region's perimeter must differ from the background by more than
-            STRONG per channel. Regions failing it are left opaque and logged.
+Anything whose median is NOT background-grey is left alone and logged, so a
+grey object (an iron ore chunk, cobbles) cannot be punched through silently.
 
 Rewrites out/site_assets/final/<id>.png in place; every decision is printed.
 """
@@ -47,13 +38,11 @@ SITE = ROOT / "out" / "site_assets"
 RAW = SITE / "_raw"
 FINAL = SITE / "final"
 
-DEFAULT_IDS = ["feat_skills", "res_bow", "hero_well", "hero_cart", "feat_world"]
+DEFAULT_IDS = None          # None -> every sprite in final/
 PAD = 8
-MIN_REGION = 0.0015      # ignore specks below this share of the frame
-MAX_REGION = 0.05        # spec guard: never treat >5% of the frame as a cavity
-STRONG = 30              # per-channel distance from bg that counts as a real outline
-MIN_BORDER = 0.60        # share of the perimeter that must be a real outline
-BAND = 4                 # px sampled outward from the region (clears the anti-alias ramp)
+MIN_REGION = 0.0008         # ignore specks below this share of the frame
+BG_TOL_MEDIAN = 16          # a region counts as background if its MEDIAN sits
+                            # within this per-channel distance of the backdrop
 
 
 def source_frame(tid):
@@ -90,29 +79,21 @@ def fix(tid, src=None):
         share = region.sum() / px
         if share < MIN_REGION:
             continue
-        ring = ndimage.binary_dilation(region) & ~region
-        obj_frac = float((~flood & ~region)[ring].mean()) if ring.any() else 0.0
-        # Sample a BAND, not the 1px ring: the pixels immediately outside a
-        # cavity are the anti-aliased ramp off the outline (dist barely over
-        # the +-12 tolerance), so a 1px ring reads soft even around a hard
-        # black outline. A few px out the real outline is inside the sample.
-        band = ndimage.binary_dilation(region, iterations=BAND) & ~region
-        border_frac = float((dist[band] > STRONG).mean()) if band.any() else 0.0
-
-        if share > MAX_REGION:
-            print(f"    ПРОПУСК область {share*100:.2f}% кадра (>5%), "
-                  f"obj%={obj_frac*100:.0f} outline%={border_frac*100:.0f}")
-            skipped += 1
-            continue
-        if border_frac < MIN_BORDER:
-            print(f"    ПРОПУСК слабый контур: outline%={border_frac*100:.0f} "
-                  f"(<{MIN_BORDER*100:.0f}), область {share*100:.2f}%, obj%={obj_frac*100:.0f}")
+        # The test is now the region's own colour, not its size or its border:
+        # if the median of an enclosed region sits within BG_TOL_MEDIAN of the
+        # backdrop, it IS backdrop and must come out — however large it is. The
+        # old 5%-of-frame cap was arbitrary and left real holes (pine crowns,
+        # the gaps between bare branches) opaque.
+        med = np.median(a[region], axis=0)
+        dist = float(np.abs(med - bg).max())
+        if dist > BG_TOL_MEDIAN:
+            print(f"    ПРОПУСК не фон: медиана отходит на {dist:.0f} (>{BG_TOL_MEDIAN}), "
+                  f"область {share*100:.2f}%")
             skipped += 1
             continue
         alpha_bg |= region
         filled += 1
-        print(f"    залито {share*100:.2f}% кадра  obj%={obj_frac*100:.0f} "
-              f"outline%={border_frac*100:.0f}")
+        print(f"    залито {share*100:.2f}% кадра  дельта медианы {dist:.0f}")
 
     obj = ~alpha_bg
     if not obj.any():
@@ -128,7 +109,7 @@ def fix(tid, src=None):
 
 
 def main():
-    ids = sys.argv[1:] or DEFAULT_IDS
+    ids = sys.argv[1:] or sorted(p.stem for p in FINAL.glob("*.png"))
     tot_f = tot_s = 0
     for tid in ids:
         print(f"{tid}:")

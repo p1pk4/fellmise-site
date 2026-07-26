@@ -26,10 +26,10 @@ the operation idempotent and reversible.
    depth from the clean interior — see defringe(). A first attempt that treated
    only the outermost ring made it worse: it sourced replacement colour from
    ring 2, which is contaminated too, and simply moved the halo outward.
-   ALPHA IS NEVER TOUCHED, as asked: the silhouette is bit-for-bit identical,
-   only colour changes. Measured over the pack, the 2px rim sat +53.3 luma
-   above the interior before and -8.4 after (i.e. the rim is now the art's own
-   dark outline, which is what it should be).
+   v3 adds a second test: grey rim against saturated interior. On the dark
+   biome props the fringe is not lighter than the art, it is merely NEUTRAL
+   against colour, which the luma test cannot see. ALPHA IS NEVER TOUCHED, as
+   asked: the silhouette is bit-for-bit identical, only colour changes.
 
 2. GRADE. One shared set of parameters for every sprite:
      * warm shift  — per-channel gain interpolated by luminance, lifting reds
@@ -66,6 +66,16 @@ LUMA = np.array([0.2126, 0.7152, 0.0722])
 
 FRINGE_MARGIN = 12.0    # luma a rim pixel must exceed the clean interior by
 FRINGE_DEPTH = 3        # how many pixels in the background bleed reaches
+FRINGE_SAT_RIM = 0.15   # rim this desaturated ...
+FRINGE_SAT_IN = 0.22    # ... against an interior this saturated is grey bleed
+FRINGE_REF_DEPTH = 7    # where the 'interior' colour is SAMPLED for that test
+
+
+def _sat(rgb):
+    """HSV-style saturation of an HxWx3 float array."""
+    mx = rgb.max(axis=-1)
+    mn = rgb.min(axis=-1)
+    return np.where(mx > 1e-6, (mx - mn) / np.maximum(mx, 1e-6), 0.0)
 
 
 def defringe(rgba):
@@ -78,11 +88,19 @@ def defringe(rgba):
     118). So the clean source is taken from FRINGE_DEPTH pixels in, and every
     ring outside that is repainted from it in one go.
 
-    Only pixels LIGHTER than that clean interior by FRINGE_MARGIN are touched:
-    this style outlines everything dark, so "lighter than the art behind it" is
-    what background bleed looks like, and the test spares genuinely bright edges
-    such as a sword blade. On sprites too thin to erode that far the depth backs
-    off automatically rather than eating the art.
+    Two independent tests mark a rim pixel as contaminated; either is enough:
+
+      LUMA   — the pixel is lighter than the clean interior by FRINGE_MARGIN.
+               Catches a pale halo on mid and dark art.
+      GREY   — the pixel is desaturated (< FRINGE_SAT_RIM) while the interior
+               behind it is saturated (> FRINGE_SAT_IN). The backdrop is neutral
+               grey, so grey sitting against colour is bleed no matter how dark
+               it is — this is the case the luma test misses on the dark biome
+               props, where the fringe is the same brightness as the art.
+
+    Genuinely bright or genuinely grey art is untouched: a sword blade fails the
+    grey test (its interior is also desaturated) and a stone fails it for the
+    same reason, while neither is lighter than its own interior.
     """
     rgb = rgba[..., :3].astype(np.float32)
     alpha = rgba[..., 3]
@@ -105,10 +123,29 @@ def defringe(rgba):
         return np.dstack([rgb.astype(np.uint8), alpha])
 
     _, (jy, jx) = ndimage.distance_transform_edt(~inner, return_indices=True)
-    clean = rgb[jy, jx]
+    clean = rgb[jy, jx]           # what the rim is REPAINTED with (keeps the outline)
+
+    # The saturation reference must be sampled deeper than the replacement: at
+    # depth 3 the sample lands on the art's own dark outline, which is itself
+    # desaturated, so the grey test could never fire. Sampling past the outline
+    # asks the right question ("is there colour behind this rim?") while the
+    # repaint still comes from the outline, so outlines survive.
+    ref_d = FRINGE_REF_DEPTH
+    ref_mask = ndimage.binary_erosion(obj, iterations=ref_d)
+    while ref_d > depth and not ref_mask.any():
+        ref_d -= 1
+        ref_mask = ndimage.binary_erosion(obj, iterations=ref_d)
+    if ref_mask.any():
+        _, (ky, kx) = ndimage.distance_transform_edt(~ref_mask, return_indices=True)
+        ref = rgb[ky, kx]
+    else:
+        ref = clean
 
     rim = obj & ~inner
-    contaminated = rim & ((rgb @ LUMA) > (clean @ LUMA) + FRINGE_MARGIN)
+    by_luma = (rgb @ LUMA) > (clean @ LUMA) + FRINGE_MARGIN
+    by_grey = (_sat(rgb / 255.0) < FRINGE_SAT_RIM) & (_sat(ref / 255.0) > FRINGE_SAT_IN)
+    contaminated = rim & (by_luma | by_grey)
+
     rgb = np.where(contaminated[..., None], clean, rgb)
     return np.dstack([rgb.astype(np.uint8), alpha])
 

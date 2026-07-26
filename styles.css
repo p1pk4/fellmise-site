@@ -664,7 +664,14 @@ h2, h3 { font-family: var(--display); font-weight: 700; }
    leaves every biome and all of its content reachable by plain scrolling. */
 .is-static .gate { display: none; }
 /* under 760px keep the glows, drop the particle layers (perf) */
-@media (max-width: 760px) { .fx { display: none; } }
+@media (max-width: 760px) {
+  .fx { display: none; }
+  /* smaller ground tiles on phones — same look at that size, fewer bytes */
+  .biome--village, .biome--forest, .biome--home { --tile: url("assets/tile_grass-480.webp"); }
+  .biome--mine { --tile: url("assets/tile_dirt-480.webp"); }
+  .biome--spirit { --tile: url("assets/tile_spirit-480.webp"); }
+  .biome__road { background-image: url("assets/tile_road-480.webp"); }
+}
 .is-static .biome__reveal { display: none; }
 .is-static .sprite { transform: none !important; }
 

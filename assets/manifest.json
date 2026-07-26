@@ -1,0 +1,456 @@
+{
+ "biome_brazier": {
+  "w": [
+   480
+  ],
+  "fallback": 480,
+  "width": 480,
+  "height": 505
+ },
+ "biome_crystals": {
+  "w": [
+   480,
+   768
+  ],
+  "fallback": 768,
+  "width": 768,
+  "height": 801
+ },
+ "biome_deadtree": {
+  "w": [
+   480
+  ],
+  "fallback": 480,
+  "width": 480,
+  "height": 581
+ },
+ "biome_orevein": {
+  "w": [
+   480,
+   768
+  ],
+  "fallback": 768,
+  "width": 768,
+  "height": 763
+ },
+ "biome_pine_a": {
+  "w": [
+   480
+  ],
+  "fallback": 480,
+  "width": 480,
+  "height": 839
+ },
+ "biome_pine_b": {
+  "w": [
+   480,
+   768
+  ],
+  "fallback": 768,
+  "width": 768,
+  "height": 740
+ },
+ "biome_portal": {
+  "w": [
+   480,
+   768
+  ],
+  "fallback": 768,
+  "width": 768,
+  "height": 737
+ },
+ "biome_stump": {
+  "w": [
+   480,
+   768
+  ],
+  "fallback": 768,
+  "width": 768,
+  "height": 716
+ },
+ "feat_craft": {
+  "w": [
+   480,
+   768
+  ],
+  "fallback": 768,
+  "width": 768,
+  "height": 760
+ },
+ "feat_death": {
+  "w": [
+   480,
+   768
+  ],
+  "fallback": 768,
+  "width": 768,
+  "height": 840
+ },
+ "feat_death_alt": {
+  "w": [
+   480
+  ],
+  "fallback": 480,
+  "width": 480,
+  "height": 597
+ },
+ "feat_death_door": {
+  "w": [
+   480,
+   768
+  ],
+  "fallback": 768,
+  "width": 768,
+  "height": 840
+ },
+ "feat_death_open": {
+  "w": [
+   480,
+   768
+  ],
+  "fallback": 768,
+  "width": 768,
+  "height": 840
+ },
+ "feat_mining": {
+  "w": [
+   480,
+   768
+  ],
+  "fallback": 768,
+  "width": 768,
+  "height": 757
+ },
+ "feat_pvp": {
+  "w": [
+   480,
+   768
+  ],
+  "fallback": 768,
+  "width": 768,
+  "height": 932
+ },
+ "feat_skills": {
+  "w": [
+   480,
+   768
+  ],
+  "fallback": 768,
+  "width": 768,
+  "height": 744
+ },
+ "feat_tavern": {
+  "w": [
+   480,
+   768
+  ],
+  "fallback": 768,
+  "width": 768,
+  "height": 803
+ },
+ "feat_vendetta": {
+  "w": [
+   480
+  ],
+  "fallback": 480,
+  "width": 480,
+  "height": 610
+ },
+ "feat_world": {
+  "w": [
+   480
+  ],
+  "fallback": 480,
+  "width": 480,
+  "height": 433
+ },
+ "hero_cart": {
+  "w": [
+   480,
+   768
+  ],
+  "fallback": 768,
+  "width": 768,
+  "height": 704
+ },
+ "hero_fence": {
+  "w": [
+   480,
+   768
+  ],
+  "fallback": 768,
+  "width": 768,
+  "height": 406
+ },
+ "hero_house_a": {
+  "w": [
+   480,
+   768
+  ],
+  "fallback": 768,
+  "width": 768,
+  "height": 779
+ },
+ "hero_house_b": {
+  "w": [
+   480,
+   768
+  ],
+  "fallback": 768,
+  "width": 768,
+  "height": 742
+ },
+ "hero_house_b_door": {
+  "w": [
+   480,
+   768
+  ],
+  "fallback": 768,
+  "width": 768,
+  "height": 742
+ },
+ "hero_house_b_open": {
+  "w": [
+   480,
+   768
+  ],
+  "fallback": 768,
+  "width": 768,
+  "height": 742
+ },
+ "hero_tree_a": {
+  "w": [
+   480,
+   768
+  ],
+  "fallback": 768,
+  "width": 768,
+  "height": 774
+ },
+ "hero_tree_b": {
+  "w": [
+   480
+  ],
+  "fallback": 480,
+  "width": 480,
+  "height": 428
+ },
+ "hero_well": {
+  "w": [
+   480
+  ],
+  "fallback": 480,
+  "width": 480,
+  "height": 638
+ },
+ "prop_crates": {
+  "w": [
+   480
+  ],
+  "fallback": 480,
+  "width": 480,
+  "height": 585
+ },
+ "prop_lantern": {
+  "w": [
+   286
+  ],
+  "fallback": 286,
+  "width": 286,
+  "height": 914
+ },
+ "prop_signpost": {
+  "w": [
+   480
+  ],
+  "fallback": 480,
+  "width": 480,
+  "height": 685
+ },
+ "prop_stones": {
+  "w": [
+   480
+  ],
+  "fallback": 480,
+  "width": 480,
+  "height": 373
+ },
+ "res_axe": {
+  "w": [
+   305
+  ],
+  "fallback": 305,
+  "width": 305,
+  "height": 634
+ },
+ "res_bow": {
+  "w": [
+   363
+  ],
+  "fallback": 363,
+  "width": 363,
+  "height": 499
+ },
+ "res_dagger": {
+  "w": [
+   148
+  ],
+  "fallback": 148,
+  "width": 148,
+  "height": 519
+ },
+ "res_diamond": {
+  "w": [
+   480,
+   768
+  ],
+  "fallback": 768,
+  "width": 768,
+  "height": 774
+ },
+ "res_fish": {
+  "w": [
+   480
+  ],
+  "fallback": 480,
+  "width": 480,
+  "height": 557
+ },
+ "res_gold": {
+  "w": [
+   480,
+   768
+  ],
+  "fallback": 768,
+  "width": 768,
+  "height": 688
+ },
+ "res_herbs": {
+  "w": [
+   480
+  ],
+  "fallback": 480,
+  "width": 480,
+  "height": 712
+ },
+ "res_iron": {
+  "w": [
+   480,
+   768
+  ],
+  "fallback": 768,
+  "width": 768,
+  "height": 796
+ },
+ "res_pickaxe": {
+  "w": [
+   480
+  ],
+  "fallback": 480,
+  "width": 480,
+  "height": 805
+ },
+ "res_potion": {
+  "w": [
+   449
+  ],
+  "fallback": 449,
+  "width": 449,
+  "height": 728
+ },
+ "res_runes": {
+  "w": [
+   480
+  ],
+  "fallback": 480,
+  "width": 480,
+  "height": 525
+ },
+ "res_shield": {
+  "w": [
+   480,
+   768
+  ],
+  "fallback": 768,
+  "width": 768,
+  "height": 772
+ },
+ "res_spellbook": {
+  "w": [
+   480,
+   768
+  ],
+  "fallback": 768,
+  "width": 768,
+  "height": 664
+ },
+ "res_staff": {
+  "w": [
+   147
+  ],
+  "fallback": 147,
+  "width": 147,
+  "height": 929
+ },
+ "res_sword": {
+  "w": [
+   142
+  ],
+  "fallback": 142,
+  "width": 142,
+  "height": 559
+ },
+ "res_wood": {
+  "w": [
+   480
+  ],
+  "fallback": 480,
+  "width": 480,
+  "height": 809
+ },
+ "feat_home": {
+  "w": [
+   480,
+   768
+  ],
+  "fallback": 768,
+  "width": 768,
+  "height": 742
+ },
+ "tile_grass": {
+  "w": [
+   480,
+   512
+  ],
+  "fallback": 512,
+  "width": 512,
+  "height": 512
+ },
+ "tile_dirt": {
+  "w": [
+   480,
+   512
+  ],
+  "fallback": 512,
+  "width": 512,
+  "height": 512
+ },
+ "tile_spirit": {
+  "w": [
+   480,
+   512
+  ],
+  "fallback": 512,
+  "width": 512,
+  "height": 512
+ },
+ "tile_road": {
+  "w": [
+   480,
+   1536
+  ],
+  "fallback": 1536,
+  "width": 1536,
+  "height": 1201
+ }
+}

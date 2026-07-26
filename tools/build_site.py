@@ -193,28 +193,52 @@ def att(s):
     return esc(s).replace('"', "&quot;")
 
 
-def _dims(name):
-    """Intrinsic size of the exported asset, so the browser reserves the box.
-    Without this the page reflows as each sprite lands — CLS was 0.22."""
-    try:
-        from PIL import Image
-        with Image.open(ROOT / "assets" / f"{name}.webp") as im:
-            return f' width="{im.width}" height="{im.height}"'
-    except Exception:
-        return ""
+import json as _json
+
+_MANIFEST = None
 
 
-def pic(a, name, alt, cls="", loading="lazy", extra_attr=""):
-    """<picture> with a WebP source and a PNG fallback."""
+def manifest():
+    """Which widths export_web actually produced, per name."""
+    global _MANIFEST
+    if _MANIFEST is None:
+        p = ROOT / "assets" / "manifest.json"
+        _MANIFEST = _json.loads(p.read_text(encoding="utf-8")) if p.exists() else {}
+    return _MANIFEST
+
+
+# How wide each kind of image is drawn, so the browser can pick a variant
+# BEFORE layout. Values are deliberately a little generous: guessing small
+# fetches a blurry file, guessing large only wastes a step.
+SIZES = {
+    "scene": "(max-width: 760px) 46vw, 34vw",   # sprites standing in a biome
+    "card": "(max-width: 760px) 78vw, 30vw",    # art inside a feature card
+    "res": "(max-width: 760px) 26vw, 120px",    # resource strip pictogram
+    "gate": "(max-width: 760px) 92vw, 52vw",    # doorway art in a gate
+}
+
+
+def pic(a, name, alt, cls="", loading="lazy", extra_attr="", kind="scene"):
+    """<picture> with a responsive WebP srcset and a single PNG fallback.
+
+    srcset comes straight from assets/manifest.json, so the markup can never
+    claim a width that was not exported (and never asks for an upscale — the
+    exporter refuses to make one).
+    """
+    m = manifest().get(name)
     c = f' class="{cls}"' if cls else ""
-    extra_attr = _dims(name) + extra_attr
+    if not m:
+        return (f'<picture{c}><source srcset="{a}{name}.webp" type="image/webp">'
+                f'<img src="{a}{name}.png" alt="{att(alt)}" loading="{loading}" '
+                f'decoding="async"{extra_attr}></picture>')
+
+    srcset = ", ".join(f"{a}{name}-{w}.webp {w}w" for w in m["w"])
+    sizes = SIZES.get(kind, SIZES["scene"])
+    dims = f' width="{m["width"]}" height="{m["height"]}"'
     return (f'<picture{c}>'
-            f'<source srcset="{a}{name}.webp" type="image/webp">'
+            f'<source type="image/webp" srcset="{srcset}" sizes="{sizes}">'
             f'<img src="{a}{name}.png" alt="{att(alt)}" loading="{loading}" '
-            f'decoding="async"{extra_attr}></picture>')
-
-
-FEAT_BY_ID = {f["id"]: f for f in FEATURES}
+            f'decoding="async"{dims}{extra_attr}></picture>')
 
 
 def build(lang):
@@ -226,9 +250,9 @@ def build(lang):
     def card_html(fid):
         f = FEAT_BY_ID[fid]
         if f["sprite"]:
-            art = pic(a, f["sprite"], f[tk], cls="card__art")
+            art = pic(a, f["sprite"], f[tk], cls="card__art", kind="card")
             if f.get("extra"):
-                art += pic(a, f["extra"], "", cls="card__art card__art--corner")
+                art += pic(a, f["extra"], "", cls="card__art card__art--corner", kind="card")
         else:
             art = (f'<div class="card__art card__art--soon" role="img" '
                    f'aria-label="{att(t["soon"])}"><span>{esc(t["soon"])}</span></div>')
@@ -248,7 +272,7 @@ def build(lang):
         '          <ul class="resources__strip">\n'
         + "\n".join(
             '            <li class="res"><figure>'
-            + pic(a, rid, label if lang == "en" else label_ru)
+            + pic(a, rid, label if lang == "en" else label_ru, kind="res")
             + '<figcaption>' + esc(label if lang == "en" else label_ru) + '</figcaption>'
             + '</figure></li>'
             for rid, label, label_ru in RESOURCES)
@@ -318,7 +342,7 @@ def build(lang):
                 # the door is a separate layer hinged on its left edge; the warm
                 # opening behind it is the same art with the door area darkened
                 door = ('        <div class="gate__door">'
-                        + pic(a, g["art"] + "_door", "", loading="lazy") + '</div>\n')
+                        + pic(a, g["art"] + "_door", "", loading="lazy", kind="gate") + '</div>\n')
             body = g["art"] + "_open" if g.get("door") else g["art"]
             sections.append(
                 '  <div class="gate" data-gate="' + b["id"] + '"'
@@ -326,7 +350,7 @@ def build(lang):
                 + ' aria-hidden="true">\n'
                 '    <div class="gate__stage">\n'
                 '      <div class="gate__zoom">\n'
-                '        <div class="gate__art">' + pic(a, body, "", loading="lazy") + '</div>\n'
+                '        <div class="gate__art">' + pic(a, body, "", loading="lazy", kind="gate") + '</div>\n'
                 + door +
                 '        <div class="gate__light"></div>\n'
                 '      </div>\n'
@@ -368,10 +392,14 @@ def build(lang):
 <link rel="icon" href="{a}favicon-32.png" sizes="32x32">
 <link rel="icon" href="{a}icon-512.png" sizes="512x512">
 <link rel="apple-touch-icon" href="{a}apple-touch-icon.png">
-<!-- LCP is the ground band, which paints from a CSS background tile; without
-     this the tile is only discovered after the stylesheet parses. -->
-<link rel="preload" as="image" type="image/webp" href="{a}tile_grass.webp" fetchpriority="high">
-<link rel="preload" as="image" type="image/webp" href="{a}hero_house_a.webp">
+<!-- LCP is the village ground band, painted from a CSS background tile, so the
+     tile is only discovered after the stylesheet parses unless it is preloaded.
+     imagesrcset/imagesizes mirror the media query in styles.css, so a phone
+     preloads the 480 variant and a desktop the full one. -->
+<link rel="preload" as="image" type="image/webp" fetchpriority="high"
+      href="{a}tile_grass.webp"
+      imagesrcset="{a}tile_grass-480.webp 480w, {a}tile_grass.webp 512w"
+      imagesizes="100vw">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" media="print" onload="this.media='all'"

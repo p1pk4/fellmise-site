@@ -2,20 +2,20 @@
 
     python tools/export_web.py
 
-For every sprite: WebP q85 (what browsers actually load) plus a PNG fallback at
-the same pixel width, names preserved. Widths follow the role of the sprite on
-the page, not its source size:
+Every sprite ships as a responsive set: <stem>-480.webp, -768.webp, -1024.webp
+for whichever of those the master can actually supply, plus a single PNG
+fallback at the largest of them. The page picks a variant through srcset/sizes,
+so a phone fetches the 480 and a desktop the 768 or 1024 — the role-based fixed
+widths this used to emit sent the same bytes to both.
 
-    hero_*  560px   composed into the hero scene
-    feat_*  640px   the largest single element of a feature card
-    res_*   224px   pictogram in the resource strip
-    prop_*  360px   small dressing on the hero road (~120-180px on screen)
-    biome_* 560px   scenery in the journey biomes (up to ~450px on screen)
+assets/manifest.json records which widths exist for each name; build_site.py
+reads it to write srcset, so the two can never disagree.
 
 Also emits the favicon set from res_diamond and the 1200x630 og:image.
 Everything lands in assets/; the site never reads out/.
 """
 
+import json
 import pathlib
 
 from PIL import Image
@@ -28,29 +28,7 @@ _GRADED = ROOT / "out" / "site_assets" / "final_web"
 FINAL = _GRADED if _GRADED.is_dir() else _MASTER
 ASSETS = ROOT / "assets"
 
-WIDTHS = {"hero_": 560, "feat_": 640, "res_": 224, "prop_": 360, "biome_": 560}
-QUALITY = 85
-
-# Sprites that get drawn large in a biome scene. At 560px a house filling most
-# of a 1280px scene band was being upscaled past its own pixels and went soft,
-# so these ship at 1024 and a slightly higher quality. check_display_sizes.py
-# asserts that no sprite is ever displayed above its exported height.
-BIG = {
-    "hero_house_a", "hero_house_b", "hero_tree_a", "feat_tavern", "feat_death_alt",
-    "feat_death", "biome_pine_a", "biome_pine_b", "biome_orevein", "biome_portal",
-    "biome_crystals", "biome_deadtree", "biome_stump", "biome_brazier",
-    "hero_house_b_door", "hero_house_b_open", "feat_death_door", "feat_death_open",
-}
-BIG_WIDTH = 1024
-BIG_QUALITY = 88
-
-# Sprites the page needs at a second size under a second name. The housing card
-# reuses the hero farmhouse, but as a feature card it wants the 640px feature
-# width, and a file can only carry one width per name.
-ALIASES = {"feat_home": "hero_house_b"}
-
 # Hero scene layout for the og:image: (sprite, centre x, baseline y, width).
-# Mirrors the on-page composition closely enough to read as the same scene.
 OG_LAYOUT = [
     ("hero_tree_a", 150, 470, 260),
     ("hero_house_b", 355, 430, 300),
@@ -65,35 +43,84 @@ SKY_TOP, SKY_BOT = (0x7E, 0xB8, 0xE0), (0xC7, 0xE6, 0xF2)
 GRASS = [(0xA8, 0xCB, 0x53), (0xBD, 0xD8, 0x5A), (0xD1, 0xE2, 0x76)]
 PATH = (0xF2, 0xCA, 0x78)
 
+# Responsive ladder. A variant is emitted only when the master is at least that
+# wide — upscaling a generated sprite adds bytes and softness and buys nothing.
+# NB: no master in this pack reaches 1024 (the widest is 913), because the cut
+# crops to the object's bounding box. The previous "big sprites at 1024" rule
+# was therefore upscaling every one of them; capping at the master fixes that.
+LADDER = [480, 768, 1024]
+QUALITY = 85
+BIG_QUALITY = 88
 
-def width_for(name):
-    if name in BIG:
-        return BIG_WIDTH
-    for pref, w in WIDTHS.items():
-        if name.startswith(pref):
-            return w
-    return 320
+# Sprites drawn large in a biome scene keep the higher quality setting.
+BIG = {
+    "hero_house_a", "hero_house_b", "hero_tree_a", "feat_tavern", "feat_death_alt",
+    "feat_death", "biome_pine_a", "biome_pine_b", "biome_orevein", "biome_portal",
+    "biome_crystals", "biome_deadtree", "biome_stump", "biome_brazier",
+    "hero_house_b_door", "hero_house_b_open", "feat_death_door", "feat_death_open",
+}
+
+# Sprites the page needs at a second size under a second name.
+ALIASES = {"feat_home": "hero_house_b"}
 
 
 def sprites():
     return sorted(FINAL.glob("*.png"))
 
 
+def widths_for(natural):
+    """Ladder steps that do not exceed the master; at least the master itself."""
+    ws = [w for w in LADDER if w <= natural]
+    return ws or [natural]
+
+
 def export_sprites():
+    """Write <stem>-<w>.webp for each usable width plus one PNG fallback.
+
+    Returns the manifest the page generator needs to write srcset: which widths
+    exist for each name, and the intrinsic size of the fallback.
+    """
     ASSETS.mkdir(parents=True, exist_ok=True)
-    rows = []
+    manifest = {}
+    tot_w = tot_p = 0
+
     jobs = [(p.stem, p) for p in sprites()]
     jobs += [(alias, FINAL / f"{src}.png") for alias, src in ALIASES.items()]
-    for stem, p in jobs:
-        w = width_for(stem)
-        im = Image.open(p).convert("RGBA")
-        h = max(1, round(im.height * w / im.width))
-        im = im.resize((w, h), Image.LANCZOS)
-        png, webp = ASSETS / f"{stem}.png", ASSETS / f"{stem}.webp"
-        im.save(png, optimize=True)
-        im.save(webp, quality=BIG_QUALITY if stem in BIG else QUALITY, method=6)
-        rows.append((stem, w, h, png.stat().st_size, webp.stat().st_size))
-    return rows
+
+    for stem, path in jobs:
+        src = Image.open(path).convert("RGBA")
+        q = BIG_QUALITY if stem in BIG else QUALITY
+        ws = widths_for(src.width)
+        for w in ws:
+            h = max(1, round(src.height * w / src.width))
+            im = src if w == src.width else src.resize((w, h), Image.LANCZOS)
+            out = ASSETS / f"{stem}-{w}.webp"
+            im.save(out, quality=q, method=6)
+            tot_w += out.stat().st_size
+        # one PNG fallback, at the largest width we actually produced
+        top = ws[-1]
+        h = max(1, round(src.height * top / src.width))
+        png = ASSETS / f"{stem}.png"
+        (src if top == src.width else src.resize((top, h), Image.LANCZOS)).save(png, optimize=True)
+        tot_p += png.stat().st_size
+        manifest[stem] = {"w": ws, "fallback": top, "width": top, "height": h}
+
+    # tiles are CSS backgrounds; they get a small variant for phones
+    for tile in ("tile_grass", "tile_dirt", "tile_spirit", "tile_road"):
+        p = ASSETS / f"{tile}.webp"
+        if not p.exists():
+            continue
+        im = Image.open(p).convert("RGB")
+        small = min(480, im.width)
+        if small < im.width:
+            out = ASSETS / f"{tile}-{small}.webp"
+            im.resize((small, round(im.height * small / im.width)), Image.LANCZOS) \
+              .save(out, quality=82, method=6)
+            manifest[tile] = {"w": [small, im.width], "fallback": im.width,
+                              "width": im.width, "height": im.height}
+
+    (ASSETS / "manifest.json").write_text(json.dumps(manifest, indent=1), encoding="utf-8")
+    return manifest, tot_w, tot_p
 
 
 def export_favicon():
@@ -152,18 +179,17 @@ def export_og():
 
 
 def main():
-    rows = export_sprites()
+    manifest, tot_w, tot_p = export_sprites()
     icons = export_favicon()
     og_png, og_jpg = export_og()
 
-    print(f"{'sprite':<18}{'px':>10}{'png KB':>9}{'webp KB':>9}  экономия")
-    tot_p = tot_w = 0
-    for name, w, h, sp, sw in rows:
-        tot_p += sp
-        tot_w += sw
-        print(f"{name:<18}{f'{w}x{h}':>10}{sp/1024:9.0f}{sw/1024:9.0f}"
-              f"{(1-sw/sp)*100:9.0f}%")
-    print(f"\n{len(rows)} спрайтов: PNG {tot_p/1024:.0f} KB -> WebP {tot_w/1024:.0f} KB")
+    steps = {}
+    for name, m in manifest.items():
+        steps.setdefault(tuple(m["w"]), []).append(name)
+    print("варианты по ширинам:")
+    for ws, names in sorted(steps.items(), key=lambda kv: -len(kv[1])):
+        print(f"  {str(list(ws)):<22} {len(names):>3} шт  напр. {', '.join(sorted(names)[:3])}")
+    print(f"\n{len(manifest)} имён: WebP-варианты {tot_w/1024:.0f} KB, PNG-фолбэки {tot_p/1024:.0f} KB")
     print(f"favicon: {', '.join(icons)}")
     print(f"og.png {og_png/1024:.0f} KB, og.jpg {og_jpg/1024:.0f} KB")
 

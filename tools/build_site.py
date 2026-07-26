@@ -10,11 +10,11 @@ stamped from the same template. Edit this file, re-run, commit the HTML.
 
 import pathlib
 
-from biomes import BIOMES, ROWS
+from biomes import BIOMES
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 
-CSS_V = "5"          # cache-buster on styles.css / main.js
+CSS_V = "4"          # cache-buster on styles.css / main.js
 
 # --------------------------------------------------------------------------
 # copy
@@ -193,21 +193,9 @@ def att(s):
     return esc(s).replace('"', "&quot;")
 
 
-def _dims(name):
-    """Intrinsic size of the exported asset, so the browser reserves the box.
-    Without this the page reflows as each sprite lands — CLS was 0.22."""
-    try:
-        from PIL import Image
-        with Image.open(ROOT / "assets" / f"{name}.webp") as im:
-            return f' width="{im.width}" height="{im.height}"'
-    except Exception:
-        return ""
-
-
 def pic(a, name, alt, cls="", loading="lazy", extra_attr=""):
     """<picture> with a WebP source and a PNG fallback."""
     c = f' class="{cls}"' if cls else ""
-    extra_attr = _dims(name) + extra_attr
     return (f'<picture{c}>'
             f'<source srcset="{a}{name}.webp" type="image/webp">'
             f'<img src="{a}{name}.png" alt="{att(alt)}" loading="{loading}" '
@@ -267,20 +255,12 @@ def build(lang):
         # Biome 1 is the first screen and loads eagerly; everything below is
         # lazy, and main.js promotes the next biome to eager one section ahead.
         load = "eager" if first else "lazy"
-        def sprite_html(cls, name, row, base_h, hide, iso):
-            r = ROWS[row]
-            h = round(base_h * r["scale"], 1)
-            style = ('bottom:' + str(r["bottom"]) + '%;height:' + str(h) + '%;'
-                     'z-index:' + str(r["z"]) + ';')
-            return ('        <div class="sprite sprite--' + cls
-                    + (' is-mobile-hidden' if hide else '')
-                    + (' is-iso' if iso else '')
-                    + '" data-row="' + str(row) + '" style="' + style + '">'
-                    # a sprite the mobile layout hides is dead weight on the
-                    # first screen there, so it never loads eagerly
-                    + pic(a, name, "", loading=('lazy' if hide else load)) + '</div>')
-
-        scene = "\n".join(sprite_html(*sp) for sp in b["sprites"])
+        scene = "\n".join(
+            '        <div class="sprite sprite--' + cls
+            + (' is-mobile-hidden' if hide else '')
+            + (' is-iso' if iso else '')
+            + '" data-depth="' + str(depth) + '">' + pic(a, name, "", loading=load) + '</div>'
+            for cls, name, depth, hide, iso in b["sprites"])
 
         parts = ['  <section class="biome biome--' + b["id"] + '" id="b-' + b["id"] + '"\n'
                  '           data-biome="' + b["id"] + '" aria-label="' + att(b[lang]) + '">']
@@ -313,25 +293,11 @@ def build(lang):
 
         if b.get("gate"):
             g = b["gate"]
-            door = ''
-            if g.get("door"):
-                # the door is a separate layer hinged on its left edge; the warm
-                # opening behind it is the same art with the door area darkened
-                door = ('        <div class="gate__door">'
-                        + pic(a, g["art"] + "_door", "", loading="lazy") + '</div>\n')
-            body = g["art"] + "_open" if g.get("door") else g["art"]
             sections.append(
-                '  <div class="gate" data-gate="' + b["id"] + '"'
-                + (' data-door="1"' if g.get("door") else '')
-                + ' aria-hidden="true">\n'
+                '  <div class="gate" data-gate="' + b["id"] + '" aria-hidden="true">\n'
                 '    <div class="gate__stage">\n'
-                '      <div class="gate__zoom">\n'
-                '        <div class="gate__art">' + pic(a, body, "", loading="lazy") + '</div>\n'
-                + door +
-                '        <div class="gate__light"></div>\n'
-                '      </div>\n'
-                '      <div class="gate__glow"></div>\n'
-                '      <div class="gate__vignette"></div>\n'
+                '      <div class="gate__art">' + pic(a, g["art"], "", loading="lazy") + '</div>\n'
+                '      <div class="gate__veil"></div>\n'
                 '    </div>\n'
                 '  </div>')
 
@@ -368,16 +334,9 @@ def build(lang):
 <link rel="icon" href="{a}favicon-32.png" sizes="32x32">
 <link rel="icon" href="{a}icon-512.png" sizes="512x512">
 <link rel="apple-touch-icon" href="{a}apple-touch-icon.png">
-<!-- LCP is the ground band, which paints from a CSS background tile; without
-     this the tile is only discovered after the stylesheet parses. -->
-<link rel="preload" as="image" type="image/webp" href="{a}tile_grass.webp" fetchpriority="high">
-<link rel="preload" as="image" type="image/webp" href="{a}hero_house_a.webp">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" media="print" onload="this.media='all'"
-      href="https://fonts.googleapis.com/css2?family=Podkova:wght@500;700&family=Vollkorn:wght@400;600;700&family=PT+Mono&display=swap">
-<noscript><link rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Podkova:wght@500;700&family=Vollkorn:wght@400;600;700&family=PT+Mono&display=swap"></noscript>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Podkova:wght@500;700&family=Vollkorn:wght@400;600;700&family=PT+Mono&display=swap">
 <link rel="stylesheet" href="{root}styles.css?v={CSS_V}">
 <script>window.TOD_LABELS = {tod_json};</script>
 </head>
@@ -405,7 +364,6 @@ def build(lang):
   </nav>
 </header>
 
-<div id="smooth-wrapper"><div id="smooth-content">
 <main>
 {biomes_html}
 
@@ -422,10 +380,7 @@ def build(lang):
     <a href="{t['other_href']}">{esc(t['other_label'])}</a>
   </nav>
 </footer>
-</div></div>
 
-<!-- GSAP is fetched by main.js only when the journey will run (desktop, motion
-     allowed). On phones the journey is off, so 127 KB is never downloaded. -->
 <script src="{root}main.js?v={CSS_V}" defer></script>
 </body>
 </html>

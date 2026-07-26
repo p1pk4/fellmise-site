@@ -31,19 +31,6 @@ ASSETS = ROOT / "assets"
 WIDTHS = {"hero_": 560, "feat_": 640, "res_": 224, "prop_": 360, "biome_": 560}
 QUALITY = 85
 
-# Sprites that get drawn large in a biome scene. At 560px a house filling most
-# of a 1280px scene band was being upscaled past its own pixels and went soft,
-# so these ship at 1024 and a slightly higher quality. check_display_sizes.py
-# asserts that no sprite is ever displayed above its exported height.
-BIG = {
-    "hero_house_a", "hero_house_b", "hero_tree_a", "feat_tavern", "feat_death_alt",
-    "feat_death", "biome_pine_a", "biome_pine_b", "biome_orevein", "biome_portal",
-    "biome_crystals", "biome_deadtree", "biome_stump", "biome_brazier",
-    "hero_house_b_door", "hero_house_b_open", "feat_death_door", "feat_death_open",
-}
-BIG_WIDTH = 1024
-BIG_QUALITY = 88
-
 # Sprites the page needs at a second size under a second name. The housing card
 # reuses the hero farmhouse, but as a feature card it wants the 640px feature
 # width, and a file can only carry one width per name.
@@ -67,8 +54,6 @@ PATH = (0xF2, 0xCA, 0x78)
 
 
 def width_for(name):
-    if name in BIG:
-        return BIG_WIDTH
     for pref, w in WIDTHS.items():
         if name.startswith(pref):
             return w
@@ -91,7 +76,7 @@ def export_sprites():
         im = im.resize((w, h), Image.LANCZOS)
         png, webp = ASSETS / f"{stem}.png", ASSETS / f"{stem}.webp"
         im.save(png, optimize=True)
-        im.save(webp, quality=BIG_QUALITY if stem in BIG else QUALITY, method=6)
+        im.save(webp, quality=QUALITY, method=6)
         rows.append((stem, w, h, png.stat().st_size, webp.stat().st_size))
     return rows
 

@@ -20,7 +20,7 @@
   сбалансированы) · Pages build ✓ · отдача 200 по EN, RU, css, js, webp, og ✓
   (через `--resolve` на IP Pages, пока DNS не переключён) · вес страницы 0.98 MB
   при цели <1.5 MB ✓ · runClient n/a
-- **Commit:** 91175d4, d43d484
+- **Commit:** 91175d4, 4d86a0a
 
 **Impact trace**
 

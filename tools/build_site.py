@@ -205,6 +205,54 @@ def pic(a, name, alt, cls="", loading="lazy", extra_attr=""):
 FEAT_BY_ID = {f["id"]: f for f in FEATURES}
 
 
+
+def json_ld(t, lang):
+    """Structured data for search engines and answer engines.
+
+    Deliberately conservative: only facts the site itself states. No release
+    date, no rating, no price, no review count — the game is unannounced, and
+    inventing those fields is exactly what gets structured data distrusted.
+    """
+    import json as _j
+    lang_tag = "en" if lang == "en" else "ru"
+    site = "https://fellmise.com/"
+    page = site if lang == "en" else site + "ru/"
+    org = {
+        "@type": "Organization",
+        "name": "Fellmise",
+        "url": site,
+        "logo": site + "assets/icon-512.png",
+    }
+    blocks = [
+        {
+            "@context": "https://schema.org",
+            "@type": "VideoGame",
+            "name": "Fellmise",
+            "url": page,
+            "description": t["descriptor"],
+            "genre": ["MMORPG", "Sandbox"],
+            "gamePlatform": ["PC", "iOS", "Android"],
+            "applicationCategory": "Game",
+            "inLanguage": lang_tag,
+            "image": site + "assets/og.jpg",
+            "publisher": org,
+        },
+        {"@context": "https://schema.org", **org},
+        {
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            "name": "Fellmise",
+            "url": page,
+            "inLanguage": lang_tag,
+        },
+    ]
+    return "\n".join(
+        '<script type="application/ld+json">'
+        + _j.dumps(b, ensure_ascii=False, separators=(",", ":"))
+        + "</script>"
+        for b in blocks)
+
+
 def build(lang):
     t = I18N[lang]
     a = "assets/" if lang == "en" else "../assets/"
@@ -334,6 +382,7 @@ def build(lang):
 <link rel="icon" href="{a}favicon-32.png" sizes="32x32">
 <link rel="icon" href="{a}icon-512.png" sizes="512x512">
 <link rel="apple-touch-icon" href="{a}apple-touch-icon.png">
+{json_ld(t, lang)}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Podkova:wght@500;700&family=Vollkorn:wght@400;600;700&family=PT+Mono&display=swap">

@@ -18,13 +18,10 @@
     } catch (e) { return false; }
   }
 
-  // The Pixi layer is OPT-IN (?pixi=1) until its rendering is signed off.
-  // Scene graph, textures, layout, particles and gate choreography are all in
-  // place, but the scene renders squeezed into a corner on this driver and the
-  // cause is not yet found — so the default preview is the static version,
-  // which is complete and correct. See DEVLOG.
-  var wantPixi = new URLSearchParams(location.search).get('pixi') === '1';
-  var usePixi = wantPixi && !reduced && window.innerWidth >= STATIC_MAX && hasWebGL();
+  // Renderer on by default; ?static=1 forces the DOM version (escape hatch for
+  // comparing, or if a machine misbehaves).
+  var forceStatic = new URLSearchParams(location.search).get('static') === '1';
+  var usePixi = !forceStatic && !reduced && window.innerWidth >= STATIC_MAX && hasWebGL();
   document.body.classList.add(usePixi ? 'is-pixi' : 'is-static');
 
   /* ------------------------------------------------ header chrome -------- */

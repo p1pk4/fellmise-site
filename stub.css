@@ -1,0 +1,97 @@
+/* fellmise.com — placeholder. Self-contained: the full site's stylesheet is
+   not loaded here, so the page stays small and cannot drift with it. */
+:root {
+  --grass-1: #a8cb53; --grass-2: #bdd85a; --path: #f2ca78;
+  --wood: #a6744a; --wood-dark: #7c5233; --roof: #88362b;
+  --ink: #383b2d; --cream: #fdf6e0;
+  --sky-1: #7eb8e0; --sky-2: #c7e6f2;
+  --display: "Podkova", Georgia, serif;
+  --body: "Vollkorn", Georgia, serif;
+  --mono: "PT Mono", ui-monospace, monospace;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--cream); color: var(--ink);
+  font-family: var(--body); font-size: 18px; line-height: 1.6;
+  display: flex; flex-direction: column; min-height: 100vh;
+}
+img { display: block; max-width: 100%; height: auto; }
+
+.top {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem; padding: 1rem clamp(1rem, 4vw, 2.5rem); background: var(--ink);
+}
+.logo {
+  font-family: var(--display); font-weight: 700;
+  font-size: clamp(1.15rem, 2.6vw, 1.6rem); letter-spacing: .12em;
+  color: var(--cream); text-decoration: none; text-shadow: 2px 2px 0 var(--roof);
+}
+.lang { display: flex; gap: .3rem; font-family: var(--mono); font-size: .75rem; }
+.lang a, .lang span {
+  padding: .28rem .5rem; border: 2px solid var(--cream); line-height: 1; text-decoration: none;
+}
+.lang span { background: var(--cream); color: var(--ink); }
+.lang a { color: var(--cream); }
+
+.scene { position: relative; height: clamp(200px, 34vh, 380px); overflow: hidden;
+         background: linear-gradient(180deg, var(--sky-1), var(--sky-2)); }
+.scene__ground {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 46%;
+  background: linear-gradient(180deg, var(--grass-1), var(--grass-2));
+}
+.scene__road { position: absolute; left: 0; right: 0; bottom: 0; height: 13%; background: var(--path); }
+.sp { position: absolute; bottom: 12%; }
+.sp img { height: 100%; width: auto; }
+.sp--house-b { left: 6%;  height: 62%; }
+.sp--tree    { left: 38%; height: 56%; }
+.sp--house-a { left: 62%; height: 70%; }
+
+main { flex: 1; text-align: center; padding: clamp(1.5rem, 5vw, 3rem) clamp(1rem, 4vw, 2.5rem); }
+
+.sign {
+  display: inline-block; max-width: min(48rem, calc(100vw - 32px));
+  background: repeating-linear-gradient(180deg, var(--wood) 0 16px, var(--wood-dark) 16px 19px);
+  border: 4px solid var(--ink); box-shadow: 6px 6px 0 var(--ink);
+  padding: clamp(1rem, 3vw, 1.9rem) clamp(1rem, 3.5vw, 2.2rem);
+}
+.sign h1 {
+  margin: 0; font-family: var(--display); font-weight: 700;
+  font-size: clamp(22px, 4.2vw, 40px); line-height: 1.22; color: var(--cream);
+  text-shadow: 2px 3px 0 rgba(0,0,0,.5); overflow-wrap: break-word;
+}
+.sign p {
+  margin: .9rem 0 0; padding-top: .85rem;
+  border-top: 3px solid rgba(253,246,224,.35);
+  font-weight: 600; font-size: clamp(15px, 1.9vw, 19px);
+  color: var(--cream); text-shadow: 1px 2px 0 rgba(0,0,0,.4);
+}
+
+.cta { margin-top: 1.5rem; display: flex; flex-wrap: wrap; gap: .9rem; justify-content: center; }
+.btn {
+  font-family: var(--body); font-weight: 700; font-size: 1.05rem;
+  padding: .85rem 1.4rem; border: 4px solid var(--ink); box-shadow: 4px 4px 0 var(--ink);
+  text-decoration: none; cursor: pointer;
+}
+.btn--steam { background: #b9b6ab; color: #4a4942; cursor: not-allowed; }
+.btn--discord { background: var(--grass-1); color: var(--ink); }
+
+.note { margin: clamp(1.5rem, 4vw, 2.5rem) auto 0; max-width: 44rem;
+        font-family: var(--mono); font-size: .8rem; color: rgba(56,59,45,.8); }
+
+.foot {
+  background: var(--ink); color: var(--cream);
+  padding: 1.4rem clamp(1rem, 4vw, 2.5rem);
+  display: flex; flex-wrap: wrap; gap: .6rem 1.6rem;
+  align-items: center; justify-content: space-between;
+  font-family: var(--mono); font-size: .78rem;
+}
+.foot a { color: var(--cream); }
+
+@media (max-width: 620px) {
+  .sp--tree { display: none; }
+  .sp--house-b { left: 2%; height: 58%; }
+  .sp--house-a { left: 52%; height: 66%; }
+  .cta { flex-direction: column; align-items: stretch; }
+  .btn { width: 100%; text-align: center; }
+  .foot { justify-content: center; text-align: center; }
+}

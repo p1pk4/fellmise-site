@@ -1,9 +1,11 @@
 # fellmise.com
-# Everything is open except the preview build, which is an unfinished copy of
-# the site and must not compete with it in search.
+# Everything is open except two copies of the site that must not compete with
+# the root in search: the unfinished preview, and the previous full version kept
+# for reference while the new one is built.
 
 User-agent: *
 Allow: /
 Disallow: /next/
+Disallow: /full/
 
 Sitemap: https://fellmise.com/sitemap.xml

@@ -97,6 +97,11 @@
     if (!window.gsap || !window.ScrollTrigger) return;
     gsap.registerPlugin(ScrollTrigger);
 
+    // A gate owns the camera while it is being scrubbed. Without this the next
+    // biome's own trigger fires mid-flight and resets the scene, so the tunnel
+    // collapsed into "next biome, already arrived".
+    var gateActive = null;
+
     // Each biome section owns the camera while it is on screen...
     api.biomes.forEach(function (id) {
       var el = document.getElementById('b-' + id);
@@ -105,7 +110,7 @@
         trigger: el,
         start: 'top 60%',
         end: 'bottom 40%',
-        onToggle: function (self) { if (self.isActive) api.setBiome(id, 0); },
+        onToggle: function (self) { if (self.isActive && !gateActive) api.setBiome(id, 0); },
       });
     });
 
@@ -118,9 +123,11 @@
         start: 'top top',
         end: 'bottom bottom',
         scrub: true,
-        onUpdate: function (self) { api.setGate(g, self.progress); },
-        onLeave: function () { api.setBiome(nextOf(g.from), 0); },
-        onLeaveBack: function () { api.setBiome(g.from, 0); },
+        onEnter: function () { gateActive = g.from; },
+        onEnterBack: function () { gateActive = g.from; },
+        onUpdate: function (self) { gateActive = g.from; api.setGate(g, self.progress); },
+        onLeave: function () { gateActive = null; api.setBiome(nextOf(g.from), 0); },
+        onLeaveBack: function () { gateActive = null; api.setBiome(g.from, 0); },
       });
     });
 

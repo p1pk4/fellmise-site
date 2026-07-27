@@ -343,18 +343,20 @@ export async function startJourney({ sceneUrl, assetBase, onReady }) {
     // Ф1 approach 0..0.35 — camera leans in, door swings, light kindles
     // Ф2 fall 0.35..0.75 — camera flies at the opening
     // Ф3 birth 0.75..1   — next scene grows out of the light
-    const p1 = clamp(p / 0.35), p2 = clamp((p - 0.35) / 0.40), p3 = clamp((p - 0.75) / 0.25);
+    const p1 = clamp(p / 0.35), p2 = clamp((p - 0.35) / 0.40), p3 = clamp((p - 0.74) / 0.22);
     const zoom = 1 + ease(p1) * 0.15 + ease(p2) * 2.05;
 
     gateArt.pivot.set(fx, fy);
     gateArt.position.set(fx, fy);
     gateArt.scale.set(zoom);
-    gateArt.alpha = 1 - clamp((p - 0.80) / 0.15);
+    // everything we are flying THROUGH is gone by the white-out, so the old
+    // scene, the gate art, the light and the new biome never all overlap
+    gateArt.alpha = 1 - clamp((p - 0.62) / 0.16);
 
     from.c.pivot.set(fx, fy);
     from.c.position.set(fx, fy);
     from.c.scale.set(zoom);
-    from.c.alpha = 1 - clamp((p - 0.72) / 0.20);
+    from.c.alpha = 1 - clamp((p - 0.60) / 0.18);
 
     // the door: a real perspective quad, hinged on its own left edge
     if (g.door && tex[g.art + '_door'] && gateBody.texture) {
@@ -385,10 +387,11 @@ export async function startJourney({ sceneUrl, assetBase, onReady }) {
     const ls = (H * 0.5 / 32) * (0.5 + ease(p1) * 0.8 + ease(p2) * 3.4);
     light.scale.set(ls);
     light.tint = g.warm;
-    light.alpha = ease(p1) * 0.85;
+    light.alpha = ease(p1) * 0.55;
 
     flood.tint = g.warm;
-    flood.alpha = ease(clamp((p - 0.5) / 0.28)) * (1 - clamp((p - 0.82) / 0.18));
+    // the flood belongs to the moment of passing through, not the approach
+    flood.alpha = ease(clamp((p - 0.58) / 0.18)) * (1 - clamp((p - 0.80) / 0.15)) * 0.95;
 
     vign.clear();
     if (p2 > 0) {

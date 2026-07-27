@@ -18,13 +18,10 @@
     } catch (e) { return false; }
   }
 
-  // The Pixi layer is OPT-IN (?pixi=1) until its rendering is signed off.
-  // Scene graph, textures, layout, particles and gate choreography are all in
-  // place, but the scene renders squeezed into a corner on this driver and the
-  // cause is not yet found — so the default preview is the static version,
-  // which is complete and correct. See DEVLOG.
-  var wantPixi = new URLSearchParams(location.search).get('pixi') === '1';
-  var usePixi = wantPixi && !reduced && window.innerWidth >= STATIC_MAX && hasWebGL();
+  // Renderer on by default; ?static=1 forces the DOM version (escape hatch for
+  // comparing, or if a machine misbehaves).
+  var forceStatic = new URLSearchParams(location.search).get('static') === '1';
+  var usePixi = !forceStatic && !reduced && window.innerWidth >= STATIC_MAX && hasWebGL();
   document.body.classList.add(usePixi ? 'is-pixi' : 'is-static');
 
   /* ------------------------------------------------ header chrome -------- */
@@ -100,6 +97,11 @@
     if (!window.gsap || !window.ScrollTrigger) return;
     gsap.registerPlugin(ScrollTrigger);
 
+    // A gate owns the camera while it is being scrubbed. Without this the next
+    // biome's own trigger fires mid-flight and resets the scene, so the tunnel
+    // collapsed into "next biome, already arrived".
+    var gateActive = null;
+
     // Each biome section owns the camera while it is on screen...
     api.biomes.forEach(function (id) {
       var el = document.getElementById('b-' + id);
@@ -108,7 +110,7 @@
         trigger: el,
         start: 'top 60%',
         end: 'bottom 40%',
-        onToggle: function (self) { if (self.isActive) api.setBiome(id, 0); },
+        onToggle: function (self) { if (self.isActive && !gateActive) api.setBiome(id, 0); },
       });
     });
 
@@ -121,9 +123,11 @@
         start: 'top top',
         end: 'bottom bottom',
         scrub: true,
-        onUpdate: function (self) { api.setGate(g, self.progress); },
-        onLeave: function () { api.setBiome(nextOf(g.from), 0); },
-        onLeaveBack: function () { api.setBiome(g.from, 0); },
+        onEnter: function () { gateActive = g.from; },
+        onEnterBack: function () { gateActive = g.from; },
+        onUpdate: function (self) { gateActive = g.from; api.setGate(g, self.progress); },
+        onLeave: function () { gateActive = null; api.setBiome(nextOf(g.from), 0); },
+        onLeaveBack: function () { gateActive = null; api.setBiome(g.from, 0); },
       });
     });
 

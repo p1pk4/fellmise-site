@@ -23,40 +23,81 @@ export function bindRail({ gsap, ScrollTrigger, stage }) {
     pts.push(new THREE.Vector3(wander * 0.5, 3.6, biomeZ(i) + 2));
     pts.push(new THREE.Vector3(wander, 3.2, biomeZ(i) - 18));
     if (GATES[i]) {
-      // aim straight at the opening, then just past it
-      pts.push(new THREE.Vector3(0, GATES[i].h * 0.42, gateZ(i) + 6));
-      pts.push(new THREE.Vector3(0, GATES[i].h * 0.42, gateZ(i) - 5));
+      // Long approach, then through. The first attempt put a single point 6
+      // units before the frame, so the camera crossed it almost immediately and
+      // the opening was never on screen — the flight read as a hard cut.
+      const gy = GATES[i].h * 0.42;
+      pts.push(new THREE.Vector3(0, gy + 0.6, gateZ(i) + 30));
+      pts.push(new THREE.Vector3(0, gy, gateZ(i) + 12));
+      pts.push(new THREE.Vector3(0, gy, gateZ(i) + 2));
+      pts.push(new THREE.Vector3(0, gy, gateZ(i) - 8));
     }
   });
   const curve = new THREE.CatmullRomCurve3(pts, false, 'catmullrom', 0.35);
   stage.curve = curve;
 
-  // ---- pacing table: slow in biomes, quick through gates -------------------
-  const N = BIOMES.length;
-  const segs = [];
-  for (let i = 0; i < N; i++) {
-    segs.push({ kind: 'biome', weight: 1.6 });
-    if (GATES[i]) segs.push({ kind: 'gate', weight: 0.85 });
+  /* ---- pacing -------------------------------------------------------------
+     Each scroll segment must own the stretch of curve that actually contains
+     its subject. Splitting the curve into equal slices does NOT do that: a gate
+     carries four control points and a biome two, so equal slices put the
+     "through the doorway" moment well after the doorway was already behind the
+     camera. So every anchor (biome centre, gate frame) is located ON the curve
+     by nearest-point search, and progress is mapped between those u values. */
+  const SAMPLES = 1500;
+  const samples = [];
+  for (let i = 0; i <= SAMPLES; i++) samples.push(curve.getPointAt(i / SAMPLES));
+
+  function uNearest(target) {
+    let best = 0, bestD = Infinity;
+    for (let i = 0; i <= SAMPLES; i++) {
+      const d = samples[i].distanceToSquared(target);
+      if (d < bestD) { bestD = d; best = i; }
+    }
+    return best / SAMPLES;
   }
-  const total = segs.reduce((a, s) => a + s.weight, 0);
+
+  const anchors = [];
+  BIOMES.forEach((b, i) => {
+    anchors.push({ kind: 'biome', i, u: uNearest(new THREE.Vector3(0, 3.4, biomeZ(i) - 8)), weight: 1.6 });
+    if (GATES[i]) {
+      anchors.push({ kind: 'gate', i, u: uNearest(new THREE.Vector3(0, GATES[i].h * 0.42, gateZ(i))), weight: 0.9 });
+    }
+  });
+
+  /* Each segment is centred ON its anchor: it runs from the midpoint with the
+     previous anchor to the midpoint with the next. Spanning anchor -> NEXT
+     anchor instead put the doorway at the segment's start, so by the time the
+     scroll reached the middle of the "gate" the opening was ~45 units behind
+     the camera and the flight read as arriving, not passing through. */
+  const total = anchors.reduce((a, x) => a + x.weight, 0);
   let acc = 0;
-  segs.forEach((s) => { s.from = acc / total; acc += s.weight; s.to = acc / total; });
+  const segs = anchors.map((a, idx) => {
+    const from = acc / total;
+    acc += a.weight;
+    const to = acc / total;
+    const prevU = idx > 0 ? anchors[idx - 1].u : 0;
+    const nextU = anchors[idx + 1] ? anchors[idx + 1].u : 1;
+    return {
+      kind: a.kind, i: a.i, from, to,
+      uFrom: (prevU + a.u) / 2,
+      uTo: (a.u + nextU) / 2,
+      uAnchor: a.u,
+    };
+  });
   stage.segs = segs;
 
-  // uniform u (0..1 along the curve) for a given scroll progress
   function pathU(p) {
-    const stepsPerSeg = 1 / segs.length;
     for (let i = 0; i < segs.length; i++) {
       const s = segs[i];
       if (p <= s.to || i === segs.length - 1) {
-        const local = (p - s.from) / (s.to - s.from || 1);
-        const eased = s.kind === 'biome'
-          ? local                                   // even inside a biome
-          : local * local * (3 - 2 * local);        // ease across a gate
-        return (i + Math.min(Math.max(eased, 0), 1)) * stepsPerSeg;
+        const local = Math.min(Math.max((p - s.from) / (s.to - s.from || 1), 0), 1);
+        // dwell inside a biome, accelerate through a gate
+        const eased = s.kind === 'biome' ? local
+          : 0.5 - 0.5 * Math.cos(Math.PI * local);   // symmetric about the opening
+        return s.uFrom + (s.uTo - s.uFrom) * eased;
       }
     }
-    return p;
+    return 1;
   }
   stage.pathU = pathU;
 
@@ -73,7 +114,7 @@ export function bindRail({ gsap, ScrollTrigger, stage }) {
     const cam = stage.camera;
     const mx = stage.mouse.cx, my = stage.mouse.cy;
     cam.position.set(pos.x + mx * 1.6, pos.y - my * 0.9, pos.z);
-    cam.lookAt(look.x + mx * 0.8, look.y - my * 0.5, look.z);
+    cam.lookAt(look.x + mx * 0.8, look.y - 1.15 - my * 0.5, look.z);
     cam.rotation.z = mx * 0.02;
 
     updateAtmosphere(stage, progress);
@@ -121,10 +162,9 @@ function updateAtmosphere(stage, p) {
 /* ------------------------------------------------------------------ gates */
 function updateGates(stage, p) {
   const per = 1 / stage.segs.length;
-  stage.segs.forEach((s, i) => {
+  stage.segs.forEach((s) => {
     if (s.kind !== 'gate') return;
-    const gi = Math.floor(i / 2);
-    const g = stage.gates[gi];
+    const g = stage.gates[s.i];
     if (!g) return;
     // 0..1 across this gate's own slice of the scroll
     const local = Math.min(Math.max((p - s.from) / (s.to - s.from), 0), 1);
@@ -145,12 +185,14 @@ function updateText(stage, p) {
       el, kids: [...el.children],
     }));
   }
-  const n = BIOMES.length;
+  const bsegs = stage.segs.filter((s) => s.kind === 'biome');
   stage.stops.forEach((s, i) => {
-    const centre = (i + 0.5) / n;
-    const d = Math.abs(p - centre);
-    // visible while the camera is inside this biome's share of the rail
-    const vis = Math.min(Math.max(1 - (d - 0.055) / 0.055, 0), 1);
+    const seg = bsegs[i];
+    if (!seg) return;
+    const span = seg.to - seg.from;
+    const local = (p - seg.from) / span;              // 0..1 inside this biome
+    // fade in over the first fifth, hold, fade out over the last fifth
+    const vis = Math.min(Math.max(Math.min(local / 0.2, (1 - local) / 0.2), 0), 1);
     s.kids.forEach((k) => {
       k.style.opacity = vis.toFixed(3);
       k.style.transform = `translate3d(0, ${((1 - vis) * 26).toFixed(1)}px, 0)`;

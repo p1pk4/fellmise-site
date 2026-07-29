@@ -12,13 +12,13 @@
  * layer: 0 backdrop .. 3 occluder nearest the camera.
  */
 
-export const BIOME_SPACING = 120;      // distance between biome centres on Z
-export const GATE_OFFSET = 60;         // where the transition sits between them
+export const BIOME_SPACING = 150;      // distance between biome centres on Z
+export const GATE_OFFSET = 74;         // where the transition sits between them
 
 export const BIOMES = [
   {
     id: 'village',
-    fog: 0xd9c79a, fogNear: 40, fogFar: 190,
+    fog: 0xd9c79a, fogNear: 34, fogFar: 130,
     sky: [0x7eb8e0, 0xc7e6f2],
     ground: 'tile_grass', groundTint: 0xa8cb53,
     road: 'tile_road',
@@ -47,7 +47,7 @@ export const BIOMES = [
   },
   {
     id: 'forest',
-    fog: 0x2f4a2a, fogNear: 26, fogFar: 150,
+    fog: 0x2f4a2a, fogNear: 22, fogFar: 105,
     sky: [0x8fbcd6, 0xcfe4d6],
     ground: 'tile_grass', groundTint: 0x6b8f43,
     sprites: [
@@ -65,7 +65,7 @@ export const BIOMES = [
   },
   {
     id: 'mine',
-    fog: 0x0d1018, fogNear: 14, fogFar: 96, dark: true,
+    fog: 0x0d1018, fogNear: 12, fogFar: 74, dark: true,
     sky: [0x221f2a, 0x3a3542],
     ground: 'tile_dirt', groundTint: 0x3d3a45,
     sprites: [
@@ -86,7 +86,7 @@ export const BIOMES = [
   },
   {
     id: 'spirit',
-    fog: 0x0d2a2c, fogNear: 18, fogFar: 120, dark: true,
+    fog: 0x0d2a2c, fogNear: 14, fogFar: 84, dark: true,
     sky: [0x10222a, 0x21454a],
     ground: 'tile_spirit', groundTint: 0x1e3d3d,
     sprites: [
@@ -103,7 +103,7 @@ export const BIOMES = [
   },
   {
     id: 'home',
-    fog: 0xe08a4a, fogNear: 36, fogFar: 180, dusk: true,
+    fog: 0xe08a4a, fogNear: 30, fogFar: 125, dusk: true,
     sky: [0xe78b4a, 0xf4c98a],
     ground: 'tile_grass', groundTint: 0xa8cb53,
     road: 'tile_road',

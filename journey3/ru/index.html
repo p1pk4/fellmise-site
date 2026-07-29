@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Fellmise — 2D-песочница MMO с видом сверху — journey preview</title>
+<meta name="description" content="Хардкорная 2D-песочница MMO с видом сверху в духе Ultima Online: скиллы вместо уровней, играбельная фракция монстров, кроссплей PC и мобайл">
+<link rel="icon" href="../assets/favicon-32.png" sizes="32x32">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" media="print" onload="this.media='all'"
+      href="https://fonts.googleapis.com/css2?family=Podkova:wght@700&family=Vollkorn:wght@400;600;700&family=PT+Mono&display=swap">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"VideoGame","name":"Fellmise","url":"https://fellmise.com/ru/","description":"Качаешь то, чем играешь. Смерть уносит вещи. Мир живёт без тебя. Доната нет.","genre":["MMORPG","Sandbox"],"gamePlatform":["PC","iOS","Android"],"applicationCategory":"Game","inLanguage":"ru","image":"https://fellmise.com/assets/og.jpg","publisher":{"@type":"Organization","name":"Fellmise","url":"https://fellmise.com/","logo":"https://fellmise.com/assets/icon-512.png"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Fellmise","url":"https://fellmise.com/","logo":"https://fellmise.com/assets/icon-512.png"}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Fellmise","url":"https://fellmise.com/ru/","inLanguage":"ru"}</script>
+<script>window.J3 = { lang: "ru", assets: "../assets/", tod: {"dawn": "рассвет", "day": "день", "dusk": "закат", "night": "ночь"},
+                       todPrefix: "в Fellmise сейчас:" };</script>
+</head>
+<body>
+
+<canvas id="stage" aria-hidden="true"></canvas>
+<div id="veil" aria-hidden="true"></div>
+
+<header class="top">
+  <a class="logo" href="../">FELLMISE</a>
+  <p class="clock" id="clock"><span class="dot"></span><span id="clock-text"></span></p>
+  <nav class="lang" aria-label="Language">
+    <span aria-current="true">RU</span>
+    <a href="../">EN</a>
+  </nav>
+</header>
+
+<main id="rail">
+    <section class="stop" data-biome="village" aria-label="Деревня">
+      <div class="sign">
+        <h1>Ты убивал их сотнями. Теперь они пришли за тобой.</h1>
+        <p>Качаешь то, чем играешь. Смерть уносит вещи. Мир живёт без тебя. Доната нет.</p>
+      </div>
+      <div class="cta">
+        <button class="btn btn--steam" disabled>Wishlist в Steam — скоро</button>
+        <a class="btn btn--discord" href="#">Discord</a>
+      </div>
+      <div class="cards">
+        <article class="card">
+          <img class="card__art" src="../assets/feat_world.webp" alt="Мир играет сам" width="640" height="577" loading="lazy">
+          <h3>Мир играет сам</h3>
+          <p>Вышел из игры — мир остался. NPC лезут в данжи, возят товар, торгуются и пьют в таверне. Ты приходишь не на пустую карту.</p>
+        </article>
+      </div>
+    </section>
+    <section class="stop" data-biome="forest" aria-label="Лес">
+      <div class="cards">
+        <article class="card">
+          <img class="card__art" src="../assets/feat_skills.webp" alt="Скиллы вместо уровней" width="640" height="620" loading="lazy">
+          <h3>Скиллы вместо уровней</h3>
+          <p>Уровня нет. Машешь мечом — растёт меч, лезешь по замкам — растёт взлом. Нужен другой персонаж — играй по-другому, а не создавай нового.</p>
+        </article>
+        <article class="card">
+          <img class="card__art" src="../assets/feat_craft.webp" alt="Крафт" width="640" height="634" loading="lazy">
+          <h3>Крафт</h3>
+          <p>Всё стоящее делают игроки у наковальни. Кузнеца с именем знают на весь шард. Из меню не падает ничего.</p>
+        </article>
+      </div>
+    </section>
+    <section class="stop" data-biome="mine" aria-label="Шахта">
+      <div class="cards">
+        <article class="card">
+          <img class="card__art" src="../assets/feat_pvp.webp" alt="Долгий бой" width="640" height="776" loading="lazy">
+          <h3>Долгий бой</h3>
+          <p>С одного удара не убивают. Успеешь развернуться, позвать своих или уйти ногами. Кто победил — тот дожал, а не прокнул.</p>
+        </article>
+        <article class="card">
+          <img class="card__art" src="../assets/feat_mining.webp" alt="Добыча" width="640" height="631" loading="lazy">
+          <h3>Добыча</h3>
+          <p>Руду, дерево, траву и рыбу кто-то вытащил руками. Жилы кончаются, лучшее лежит там, где убивают. Сколько дотащил — столько и твоё.</p>
+        </article>
+      </div>
+    </section>
+    <section class="stop" data-biome="spirit" aria-label="Мир духов">
+      <div class="cards">
+        <article class="card">
+          <img class="card__art" src="../assets/feat_death.webp" alt="Смерть — это место" width="640" height="700" loading="lazy">
+          <h3>Смерть — это место</h3>
+          <p>Некромантию не учат живые. Умри, сядь духом на корабль мёртвых — и вернись другим.</p>
+        </article>
+        <article class="card">
+          <img class="card__art" src="../assets/feat_vendetta.webp" alt="Кровная месть" width="640" height="813" loading="lazy">
+          <h3>Кровная месть</h3>
+          <p>Убил при свидетелях — родня запомнила. Мститель найдёт тебя хоть на другом конце карты. Работай чисто.</p>
+        </article>
+      </div>
+    </section>
+    <section class="stop" data-biome="home" aria-label="Дом">
+      <div class="cards">
+        <article class="card">
+          <img class="card__art" src="../assets/feat_home.webp" alt="Дом, куда возвращаешься" width="640" height="618" loading="lazy">
+          <h3>Дом, куда возвращаешься</h3>
+          <p>Займи свободный клочок земли и строй слоями: фундамент, стены, дверь, крыша. В сундуках — всё нажитое. Ночью монстры проверят стены на прочность.</p>
+        </article>
+        <article class="card">
+          <div class="card__soon">арт будет</div>
+          <h3>Люди и монстры</h3>
+          <p>Играй за людей за стеной или за тех, кто ломится снаружи. Обе стороны живые, у обеих свой дом.</p>
+        </article>
+      </div>
+      <section class="res" aria-label="Копай, руби, куй">
+        <h3>Копай, руби, куй</h3>
+        <ul>
+          <li><img src="../assets/res_iron.webp" alt="Руда" width="224" height="232" loading="lazy"><span>Руда</span></li>
+          <li><img src="../assets/res_gold.webp" alt="Золото" width="224" height="201" loading="lazy"><span>Золото</span></li>
+          <li><img src="../assets/res_diamond.webp" alt="Кристаллы" width="224" height="226" loading="lazy"><span>Кристаллы</span></li>
+          <li><img src="../assets/res_wood.webp" alt="Брёвна" width="224" height="378" loading="lazy"><span>Брёвна</span></li>
+          <li><img src="../assets/res_herbs.webp" alt="Травы" width="224" height="332" loading="lazy"><span>Травы</span></li>
+          <li><img src="../assets/res_fish.webp" alt="Рыба" width="224" height="260" loading="lazy"><span>Рыба</span></li>
+          <li><img src="../assets/res_pickaxe.webp" alt="Кирка" width="224" height="376" loading="lazy"><span>Кирка</span></li>
+          <li><img src="../assets/res_sword.webp" alt="Меч" width="224" height="882" loading="lazy"><span>Меч</span></li>
+          <li><img src="../assets/res_bow.webp" alt="Лук" width="224" height="308" loading="lazy"><span>Лук</span></li>
+          <li><img src="../assets/res_staff.webp" alt="Посох" width="224" height="1416" loading="lazy"><span>Посох</span></li>
+          <li><img src="../assets/res_spellbook.webp" alt="Книга заклинаний" width="224" height="194" loading="lazy"><span>Книга заклинаний</span></li>
+          <li><img src="../assets/res_runes.webp" alt="Руны" width="224" height="245" loading="lazy"><span>Руны</span></li>
+          <li><img src="../assets/res_potion.webp" alt="Зелье" width="224" height="363" loading="lazy"><span>Зелье</span></li>
+        </ul>
+      </section>
+      <div class="cta">
+        <button class="btn btn--steam" disabled>Wishlist в Steam — скоро</button>
+        <a class="btn btn--discord" href="#">Discord</a>
+      </div>
+    </section>
+  <p class="note">Игра в ранней разработке. Всё, что видишь, ещё поменяется.</p>
+</main>
+
+<footer class="foot">
+  <span>fellmise.com</span><span>© 2026 Fellmise</span>
+  <a href="../">EN</a>
+</footer>
+
+<script type="module" src="../src/main.js"></script>
+</body>
+</html>

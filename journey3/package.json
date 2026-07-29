@@ -1,0 +1,20 @@
+{
+  "name": "fellmise-journey3",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Three.js scroll journey for fellmise.com/next/ — built to static, no runtime deps.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "dependencies": {
+    "gsap": "^3.13.0",
+    "lenis": "^1.1.20",
+    "postprocessing": "^6.36.0",
+    "three": "^0.170.0"
+  },
+  "devDependencies": {
+    "vite": "^5.4.11"
+  }
+}

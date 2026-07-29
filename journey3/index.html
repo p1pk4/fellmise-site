@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Fellmise — top-down 2D sandbox MMO — journey preview</title>
+<meta name="description" content="Top-down 2D sandbox MMO inspired by Ultima Online: skill-based progression, playable monster faction, PC+mobile crossplay">
+<link rel="icon" href="assets/favicon-32.png" sizes="32x32">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" media="print" onload="this.media='all'"
+      href="https://fonts.googleapis.com/css2?family=Podkova:wght@700&family=Vollkorn:wght@400;600;700&family=PT+Mono&display=swap">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"VideoGame","name":"Fellmise","url":"https://fellmise.com/","description":"Skills instead of levels. Death costs you. A world that runs without you. No pay-to-win.","genre":["MMORPG","Sandbox"],"gamePlatform":["PC","iOS","Android"],"applicationCategory":"Game","inLanguage":"en","image":"https://fellmise.com/assets/og.jpg","publisher":{"@type":"Organization","name":"Fellmise","url":"https://fellmise.com/","logo":"https://fellmise.com/assets/icon-512.png"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Fellmise","url":"https://fellmise.com/","logo":"https://fellmise.com/assets/icon-512.png"}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Fellmise","url":"https://fellmise.com/","inLanguage":"en"}</script>
+<script>window.J3 = { lang: "en", assets: "assets/", tod: {"dawn": "dawn", "day": "day", "dusk": "sunset", "night": "night"},
+                       todPrefix: "in Fellmise now:" };</script>
+</head>
+<body>
+
+<canvas id="stage" aria-hidden="true"></canvas>
+<div id="veil" aria-hidden="true"></div>
+
+<header class="top">
+  <a class="logo" href="./">FELLMISE</a>
+  <p class="clock" id="clock"><span class="dot"></span><span id="clock-text"></span></p>
+  <nav class="lang" aria-label="Language">
+    <span aria-current="true">EN</span>
+    <a href="ru/">RU</a>
+  </nav>
+</header>
+
+<main id="rail">
+    <section class="stop" data-biome="village" aria-label="The village">
+      <div class="sign">
+        <h1>You killed them by the hundreds. Now they've come for you.</h1>
+        <p>Skills instead of levels. Death costs you. A world that runs without you. No pay-to-win.</p>
+      </div>
+      <div class="cta">
+        <button class="btn btn--steam" disabled>Wishlist on Steam — soon</button>
+        <a class="btn btn--discord" href="#">Discord</a>
+      </div>
+      <div class="cards">
+        <article class="card">
+          <img class="card__art" src="assets/feat_world.webp" alt="A world that plays itself" width="640" height="577" loading="lazy">
+          <h3>A world that plays itself</h3>
+          <p>Log off and the world stays. NPCs run dungeons, haul goods, haggle and drink in taverns. You are not arriving at an empty map.</p>
+        </article>
+      </div>
+    </section>
+    <section class="stop" data-biome="forest" aria-label="The forest">
+      <div class="cards">
+        <article class="card">
+          <img class="card__art" src="assets/feat_skills.webp" alt="Skills, no levels" width="640" height="620" loading="lazy">
+          <h3>Skills, no levels</h3>
+          <p>No level next to your name. Swing a sword and your sword skill grows; pick locks and your lockpicking does. Want a different character — play differently, don't roll a new one.</p>
+        </article>
+        <article class="card">
+          <img class="card__art" src="assets/feat_craft.webp" alt="Crafting" width="640" height="634" loading="lazy">
+          <h3>Crafting</h3>
+          <p>Anything worth wearing is made by a player at an anvil. A good smith's name is known across the shard. Nothing drops out of a menu.</p>
+        </article>
+      </div>
+    </section>
+    <section class="stop" data-biome="mine" aria-label="The mine">
+      <div class="cards">
+        <article class="card">
+          <img class="card__art" src="assets/feat_pvp.webp" alt="Fights that last" width="640" height="776" loading="lazy">
+          <h3>Fights that last</h3>
+          <p>Nobody dies in one hit. There is time to turn around, call your people, or leave on foot. Whoever won ground it out — they didn't get a lucky proc.</p>
+        </article>
+        <article class="card">
+          <img class="card__art" src="assets/feat_mining.webp" alt="Mining and gathering" width="640" height="631" loading="lazy">
+          <h3>Mining and gathering</h3>
+          <p>Every ore, log, herb and fish was pulled out of the ground by somebody's hands. Veins run out. The best ground is where people get killed. What you haul back is what you keep.</p>
+        </article>
+      </div>
+    </section>
+    <section class="stop" data-biome="spirit" aria-label="The spirit world">
+      <div class="cards">
+        <article class="card">
+          <img class="card__art" src="assets/feat_death.webp" alt="Death is a place" width="640" height="700" loading="lazy">
+          <h3>Death is a place</h3>
+          <p>The living don't teach necromancy. Die, ride the ship of the dead as a ghost, and come back changed.</p>
+        </article>
+        <article class="card">
+          <img class="card__art" src="assets/feat_vendetta.webp" alt="Vendetta" width="640" height="813" loading="lazy">
+          <h3>Vendetta</h3>
+          <p>Kill in front of witnesses and the family remembers. An avenger will find you on the far side of the map. Work clean.</p>
+        </article>
+      </div>
+    </section>
+    <section class="stop" data-biome="home" aria-label="Home">
+      <div class="cards">
+        <article class="card">
+          <img class="card__art" src="assets/feat_home.webp" alt="A home to come back to" width="640" height="618" loading="lazy">
+          <h3>A home to come back to</h3>
+          <p>Claim an empty patch of land and build it in layers: foundation, walls, door, roof. Your chests hold everything you have earned. At night the monsters test the walls.</p>
+        </article>
+        <article class="card">
+          <div class="card__soon">art coming soon</div>
+          <h3>Humans and monsters</h3>
+          <p>Play the people behind the wall, or the ones hammering on it. Both sides are alive, and both sides have a home.</p>
+        </article>
+      </div>
+      <section class="res" aria-label="Dug up, chopped down, forged">
+        <h3>Dug up, chopped down, forged</h3>
+        <ul>
+          <li><img src="assets/res_iron.webp" alt="Iron ore" width="224" height="232" loading="lazy"><span>Iron ore</span></li>
+          <li><img src="assets/res_gold.webp" alt="Gold ore" width="224" height="201" loading="lazy"><span>Gold ore</span></li>
+          <li><img src="assets/res_diamond.webp" alt="Crystals" width="224" height="226" loading="lazy"><span>Crystals</span></li>
+          <li><img src="assets/res_wood.webp" alt="Logs" width="224" height="378" loading="lazy"><span>Logs</span></li>
+          <li><img src="assets/res_herbs.webp" alt="Herbs" width="224" height="332" loading="lazy"><span>Herbs</span></li>
+          <li><img src="assets/res_fish.webp" alt="Fish" width="224" height="260" loading="lazy"><span>Fish</span></li>
+          <li><img src="assets/res_pickaxe.webp" alt="Pickaxe" width="224" height="376" loading="lazy"><span>Pickaxe</span></li>
+          <li><img src="assets/res_sword.webp" alt="Sword" width="224" height="882" loading="lazy"><span>Sword</span></li>
+          <li><img src="assets/res_bow.webp" alt="Bow" width="224" height="308" loading="lazy"><span>Bow</span></li>
+          <li><img src="assets/res_staff.webp" alt="Staff" width="224" height="1416" loading="lazy"><span>Staff</span></li>
+          <li><img src="assets/res_spellbook.webp" alt="Spellbook" width="224" height="194" loading="lazy"><span>Spellbook</span></li>
+          <li><img src="assets/res_runes.webp" alt="Runes" width="224" height="245" loading="lazy"><span>Runes</span></li>
+          <li><img src="assets/res_potion.webp" alt="Potion" width="224" height="363" loading="lazy"><span>Potion</span></li>
+        </ul>
+      </section>
+      <div class="cta">
+        <button class="btn btn--steam" disabled>Wishlist on Steam — soon</button>
+        <a class="btn btn--discord" href="#">Discord</a>
+      </div>
+    </section>
+  <p class="note">Fellmise is in early development. Everything here is still being built and will change.</p>
+</main>
+
+<footer class="foot">
+  <span>fellmise.com</span><span>© 2026 Fellmise</span>
+  <a href="ru/">RU</a>
+</footer>
+
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

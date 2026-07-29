@@ -109,26 +109,42 @@ export async function createWorld({ canvas, tod }) {
     return t;
   }
 
-  async function makeGround(b, group) {
-    const tex = await loadTex(b.ground);
+  async function makeGround(b, group, index) {
+    // A ground plane must cover its own biome and reach into the gate, but NOT
+    // sit on top of the next biome's ground: they are coplanar at y=0, and the
+    // neighbour's tint was winning the depth test (the mine rendered on grass).
+    // Hence a shorter plane plus a hair of Y separation per biome, so where two
+    // do overlap the nearer-in-order one deterministically wins.
+    // A biome's floor must begin just after the PREVIOUS opening and end just
+    // after its own, so the floor changes underfoot exactly while passing
+    // through. Sitting it under the biome only meant the forest's grass ran on
+    // under the mine's cave mouth. Later biomes sit a hair higher, so in the
+    // overlap the destination's floor wins — which is the direction of travel.
+    const LEN = 150, CZ = -5;
+    const y = index * 0.004;
+
+    const tex = (await loadTex(b.ground)).clone();
+    tex.needsUpdate = true;
     tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-    tex.repeat.set(14, 26);
+    tex.repeat.set(12, 9);
     const mat = new THREE.MeshBasicMaterial({ map: tex, fog: true });
     mat.color.setHex(b.groundTint);
-    const g = new THREE.Mesh(new THREE.PlaneGeometry(180, 260), mat);
+    const g = new THREE.Mesh(new THREE.PlaneGeometry(170, LEN), mat);
     g.rotation.x = -Math.PI / 2;
-    g.position.set(0, 0, -60);
+    g.position.set(0, y, CZ);
     g.renderOrder = -10;
     group.add(g);
 
     if (b.road) {
-      const rt = await loadTex(b.road);
+      const rt = (await loadTex(b.road)).clone();
+      rt.needsUpdate = true;
       rt.wrapS = rt.wrapT = THREE.RepeatWrapping;
-      rt.repeat.set(1, 18);
+      rt.repeat.set(1, 3);
       const rm = new THREE.MeshBasicMaterial({ map: rt, transparent: true, fog: true });
-      const r = new THREE.Mesh(new THREE.PlaneGeometry(11, 260), rm);
+      rm.color.setHex(0xf2ca78);          // keep it reading as the path colour
+      const r = new THREE.Mesh(new THREE.PlaneGeometry(11, LEN), rm);
       r.rotation.x = -Math.PI / 2;
-      r.position.set(0, 0.02, -60);
+      r.position.set(0, y + 0.02, CZ);
       r.renderOrder = -9;
       group.add(r);
     }
@@ -146,7 +162,7 @@ export async function createWorld({ canvas, tod }) {
     state.groups[i] = { group, def: b };
 
     const job = (async () => {
-      await makeGround(b, group);
+      await makeGround(b, group, i);
       for (const s of b.sprites) await makeSprite(s, group);
       const { makeEmitters } = await import('./life.js');
       state.emitters.push(...makeEmitters(THREE, group, b, glowTex));
@@ -183,7 +199,9 @@ export async function createWorld({ canvas, tod }) {
         map: glowTex, color: g.warm, transparent: true,
         blending: THREE.AdditiveBlending, depthWrite: false, fog: false, opacity: 0,
       }));
-    light.position.set(0, g.h * 0.42, -1.2);
+    // In FRONT of the facade, at door height: behind it the opaque wall of the
+    // sprite hid the glow entirely and the opening read as a dark patch.
+    light.position.set(0, g.h * 0.30, 0.6);
     light.renderOrder = 8;
     grp.add(light);
 

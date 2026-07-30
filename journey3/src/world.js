@@ -62,7 +62,7 @@ export async function createWorld({ canvas, tod }) {
 
   const state = {
     renderer, scene, camera, tod,
-    groups: [], gates: [], sway: [], lights: [], emitters: [],
+    groups: [], gates: [], sway: [], lights: [], emitters: [], boards: [],
     ready: new Set(), loading: new Map(),
     clock: new THREE.Clock(), progress: 0, mouse: { x: 0, y: 0, cx: 0, cy: 0 },
   };
@@ -145,6 +145,38 @@ export async function createWorld({ canvas, tod }) {
     return t;
   }
 
+  /* Text type A: a board standing in the scene, its face drawn into a canvas.
+     Copy comes from the page (window.J3.boards) so both locales use the same
+     markup and the same words as the DOM, which stays as the caption and as
+     the fallback. */
+  async function makeBoard(def, group) {
+    const copy = ((window.J3 && window.J3.boards) || {})[def.key];
+    if (!copy) return;
+    const { drawBoard, fontsReady } = await import('./signs.js');
+    await fontsReady();
+    const canvas = drawBoard({ kind: def.kind, title: copy.title, sub: copy.sub });
+    const tex = new THREE.CanvasTexture(canvas);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+    tex.generateMipmaps = true;
+    tex.minFilter = THREE.LinearMipmapLinearFilter;
+
+    const aspect = canvas.width / canvas.height;
+    const mesh = new THREE.Mesh(
+      new THREE.PlaneGeometry(def.h * aspect, def.h),
+      new THREE.MeshBasicMaterial({
+        map: tex, transparent: true, alphaTest: 0.02,
+        depthWrite: false, side: THREE.DoubleSide, fog: true,
+      }));
+    mesh.position.set(def.x, def.h / 2, def.z);
+    // turned a little towards the road, so it reads as placed rather than pasted
+    mesh.rotation.y = def.ry || 0;
+    mesh.renderOrder = 2;
+    group.add(mesh);
+    state.boards.push(mesh);
+    return mesh;
+  }
+
   async function makeGround(b, group, index) {
     // A ground plane must cover its own biome and reach into the gate, but NOT
     // sit on top of the next biome's ground: they are coplanar at y=0, and the
@@ -200,6 +232,7 @@ export async function createWorld({ canvas, tod }) {
     const job = (async () => {
       await makeGround(b, group, i);
       for (const s of b.sprites) await makeSprite(s, group);
+      if (b.board) await makeBoard(b.board, group);
       const { makeEmitters } = await import('./life.js');
       state.emitters.push(...makeEmitters(THREE, group, b, dotTex));
       state.ready.add(i);

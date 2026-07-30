@@ -36,6 +36,11 @@ BIOME_TEXT = [
     ("spirit", ["death", "vendetta"]),
     ("home", ["home", "factions"]),
 ]
+# Text type A — these blocks are said by an object standing in the scene
+# (journey3/src/signs.js). The DOM keeps the same words as a caption, and shows
+# them in full in the static fallback.
+INWORLD_CARD = {"vendetta": "spirit"}
+
 BIOME_NAME = {
     "village": ("The village", "Деревня"),
     "forest": ("The forest", "Лес"),
@@ -70,11 +75,12 @@ def build(lang):
     other = "ru/" if lang == "en" else "../"
     base = "" if lang == "en" else "../"
 
-    def card(fid):
+    def card(fid, inworld=""):
         f = FEAT[fid]
+        mark = f' data-inworld="{inworld}"' if inworld else ""
         art = img(f["sprite"], f[tk], cls="card__art", base=base) if f["sprite"] else \
             f'<div class="card__soon">{esc(t["soon"])}</div>'
-        return ('        <article class="card">\n'
+        return (f'        <article class="card"{mark}>\n'
                 f'          {art}\n'
                 f'          <h3>{esc(f[tk])}</h3>\n'
                 f'          <p>{esc(f[pk])}</p>\n'
@@ -85,13 +91,18 @@ def build(lang):
         f'<span>{esc(lab if lang == "en" else lab_ru)}</span></li>'
         for rid, lab, lab_ru in RESOURCES)
 
+    boards = {
+        "village": {"title": t["tagline"], "sub": t["descriptor"]},
+        "spirit": {"title": FEAT["vendetta"][tk], "sub": FEAT["vendetta"][pk]},
+    }
+
     stops = []
     for i, (bid, cards) in enumerate(BIOME_TEXT):
         name = BIOME_NAME[bid][0 if lang == "en" else 1]
         inner = []
         if i == 0:
             inner.append(
-                '      <div class="sign">\n'
+                '      <div class="sign" data-inworld="village">\n'
                 f'        <h1>{esc(t["tagline"])}</h1>\n'
                 f'        <p>{esc(t["descriptor"])}</p>\n'
                 '      </div>\n'
@@ -99,7 +110,9 @@ def build(lang):
                 f'        <button class="btn btn--steam" disabled>{esc(t["cta_steam"])}</button>\n'
                 f'        <a class="btn btn--discord" href="#">{esc(t["cta_discord"])}</a>\n'
                 '      </div>')
-        inner.append('      <div class="cards">\n' + "\n".join(card(c) for c in cards) + '\n      </div>')
+        inner.append('      <div class="cards">\n'
+                     + "\n".join(card(c, INWORLD_CARD.get(c, "")) for c in cards)
+                     + '\n      </div>')
         if bid == "home":
             inner.append('      <section class="res" aria-label="' + att(t["res_title"]) + '">\n'
                          f'        <h3>{esc(t["res_title"])}</h3>\n'
@@ -127,7 +140,8 @@ def build(lang):
       href="https://fonts.googleapis.com/css2?family=Podkova:wght@700&family=Vollkorn:wght@400;600;700&family=PT+Mono&display=swap">
 {json_ld(t, lang)}
 <script>window.J3 = {{ lang: "{lang}", assets: "{base}assets/", tod: {json.dumps(t['tod'], ensure_ascii=False)},
-                       todPrefix: {json.dumps(t['tod_prefix'], ensure_ascii=False)} }};</script>
+                       todPrefix: {json.dumps(t['tod_prefix'], ensure_ascii=False)},
+                       boards: {json.dumps(boards, ensure_ascii=False)} }};</script>
 </head>
 <body>
 

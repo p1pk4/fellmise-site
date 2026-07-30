@@ -128,6 +128,32 @@ body.is-live .stop > * {
 .card h3 { margin: .4rem 0 .5rem; font-size: 1.3rem; line-height: 1.25; }
 .card p { margin: 0; }
 
+/* Text type A — said by an object in the scene (journey3/src/signs.js). Live,
+   the panel steps down to a caption under the board: the words stay in the DOM
+   for screen readers and for search, but the eye reads them off the sign. In
+   the static fallback there is no sign, so these blocks stay full size. */
+body.is-live [data-inworld] {
+  max-width: min(38rem, calc(100vw - 32px));
+  margin-left: auto; margin-right: auto;
+  background: rgba(18,22,24,.74); border: 2px solid rgba(253,246,224,.28);
+  box-shadow: none; backdrop-filter: blur(3px);
+  padding: .6rem 1rem; text-align: center; color: var(--cream);
+  align-self: start;             /* a caption is not a card: do not fill the cell */
+}
+body.is-live [data-inworld] h1, body.is-live [data-inworld] h3 {
+  font-size: clamp(13px, 1.5vw, 16px); line-height: 1.35; margin: 0;
+  color: var(--cream); text-shadow: none;
+}
+body.is-live [data-inworld] p {
+  font-size: clamp(12px, 1.3vw, 14px); line-height: 1.4;
+  margin: .25rem 0 0; padding: 0; border: 0; color: rgba(253,246,224,.86);
+  text-shadow: none;
+}
+/* the card's sprite is already standing in the scene a few metres away */
+body.is-live [data-inworld] .card__art { display: none; }
+/* the sign hangs high in the frame, so its caption sits under the board */
+body.is-live .sign[data-inworld] { margin-top: 34vh; }
+
 .res { margin-top: 1.8rem; background: rgba(209,226,118,.92); border: 4px solid var(--ink);
        box-shadow: 6px 6px 0 var(--ink); padding: 1.2rem; color: var(--ink); }
 .res h3 { margin: 0 0 1rem; text-align: center; font-size: 1.2rem; }

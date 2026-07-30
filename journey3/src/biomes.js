@@ -29,7 +29,7 @@ export const BIOMES = [
     fog: 0xd9c79a, fogNear: 34, fogFar: 130,
     sky: [0x7eb8e0, 0xc7e6f2],
     ground: 'tile_grass', groundTint: 0xa8cb53,
-    road: 'tile_road',
+    road: 'tile_path',
     tod: true,                          // only this biome follows the visitor's clock
     sprites: [
       // sky — weather crossing slowly behind everything
@@ -37,9 +37,9 @@ export const BIOMES = [
       { t: 'cloud_b', x: 16, y: 35, z: -94, h: 8, layer: 0, drift: 0.22, span: 110 },
       { t: 'cloud_c', x: 40, y: 27, z: -78, h: 7, layer: 0, dim: 0.9, drift: 0.38, span: 110 },
       // layer 0 — the land behind the village
-      { t: 'hill_green', x: -30, z: -66, h: 15, layer: 0, dim: 0.78 },
-      { t: 'hill_green', x: 26, z: -72, h: 17, layer: 0, dim: 0.70 },
-      { t: 'hill_dark', x: -2, z: -84, h: 19, layer: 0, dim: 0.52 },
+      { t: 'hill_green', x: -34, y: 3, z: -100, h: 26, layer: 0, dim: 0.72 },
+      { t: 'hill_green', x: 30, y: 2, z: -106, h: 30, layer: 0, dim: 0.66 },
+      { t: 'hill_dark', x: -4, y: 1, z: -116, h: 30, layer: 0, dim: 0.48 },
       { t: 'hero_tree_a', x: -34, z: -46, h: 26, layer: 0, dim: 0.34 },
       { t: 'biome_pine_b', x: 30, z: -52, h: 24, layer: 0, dim: 0.30 },
       // layer 1 — the village itself
@@ -77,7 +77,7 @@ export const BIOMES = [
     sky: [0x8fbcd6, 0xcfe4d6],
     ground: 'tile_grass', groundTint: 0x6b8f43,
     sprites: [
-      { t: 'hill_dark', x: -6, z: -76, h: 20, layer: 0, dim: 0.40 },
+      { t: 'hill_dark', x: -6, y: 2, z: -88, h: 26, layer: 0, dim: 0.38 },
       { t: 'cloud_c', x: -18, y: 32, z: -90, h: 8, layer: 0, dim: 0.7, drift: 0.20, span: 110 },
       { t: 'biome_pine_a', x: -28, z: -50, h: 30, layer: 0, dim: 0.30 },
       { t: 'biome_pine_b', x: 24, z: -46, h: 27, layer: 0, dim: 0.32 },
@@ -92,8 +92,6 @@ export const BIOMES = [
       { t: 'fern', x: 4.6, z: -11, h: 1.1, layer: 2 },
       { t: 'mushrooms', x: 6.2, z: -3, h: 0.9, layer: 2 },
       { t: 'rock_s', x: 8.4, z: -17, h: 1.0, layer: 2 },
-      // a branch hanging into the top of the frame, out of focus
-      { t: 'branch_canopy', x: 1.5, y: 9.6, z: -1, h: 4.4, layer: 3, dim: 0.30, blur: 2.2 },
       { t: 'biome_pine_a', x: -11, z: 8, h: 22, layer: 3, dim: 0.20, blur: 2.6 },
       { t: 'biome_pine_b', x: 10.5, z: 10, h: 19, layer: 3, dim: 0.22, blur: 2.6 },
     ],
@@ -111,8 +109,8 @@ export const BIOMES = [
       { t: 'feat_mining', x: 3.5, z: -13, h: 5.2, layer: 1 },
       { t: 'biome_crystals', x: 12, z: -16, h: 7.2, layer: 1 },
       // beams spanning the tunnel — the camera flies under them
-      { t: 'beam_frame', x: 0, y: 3.4, z: -9, h: 6.8, layer: 2 },
-      { t: 'beam_frame', x: 0, y: 3.6, z: -25, h: 7.2, layer: 2, dim: 0.8 },
+      { t: 'beam_frame', x: 0, y: 8.2, z: -9, h: 5.6, layer: 2 },
+      { t: 'beam_frame', x: 0, y: 8.6, z: -25, h: 5.8, layer: 2, dim: 0.8 },
       { t: 'lantern_chain', x: -4.4, y: 5.0, z: -19, h: 2.4, layer: 2 },
       { t: 'lantern_chain', x: 4.8, y: 5.4, z: -31, h: 2.4, layer: 2, dim: 0.9 },
       { t: 'stalagmite_a', x: -7.2, z: -11, h: 2.6, layer: 2 },
@@ -138,7 +136,7 @@ export const BIOMES = [
     sky: [0x10222a, 0x21454a],
     ground: 'tile_spirit', groundTint: 0x1e3d3d,
     sprites: [
-      { t: 'hill_dark', x: 4, z: -80, h: 18, layer: 0, dim: 0.30 },
+      { t: 'hill_dark', x: 4, y: 2, z: -62, h: 22, layer: 0, dim: 0.30 },
       { t: 'biome_deadtree', x: -26, z: -46, h: 24, layer: 0, dim: 0.26 },
       { t: 'feat_death_alt', x: 22, z: -42, h: 20, layer: 0, dim: 0.30 },
       { t: 'feat_death_alt', x: -12.5, z: -19, h: 7.6, layer: 1 },
@@ -166,14 +164,14 @@ export const BIOMES = [
     fog: 0xe08a4a, fogNear: 30, fogFar: 125, dusk: true,
     sky: [0xe78b4a, 0xf4c98a],
     ground: 'tile_grass', groundTint: 0xa8cb53,
-    road: 'tile_road',
+    road: 'tile_path',
     sprites: [
       // dusk: the moon is already up behind the warm haze
-      { t: 'moon', x: 15, y: 31, z: -92, h: 5.5, layer: 0 },
+      { t: 'moon', x: 15, y: 31, z: -92, h: 5.5, layer: 0, nofog: true },
       { t: 'cloud_b', x: -20, y: 28, z: -84, h: 9, layer: 0, drift: 0.24, span: 110 },
       { t: 'cloud_a', x: 22, y: 33, z: -90, h: 8, layer: 0, dim: 0.9, drift: 0.18, span: 110 },
-      { t: 'hill_green', x: -28, z: -68, h: 16, layer: 0, dim: 0.66 },
-      { t: 'hill_dark', x: 8, z: -80, h: 18, layer: 0, dim: 0.46 },
+      { t: 'hill_green', x: -32, y: 3, z: -98, h: 26, layer: 0, dim: 0.62 },
+      { t: 'hill_dark', x: 10, y: 2, z: -110, h: 28, layer: 0, dim: 0.44 },
       { t: 'hero_tree_a', x: -32, z: -48, h: 27, layer: 0, dim: 0.32 },
       { t: 'biome_pine_b', x: 27, z: -44, h: 25, layer: 0, dim: 0.30 },
       { t: 'hero_house_b', x: -10, z: -16, h: 7.6, layer: 1 },

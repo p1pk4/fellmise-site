@@ -75,8 +75,10 @@ export async function createWorld({ canvas, tod }) {
     const h = spec.h;
     const geo = new THREE.PlaneGeometry(h * aspect, h);
     const mat = new THREE.MeshBasicMaterial({
-      map: tex, transparent: true, alphaTest: 0.04,
-      depthWrite: false, side: THREE.DoubleSide, fog: true,
+      map: tex, transparent: true, alphaTest: 0.04, depthWrite: false,
+      side: THREE.DoubleSide,
+      // the moon is not weather: at dusk the fog turned it into an orange disc
+      fog: spec.nofog !== true,
     });
     if (spec.dim) mat.color.setScalar(spec.dim);
     // Occluders brushing the lens should be out of focus. Rather than shipping a
@@ -273,15 +275,20 @@ export async function createWorld({ canvas, tod }) {
     group.add(g);
 
     if (b.road) {
+      // tile_path is the sand interior of the road tile, cut out by
+      // tools/make_path_tile.py: the tile itself has grass painted along its
+      // edges, and repeating it laid that grass across the road every few
+      // metres. Mirrored wrapping makes an ordinary crop tile without a seam.
       const rt = (await loadTex(b.road)).clone();
       rt.needsUpdate = true;
-      rt.wrapS = rt.wrapT = THREE.RepeatWrapping;
-      rt.repeat.set(1, 3);
-      const rm = new THREE.MeshBasicMaterial({ map: rt, transparent: true, fog: true });
-      rm.color.setHex(0xf2ca78);          // keep it reading as the path colour
-      const rgeo = new THREE.PlaneGeometry(11, LEN, 1, 32);
-      fadeEnds(rgeo, LEN, FADE);
-      rm.vertexColors = true;
+      rt.wrapS = rt.wrapT = THREE.MirroredRepeatWrapping;
+      rt.repeat.set(2, 20);
+      const rm = new THREE.MeshBasicMaterial({
+        map: rt, transparent: true, fog: true, depthWrite: false, vertexColors: true,
+      });
+      rm.color.setHex(0xdccbaa);          // tint, not repaint: 0xf2ca78 turned it orange
+      const rgeo = new THREE.PlaneGeometry(11, LEN, 8, 32);
+      fadeEnds(rgeo, LEN, FADE, 11, 1.6);   // and soften the verges into the grass
       const r = new THREE.Mesh(rgeo, rm);
       r.rotation.x = -Math.PI / 2;
       r.position.set(0, y + 0.02, CZ);
@@ -293,14 +300,16 @@ export async function createWorld({ canvas, tod }) {
   /* Per-vertex alpha ramp along the plane's length, so a floor arrives and
      leaves instead of starting at a straight edge. Written into the colour
      attribute as RGBA — the material's own colour still tints on top. */
-  function fadeEnds(geo, len, fade) {
+  function fadeEnds(geo, len, fade, width, edge) {
     const pos = geo.attributes.position;
     const col = new Float32Array(pos.count * 4);
+    const smooth = (t) => { const u = Math.min(Math.max(t, 0), 1); return u * u * (3 - 2 * u); };
     for (let i = 0; i < pos.count; i++) {
       const d = len / 2 - Math.abs(pos.getY(i));    // distance to the nearer end
-      const t = Math.min(Math.max(d / fade, 0), 1);
+      let a = smooth(d / fade);
+      if (width) a *= smooth((width / 2 - Math.abs(pos.getX(i))) / edge);
       col[i * 4] = col[i * 4 + 1] = col[i * 4 + 2] = 1;
-      col[i * 4 + 3] = t * t * (3 - 2 * t);
+      col[i * 4 + 3] = a;
     }
     geo.setAttribute('color', new THREE.BufferAttribute(col, 4));
   }

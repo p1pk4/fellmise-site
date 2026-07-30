@@ -88,5 +88,23 @@
    196,
    217
   ]
+ },
+ "lantern_chain": {
+  "kind": "steady",
+  "strength": 0.42,
+  "colour": [
+   249,
+   221,
+   96
+  ]
+ },
+ "candles": {
+  "kind": "fire",
+  "strength": 0.32,
+  "colour": [
+   254,
+   220,
+   115
+  ]
  }
 }

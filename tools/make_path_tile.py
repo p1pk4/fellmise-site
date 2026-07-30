@@ -24,7 +24,8 @@ from PIL import Image
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 SRC = ROOT / "journey3" / "public" / "assets" / "tile_road.webp"
 OUT = ROOT / "assets" / "tile_path.webp"
-INSET = 0.06          # fraction of the band dropped at each edge, as insurance
+INSET = 0.13          # fraction of the band dropped at each edge, as insurance
+                      # (0.06 still left flecks of the grass edge in the crop)
 QUALITY = 88
 
 

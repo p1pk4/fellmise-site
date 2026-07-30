@@ -36,10 +36,22 @@ BIOME_TEXT = [
     ("spirit", ["death", "vendetta"]),
     ("home", ["home", "factions"]),
 ]
-# Text type A — these blocks are said by an object standing in the scene
-# (journey3/src/signs.js). The DOM keeps the same words as a caption, and shows
-# them in full in the static fallback.
-INWORLD_CARD = {"vendetta": "spirit"}
+# Every stop is now spoken by an object standing in the scene: the owner's
+# call after seeing both kinds side by side. The DOM keeps every word — it is
+# the static fallback, and it is what a crawler and a screen reader read — but
+# in the live journey it is not drawn. See `body.is-live` in style.css.
+#
+# board key -> where the words come from. `tagline` is the slogan pair; anything
+# else is a feature id out of build_site.FEATURES.
+BOARD_COPY = {
+    "village": "tagline",
+    "forest": "skills",
+    "mine_mining": "mining",
+    "mine_pvp": "pvp",
+    "spirit_death": "death",
+    "spirit_vendetta": "vendetta",
+    "home": "home",
+}
 
 BIOME_NAME = {
     "village": ("The village", "Деревня"),
@@ -75,12 +87,11 @@ def build(lang):
     other = "ru/" if lang == "en" else "../"
     base = "" if lang == "en" else "../"
 
-    def card(fid, inworld=""):
+    def card(fid):
         f = FEAT[fid]
-        mark = f' data-inworld="{inworld}"' if inworld else ""
         art = img(f["sprite"], f[tk], cls="card__art", base=base) if f["sprite"] else \
             f'<div class="card__soon">{esc(t["soon"])}</div>'
-        return (f'        <article class="card"{mark}>\n'
+        return ('        <article class="card">\n'
                 f'          {art}\n'
                 f'          <h3>{esc(f[tk])}</h3>\n'
                 f'          <p>{esc(f[pk])}</p>\n'
@@ -91,10 +102,12 @@ def build(lang):
         f'<span>{esc(lab if lang == "en" else lab_ru)}</span></li>'
         for rid, lab, lab_ru in RESOURCES)
 
-    boards = {
-        "village": {"title": t["tagline"], "sub": t["descriptor"]},
-        "spirit": {"title": FEAT["vendetta"][tk], "sub": FEAT["vendetta"][pk]},
-    }
+    boards = {}
+    for key, src in BOARD_COPY.items():
+        if src == "tagline":
+            boards[key] = {"title": t["tagline"], "sub": t["descriptor"]}
+        else:
+            boards[key] = {"title": FEAT[src][tk], "sub": FEAT[src][pk]}
 
     stops = []
     for i, (bid, cards) in enumerate(BIOME_TEXT):
@@ -102,23 +115,23 @@ def build(lang):
         inner = []
         if i == 0:
             inner.append(
-                '      <div class="sign" data-inworld="village">\n'
+                '      <div class="sign">\n'
                 f'        <h1>{esc(t["tagline"])}</h1>\n'
                 f'        <p>{esc(t["descriptor"])}</p>\n'
                 '      </div>\n'
-                '      <div class="cta">\n'
+                '      <div class="cta cta--open">\n'
                 f'        <button class="btn btn--steam" disabled>{esc(t["cta_steam"])}</button>\n'
                 f'        <a class="btn btn--discord" href="#">{esc(t["cta_discord"])}</a>\n'
                 '      </div>')
         inner.append('      <div class="cards">\n'
-                     + "\n".join(card(c, INWORLD_CARD.get(c, "")) for c in cards)
+                     + "\n".join(card(c) for c in cards)
                      + '\n      </div>')
         if bid == "home":
             inner.append('      <section class="res" aria-label="' + att(t["res_title"]) + '">\n'
                          f'        <h3>{esc(t["res_title"])}</h3>\n'
                          f'        <ul>\n{res}\n        </ul>\n      </section>')
             inner.append(
-                '      <div class="cta">\n'
+                '      <div class="cta cta--close">\n'
                 f'        <button class="btn btn--steam" disabled>{esc(t["cta_steam"])}</button>\n'
                 f'        <a class="btn btn--discord" href="#">{esc(t["cta_discord"])}</a>\n'
                 '      </div>')
@@ -138,6 +151,22 @@ def build(lang):
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" media="print" onload="this.media='all'"
       href="https://fonts.googleapis.com/css2?family=Podkova:wght@700&family=Vollkorn:wght@400;600;700&family=PT+Mono&display=swap">
+<style>
+/* Critical, inline: the splash must be painted before the stylesheet lands. */
+html,body{{margin:0;background:#383b2d}}
+#boot{{position:fixed;inset:0;z-index:9;display:flex;flex-direction:column;
+ align-items:center;justify-content:center;gap:1.1rem;background:#383b2d;
+ font-family:Georgia,serif;transition:opacity .45s ease}}
+#boot .boot__logo{{margin:0;font-size:clamp(1.6rem,5vw,2.6rem);font-weight:700;
+ letter-spacing:.14em;color:#fdf6e0;text-shadow:3px 3px 0 #88362b}}
+#boot .boot__bar{{width:min(320px,60vw);height:12px;background:rgba(253,246,224,.16);
+ border:2px solid #fdf6e0}}
+#boot .boot__bar i{{display:block;height:100%;width:0;background:#a8cb53;
+ transition:width .25s ease}}
+#boot .boot__hint{{margin:0;font-family:ui-monospace,monospace;font-size:.72rem;
+ letter-spacing:.06em;color:rgba(253,246,224,.62)}}
+body.is-ready #boot{{opacity:0;pointer-events:none}}
+</style>
 {json_ld(t, lang)}
 <script>window.J3 = {{ lang: "{lang}", assets: "{base}assets/", tod: {json.dumps(t['tod'], ensure_ascii=False)},
                        todPrefix: {json.dumps(t['tod_prefix'], ensure_ascii=False)},
@@ -146,7 +175,11 @@ def build(lang):
 <body>
 
 <canvas id="stage" aria-hidden="true"></canvas>
-<div id="veil" aria-hidden="true"></div>
+<div id="boot" role="status" aria-live="polite">
+  <p class="boot__logo">FELLMISE</p>
+  <div class="boot__bar"><i id="boot-fill"></i></div>
+  <p class="boot__hint">{esc(t['boot'])}</p>
+</div>
 
 <header class="top">
   <a class="logo" href="{base or './'}">FELLMISE</a>

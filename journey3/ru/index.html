@@ -11,17 +11,37 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" media="print" onload="this.media='all'"
       href="https://fonts.googleapis.com/css2?family=Podkova:wght@700&family=Vollkorn:wght@400;600;700&family=PT+Mono&display=swap">
+<style>
+/* Critical, inline: the splash must be painted before the stylesheet lands. */
+html,body{margin:0;background:#383b2d}
+#boot{position:fixed;inset:0;z-index:9;display:flex;flex-direction:column;
+ align-items:center;justify-content:center;gap:1.1rem;background:#383b2d;
+ font-family:Georgia,serif;transition:opacity .45s ease}
+#boot .boot__logo{margin:0;font-size:clamp(1.6rem,5vw,2.6rem);font-weight:700;
+ letter-spacing:.14em;color:#fdf6e0;text-shadow:3px 3px 0 #88362b}
+#boot .boot__bar{width:min(320px,60vw);height:12px;background:rgba(253,246,224,.16);
+ border:2px solid #fdf6e0}
+#boot .boot__bar i{display:block;height:100%;width:0;background:#a8cb53;
+ transition:width .25s ease}
+#boot .boot__hint{margin:0;font-family:ui-monospace,monospace;font-size:.72rem;
+ letter-spacing:.06em;color:rgba(253,246,224,.62)}
+body.is-ready #boot{opacity:0;pointer-events:none}
+</style>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"VideoGame","name":"Fellmise","url":"https://fellmise.com/ru/","description":"Качаешь то, чем играешь. Смерть уносит вещи. Мир живёт без тебя. Доната нет.","genre":["MMORPG","Sandbox"],"gamePlatform":["PC","iOS","Android"],"applicationCategory":"Game","inLanguage":"ru","image":"https://fellmise.com/assets/og.jpg","publisher":{"@type":"Organization","name":"Fellmise","url":"https://fellmise.com/","logo":"https://fellmise.com/assets/icon-512.png"}}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Fellmise","url":"https://fellmise.com/","logo":"https://fellmise.com/assets/icon-512.png"}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Fellmise","url":"https://fellmise.com/ru/","inLanguage":"ru"}</script>
 <script>window.J3 = { lang: "ru", assets: "../assets/", tod: {"dawn": "рассвет", "day": "день", "dusk": "закат", "night": "ночь"},
                        todPrefix: "в Fellmise сейчас:",
-                       boards: {"village": {"title": "Ты убивал их сотнями. Теперь они пришли за тобой.", "sub": "Качаешь то, чем играешь. Смерть уносит вещи. Мир живёт без тебя. Доната нет."}, "spirit": {"title": "Кровная месть", "sub": "Убил при свидетелях — родня запомнила. Мститель найдёт тебя хоть на другом конце карты. Работай чисто."}} };</script>
+                       boards: {"village": {"title": "Ты убивал их сотнями. Теперь они пришли за тобой.", "sub": "Качаешь то, чем играешь. Смерть уносит вещи. Мир живёт без тебя. Доната нет."}, "forest": {"title": "Скиллы вместо уровней", "sub": "Уровня нет. Машешь мечом — растёт меч, лезешь по замкам — растёт взлом. Нужен другой персонаж — играй по-другому, а не создавай нового."}, "mine_mining": {"title": "Добыча", "sub": "Руду, дерево, траву и рыбу кто-то вытащил руками. Жилы кончаются, лучшее лежит там, где убивают. Сколько дотащил — столько и твоё."}, "mine_pvp": {"title": "Долгий бой", "sub": "С одного удара не убивают. Успеешь развернуться, позвать своих или уйти ногами. Кто победил — тот дожал, а не прокнул."}, "spirit_death": {"title": "Смерть — это место", "sub": "Некромантию не учат живые. Умри, сядь духом на корабль мёртвых — и вернись другим."}, "spirit_vendetta": {"title": "Кровная месть", "sub": "Убил при свидетелях — родня запомнила. Мститель найдёт тебя хоть на другом конце карты. Работай чисто."}, "home": {"title": "Дом, куда возвращаешься", "sub": "Займи свободный клочок земли и строй слоями: фундамент, стены, дверь, крыша. В сундуках — всё нажитое. Ночью монстры проверят стены на прочность."}} };</script>
 </head>
 <body>
 
 <canvas id="stage" aria-hidden="true"></canvas>
-<div id="veil" aria-hidden="true"></div>
+<div id="boot" role="status" aria-live="polite">
+  <p class="boot__logo">FELLMISE</p>
+  <div class="boot__bar"><i id="boot-fill"></i></div>
+  <p class="boot__hint">грузим мир…</p>
+</div>
 
 <header class="top">
   <a class="logo" href="../">FELLMISE</a>
@@ -34,11 +54,11 @@
 
 <main id="rail">
     <section class="stop" data-biome="village" aria-label="Деревня">
-      <div class="sign" data-inworld="village">
+      <div class="sign">
         <h1>Ты убивал их сотнями. Теперь они пришли за тобой.</h1>
         <p>Качаешь то, чем играешь. Смерть уносит вещи. Мир живёт без тебя. Доната нет.</p>
       </div>
-      <div class="cta">
+      <div class="cta cta--open">
         <button class="btn btn--steam" disabled>Wishlist в Steam — скоро</button>
         <a class="btn btn--discord" href="#">Discord</a>
       </div>
@@ -85,7 +105,7 @@
           <h3>Смерть — это место</h3>
           <p>Некромантию не учат живые. Умри, сядь духом на корабль мёртвых — и вернись другим.</p>
         </article>
-        <article class="card" data-inworld="spirit">
+        <article class="card">
           <img class="card__art" src="../assets/feat_vendetta.webp" alt="Кровная месть" width="640" height="813" loading="lazy">
           <h3>Кровная месть</h3>
           <p>Убил при свидетелях — родня запомнила. Мститель найдёт тебя хоть на другом конце карты. Работай чисто.</p>
@@ -123,7 +143,7 @@
           <li><img src="../assets/res_potion.webp" alt="Зелье" width="224" height="363" loading="lazy"><span>Зелье</span></li>
         </ul>
       </section>
-      <div class="cta">
+      <div class="cta cta--close">
         <button class="btn btn--steam" disabled>Wishlist в Steam — скоро</button>
         <a class="btn btn--discord" href="#">Discord</a>
       </div>

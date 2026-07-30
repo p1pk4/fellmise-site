@@ -53,6 +53,9 @@ RULES = {
     # the ore vein inside the cave mouth
     "biome_orevein": dict(hue=(150, 210), val=0.42, sat=0.28, grow=1),
     "feat_mining": dict(hue=(150, 210), val=0.42, sat=0.26, grow=1),
+    # batch 7: the two new flames in the scene
+    "lantern_chain": dict(hue=(28, 62), val=0.60, sat=0.35, grow=1),
+    "candles": dict(hue=(20, 62), val=0.64, sat=0.30, grow=1),
 }
 
 # how each source behaves: fire flickers on noise, arcane light pulses slowly,
@@ -63,6 +66,7 @@ KIND = {
     "biome_orevein": "pulse", "feat_mining": "pulse",
     "prop_lantern": "steady", "hero_house_a": "steady",
     "hero_house_b": "steady", "feat_tavern": "steady",
+    "lantern_chain": "steady", "candles": "fire",
 }
 
 MIN_PIXELS = 40          # below this the rule found nothing real

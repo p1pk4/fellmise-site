@@ -10,6 +10,10 @@
  * own aspect, so nothing is stretched.
  *
  * layer: 0 backdrop .. 3 occluder nearest the camera.
+ *
+ * Light is NOT declared here. A sprite emits light if tools/make_emissive.py
+ * cut a mask for it, and the light then has the shape of the glowing pixels in
+ * the art itself — see assets/emissive.json.
  */
 
 export const BIOME_SPACING = 150;      // distance between biome centres on Z
@@ -37,7 +41,7 @@ export const BIOMES = [
       { t: 'prop_crates', x: 14, z: -9, h: 2.4, layer: 2 },
       // layer 2 — road dressing
       { t: 'prop_signpost', x: -6.5, z: -2, h: 3.2, layer: 2 },
-      { t: 'prop_lantern', x: 5.2, z: -4, h: 3.6, layer: 2, glow: 0xffbe6e },
+      { t: 'prop_lantern', x: 5.2, z: -4, h: 3.6, layer: 2 },
       { t: 'prop_stones', x: -2.2, z: 1.5, h: 0.9, layer: 2 },
       // layer 3 — occluder: an oversized darkened tree crown brushing the lens
       { t: 'hero_tree_a', x: -13, z: 9, h: 20, layer: 3, dim: 0.22 },
@@ -72,10 +76,10 @@ export const BIOMES = [
       { t: 'biome_orevein', x: -22, z: -44, h: 24, layer: 0, dim: 0.42 },
       { t: 'biome_orevein', x: 20, z: -40, h: 21, layer: 0, dim: 0.38 },
       { t: 'biome_orevein', x: -9, z: -17, h: 10, layer: 1 },
-      { t: 'feat_mining', x: 3.5, z: -13, h: 5.2, layer: 1, glow: 0x7fe4ff },
-      { t: 'biome_crystals', x: 12, z: -16, h: 7.2, layer: 1, glow: 0xc06bff },
-      { t: 'biome_brazier', x: -3.4, z: -5, h: 2.9, layer: 2, glow: 0xff8a2b },
-      { t: 'biome_crystals', x: 9.5, z: -3, h: 3.4, layer: 2, glow: 0xc06bff },
+      { t: 'feat_mining', x: 3.5, z: -13, h: 5.2, layer: 1 },
+      { t: 'biome_crystals', x: 12, z: -16, h: 7.2, layer: 1 },
+      { t: 'biome_brazier', x: -3.4, z: -5, h: 2.9, layer: 2 },
+      { t: 'biome_crystals', x: 9.5, z: -3, h: 3.4, layer: 2 },
       { t: 'biome_orevein', x: -14, z: 9, h: 20, layer: 3, dim: 0.18 },
       { t: 'biome_orevein', x: 13, z: 11, h: 18, layer: 3, dim: 0.20 },
     ],
@@ -95,8 +99,8 @@ export const BIOMES = [
       { t: 'feat_death_alt', x: -12.5, z: -19, h: 7.6, layer: 1 },
       { t: 'biome_deadtree', x: -3.5, z: -24, h: 9.5, layer: 1, sway: true },
       { t: 'feat_vendetta', x: 3.8, z: -14, h: 7.4, layer: 1 },
-      { t: 'feat_death', x: 13.5, z: -18, h: 7.6, layer: 1, glow: 0xffd696 },
-      { t: 'biome_brazier', x: 7.6, z: -5, h: 2.7, layer: 2, glow: 0xff8a2b },
+      { t: 'feat_death', x: 13.5, z: -18, h: 7.6, layer: 1 },
+      { t: 'biome_brazier', x: 7.6, z: -5, h: 2.7, layer: 2 },
       { t: 'biome_deadtree', x: -12, z: 9, h: 21, layer: 3, dim: 0.18 },
     ],
     particles: [{ kind: 'soul', n: 8, box: [-15, 0.6, -26, 15, 8, 6] }],
@@ -113,7 +117,7 @@ export const BIOMES = [
       { t: 'hero_house_b', x: -10, z: -16, h: 7.6, layer: 1 },
       { t: 'hero_tree_a', x: -1.5, z: -21, h: 8, layer: 1, sway: true },
       { t: 'hero_house_a', x: 10, z: -14, h: 8.4, layer: 1 },
-      { t: 'prop_lantern', x: 3.6, z: -4, h: 3.6, layer: 2, glow: 0xffbe6e },
+      { t: 'prop_lantern', x: 3.6, z: -4, h: 3.6, layer: 2 },
       { t: 'hero_tree_b', x: -12, z: 9, h: 10, layer: 3, dim: 0.24 },
     ],
     particles: [{ kind: 'leaf', n: 8, box: [-13, 2, -20, 13, 8, 4] }],

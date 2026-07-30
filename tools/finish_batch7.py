@@ -36,9 +36,9 @@ QUALITY = 85
 # id prefix -> exported width. Backdrops are seen large and far, dressing small
 # and near; nothing is exported wider than it is ever drawn.
 WIDTH = {
-    "cloud": 720, "moon": 420, "hill": 900,
-    "rock": 320, "grass_tuft": 260, "branch_canopy": 640,
-    "fence_seg": 360, "barn": 560, "haystack": 300,
+    "cloud": 560, "moon": 360, "hill": 720,
+    "rock": 320, "grass_tuft": 260, "branch_canopy": 560,
+    "fence_seg": 360, "barn": 480, "haystack": 300,
     "mushrooms": 260, "fern": 260,
     "beam_frame": 560, "stalagmite": 300, "minecart": 380,
     "lantern_chain": 300, "ore_pile": 300,

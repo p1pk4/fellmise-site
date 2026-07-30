@@ -175,6 +175,14 @@ function updateGates(stage, p) {
     const s2 = 1 + rise * 2.6;
     g.light.scale.set(s2, s2, 1);
     g.frame.material.opacity = 1;
+    // the leaves swing open just before the pass-through, then stay open
+    if (g.leaves) {
+      const open = Math.min(Math.max((local - 0.18) / 0.40, 0), 1);
+      const ang = (1 - Math.cos(Math.PI * open)) / 2 * 1.35;   // ~77deg, eased
+      // outward, towards the camera: with the other sign the leaves swing
+      // INTO the dark interior and are never seen
+      for (const L of g.leaves) L.mesh.rotation.y = L.side * ang;
+    }
   });
 }
 

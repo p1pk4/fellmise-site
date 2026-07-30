@@ -59,7 +59,12 @@ body[data-tod="dawn"] .clock .dot { background: #ffc27a; }
   padding: .26rem .5rem; border: 2px solid var(--cream); line-height: 1; text-decoration: none;
 }
 .lang span { background: var(--cream); color: var(--ink); }
-.lang a { color: var(--cream); }
+.lang a {
+  color: var(--cream);
+  /* the header sits on whatever the biome puts behind it; over the forest's
+     pale sky the gradient alone left this link at 4.1:1 */
+  background: rgba(10,10,12,.5);
+}
 
 /* -------------------------------------------------------------------- rail */
 /* Live: the rail is a tall invisible scroll track; the scene is on canvas and
@@ -110,7 +115,11 @@ body.is-live .stop > * {
   padding: .8rem 1.35rem; border: 4px solid var(--ink); box-shadow: 4px 4px 0 var(--ink);
   text-decoration: none; cursor: pointer;
 }
-.btn--steam { background: #b9b6ab; color: #4a4942; cursor: not-allowed; }
+.btn--steam {
+  /* disabled is said by the cursor and the muted fill, not by unreadable text:
+     the old #4a4942 on this grey measured 4.2:1 */
+  background: #b9b6ab; color: var(--ink); cursor: not-allowed;
+}
 .btn--discord { background: var(--grass-1); color: var(--ink); }
 
 .cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.6rem; margin-top: 1.6rem; }

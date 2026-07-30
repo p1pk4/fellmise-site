@@ -128,12 +128,19 @@ export const BIOMES = [
   },
 ];
 
-/* The four transitions. `art` is the opening the camera flies through; the light
-   quad sits inside it and floods the frame at the peak. Door leaves are NOT
-   animated in this stage — the opening simply glows (polish stage). */
+/* The four transitions. `art` is the opening the camera flies through; the
+   light quad sits inside it and floods the frame at the peak.
+
+   `door` is where the leaves are, as a fraction of the art (x0, y0, x1, y1 from
+   the top-left). Where it is given, the doorway swings open as the camera
+   arrives: two leaves cut out of the art itself by texture offset — no extra
+   texture — hinged at the jambs. The cave mouth and the portal have no leaves,
+   so they simply glow. */
 export const GATES = [
-  { from: 'village', art: 'hero_house_b', h: 9, warm: 0xffbe6e },
+  { from: 'village', art: 'hero_house_b', h: 9, warm: 0xffbe6e,
+    door: [0.408, 0.700, 0.575, 0.915] },
   { from: 'forest', art: 'biome_orevein', h: 12, warm: 0x9ad6ff },
   { from: 'mine', art: 'biome_portal', h: 10, warm: 0x78ffe8 },
-  { from: 'spirit', art: 'feat_death', h: 9, warm: 0xffd696 },
+  { from: 'spirit', art: 'feat_death', h: 9, warm: 0xffd696,
+    door: [0.400, 0.185, 0.617, 0.495] },
 ];

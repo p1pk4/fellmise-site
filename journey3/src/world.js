@@ -37,21 +37,32 @@ export async function createWorld({ canvas, tod }) {
   const texCache = new Map();
   function loadTex(name) {
     if (texCache.has(name)) return texCache.get(name);
-    const p = new Promise((res, rej) => {
+    // resolves to null rather than rejecting: optional maps (_em, _bleed) are
+    // asked for by name, and a cached rejection would surface as an unhandled
+    // rejection the moment a second sprite asked for the same one.
+    const p = new Promise((res) => {
       loader.load(`${ASSETS}${name}.webp`, (t) => {
         t.colorSpace = THREE.SRGBColorSpace;
         t.generateMipmaps = true;
         t.minFilter = THREE.LinearMipmapLinearFilter;
         res(t);
-      }, undefined, rej);
+      }, undefined, () => res(null));
     });
     texCache.set(name, p);
     return p;
   }
 
+  /* Which sprites emit light, and how that light behaves. Written by
+     tools/make_emissive.py alongside the masks, so the renderer never has to
+     guess: a source exists here only if a mask was actually cut for it. */
+  let EMISSIVE = {};
+  try {
+    EMISSIVE = await fetch(`${ASSETS}emissive.json`).then((r) => r.json());
+  } catch { /* no manifest -> no emissive planes, the scene still renders */ }
+
   const state = {
     renderer, scene, camera, tod,
-    groups: [], gates: [], sway: [], glows: [], emitters: [],
+    groups: [], gates: [], sway: [], lights: [], emitters: [],
     ready: new Set(), loading: new Map(),
     clock: new THREE.Clock(), progress: 0, mouse: { x: 0, y: 0, cx: 0, cy: 0 },
   };
@@ -59,6 +70,7 @@ export async function createWorld({ canvas, tod }) {
   /* ------------------------------------------------------------- primitives */
   async function makeSprite(spec, group) {
     const tex = await loadTex(spec.t);
+    if (!tex) return null;
     const aspect = tex.image.width / tex.image.height;
     const h = spec.h;
     const geo = new THREE.PlaneGeometry(h * aspect, h);
@@ -72,28 +84,52 @@ export async function createWorld({ canvas, tod }) {
     mesh.renderOrder = spec.layer;
     group.add(mesh);
     if (spec.sway) state.sway.push({ mesh, phase: Math.random() * 6.28 });
-    if (spec.glow) addGlow(group, mesh, spec);
+    if (EMISSIVE[spec.t]) await addLight(group, spec, EMISSIVE[spec.t]);
     return mesh;
   }
 
-  // A soft additive quad in front of a light source. Bloom picks these up; the
-  // sprite art itself stays below the bloom threshold.
-  const glowTex = makeGlowTexture();
-  function addGlow(group, mesh, spec) {
-    const size = spec.h * 0.9;
-    const g = new THREE.Mesh(
-      new THREE.PlaneGeometry(size, size),
-      new THREE.MeshBasicMaterial({
-        map: glowTex, color: spec.glow, transparent: true,
+  /* A light source is the sprite's OWN glowing pixels, drawn additively back
+     over it, plus the same shape blurred wide as the spill onto the object it
+     sits on. Nothing round is involved: the flame is flame-shaped, the window
+     is a rectangle, the crystal has facets. Both planes match the sprite's
+     footprint exactly, so the mask lines up pixel for pixel with the art.
+
+     They are the only things above the bloom threshold, which is what makes the
+     bloom selective without a second render pass. */
+  async function addLight(group, spec, info) {
+    const bleedTex = await loadTex(`${spec.t}_bleed`);
+    const emTex = await loadTex(`${spec.t}_em`);
+    if (!emTex) return;
+    const aspect = emTex.image.width / emTex.image.height;
+    const geo = new THREE.PlaneGeometry(spec.h * aspect, spec.h);
+    const entry = { kind: info.kind, phase: Math.random() * 6.28, parts: [] };
+    // a darkened backdrop or occluder copy is a silhouette, not a lit object —
+    // its light is dimmed by the same factor as its art
+    // ...times the source's own strength, which falls with how much of the
+    // sprite already glows (see tools/make_emissive.py)
+    const level = (spec.dim !== undefined ? spec.dim : 1) * (info.strength || 0.7);
+
+    const add = (role, tex, dz, opacity) => {
+      const m = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({
+        map: tex, transparent: true, opacity,
         blending: THREE.AdditiveBlending, depthWrite: false, fog: false,
       }));
-    g.position.set(spec.x, spec.h * 0.62, spec.z + 0.2);
-    g.renderOrder = 9;
-    group.add(g);
-    state.glows.push({ mesh: g, base: 0.75, phase: Math.random() * 6.28 });
+      m.position.set(spec.x, spec.h / 2, spec.z + dz);
+      m.renderOrder = 9;
+      group.add(m);
+      entry.parts.push({ role, mesh: m, base: opacity });
+    };
+
+    // spill first, then the source itself on top of it
+    if (bleedTex) add('bleed', bleedTex, 0.02, 0.62 * level);
+    add('em', emTex, 0.04, 1.0 * level);
+    state.lights.push(entry);
   }
 
-  function makeGlowTexture() {
+  // A soft round dot — for particles only (embers, dust, souls). Light sources
+  // no longer use it: they carry their own shape.
+  const dotTex = makeDotTexture();
+  function makeDotTexture() {
     const s = 128;
     const c = document.createElement('canvas');
     c.width = c.height = s;
@@ -165,7 +201,7 @@ export async function createWorld({ canvas, tod }) {
       await makeGround(b, group, i);
       for (const s of b.sprites) await makeSprite(s, group);
       const { makeEmitters } = await import('./life.js');
-      state.emitters.push(...makeEmitters(THREE, group, b, glowTex));
+      state.emitters.push(...makeEmitters(THREE, group, b, dotTex));
       state.ready.add(i);
       state.loading.delete(i);
     })();
@@ -181,6 +217,7 @@ export async function createWorld({ canvas, tod }) {
     scene.add(grp);
 
     const tex = await loadTex(g.art);
+    if (!tex) return;
     const aspect = tex.image.width / tex.image.height;
     const frame = new THREE.Mesh(
       new THREE.PlaneGeometry(g.h * aspect, g.h),
@@ -192,18 +229,41 @@ export async function createWorld({ canvas, tod }) {
     frame.renderOrder = 4;
     grp.add(frame);
 
-    // the light behind the opening, growing to fill the frame at the peak
+    // The flood at the peak is the gate art's own spill map blown up, not a
+    // round blob: the crypt floods candle-shaped, the cave floods vein-shaped.
+    // All four gate arts have a mask, but fall back to the frame's silhouette
+    // if one is ever missing.
+    const floodTex = (await loadTex(`${g.art}_bleed`)) || tex;
     const light = new THREE.Mesh(
-      new THREE.PlaneGeometry(g.h * 1.5, g.h * 1.5),
+      new THREE.PlaneGeometry(g.h * aspect * 1.35, g.h * 1.35),
       new THREE.MeshBasicMaterial({
-        map: glowTex, color: g.warm, transparent: true,
+        map: floodTex, color: g.warm, transparent: true,
         blending: THREE.AdditiveBlending, depthWrite: false, fog: false, opacity: 0,
       }));
-    // In FRONT of the facade, at door height: behind it the opaque wall of the
-    // sprite hid the glow entirely and the opening read as a dark patch.
-    light.position.set(0, g.h * 0.30, 0.6);
+    // In FRONT of the facade: behind it the opaque wall of the sprite hid the
+    // glow entirely and the opening read as a dark patch.
+    light.position.set(0, g.h * 0.55, 0.6);
     light.renderOrder = 8;
     grp.add(light);
+
+    // the opening's own emissive, always on — so the gate reads as lit from
+    // far away, before the flood starts
+    const emTex = await loadTex(`${g.art}_em`);
+    if (emTex) {
+      const em = new THREE.Mesh(
+        new THREE.PlaneGeometry(g.h * aspect, g.h),
+        new THREE.MeshBasicMaterial({
+          map: emTex, transparent: true, opacity: 1,
+          blending: THREE.AdditiveBlending, depthWrite: false, fog: false,
+        }));
+      em.position.set(0, g.h / 2, 0.04);
+      em.renderOrder = 9;
+      grp.add(em);
+      state.lights.push({
+        kind: (EMISSIVE[g.art] || {}).kind || 'steady',
+        phase: Math.random() * 6.28, parts: [{ role: 'em', mesh: em, base: 1.0 }],
+      });
+    }
 
     state.gates[i] = { def: g, group: grp, frame, light };
   }
@@ -261,6 +321,34 @@ function addResize(state) {
   on();
 }
 
+/* Value noise: a pseudo-random value per unit of x, smoothly interpolated. A
+   sine reads as machinery — the eye locks onto the period within a second or
+   two. Fire needs the level to wander instead. */
+function noise1(x, seed) {
+  const hash = (n) => {
+    const s = Math.sin(n * 127.1 + seed * 311.7) * 43758.5453;
+    return s - Math.floor(s);
+  };
+  const i = Math.floor(x);
+  const f = x - i;
+  const u = f * f * (3 - 2 * f);
+  return hash(i) * (1 - u) + hash(i + 1) * u;
+}
+
+/* How bright a source is right now, 0..1 of its own level.
+   fire   — flickers on two octaves of noise, never fully out
+   pulse  — arcane light breathing slowly, shallow and regular
+   steady — a window is simply on */
+function lightLevel(kind, t, phase) {
+  if (kind === 'fire') {
+    const n = 0.65 * noise1(t * 6.5 + phase, phase)
+            + 0.35 * noise1(t * 17.0 + phase, phase + 4);
+    return 0.74 + 0.30 * n;
+  }
+  if (kind === 'pulse') return 0.88 + 0.12 * Math.sin(t * 0.85 + phase);
+  return 1;
+}
+
 export function startLoop(state) {
   const { renderer, scene, camera } = state;
   if (state.warmRest) state.warmRest();
@@ -295,8 +383,11 @@ export function startLoop(state) {
     for (const s of state.sway) {
       s.mesh.rotation.z = Math.sin(t * 0.42 + s.phase) * 0.0087;   // ~0.5deg
     }
-    for (const g of state.glows) {
-      g.mesh.material.opacity = g.base * (0.86 + 0.14 * Math.sin(t * 2.1 + g.phase));
+    for (const L of state.lights) {
+      // lightHold freezes the flicker so before/after captures are comparable
+      const k = state.lightHold !== undefined ? state.lightHold
+                                              : lightLevel(L.kind, t, L.phase);
+      for (const p of L.parts) p.mesh.material.opacity = p.base * k;
     }
     if (state.stepEmitters) state.stepEmitters(state, dt, t);
 

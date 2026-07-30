@@ -15,9 +15,10 @@
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Fellmise","url":"https://fellmise.com/","logo":"https://fellmise.com/assets/icon-512.png"}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Fellmise","url":"https://fellmise.com/ru/","inLanguage":"ru"}</script>
 <script>window.J3 = { lang: "ru", assets: "../assets/", tod: {"dawn": "рассвет", "day": "день", "dusk": "закат", "night": "ночь"},
-                       todPrefix: "в Fellmise сейчас:" };</script>
-  <script type="module" crossorigin src="../assets/main-Dd8Mduj8.js"></script>
-  <link rel="stylesheet" crossorigin href="../assets/main-CF-SRBlK.css">
+                       todPrefix: "в Fellmise сейчас:",
+                       boards: {"village": {"title": "Ты убивал их сотнями. Теперь они пришли за тобой.", "sub": "Качаешь то, чем играешь. Смерть уносит вещи. Мир живёт без тебя. Доната нет."}, "spirit": {"title": "Кровная месть", "sub": "Убил при свидетелях — родня запомнила. Мститель найдёт тебя хоть на другом конце карты. Работай чисто."}} };</script>
+  <script type="module" crossorigin src="../assets/main-D_2ceWfO.js"></script>
+  <link rel="stylesheet" crossorigin href="../assets/main-B5F02wpn.css">
 </head>
 <body>
 
@@ -35,7 +36,7 @@
 
 <main id="rail">
     <section class="stop" data-biome="village" aria-label="Деревня">
-      <div class="sign">
+      <div class="sign" data-inworld="village">
         <h1>Ты убивал их сотнями. Теперь они пришли за тобой.</h1>
         <p>Качаешь то, чем играешь. Смерть уносит вещи. Мир живёт без тебя. Доната нет.</p>
       </div>
@@ -86,7 +87,7 @@
           <h3>Смерть — это место</h3>
           <p>Некромантию не учат живые. Умри, сядь духом на корабль мёртвых — и вернись другим.</p>
         </article>
-        <article class="card">
+        <article class="card" data-inworld="spirit">
           <img class="card__art" src="../assets/feat_vendetta.webp" alt="Кровная месть" width="640" height="813" loading="lazy">
           <h3>Кровная месть</h3>
           <p>Убил при свидетелях — родня запомнила. Мститель найдёт тебя хоть на другом конце карты. Работай чисто.</p>

@@ -15,7 +15,8 @@
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Fellmise","url":"https://fellmise.com/","logo":"https://fellmise.com/assets/icon-512.png"}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Fellmise","url":"https://fellmise.com/","inLanguage":"en"}</script>
 <script>window.J3 = { lang: "en", assets: "assets/", tod: {"dawn": "dawn", "day": "day", "dusk": "sunset", "night": "night"},
-                       todPrefix: "in Fellmise now:" };</script>
+                       todPrefix: "in Fellmise now:",
+                       boards: {"village": {"title": "You killed them by the hundreds. Now they've come for you.", "sub": "Skills instead of levels. Death costs you. A world that runs without you. No pay-to-win."}, "spirit": {"title": "Vendetta", "sub": "Kill in front of witnesses and the family remembers. An avenger will find you on the far side of the map. Work clean."}} };</script>
 </head>
 <body>
 
@@ -33,7 +34,7 @@
 
 <main id="rail">
     <section class="stop" data-biome="village" aria-label="The village">
-      <div class="sign">
+      <div class="sign" data-inworld="village">
         <h1>You killed them by the hundreds. Now they've come for you.</h1>
         <p>Skills instead of levels. Death costs you. A world that runs without you. No pay-to-win.</p>
       </div>
@@ -84,7 +85,7 @@
           <h3>Death is a place</h3>
           <p>The living don't teach necromancy. Die, ride the ship of the dead as a ghost, and come back changed.</p>
         </article>
-        <article class="card">
+        <article class="card" data-inworld="spirit">
           <img class="card__art" src="assets/feat_vendetta.webp" alt="Vendetta" width="640" height="813" loading="lazy">
           <h3>Vendetta</h3>
           <p>Kill in front of witnesses and the family remembers. An avenger will find you on the far side of the map. Work clean.</p>

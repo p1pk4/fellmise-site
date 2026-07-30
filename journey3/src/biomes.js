@@ -36,9 +36,9 @@ export const BIOMES = [
       { t: 'hero_house_b', x: -11, z: -14, h: 7.4, layer: 1 },
       { t: 'hero_tree_a', x: -4.5, z: -18, h: 8.2, layer: 1, sway: true },
       { t: 'hero_well', x: 1.5, z: -11, h: 4.4, layer: 1 },
-      { t: 'hero_house_a', x: 9.5, z: -15, h: 8.2, layer: 1 },
+      { t: 'hero_house_a', x: 15, z: -16, h: 8.2, layer: 1 },
       { t: 'hero_tree_b', x: 17, z: -20, h: 3.2, layer: 1, sway: true },
-      { t: 'prop_crates', x: 14, z: -9, h: 2.4, layer: 2 },
+      { t: 'prop_crates', x: 16.5, z: -8, h: 2.4, layer: 2 },
       // layer 2 — road dressing
       { t: 'prop_signpost', x: -6.5, z: -2, h: 3.2, layer: 2 },
       { t: 'prop_lantern', x: 5.2, z: -4, h: 3.6, layer: 2 },
@@ -48,6 +48,8 @@ export const BIOMES = [
       { t: 'hero_tree_b', x: 12.5, z: 11, h: 9, layer: 3, dim: 0.26 },
     ],
     particles: [{ kind: 'leaf', n: 10, box: [-14, 2, -22, 14, 8, 4] }],
+    // text type A: the slogan on a plank sign by the road (see signs.js)
+    board: { key: 'village', kind: 'wood', x: 7.5, z: -26, h: 7.6, ry: -0.22 },
   },
   {
     id: 'forest',
@@ -98,12 +100,14 @@ export const BIOMES = [
       { t: 'feat_death_alt', x: 22, z: -42, h: 20, layer: 0, dim: 0.30 },
       { t: 'feat_death_alt', x: -12.5, z: -19, h: 7.6, layer: 1 },
       { t: 'biome_deadtree', x: -3.5, z: -24, h: 9.5, layer: 1, sway: true },
-      { t: 'feat_vendetta', x: 3.8, z: -14, h: 7.4, layer: 1 },
-      { t: 'feat_death', x: 13.5, z: -18, h: 7.6, layer: 1 },
-      { t: 'biome_brazier', x: 7.6, z: -5, h: 2.7, layer: 2 },
+      { t: 'feat_vendetta', x: 1.5, z: -14, h: 7.4, layer: 1 },
+      { t: 'feat_death', x: 16, z: -19, h: 7.6, layer: 1 },
+      { t: 'biome_brazier', x: 4.5, z: -5, h: 2.7, layer: 2 },
       { t: 'biome_deadtree', x: -12, z: 9, h: 21, layer: 3, dim: 0.18 },
     ],
     particles: [{ kind: 'soul', n: 8, box: [-15, 0.6, -26, 15, 8, 6] }],
+    // text type A: Vendetta cut into a stone slab
+    board: { key: 'spirit', kind: 'stone', x: 5.4, z: -28, h: 7.6, ry: -0.24 },
   },
   {
     id: 'home',

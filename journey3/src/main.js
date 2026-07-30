@@ -71,6 +71,10 @@ async function boot() {
   gsap.registerPlugin(ScrollTrigger);
 
   const stage = await world.createWorld({ canvas: document.getElementById('stage'), tod });
+  // Everything the opening frame needs is now in. The rest of the journey warms
+  // up in the background from startLoop, so this is the only honest place to
+  // measure the first-frame budget from.
+  document.documentElement.dataset.firstFrame = '1';
 
   /* Lenis drives the scroll; ScrollTrigger reads it through a proxy so both
      agree on a single source of truth for scrollTop. */

@@ -11,7 +11,7 @@
  */
 
 import * as THREE from 'three';
-import { BIOMES, GATES } from './biomes.js';
+import { BIOMES, GATES, BIOME_SPACING } from './biomes.js';
 import { biomeZ, gateZ, applyTod } from './world.js';
 
 export function bindRail({ gsap, ScrollTrigger, stage }) {
@@ -119,6 +119,7 @@ export function bindRail({ gsap, ScrollTrigger, stage }) {
 
     updateAtmosphere(stage, progress);
     updateGates(stage, progress);
+    updateOccluders(stage);
     updateText(stage, progress);
   }
   stage.place = place;
@@ -157,6 +158,18 @@ function updateAtmosphere(stage, p) {
   stage.scene.background.copy(skyA).lerp(skyB, k);
   stage.scene.fog.near = THREE.MathUtils.lerp(a.fogNear, b.fogNear, k);
   stage.scene.fog.far = THREE.MathUtils.lerp(a.fogFar, b.fogFar, k);
+}
+
+/* A biome's near-camera occluders only exist for someone standing in that
+   biome. Left on, they are visible through the gate from the biome before it,
+   flanking the opening with two strips of the wrong scenery. */
+function updateOccluders(stage) {
+  const z = stage.camera.position.z;
+  stage.groups.forEach((g, i) => {
+    if (!g || !g.group.userData.occluders) return;
+    const inside = z < -i * BIOME_SPACING + 62;      // past the gate, in the room
+    for (const m of g.group.userData.occluders) m.visible = inside;
+  });
 }
 
 /* ------------------------------------------------------------------ gates */

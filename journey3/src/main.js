@@ -70,7 +70,19 @@ async function boot() {
   const ScrollTrigger = scrollMod.ScrollTrigger || scrollMod.default;
   gsap.registerPlugin(ScrollTrigger);
 
+  /* The bar follows the loader, not a timer: it is the real count of textures
+     the opening frame is waiting on. `total` grows as more are queued, which is
+     honest — the bar slows down rather than lying about being nearly done. */
+  const fill = document.getElementById('boot-fill');
+  const mgr = world.loadingManager;
+  if (mgr && fill) {
+    mgr.onProgress = (_u, loaded, total) => {
+      fill.style.width = `${Math.round((loaded / Math.max(total, 1)) * 100)}%`;
+    };
+  }
+
   const stage = await world.createWorld({ canvas: document.getElementById('stage'), tod });
+  if (fill) fill.style.width = '100%';
   // Everything the opening frame needs is now in. The rest of the journey warms
   // up in the background from startLoop, so this is the only honest place to
   // measure the first-frame budget from.
@@ -97,6 +109,10 @@ async function boot() {
   world.startLoop(stage);
 
   ScrollTrigger.refresh();
+  // The splash comes off only once a frame with the village in it has actually
+  // been painted. Two frames of grace, because the first rAF fires before the
+  // renderer has put anything on the canvas.
+  await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
   document.body.classList.add('is-ready');
   window.__J3 = stage;             // handles for the smoke tests
 }

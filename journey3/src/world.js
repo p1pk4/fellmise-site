@@ -14,6 +14,11 @@ const DPR_CAP = 2;
 // the RU page sits one level deeper, so the base comes from the page
 const ASSETS = (window.J3 && window.J3.assets) || 'assets/';
 
+/* The splash bar counts real texture loads. Exported from here so the entry
+   chunk can reach it the moment this module resolves — before createWorld runs,
+   which is when the loading actually starts — without importing three itself. */
+export const loadingManager = THREE.DefaultLoadingManager;
+
 export const biomeZ = (i) => -i * BIOME_SPACING;
 export const gateZ = (i) => biomeZ(i) - GATE_OFFSET;
 
@@ -102,6 +107,11 @@ export async function createWorld({ canvas, tod }) {
         && spec.layer >= 1 && spec.layer <= 2) {
       addShadow(group, spec, h * aspect);
     }
+    // Layer 3 is the stuff meant to brush the lens from inside the biome. Seen
+    // from OUTSIDE — through the gate, before you get there — it stands either
+    // side of the opening as a pair of strips that belong to nowhere. Kept on a
+    // list so the rail can switch them off until the camera is actually inside.
+    if (spec.layer === 3) group.userData.occluders.push(mesh);
     if (spec.drift) {
       state.drift.push({ mesh, speed: spec.drift, span: spec.span || 90, x0: spec.x });
     }
@@ -240,7 +250,7 @@ export async function createWorld({ canvas, tod }) {
     mesh.rotation.y = def.ry || 0;
     mesh.renderOrder = 2;
     group.add(mesh);
-    state.boards.push(mesh);
+    state.boards.push({ key: def.key, mesh, fit: canvas.__fit });
     return mesh;
   }
 
@@ -330,13 +340,14 @@ export async function createWorld({ canvas, tod }) {
     const group = new THREE.Group();
     group.position.z = biomeZ(i);
     group.visible = true;
+    group.userData.occluders = [];
     scene.add(group);
     state.groups[i] = { group, def: b };
 
     const job = (async () => {
       await makeGround(b, group, i);
       for (const s of b.sprites) await makeSprite(s, group);
-      if (b.board) await makeBoard(b.board, group);
+      for (const bd of (b.boards || [])) await makeBoard(bd, group);
       const { makeEmitters } = await import('./life.js');
       state.emitters.push(...makeEmitters(THREE, group, b, dotTex));
       state.ready.add(i);

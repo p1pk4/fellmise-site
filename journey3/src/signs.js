@@ -126,12 +126,14 @@ export function drawBoard({ kind, title, sub, width = 900, boardH = 700, legs = 
 
   const titleFont = (px) => face(px, 700, 'Podkova', 'Georgia, serif');
   const subFont = (px) => face(px, 600, 'Vollkorn', 'Georgia, serif');
-  const t = fitLines(ctx, title, maxW, boardH * 0.56, 84, 34, 1.2, titleFont);
-  const s = sub ? fitLines(ctx, sub, maxW, boardH * 0.26, 40, 22, 1.3, subFont)
+  // The board is read from ten to twenty metres away, so the subtitle needs a
+  // real share of the height, not a footnote's worth.
+  const t = fitLines(ctx, title, maxW, boardH * 0.44, 88, 34, 1.18, titleFont);
+  const s = sub ? fitLines(ctx, sub, maxW, boardH * 0.40, 56, 30, 1.28, subFont)
                 : { px: 0, lines: [] };
 
-  const titleH = t.lines.length * t.px * 1.2;
-  const subH = s.lines.length * s.px * 1.3;
+  const titleH = t.lines.length * t.px * 1.18;
+  const subH = s.lines.length * s.px * 1.28;
   const gap = sub ? Math.round(boardH * 0.11) : 0;   // rule plus air on both sides
   let y = Math.round((boardH - titleH - subH - gap) / 2);
 
@@ -141,7 +143,7 @@ export function drawBoard({ kind, title, sub, width = 900, boardH = 700, legs = 
     ctx.fillText(line, width / 2 + 4, y + 5);
     ctx.fillStyle = CREAM;
     ctx.fillText(line, width / 2, y);
-    y += t.px * 1.2;
+    y += t.px * 1.18;
   }
 
   if (sub) {
@@ -159,8 +161,22 @@ export function drawBoard({ kind, title, sub, width = 900, boardH = 700, legs = 
       ctx.fillText(line, width / 2 + 3, y + 4);
       ctx.fillStyle = CREAM;
       ctx.fillText(line, width / 2, y);
-      y += s.px * 1.3;
+      y += s.px * 1.28;
     }
   }
+  /* What the fit test reads: the box every glyph was drawn inside, against the
+     box it had to stay inside. Reported rather than trusted, because the auto-
+     fit has a floor — if a locale ever writes something long enough to hit it,
+     the text would silently run off the plank. */
+  c.__fit = {
+    pad, width, boardH,
+    titlePx: t.px, subPx: s.px,
+    titleW: Math.max(...t.lines.map((l) => (ctx.font = titleFont(t.px), ctx.measureText(l).width))),
+    subW: s.lines.length
+      ? Math.max(...s.lines.map((l) => (ctx.font = subFont(s.px), ctx.measureText(l).width)))
+      : 0,
+    top: Math.round((boardH - titleH - subH - gap) / 2),
+    bottom: y,
+  };
   return c;
 }

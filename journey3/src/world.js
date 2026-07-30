@@ -62,7 +62,7 @@ export async function createWorld({ canvas, tod }) {
 
   const state = {
     renderer, scene, camera, tod,
-    groups: [], gates: [], sway: [], lights: [], emitters: [], boards: [],
+    groups: [], gates: [], sway: [], lights: [], emitters: [], boards: [], drift: [],
     ready: new Set(), loading: new Map(),
     clock: new THREE.Clock(), progress: 0, mouse: { x: 0, y: 0, cx: 0, cy: 0 },
   };
@@ -84,11 +84,18 @@ export async function createWorld({ canvas, tod }) {
     // mip chain — same texture, no extra bytes, and it costs nothing per frame.
     if (spec.blur) blurSampling(mat, spec.blur);
     const mesh = new THREE.Mesh(geo, mat);
-    mesh.position.set(spec.x, h / 2, spec.z);
+    // `y` is the CENTRE height, for things that do not stand on the ground:
+    // clouds, the moon, a lantern on a chain, a beam spanning the tunnel.
+    mesh.position.set(spec.x, spec.y !== undefined ? spec.y : h / 2, spec.z);
     mesh.renderOrder = spec.layer;
     group.add(mesh);
-    if (spec.shadow !== false && spec.layer >= 1 && spec.layer <= 2) {
+    // things hanging in the air cast nothing we could honestly place
+    if (spec.shadow !== false && spec.y === undefined
+        && spec.layer >= 1 && spec.layer <= 2) {
       addShadow(group, spec, h * aspect);
+    }
+    if (spec.drift) {
+      state.drift.push({ mesh, speed: spec.drift, span: spec.span || 90, x0: spec.x });
     }
     if (spec.sway) state.sway.push({ mesh, phase: Math.random() * 6.28 });
     if (EMISSIVE[spec.t]) await addLight(group, spec, EMISSIVE[spec.t]);
@@ -121,7 +128,8 @@ export async function createWorld({ canvas, tod }) {
         map: tex, transparent: true, opacity,
         blending: THREE.AdditiveBlending, depthWrite: false, fog: false,
       }));
-      m.position.set(spec.x, spec.h / 2, spec.z + dz);
+      // exactly where the sprite is, including things hung above the ground
+      m.position.set(spec.x, spec.y !== undefined ? spec.y : spec.h / 2, spec.z + dz);
       m.renderOrder = 9;
       group.add(m);
       entry.parts.push({ role, mesh: m, base: opacity });
@@ -239,16 +247,26 @@ export async function createWorld({ canvas, tod }) {
     // through. Sitting it under the biome only meant the forest's grass ran on
     // under the mine's cave mouth. Later biomes sit a hair higher, so in the
     // overlap the destination's floor wins — which is the direction of travel.
-    const LEN = 150, CZ = -5;
+    // Long enough that neighbouring biomes OVERLAP: their floors used to abut
+    // exactly, and a hard line where near-black cave stone met bright grass ran
+    // across the frame a few metres from the camera. Now each floor fades out
+    // over its last stretch while the next fades in, and the crossover lands on
+    // the gate. The Y stagger still decides who wins where both are solid.
+    const LEN = 190, CZ = -5, FADE = 24;
     const y = index * 0.004;
 
     const tex = (await loadTex(b.ground)).clone();
     tex.needsUpdate = true;
     tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-    tex.repeat.set(12, 9);
-    const mat = new THREE.MeshBasicMaterial({ map: tex, fog: true });
+    tex.repeat.set(12, 11);
+    const mat = new THREE.MeshBasicMaterial({
+      map: tex, fog: true, vertexColors: true,
+      transparent: true, depthWrite: false,
+    });
     mat.color.setHex(b.groundTint);
-    const g = new THREE.Mesh(new THREE.PlaneGeometry(170, LEN), mat);
+    const geo = new THREE.PlaneGeometry(170, LEN, 1, 32);
+    fadeEnds(geo, LEN, FADE);
+    const g = new THREE.Mesh(geo, mat);
     g.rotation.x = -Math.PI / 2;
     g.position.set(0, y, CZ);
     g.renderOrder = -10;
@@ -261,12 +279,30 @@ export async function createWorld({ canvas, tod }) {
       rt.repeat.set(1, 3);
       const rm = new THREE.MeshBasicMaterial({ map: rt, transparent: true, fog: true });
       rm.color.setHex(0xf2ca78);          // keep it reading as the path colour
-      const r = new THREE.Mesh(new THREE.PlaneGeometry(11, LEN), rm);
+      const rgeo = new THREE.PlaneGeometry(11, LEN, 1, 32);
+      fadeEnds(rgeo, LEN, FADE);
+      rm.vertexColors = true;
+      const r = new THREE.Mesh(rgeo, rm);
       r.rotation.x = -Math.PI / 2;
       r.position.set(0, y + 0.02, CZ);
       r.renderOrder = -9;
       group.add(r);
     }
+  }
+
+  /* Per-vertex alpha ramp along the plane's length, so a floor arrives and
+     leaves instead of starting at a straight edge. Written into the colour
+     attribute as RGBA — the material's own colour still tints on top. */
+  function fadeEnds(geo, len, fade) {
+    const pos = geo.attributes.position;
+    const col = new Float32Array(pos.count * 4);
+    for (let i = 0; i < pos.count; i++) {
+      const d = len / 2 - Math.abs(pos.getY(i));    // distance to the nearer end
+      const t = Math.min(Math.max(d / fade, 0), 1);
+      col[i * 4] = col[i * 4 + 1] = col[i * 4 + 2] = 1;
+      col[i * 4 + 3] = t * t * (3 - 2 * t);
+    }
+    geo.setAttribute('color', new THREE.BufferAttribute(col, 4));
   }
 
   /* ------------------------------------------------------------ biome build */
@@ -511,6 +547,12 @@ export function startLoop(state) {
     state.mouse.cx += (state.mouse.x - state.mouse.cx) * 0.06;
     state.mouse.cy += (state.mouse.y - state.mouse.cy) * 0.06;
 
+    // clouds cross the sky and wrap round; slow enough to read as weather
+    for (const d of state.drift) {
+      let x = d.mesh.position.x + d.speed * dt;
+      if (x > d.x0 + d.span / 2) x -= d.span;
+      d.mesh.position.x = x;
+    }
     for (const s of state.sway) {
       s.mesh.rotation.z = Math.sin(t * 0.42 + s.phase) * 0.0087;   // ~0.5deg
     }

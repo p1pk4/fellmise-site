@@ -34,6 +34,7 @@ export async function createWorld({ canvas, tod }) {
   scene.add(new THREE.AmbientLight(0xffffff, 1.0));
 
   const loader = new THREE.TextureLoader();
+  const maxAniso = renderer.capabilities.getMaxAnisotropy();
   const texCache = new Map();
   function loadTex(name) {
     if (texCache.has(name)) return texCache.get(name);
@@ -45,6 +46,11 @@ export async function createWorld({ canvas, tod }) {
         t.colorSpace = THREE.SRGBColorSpace;
         t.generateMipmaps = true;
         t.minFilter = THREE.LinearMipmapLinearFilter;
+        t.magFilter = THREE.LinearFilter;
+        // Without this the ground smears into blotches the moment it is seen at
+        // a grazing angle — which, on a road running away from the camera, is
+        // most of the frame.
+        t.anisotropy = maxAniso;
         res(t);
       }, undefined, () => res(null));
     });
@@ -259,8 +265,9 @@ export async function createWorld({ canvas, tod }) {
 
     const tex = (await loadTex(b.ground)).clone();
     tex.needsUpdate = true;
+    tex.anisotropy = maxAniso;
     tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-    tex.repeat.set(12, 11);
+    tex.repeat.set(24, 22);        // tile at half size: denser, so it holds up close
     const mat = new THREE.MeshBasicMaterial({
       map: tex, fog: true, vertexColors: true,
       transparent: true, depthWrite: false,
@@ -281,8 +288,9 @@ export async function createWorld({ canvas, tod }) {
       // metres. Mirrored wrapping makes an ordinary crop tile without a seam.
       const rt = (await loadTex(b.road)).clone();
       rt.needsUpdate = true;
+      rt.anisotropy = maxAniso;
       rt.wrapS = rt.wrapT = THREE.MirroredRepeatWrapping;
-      rt.repeat.set(2, 20);
+      rt.repeat.set(4, 40);        // tile at half size: denser, so it holds up close
       const rm = new THREE.MeshBasicMaterial({
         map: rt, transparent: true, fog: true, depthWrite: false, vertexColors: true,
       });

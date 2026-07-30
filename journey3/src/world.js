@@ -325,8 +325,10 @@ export async function createWorld({ canvas, tod }) {
         blending: THREE.AdditiveBlending, depthWrite: false, fog: false, opacity: 0,
       }));
     // In FRONT of the facade: behind it the opaque wall of the sprite hid the
-    // glow entirely and the opening read as a dark patch.
-    light.position.set(0, g.h * 0.55, 0.6);
+    // glow entirely and the opening read as a dark patch. Centred exactly like
+    // the frame — the flood carries the art's own footprint, so any other
+    // anchor puts the window-shaped glow up on the roof.
+    light.position.set(0, g.h / 2, 0.6);
     light.renderOrder = 8;
     grp.add(light);
 
@@ -349,7 +351,52 @@ export async function createWorld({ canvas, tod }) {
       });
     }
 
-    state.gates[i] = { def: g, group: grp, frame, light };
+    const leaves = g.door ? makeDoor(g, grp, tex, aspect) : null;
+    state.gates[i] = { def: g, group: grp, frame, light, leaves };
+  }
+
+  /* Door leaves, cut out of the gate art by texture offset — the same texture,
+     sampled twice over the doorway rectangle, so a swinging door costs no extra
+     bytes. Each leaf's geometry is shifted so its origin sits ON the jamb, and
+     then it is simply rotated about Y: the hinge is in the geometry, not in a
+     parent object. Behind them a dark quad hides the door painted into the art,
+     otherwise an open doorway still shows a closed door. */
+  function makeDoor(g, grp, tex, aspect) {
+    const [x0, y0, x1, y1] = g.door;
+    const planeW = g.h * aspect;
+    const doorW = (x1 - x0) * planeW;
+    const doorH = (y1 - y0) * g.h;
+    const cy = (1 - (y0 + y1) / 2) * g.h;
+
+    const dark = new THREE.Mesh(
+      new THREE.PlaneGeometry(doorW * 1.02, doorH * 1.02),
+      new THREE.MeshBasicMaterial({ color: 0x120d09, fog: true }));
+    dark.position.set(((x0 + x1) / 2 - 0.5) * planeW, cy, 0.02);
+    dark.renderOrder = 6;
+    grp.add(dark);
+
+    const leaves = [];
+    for (const side of [-1, 1]) {
+      const t2 = tex.clone();
+      t2.needsUpdate = true;
+      t2.wrapS = t2.wrapT = THREE.ClampToEdgeWrapping;
+      t2.repeat.set((x1 - x0) / 2, y1 - y0);
+      t2.offset.set(side < 0 ? x0 : (x0 + x1) / 2, 1 - y1);
+
+      const geo = new THREE.PlaneGeometry(doorW / 2, doorH);
+      // origin to the hinge edge: left leaf hinges on its left, right on its right
+      geo.translate((side < 0 ? 1 : -1) * doorW / 4, 0, 0);
+      const m = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({
+        map: t2, transparent: true, alphaTest: 0.04,
+        depthWrite: false, side: THREE.DoubleSide, fog: true,
+      }));
+      m.position.set((side < 0 ? x0 : x1) - 0.5, cy, 0.05);
+      m.position.x = ((side < 0 ? x0 : x1) - 0.5) * planeW;
+      m.renderOrder = 7;
+      grp.add(m);
+      leaves.push({ mesh: m, side });
+    }
+    return leaves;
   }
 
   /* first frame: village + its gate, then the rest in the background */

@@ -8,6 +8,10 @@ here is the same one the preset was accepted on.
 
 What is measured, and what is not:
 
+  вердикт     — the pipeline's own three-level frame_verdict at its own
+                threshold: OK, SOFT (background fine, outline too soft), BG
+                (failed the background cut). This is the gate the pipeline
+                accepted v2 on, so it is reported alongside the plain one.
   годных      — the pipeline's flood_usable: the background floods inward from
                 the corners over >=15% of the frame, exactly one connected
                 object remains, and it touches <=2 edges. Objective.
@@ -96,8 +100,10 @@ def collect():
                     continue
                 ok, share, blobs, edges = M.flood_usable(f)
                 sprite = cut(f)
+                verdict, _o, _s, _b, _e = M.frame_verdict(f, M.SHARP_THRESHOLD)
                 frames[seed] = {
-                    "ok": bool(ok), "share": round(float(share), 4),
+                    "ok": bool(ok), "verdict": verdict,
+                    "share": round(float(share), 4),
                     "blobs": int(blobs), "edges": int(edges),
                     "sharp": round(float(M.sharpness(f)), 1),
                     "halo": None if sprite is None else round(halo(sprite) or 0.0, 1),
@@ -113,6 +119,9 @@ def agg(frames):
         return None
     return {
         "n": len(got), "ok": len(ok),
+        "v_ok": sum(1 for f in got if f["verdict"] == "OK"),
+        "v_soft": sum(1 for f in got if f["verdict"] == "SOFT"),
+        "v_bg": sum(1 for f in got if f["verdict"] == "BG"),
         "share": float(np.mean([f["share"] for f in got])),
         "sharp": float(np.mean([f["sharp"] for f in ok])) if ok else 0.0,
         "halo": float(np.mean([f["halo"] for f in got if f["halo"] is not None])),
@@ -150,7 +159,7 @@ def sheet(tid, info):
                 cell = Image.alpha_composite(cell, sprite).convert("RGB")
                 cell.thumbnail((C - 8, C - 8))
                 im.paste(cell, (x + (C - cell.width) // 2, y + (C - cell.height) // 2))
-                mark = "годен" if fr["ok"] else "брак"
+                mark = fr["verdict"]
                 d.text((x + 4, y + C + 4),
                        f"{mark} · фон {fr['share']*100:.0f}% · ореол {fr['halo']:+.0f}",
                        fill=ink, font=f)
@@ -164,31 +173,34 @@ def main():
     data = collect()
 
     tags = [t for t, _l, _w in RUNS]
+    print("вердикт пайплайна (OK из 4 сидов), порог контурной резкости "
+          f"{M.SHARP_THRESHOLD}\n")
     print(f"{'объект':<16}{'группа':<12}" + "".join(f"{t:>12}" for t in tags))
     print("-" * (28 + 12 * len(tags)))
     for tid, info in data.items():
         cells = []
         for tag in tags:
             a = agg(info["runs"][tag]["frames"])
-            cells.append(f"{a['ok']}/{a['n']}" if a else "—")
+            cells.append(f"{a['v_ok']}/{a['n']}" if a else "—")
         print(f"{tid:<16}{info['group']:<12}" + "".join(f"{c:>12}" for c in cells))
 
     print("\nсводка по прогонам (среднее по всем объектам)")
-    print(f"{'прогон':<12}{'годных':>10}{'фон':>10}{'резкость':>11}{'ореол':>9}")
-    print("-" * 52)
+    print(f"{'прогон':<12}{'OK':>8}{'SOFT':>7}{'BG':>5}{'фон':>9}{'резкость':>11}{'ореол':>9}")
+    print("-" * 60)
     summary = {}
     for tag in tags:
-        ok = tot = 0
+        ok = tot = soft = bg = 0
         shares, sharps, halos = [], [], []
         for info in data.values():
             a = agg(info["runs"][tag]["frames"])
             if not a:
                 continue
-            ok += a["ok"]; tot += a["n"]
+            ok += a["v_ok"]; soft += a["v_soft"]; bg += a["v_bg"]; tot += a["n"]
             shares.append(a["share"]); sharps.append(a["sharp"]); halos.append(a["halo"])
-        summary[tag] = dict(ok=ok, total=tot, share=float(np.mean(shares)),
-                            sharp=float(np.mean(sharps)), halo=float(np.mean(halos)))
-        print(f"{tag:<12}{f'{ok}/{tot}':>10}{np.mean(shares)*100:9.1f}%"
+        summary[tag] = dict(ok=ok, soft=soft, bg=bg, total=tot,
+                            share=float(np.mean(shares)), sharp=float(np.mean(sharps)),
+                            halo=float(np.mean(halos)))
+        print(f"{tag:<12}{f'{ok}/{tot}':>8}{soft:>7}{bg:>5}{np.mean(shares)*100:8.1f}%"
               f"{np.mean(sharps):11.0f}{np.mean(halos):+9.1f}")
 
     print("\nпо группам (годных)")
@@ -203,7 +215,7 @@ def main():
                     continue
                 a = agg(info["runs"][tag]["frames"])
                 if a:
-                    ok += a["ok"]; tot += a["n"]
+                    ok += a["v_ok"]; tot += a["n"]
             cells.append(f"{ok}/{tot}")
         print(f"{g:<14}" + "".join(f"{c:>12}" for c in cells))
 

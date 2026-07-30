@@ -79,10 +79,17 @@ export async function createWorld({ canvas, tod }) {
       depthWrite: false, side: THREE.DoubleSide, fog: true,
     });
     if (spec.dim) mat.color.setScalar(spec.dim);
+    // Occluders brushing the lens should be out of focus. Rather than shipping a
+    // second, blurred copy of every one of them, the sampler is pushed down the
+    // mip chain — same texture, no extra bytes, and it costs nothing per frame.
+    if (spec.blur) blurSampling(mat, spec.blur);
     const mesh = new THREE.Mesh(geo, mat);
     mesh.position.set(spec.x, h / 2, spec.z);
     mesh.renderOrder = spec.layer;
     group.add(mesh);
+    if (spec.shadow !== false && spec.layer >= 1 && spec.layer <= 2) {
+      addShadow(group, spec, h * aspect);
+    }
     if (spec.sway) state.sway.push({ mesh, phase: Math.random() * 6.28 });
     if (EMISSIVE[spec.t]) await addLight(group, spec, EMISSIVE[spec.t]);
     return mesh;
@@ -124,6 +131,50 @@ export async function createWorld({ canvas, tod }) {
     if (bleedTex) add('bleed', bleedTex, 0.02, 0.62 * level);
     add('em', emTex, 0.04, 1.0 * level);
     state.lights.push(entry);
+  }
+
+  function blurSampling(mat, bias) {
+    mat.onBeforeCompile = (shader) => {
+      shader.fragmentShader = shader.fragmentShader.replace(
+        'texture2D( map, vMapUv )', `texture2D( map, vMapUv, ${bias.toFixed(1)} )`);
+    };
+    mat.customProgramCacheKey = () => `blur${bias}`;
+  }
+
+  /* A soft dark ellipse on the ground under a sprite. Billboards have no
+     contact with the floor of their own accord, and without this a tree or an
+     ore vein reads as hanging an inch above the ground — which is exactly what
+     it was doing. Only for things that stand IN the scene: backdrops and
+     occluders are too far or too near for a contact shadow to mean anything. */
+  const shadowTex = makeShadowTexture();
+  function addShadow(group, spec, width) {
+    const w = width * 0.72;
+    const m = new THREE.Mesh(
+      new THREE.PlaneGeometry(w, w * 0.34),
+      new THREE.MeshBasicMaterial({
+        map: shadowTex, transparent: true, opacity: 0.34,
+        depthWrite: false, fog: true,
+      }));
+    m.rotation.x = -Math.PI / 2;
+    // just above the floor plane, and a touch forward so the sprite's own
+    // baked base does not sit on top of it
+    m.position.set(spec.x, 0.03, spec.z + w * 0.06);
+    m.renderOrder = -8;
+    group.add(m);
+  }
+
+  function makeShadowTexture() {
+    const s = 128;
+    const c = document.createElement('canvas');
+    c.width = c.height = s;
+    const ctx = c.getContext('2d');
+    const g = ctx.createRadialGradient(s / 2, s / 2, 0, s / 2, s / 2, s / 2);
+    g.addColorStop(0, 'rgba(0,0,0,.85)');
+    g.addColorStop(0.55, 'rgba(0,0,0,.42)');
+    g.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, s, s);
+    return new THREE.CanvasTexture(c);
   }
 
   // A soft round dot — for particles only (embers, dust, souls). Light sources

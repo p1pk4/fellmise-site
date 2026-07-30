@@ -41,7 +41,30 @@ PAD = 8
 # Pinned picks, filled in after looking at the review sheet: the flood gate
 # judges the background and the sharpness tiebreak judges the outline, and
 # neither can tell whether the object is the thing that was asked for.
-PICK_OVERRIDE = {}
+PICK_OVERRIDE = {
+    # 2002/4004 are tree stumps; 1001 and 3003 are actual thatched stacks and
+    # 1001 has no stray rock beside it
+    "haystack": 1001,
+    # 2002 (sharpest) carries invented lettering across the stone — the classic
+    # text artefact. 4004 is a plain gravestone with a cross and ivy; 1001 and
+    # 3003 read as ivy-covered doorways, not graves.
+    "grave_c": 4004,
+    # 4004 is a tiny lantern with a lit base plate — it would not read as
+    # hanging. 2002 is the clearest chain and glass.
+    "lantern_chain": 2002,
+    # 2002 is the most spire-like of four cave-mouth rocks; the prompt never
+    # produced a true stalagmite (see NIGHT_LOG)
+    "stalagmite_a": 2002,
+    "stalagmite_b": 1001,
+    # variety: three boulders that were all the same shape at three sizes
+    "rock_s": 3003,
+    "rock_m": 3003,
+    # 4004 is a thin wisp with two detached specks; 3003 is a solid cloud
+    "cloud_b": 3003,
+    # 3003 is a volcano cone; 1001 is a jagged ridge, which is what a distant
+    # dark hill needs to be
+    "hill_dark": 1001,
+}
 
 
 def cut(src, dst):

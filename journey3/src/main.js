@@ -74,6 +74,7 @@ async function boot() {
   // Everything the opening frame needs is now in. The rest of the journey warms
   // up in the background from startLoop, so this is the only honest place to
   // measure the first-frame budget from.
+  performance.mark('j3-first-frame');
   document.documentElement.dataset.firstFrame = '1';
 
   /* Lenis drives the scroll; ScrollTrigger reads it through a proxy so both

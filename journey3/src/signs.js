@@ -96,7 +96,16 @@ function stone(ctx, x, y, w, h) {
 /* One board, ready to be used as a texture. `kind` picks the material; the two
    legs are part of the canvas so the sign stands on the ground instead of
    hovering. */
-export function drawBoard({ kind, title, sub, width = 900, boardH = 700, legs = 260 }) {
+/* The blank side of the same board. A double-sided plane shows the front
+   texture mirrored, which puts backwards lettering in the frame every time the
+   camera passes a sign. So the back is its own texture: the same plank, the
+   same frame, no text. */
+export function drawBoardBack({ kind, width = 900, boardH = 700, legs = 260 }) {
+  return drawBoard({ kind, title: '', sub: '', width, boardH, legs, blank: true });
+}
+
+export function drawBoard({ kind, title, sub, width = 900, boardH = 700, legs = 260,
+                            blank = false }) {
   const c = document.createElement('canvas');
   c.width = width;
   c.height = boardH + legs;
@@ -121,6 +130,11 @@ export function drawBoard({ kind, title, sub, width = 900, boardH = 700, legs = 
 
   const pad = Math.round(width * 0.07);
   const maxW = width - 2 * pad;
+  if (blank) {
+    c.__fit = { pad, width, boardH, titlePx: 0, subPx: 0, titleW: 0, subW: 0,
+                top: 0, bottom: 0 };
+    return c;
+  }
   ctx.textAlign = 'center';
   ctx.textBaseline = 'top';
 

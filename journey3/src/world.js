@@ -63,6 +63,14 @@ export async function createWorld({ canvas, tod }) {
     return p;
   }
 
+  /* How much empty space each sprite has below its art, as a fraction of its
+     height (tools/make_baselines.py). Without this a chest or a haystack floats
+     by however much padding the cut happened to leave. */
+  let BASELINE = {};
+  try {
+    BASELINE = await fetch(`${ASSETS}baselines.json`).then((r) => r.json());
+  } catch { /* no manifest -> planes sit on their own bottom edge, as before */ }
+
   /* Which sprites emit light, and how that light behaves. Written by
      tools/make_emissive.py alongside the masks, so the renderer never has to
      guess: a source exists here only if a mask was actually cut for it. */
@@ -99,8 +107,13 @@ export async function createWorld({ canvas, tod }) {
     const mesh = new THREE.Mesh(geo, mat);
     // `y` is the CENTRE height, for things that do not stand on the ground:
     // clouds, the moon, a lantern on a chain, a beam spanning the tunnel.
-    mesh.position.set(spec.x, spec.y !== undefined ? spec.y : h / 2, spec.z);
+    const drop = spec.y !== undefined ? 0 : (BASELINE[spec.t] || 0) * h;
+    mesh.position.set(spec.x, spec.y !== undefined ? spec.y : h / 2 - drop, spec.z);
     mesh.renderOrder = spec.layer;
+    // an explicit `y` means the thing is not on the floor — a cloud, the moon, a
+    // lantern on a chain, goods on a counter. The ground test reads this rather
+    // than keeping its own list of names.
+    mesh.userData.standsOnGround = spec.y === undefined;
     group.add(mesh);
     // things hanging in the air cast nothing we could honestly place
     if (spec.shadow !== false && spec.y === undefined
@@ -147,7 +160,9 @@ export async function createWorld({ canvas, tod }) {
         blending: THREE.AdditiveBlending, depthWrite: false, fog: false,
       }));
       // exactly where the sprite is, including things hung above the ground
-      m.position.set(spec.x, spec.y !== undefined ? spec.y : spec.h / 2, spec.z + dz);
+      const dy = spec.y !== undefined ? spec.y
+               : spec.h / 2 - (BASELINE[spec.t] || 0) * spec.h;
+      m.position.set(spec.x, dy, spec.z + dz);
       m.renderOrder = 9;
       group.add(m);
       entry.parts.push({ role, mesh: m, base: opacity });
@@ -185,6 +200,7 @@ export async function createWorld({ canvas, tod }) {
     // just above the floor plane, and a touch forward so the sprite's own
     // baked base does not sit on top of it
     m.position.set(spec.x, 0.03, spec.z + w * 0.06);
+    m.userData.forSprite = spec.t;
     m.renderOrder = -8;
     group.add(m);
   }
@@ -229,22 +245,33 @@ export async function createWorld({ canvas, tod }) {
   async function makeBoard(def, group) {
     const copy = ((window.J3 && window.J3.boards) || {})[def.key];
     if (!copy) return;
-    const { drawBoard, fontsReady } = await import('./signs.js');
+    const { drawBoard, drawBoardBack, fontsReady } = await import('./signs.js');
     await fontsReady();
     const canvas = drawBoard({ kind: def.kind, title: copy.title, sub: copy.sub });
-    const tex = new THREE.CanvasTexture(canvas);
-    tex.colorSpace = THREE.SRGBColorSpace;
-    tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
-    tex.generateMipmaps = true;
-    tex.minFilter = THREE.LinearMipmapLinearFilter;
+    const mkTex = (cv) => {
+      const t = new THREE.CanvasTexture(cv);
+      t.colorSpace = THREE.SRGBColorSpace;
+      t.anisotropy = renderer.capabilities.getMaxAnisotropy();
+      t.generateMipmaps = true;
+      t.minFilter = THREE.LinearMipmapLinearFilter;
+      return t;
+    };
 
     const aspect = canvas.width / canvas.height;
-    const mesh = new THREE.Mesh(
-      new THREE.PlaneGeometry(def.h * aspect, def.h),
-      new THREE.MeshBasicMaterial({
-        map: tex, transparent: true, alphaTest: 0.02,
-        depthWrite: false, side: THREE.DoubleSide, fog: true,
-      }));
+    const geo = new THREE.PlaneGeometry(def.h * aspect, def.h);
+    const mesh = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({
+      map: mkTex(canvas), transparent: true, alphaTest: 0.02,
+      depthWrite: false, side: THREE.FrontSide, fog: true,
+    }));
+    // the same plank facing the other way, with nothing written on it
+    const back = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({
+      map: mkTex(drawBoardBack({ kind: def.kind })), transparent: true,
+      alphaTest: 0.02, depthWrite: false, side: THREE.BackSide, fog: true,
+    }));
+    back.position.set(def.x, def.h / 2, def.z);
+    back.rotation.y = def.ry || 0;
+    back.renderOrder = 2;
+    group.add(back);
     mesh.position.set(def.x, def.h / 2, def.z);
     // turned a little towards the road, so it reads as placed rather than pasted
     mesh.rotation.y = def.ry || 0;
@@ -252,6 +279,21 @@ export async function createWorld({ canvas, tod }) {
     group.add(mesh);
     state.boards.push({ key: def.key, mesh, fit: canvas.__fit });
     return mesh;
+  }
+
+  /* The resource strip as an object in the world: a market stall with the
+     ore, the timber and the tools laid out along it. The DOM rail stays as the
+     static fallback — this is the same list, standing up. */
+  async function makeCounter(def, group) {
+    await makeSprite({ ...def.stall, shadow: true }, group);
+    for (let i = 0; i < def.items.length; i++) {
+      await makeSprite({
+        t: def.items[i], layer: 2, h: def.h,
+        x: def.x0 + i * def.step,
+        y: def.y + (i % 2 ? 0.03 : 0),   // a hair of unevenness, so it is laid out, not stamped
+        z: def.z,
+      }, group);
+    }
   }
 
   async function makeGround(b, group, index) {
@@ -348,6 +390,7 @@ export async function createWorld({ canvas, tod }) {
       await makeGround(b, group, i);
       for (const s of b.sprites) await makeSprite(s, group);
       for (const bd of (b.boards || [])) await makeBoard(bd, group);
+      if (b.counter) await makeCounter(b.counter, group);
       const { makeEmitters } = await import('./life.js');
       state.emitters.push(...makeEmitters(THREE, group, b, dotTex));
       state.ready.add(i);

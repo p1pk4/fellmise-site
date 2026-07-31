@@ -29,6 +29,9 @@ FINAL = _GRADED if _GRADED.is_dir() else _MASTER
 ASSETS = ROOT / "assets"
 
 WIDTHS = {"hero_": 560, "feat_": 640, "res_": 224, "prop_": 360, "biome_": 560}
+# the tavern is village dressing seen at a distance, and the village is the
+# first frame — 640px of it was bought with the opening budget
+WIDTH_OVERRIDE = {"feat_tavern": 448}
 QUALITY = 85
 
 # Sprites the page needs at a second size under a second name. The housing card

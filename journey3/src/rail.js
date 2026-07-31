@@ -144,18 +144,20 @@ function updateAtmosphere(stage, p) {
   const local = p * BIOMES.length - idx;
   const a = BIOMES[idx], b = BIOMES[nextIdx];
 
-  const fogA = new THREE.Color(a.fog), fogB = new THREE.Color(b.fog);
   const skyA = new THREE.Color(a.sky[1]), skyB = new THREE.Color(b.sky[1]);
   const k = Math.min(Math.max((local - 0.55) / 0.45, 0), 1);   // hold, then blend
 
   // the village's own look follows the visitor's clock
-  if (idx === 0 && stage.todLook) {
-    fogA.setHex(stage.todLook.fog);
-    skyA.setHex(stage.todLook.sky);
-  }
+  if (idx === 0 && stage.todLook) skyA.setHex(stage.todLook.sky);
 
-  stage.scene.fog.color.copy(fogA).lerp(fogB, k);
-  stage.scene.background.copy(skyA).lerp(skyB, k);
+  const sky = skyA.clone().lerp(skyB, k);
+  stage.scene.background.copy(sky);
+  /* Distance fades to the SKY, not to a separate fog colour. The village's fog
+     was beige and its sky blue, so anything far enough away stopped short of
+     the sky and stood there as a cream blot — the "cloud" around the gate house
+     was the forest's backdrop trees doing exactly this. Fading to the colour
+     that is actually behind them makes them recede instead of hovering. */
+  stage.scene.fog.color.copy(sky);
   stage.scene.fog.near = THREE.MathUtils.lerp(a.fogNear, b.fogNear, k);
   stage.scene.fog.far = THREE.MathUtils.lerp(a.fogFar, b.fogFar, k);
 }

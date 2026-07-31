@@ -81,7 +81,7 @@ export async function createWorld({ canvas, tod }) {
 
   const state = {
     renderer, scene, camera, tod,
-    groups: [], gates: [], sway: [], lights: [], emitters: [], boards: [], drift: [],
+    groups: [], gates: [], sway: [], lights: [], emitters: [], boards: [], drift: [], backdrops: [],
     ready: new Set(), loading: new Map(),
     clock: new THREE.Clock(), progress: 0, mouse: { x: 0, y: 0, cx: 0, cy: 0 },
   };
@@ -125,6 +125,10 @@ export async function createWorld({ canvas, tod }) {
     // side of the opening as a pair of strips that belong to nowhere. Kept on a
     // list so the rail can switch them off until the camera is actually inside.
     if (spec.layer === 3) group.userData.occluders.push(mesh);
+    // Backdrops past the fog distance are pure fog colour: above the horizon
+    // they are invisible, below it they lie there as a flat pale silhouette
+    // over the ground. They carry nothing, so they are switched off.
+    if (spec.layer === 0) state.backdrops.push(mesh);
     if (spec.drift) {
       state.drift.push({ mesh, speed: spec.drift, span: spec.span || 90, x0: spec.x });
     }
@@ -610,6 +614,7 @@ export function startLoop(state) {
     state.composer = composer;
   }).catch(() => { /* bloom is optional; the scene renders without it */ });
 
+  const _far = new THREE.Vector3();
   const tick = () => {
     const dt = Math.min(state.clock.getDelta(), 0.05);
     const t = state.clock.elapsedTime;
@@ -623,6 +628,9 @@ export function startLoop(state) {
       let x = d.mesh.position.x + d.speed * dt;
       if (x > d.x0 + d.span / 2) x -= d.span;
       d.mesh.position.x = x;
+    }
+    for (const b of state.backdrops) {
+      b.visible = b.getWorldPosition(_far).distanceTo(camera.position) < scene.fog.far;
     }
     for (const s of state.sway) {
       s.mesh.rotation.z = Math.sin(t * 0.42 + s.phase) * 0.0087;   // ~0.5deg

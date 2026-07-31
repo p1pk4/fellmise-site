@@ -26,7 +26,7 @@ export const GATE_OFFSET = 74;         // where the transition sits between them
 export const BIOMES = [
   {
     id: 'village',
-    fog: 0xd9c79a, fogNear: 52, fogFar: 210,
+    fog: 0xd9c79a, fogNear: 58, fogFar: 150,
     sky: [0x7eb8e0, 0xc7e6f2],
     ground: 'tile_grass', groundTint: 0xa8cb53,
     road: 'tile_path',
@@ -81,7 +81,7 @@ export const BIOMES = [
   },
   {
     id: 'forest',
-    fog: 0x3c5a34, fogNear: 40, fogFar: 148,
+    fog: 0x3c5a34, fogNear: 44, fogFar: 132,
     sky: [0x6f93a6, 0x9fbcb0],
     ground: 'tile_grass', groundTint: 0x6b8f43,
     sprites: [
@@ -115,7 +115,7 @@ export const BIOMES = [
   },
   {
     id: 'mine',
-    fog: 0x121826, fogNear: 26, fogFar: 130, dark: true,
+    fog: 0x121826, fogNear: 30, fogFar: 118, dark: true,
     sky: [0x0d0b14, 0x1b1826],
     ground: 'tile_dirt', groundTint: 0x3d3a45,
     sprites: [
@@ -159,7 +159,7 @@ export const BIOMES = [
   },
   {
     id: 'spirit',
-    fog: 0x123437, fogNear: 30, fogFar: 145, dark: true,
+    fog: 0x123437, fogNear: 34, fogFar: 128, dark: true,
     sky: [0x10222a, 0x21454a],
     ground: 'tile_spirit', groundTint: 0x3e6a63,
     sprites: [
@@ -194,7 +194,7 @@ export const BIOMES = [
   },
   {
     id: 'home',
-    fog: 0xe09a5e, fogNear: 48, fogFar: 200, dusk: true,
+    fog: 0xe09a5e, fogNear: 54, fogFar: 148, dusk: true,
     sky: [0xe78b4a, 0xf4c98a],
     ground: 'tile_grass', groundTint: 0xa8cb53,
     road: 'tile_path',

@@ -134,7 +134,7 @@ export const BIOMES = [
       { t: 'stalagmite_a', x: 7.8, z: -21, h: 2.4, layer: 2 },
       { t: 'stalagmite_b', x: 6.4, z: -8, h: 1.4, layer: 2 },
       { t: 'minecart', x: -5.8, z: -14, h: 1.9, layer: 2 },
-      { t: 'feat_craft', x: 10.5, z: -33, h: 4.0, layer: 1 },
+      { t: 'feat_craft', x: -11.2, z: -35, h: 4.0, layer: 1 },
       { t: 'ore_pile', x: 5.4, z: -11, h: 1.1, layer: 2 },
       { t: 'ore_pile', x: -2.6, z: -24, h: 1.0, layer: 2, dim: 0.9 },
       { t: 'biome_brazier', x: -3.4, z: -5, h: 2.9, layer: 2 },

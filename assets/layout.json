@@ -1,0 +1,1882 @@
+{
+ "version": 1,
+ "generated": "tools/dump_layout.mjs",
+ "biomes": {
+  "village": {
+   "sprites": [
+    {
+     "id": "cloud_a#1",
+     "t": "cloud_a",
+     "layer": 0,
+     "pos": [
+      -22,
+      30,
+      -86
+     ],
+     "h": 9,
+     "rotY": 0,
+     "visible": true,
+     "drift": 0.3,
+     "span": 110
+    },
+    {
+     "id": "cloud_b#1",
+     "t": "cloud_b",
+     "layer": 0,
+     "pos": [
+      16,
+      35,
+      -94
+     ],
+     "h": 8,
+     "rotY": 0,
+     "visible": true,
+     "drift": 0.22,
+     "span": 110
+    },
+    {
+     "id": "cloud_c#1",
+     "t": "cloud_c",
+     "layer": 0,
+     "pos": [
+      40,
+      27,
+      -78
+     ],
+     "h": 7,
+     "rotY": 0,
+     "visible": true,
+     "dim": 0.9,
+     "drift": 0.38,
+     "span": 110
+    },
+    {
+     "id": "hero_tree_a#1",
+     "t": "hero_tree_a",
+     "layer": 0,
+     "pos": [
+      -34,
+      null,
+      -52
+     ],
+     "h": 14,
+     "rotY": 0,
+     "visible": true,
+     "dim": 0.74
+    },
+    {
+     "id": "biome_pine_b#1",
+     "t": "biome_pine_b",
+     "layer": 0,
+     "pos": [
+      31,
+      null,
+      -64
+     ],
+     "h": 13,
+     "rotY": 0,
+     "visible": true,
+     "dim": 0.7
+    },
+    {
+     "id": "hero_house_b#1",
+     "t": "hero_house_b",
+     "layer": 1,
+     "pos": [
+      -11,
+      null,
+      -14
+     ],
+     "h": 7.4,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "hero_tree_a#2",
+     "t": "hero_tree_a",
+     "layer": 1,
+     "pos": [
+      -7.2,
+      null,
+      -22
+     ],
+     "h": 8.2,
+     "rotY": 0,
+     "visible": true,
+     "sway": true
+    },
+    {
+     "id": "hero_well#1",
+     "t": "hero_well",
+     "layer": 1,
+     "pos": [
+      1.5,
+      null,
+      -11
+     ],
+     "h": 4.4,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "hero_house_a#1",
+     "t": "hero_house_a",
+     "layer": 1,
+     "pos": [
+      15,
+      null,
+      -16
+     ],
+     "h": 8.2,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "hero_tree_b#1",
+     "t": "hero_tree_b",
+     "layer": 1,
+     "pos": [
+      17,
+      null,
+      -20
+     ],
+     "h": 3.2,
+     "rotY": 0,
+     "visible": true,
+     "sway": true
+    },
+    {
+     "id": "barn#1",
+     "t": "barn",
+     "layer": 1,
+     "pos": [
+      -19,
+      null,
+      -26
+     ],
+     "h": 7.6,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "feat_tavern#1",
+     "t": "feat_tavern",
+     "layer": 1,
+     "pos": [
+      -11.5,
+      null,
+      -32
+     ],
+     "h": 6.4,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "haystack#1",
+     "t": "haystack",
+     "layer": 2,
+     "pos": [
+      -13.2,
+      null,
+      -10
+     ],
+     "h": 2.4,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "prop_crates#1",
+     "t": "prop_crates",
+     "layer": 2,
+     "pos": [
+      16.5,
+      null,
+      -8
+     ],
+     "h": 2.4,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "hero_fence#1",
+     "t": "hero_fence",
+     "layer": 2,
+     "pos": [
+      -8.6,
+      null,
+      -6
+     ],
+     "h": 1.5,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "hero_fence#2",
+     "t": "hero_fence",
+     "layer": 2,
+     "pos": [
+      -8.6,
+      null,
+      -12
+     ],
+     "h": 1.5,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "hero_fence#3",
+     "t": "hero_fence",
+     "layer": 2,
+     "pos": [
+      -8.6,
+      null,
+      -18
+     ],
+     "h": 1.5,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "prop_signpost#1",
+     "t": "prop_signpost",
+     "layer": 2,
+     "pos": [
+      -6.5,
+      null,
+      -2
+     ],
+     "h": 3.2,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "prop_lantern#1",
+     "t": "prop_lantern",
+     "layer": 2,
+     "pos": [
+      5.2,
+      null,
+      -4
+     ],
+     "h": 3.6,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "hero_cart#1",
+     "t": "hero_cart",
+     "layer": 2,
+     "pos": [
+      9.5,
+      null,
+      -6
+     ],
+     "h": 2.2,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "prop_stones#1",
+     "t": "prop_stones",
+     "layer": 2,
+     "pos": [
+      -2.2,
+      null,
+      1.5
+     ],
+     "h": 0.9,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "grass_tuft_a#1",
+     "t": "grass_tuft_a",
+     "layer": 2,
+     "pos": [
+      -5.4,
+      null,
+      -3
+     ],
+     "h": 0.8,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "grass_tuft_b#1",
+     "t": "grass_tuft_b",
+     "layer": 2,
+     "pos": [
+      5.6,
+      null,
+      -9
+     ],
+     "h": 0.9,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "grass_tuft_a#2",
+     "t": "grass_tuft_a",
+     "layer": 2,
+     "pos": [
+      -5.8,
+      null,
+      -15
+     ],
+     "h": 0.8,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "rock_s#1",
+     "t": "rock_s",
+     "layer": 2,
+     "pos": [
+      7.4,
+      null,
+      0
+     ],
+     "h": 0.7,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "hero_tree_a#3",
+     "t": "hero_tree_a",
+     "layer": 3,
+     "pos": [
+      -13,
+      null,
+      9
+     ],
+     "h": 20,
+     "rotY": 0,
+     "visible": true,
+     "dim": 0.22,
+     "blur": 2.6
+    },
+    {
+     "id": "hero_tree_b#2",
+     "t": "hero_tree_b",
+     "layer": 3,
+     "pos": [
+      12.5,
+      null,
+      11
+     ],
+     "h": 9,
+     "rotY": 0,
+     "visible": true,
+     "dim": 0.26,
+     "blur": 2.6
+    },
+    {
+     "id": "grass_tuft_b#2",
+     "t": "grass_tuft_b",
+     "layer": 2,
+     "pos": [
+      -4.6,
+      null,
+      -28
+     ],
+     "h": 0.8,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "rock_s#2",
+     "t": "rock_s",
+     "layer": 2,
+     "pos": [
+      4.8,
+      null,
+      -34
+     ],
+     "h": 0.7,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "grass_tuft_a#3",
+     "t": "grass_tuft_a",
+     "layer": 2,
+     "pos": [
+      -5,
+      null,
+      -42
+     ],
+     "h": 0.8,
+     "rotY": 0,
+     "visible": true,
+     "dim": 0.95
+    },
+    {
+     "id": "rock_m#1",
+     "t": "rock_m",
+     "layer": 2,
+     "pos": [
+      5.4,
+      null,
+      -52
+     ],
+     "h": 1.2,
+     "rotY": 0,
+     "visible": true,
+     "dim": 0.9
+    },
+    {
+     "id": "grass_tuft_b#3",
+     "t": "grass_tuft_b",
+     "layer": 2,
+     "pos": [
+      -5.2,
+      null,
+      -62
+     ],
+     "h": 0.8,
+     "rotY": 0,
+     "visible": true,
+     "dim": 0.85
+    },
+    {
+     "id": "rock_s#3",
+     "t": "rock_s",
+     "layer": 2,
+     "pos": [
+      5,
+      null,
+      -70
+     ],
+     "h": 0.7,
+     "rotY": 0,
+     "visible": true,
+     "dim": 0.8
+    }
+   ],
+   "boards": [
+    {
+     "id": "board:village",
+     "key": "village",
+     "kind": "wood",
+     "pos": [
+      6.4,
+      null,
+      -18
+     ],
+     "h": 5,
+     "rotY": -0.24,
+     "visible": true
+    },
+    {
+     "id": "board:village_world",
+     "key": "village_world",
+     "kind": "wood",
+     "pos": [
+      -6.4,
+      null,
+      -31
+     ],
+     "h": 4.8,
+     "rotY": 0.24,
+     "visible": true
+    }
+   ]
+  },
+  "forest": {
+   "sprites": [
+    {
+     "id": "hill_dark#1",
+     "t": "hill_dark",
+     "layer": 0,
+     "pos": [
+      -13,
+      -2,
+      -78
+     ],
+     "h": 32,
+     "rotY": 0,
+     "visible": true,
+     "dim": 0.34
+    },
+    {
+     "id": "hill_dark#2",
+     "t": "hill_dark",
+     "layer": 0,
+     "pos": [
+      13,
+      -2,
+      -78
+     ],
+     "h": 32,
+     "rotY": 0,
+     "visible": true,
+     "dim": 0.34
+    },
+    {
+     "id": "cloud_c#1",
+     "t": "cloud_c",
+     "layer": 0,
+     "pos": [
+      -18,
+      32,
+      -90
+     ],
+     "h": 8,
+     "rotY": 0,
+     "visible": true,
+     "dim": 0.7,
+     "drift": 0.2,
+     "span": 110
+    },
+    {
+     "id": "biome_pine_a#1",
+     "t": "biome_pine_a",
+     "layer": 0,
+     "pos": [
+      -31,
+      null,
+      -44
+     ],
+     "h": 16,
+     "rotY": 0,
+     "visible": true,
+     "dim": 0.66
+    },
+    {
+     "id": "biome_pine_b#1",
+     "t": "biome_pine_b",
+     "layer": 0,
+     "pos": [
+      27,
+      null,
+      -36
+     ],
+     "h": 14,
+     "rotY": 0,
+     "visible": true,
+     "dim": 0.72
+    },
+    {
+     "id": "biome_deadtree#1",
+     "t": "biome_deadtree",
+     "layer": 0,
+     "pos": [
+      -17,
+      null,
+      -50
+     ],
+     "h": 12,
+     "rotY": 0,
+     "visible": true,
+     "dim": 0.6
+    },
+    {
+     "id": "biome_pine_b#2",
+     "t": "biome_pine_b",
+     "layer": 1,
+     "pos": [
+      -17,
+      null,
+      -15
+     ],
+     "h": 12,
+     "rotY": 0,
+     "visible": true,
+     "sway": true
+    },
+    {
+     "id": "biome_deadtree#2",
+     "t": "biome_deadtree",
+     "layer": 1,
+     "pos": [
+      1.5,
+      null,
+      -20
+     ],
+     "h": 9,
+     "rotY": 0,
+     "visible": true,
+     "sway": true
+    },
+    {
+     "id": "biome_pine_a#2",
+     "t": "biome_pine_a",
+     "layer": 1,
+     "pos": [
+      11,
+      null,
+      -16
+     ],
+     "h": 13.5,
+     "rotY": 0,
+     "visible": true,
+     "sway": true
+    },
+    {
+     "id": "rock_m#1",
+     "t": "rock_m",
+     "layer": 2,
+     "pos": [
+      -8.5,
+      null,
+      -13
+     ],
+     "h": 1.9,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "fern#1",
+     "t": "fern",
+     "layer": 2,
+     "pos": [
+      -5.2,
+      null,
+      -9
+     ],
+     "h": 1.2,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "mushrooms#1",
+     "t": "mushrooms",
+     "layer": 2,
+     "pos": [
+      -3.4,
+      null,
+      -4
+     ],
+     "h": 0.8,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "biome_stump#1",
+     "t": "biome_stump",
+     "layer": 2,
+     "pos": [
+      1.2,
+      null,
+      -6
+     ],
+     "h": 1.9,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "fern#2",
+     "t": "fern",
+     "layer": 2,
+     "pos": [
+      4.6,
+      null,
+      -11
+     ],
+     "h": 1.1,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "mushrooms#2",
+     "t": "mushrooms",
+     "layer": 2,
+     "pos": [
+      6.2,
+      null,
+      -3
+     ],
+     "h": 0.9,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "rock_s#1",
+     "t": "rock_s",
+     "layer": 2,
+     "pos": [
+      8.4,
+      null,
+      -17
+     ],
+     "h": 1,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "biome_pine_a#3",
+     "t": "biome_pine_a",
+     "layer": 3,
+     "pos": [
+      -11,
+      null,
+      8
+     ],
+     "h": 22,
+     "rotY": 0,
+     "visible": true,
+     "dim": 0.2,
+     "blur": 2.6
+    },
+    {
+     "id": "biome_pine_b#3",
+     "t": "biome_pine_b",
+     "layer": 3,
+     "pos": [
+      10.5,
+      null,
+      10
+     ],
+     "h": 19,
+     "rotY": 0,
+     "visible": true,
+     "dim": 0.22,
+     "blur": 2.6
+    },
+    {
+     "id": "mushrooms#3",
+     "t": "mushrooms",
+     "layer": 2,
+     "pos": [
+      -4.6,
+      null,
+      -24
+     ],
+     "h": 0.8,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "rock_s#2",
+     "t": "rock_s",
+     "layer": 2,
+     "pos": [
+      4.8,
+      null,
+      -31
+     ],
+     "h": 0.9,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "fern#3",
+     "t": "fern",
+     "layer": 2,
+     "pos": [
+      -5,
+      null,
+      -39
+     ],
+     "h": 1,
+     "rotY": 0,
+     "visible": true,
+     "dim": 0.95
+    },
+    {
+     "id": "rock_m#2",
+     "t": "rock_m",
+     "layer": 2,
+     "pos": [
+      5.2,
+      null,
+      -48
+     ],
+     "h": 1.3,
+     "rotY": 0,
+     "visible": true,
+     "dim": 0.9
+    },
+    {
+     "id": "mushrooms#4",
+     "t": "mushrooms",
+     "layer": 2,
+     "pos": [
+      -5,
+      null,
+      -58
+     ],
+     "h": 0.8,
+     "rotY": 0,
+     "visible": true,
+     "dim": 0.85
+    },
+    {
+     "id": "fern#4",
+     "t": "fern",
+     "layer": 2,
+     "pos": [
+      4.8,
+      null,
+      -68
+     ],
+     "h": 1,
+     "rotY": 0,
+     "visible": true,
+     "dim": 0.8
+    }
+   ],
+   "boards": [
+    {
+     "id": "board:forest",
+     "key": "forest",
+     "kind": "wood",
+     "pos": [
+      -6.6,
+      null,
+      -17
+     ],
+     "h": 4.8,
+     "rotY": 0.24,
+     "visible": true
+    }
+   ]
+  },
+  "mine": {
+   "sprites": [
+    {
+     "id": "biome_orevein#1",
+     "t": "biome_orevein",
+     "layer": 0,
+     "pos": [
+      -13,
+      null,
+      -44
+     ],
+     "h": 24,
+     "rotY": 0,
+     "visible": true,
+     "dim": 0.58
+    },
+    {
+     "id": "biome_orevein#2",
+     "t": "biome_orevein",
+     "layer": 0,
+     "pos": [
+      12,
+      null,
+      -40
+     ],
+     "h": 21,
+     "rotY": 0,
+     "visible": true,
+     "dim": 0.54
+    },
+    {
+     "id": "biome_orevein#3",
+     "t": "biome_orevein",
+     "layer": 1,
+     "pos": [
+      -15,
+      null,
+      -15
+     ],
+     "h": 10,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "feat_mining#1",
+     "t": "feat_mining",
+     "layer": 1,
+     "pos": [
+      3.5,
+      null,
+      -13
+     ],
+     "h": 5.2,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "biome_crystals#1",
+     "t": "biome_crystals",
+     "layer": 1,
+     "pos": [
+      15.5,
+      null,
+      -15
+     ],
+     "h": 7.2,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "beam_frame#1",
+     "t": "beam_frame",
+     "layer": 2,
+     "pos": [
+      0,
+      8.2,
+      -9
+     ],
+     "h": 5.6,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "beam_frame#2",
+     "t": "beam_frame",
+     "layer": 2,
+     "pos": [
+      0,
+      8.6,
+      -25
+     ],
+     "h": 5.8,
+     "rotY": 0,
+     "visible": true,
+     "dim": 0.8
+    },
+    {
+     "id": "lantern_chain#1",
+     "t": "lantern_chain",
+     "layer": 2,
+     "pos": [
+      -4.4,
+      5,
+      -19
+     ],
+     "h": 2.4,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "lantern_chain#2",
+     "t": "lantern_chain",
+     "layer": 2,
+     "pos": [
+      4.8,
+      5.4,
+      -31
+     ],
+     "h": 2.4,
+     "rotY": 0,
+     "visible": true,
+     "dim": 0.9
+    },
+    {
+     "id": "stalagmite_a#1",
+     "t": "stalagmite_a",
+     "layer": 2,
+     "pos": [
+      -7.2,
+      null,
+      -11
+     ],
+     "h": 2.6,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "stalagmite_b#1",
+     "t": "stalagmite_b",
+     "layer": 2,
+     "pos": [
+      -5.6,
+      null,
+      -7
+     ],
+     "h": 1.5,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "stalagmite_a#2",
+     "t": "stalagmite_a",
+     "layer": 2,
+     "pos": [
+      7.8,
+      null,
+      -21
+     ],
+     "h": 2.4,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "stalagmite_b#2",
+     "t": "stalagmite_b",
+     "layer": 2,
+     "pos": [
+      6.4,
+      null,
+      -8
+     ],
+     "h": 1.4,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "minecart#1",
+     "t": "minecart",
+     "layer": 2,
+     "pos": [
+      -5.8,
+      null,
+      -14
+     ],
+     "h": 1.9,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "feat_craft#1",
+     "t": "feat_craft",
+     "layer": 1,
+     "pos": [
+      -11.2,
+      null,
+      -35
+     ],
+     "h": 4,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "ore_pile#1",
+     "t": "ore_pile",
+     "layer": 2,
+     "pos": [
+      5.4,
+      null,
+      -11
+     ],
+     "h": 1.1,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "ore_pile#2",
+     "t": "ore_pile",
+     "layer": 2,
+     "pos": [
+      -2.6,
+      null,
+      -24
+     ],
+     "h": 1,
+     "rotY": 0,
+     "visible": true,
+     "dim": 0.9
+    },
+    {
+     "id": "biome_brazier#1",
+     "t": "biome_brazier",
+     "layer": 2,
+     "pos": [
+      -3.4,
+      null,
+      -5
+     ],
+     "h": 2.9,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "biome_crystals#2",
+     "t": "biome_crystals",
+     "layer": 2,
+     "pos": [
+      12,
+      null,
+      -3
+     ],
+     "h": 3.4,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "biome_orevein#4",
+     "t": "biome_orevein",
+     "layer": 3,
+     "pos": [
+      -14,
+      null,
+      9
+     ],
+     "h": 20,
+     "rotY": 0,
+     "visible": true,
+     "dim": 0.18,
+     "blur": 2.6
+    },
+    {
+     "id": "biome_orevein#5",
+     "t": "biome_orevein",
+     "layer": 3,
+     "pos": [
+      13,
+      null,
+      11
+     ],
+     "h": 18,
+     "rotY": 0,
+     "visible": true,
+     "dim": 0.2,
+     "blur": 2.6
+    },
+    {
+     "id": "ore_pile#3",
+     "t": "ore_pile",
+     "layer": 2,
+     "pos": [
+      -4.6,
+      null,
+      -30
+     ],
+     "h": 0.9,
+     "rotY": 0,
+     "visible": true,
+     "dim": 0.95
+    },
+    {
+     "id": "stalagmite_b#3",
+     "t": "stalagmite_b",
+     "layer": 2,
+     "pos": [
+      5,
+      null,
+      -38
+     ],
+     "h": 1.2,
+     "rotY": 0,
+     "visible": true,
+     "dim": 0.9
+    },
+    {
+     "id": "ore_pile#4",
+     "t": "ore_pile",
+     "layer": 2,
+     "pos": [
+      -5.2,
+      null,
+      -48
+     ],
+     "h": 0.9,
+     "rotY": 0,
+     "visible": true,
+     "dim": 0.85
+    },
+    {
+     "id": "stalagmite_a#3",
+     "t": "stalagmite_a",
+     "layer": 2,
+     "pos": [
+      5.4,
+      null,
+      -58
+     ],
+     "h": 1.6,
+     "rotY": 0,
+     "visible": true,
+     "dim": 0.8
+    },
+    {
+     "id": "ore_pile#5",
+     "t": "ore_pile",
+     "layer": 2,
+     "pos": [
+      -4.8,
+      null,
+      -68
+     ],
+     "h": 0.8,
+     "rotY": 0,
+     "visible": true,
+     "dim": 0.75
+    }
+   ],
+   "boards": [
+    {
+     "id": "board:mine_mining",
+     "key": "mine_mining",
+     "kind": "wood",
+     "pos": [
+      -6.2,
+      null,
+      -13
+     ],
+     "h": 4.6,
+     "rotY": 0.26,
+     "visible": true
+    },
+    {
+     "id": "board:mine_pvp",
+     "key": "mine_pvp",
+     "kind": "wood",
+     "pos": [
+      6.4,
+      null,
+      -23
+     ],
+     "h": 4.6,
+     "rotY": -0.26,
+     "visible": true
+    },
+    {
+     "id": "board:mine_craft",
+     "key": "mine_craft",
+     "kind": "wood",
+     "pos": [
+      -6.4,
+      null,
+      -32
+     ],
+     "h": 4.6,
+     "rotY": 0.26,
+     "visible": true
+    }
+   ]
+  },
+  "spirit": {
+   "sprites": [
+    {
+     "id": "biome_deadtree#1",
+     "t": "biome_deadtree",
+     "layer": 0,
+     "pos": [
+      -25,
+      null,
+      -50
+     ],
+     "h": 13,
+     "rotY": 0,
+     "visible": true,
+     "dim": 0.58
+    },
+    {
+     "id": "feat_death_alt#1",
+     "t": "feat_death_alt",
+     "layer": 0,
+     "pos": [
+      24,
+      null,
+      -58
+     ],
+     "h": 11,
+     "rotY": 0,
+     "visible": true,
+     "dim": 0.56
+    },
+    {
+     "id": "feat_death_alt#2",
+     "t": "feat_death_alt",
+     "layer": 1,
+     "pos": [
+      -16.5,
+      null,
+      -17
+     ],
+     "h": 7.6,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "biome_deadtree#2",
+     "t": "biome_deadtree",
+     "layer": 1,
+     "pos": [
+      -1.5,
+      null,
+      -18
+     ],
+     "h": 9.5,
+     "rotY": 0,
+     "visible": true,
+     "sway": true
+    },
+    {
+     "id": "feat_vendetta#1",
+     "t": "feat_vendetta",
+     "layer": 1,
+     "pos": [
+      1.5,
+      null,
+      -14
+     ],
+     "h": 7.4,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "feat_death#1",
+     "t": "feat_death",
+     "layer": 1,
+     "pos": [
+      16,
+      null,
+      -19
+     ],
+     "h": 7.6,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "grave_a#1",
+     "t": "grave_a",
+     "layer": 2,
+     "pos": [
+      -8.2,
+      null,
+      -11
+     ],
+     "h": 1.9,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "grave_b#1",
+     "t": "grave_b",
+     "layer": 2,
+     "pos": [
+      -6.4,
+      null,
+      -8
+     ],
+     "h": 1.6,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "grave_c#1",
+     "t": "grave_c",
+     "layer": 2,
+     "pos": [
+      -9.6,
+      null,
+      -7
+     ],
+     "h": 1.7,
+     "rotY": 0,
+     "visible": true,
+     "dim": 0.9
+    },
+    {
+     "id": "grave_a#2",
+     "t": "grave_a",
+     "layer": 2,
+     "pos": [
+      -3,
+      null,
+      -20
+     ],
+     "h": 1.8,
+     "rotY": 0,
+     "visible": true,
+     "dim": 0.9
+    },
+    {
+     "id": "grave_b#2",
+     "t": "grave_b",
+     "layer": 2,
+     "pos": [
+      -1.2,
+      null,
+      -23
+     ],
+     "h": 1.5,
+     "rotY": 0,
+     "visible": true,
+     "dim": 0.85
+    },
+    {
+     "id": "candles#1",
+     "t": "candles",
+     "layer": 2,
+     "pos": [
+      -7,
+      null,
+      -5
+     ],
+     "h": 0.9,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "candles#2",
+     "t": "candles",
+     "layer": 2,
+     "pos": [
+      2.6,
+      null,
+      -17
+     ],
+     "h": 0.8,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "rock_l#1",
+     "t": "rock_l",
+     "layer": 2,
+     "pos": [
+      10.5,
+      null,
+      -9
+     ],
+     "h": 2.6,
+     "rotY": 0,
+     "visible": true,
+     "dim": 0.9
+    },
+    {
+     "id": "biome_brazier#1",
+     "t": "biome_brazier",
+     "layer": 2,
+     "pos": [
+      4.5,
+      null,
+      -5
+     ],
+     "h": 2.7,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "biome_deadtree#3",
+     "t": "biome_deadtree",
+     "layer": 3,
+     "pos": [
+      -12,
+      null,
+      9
+     ],
+     "h": 21,
+     "rotY": 0,
+     "visible": true,
+     "dim": 0.18,
+     "blur": 2.6
+    },
+    {
+     "id": "grave_b#3",
+     "t": "grave_b",
+     "layer": 2,
+     "pos": [
+      -4.8,
+      null,
+      -30
+     ],
+     "h": 1.3,
+     "rotY": 0,
+     "visible": true,
+     "dim": 0.95
+    },
+    {
+     "id": "candles#3",
+     "t": "candles",
+     "layer": 2,
+     "pos": [
+      4.6,
+      null,
+      -37
+     ],
+     "h": 0.7,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "grave_a#3",
+     "t": "grave_a",
+     "layer": 2,
+     "pos": [
+      -5.2,
+      null,
+      -46
+     ],
+     "h": 1.4,
+     "rotY": 0,
+     "visible": true,
+     "dim": 0.9
+    },
+    {
+     "id": "grave_c#2",
+     "t": "grave_c",
+     "layer": 2,
+     "pos": [
+      5,
+      null,
+      -56
+     ],
+     "h": 1.3,
+     "rotY": 0,
+     "visible": true,
+     "dim": 0.85
+    },
+    {
+     "id": "grave_b#4",
+     "t": "grave_b",
+     "layer": 2,
+     "pos": [
+      -4.8,
+      null,
+      -66
+     ],
+     "h": 1.2,
+     "rotY": 0,
+     "visible": true,
+     "dim": 0.8
+    }
+   ],
+   "boards": [
+    {
+     "id": "board:spirit_vendetta",
+     "key": "spirit_vendetta",
+     "kind": "stone",
+     "pos": [
+      -6.2,
+      null,
+      -15
+     ],
+     "h": 4.8,
+     "rotY": 0.24,
+     "visible": true
+    },
+    {
+     "id": "board:spirit_death",
+     "key": "spirit_death",
+     "kind": "stone",
+     "pos": [
+      6.6,
+      null,
+      -24
+     ],
+     "h": 4.8,
+     "rotY": -0.24,
+     "visible": true
+    }
+   ]
+  },
+  "home": {
+   "sprites": [
+    {
+     "id": "moon#1",
+     "t": "moon",
+     "layer": 0,
+     "pos": [
+      15,
+      31,
+      -92
+     ],
+     "h": 5.5,
+     "rotY": 0,
+     "visible": true,
+     "nofog": true
+    },
+    {
+     "id": "cloud_b#1",
+     "t": "cloud_b",
+     "layer": 0,
+     "pos": [
+      -20,
+      28,
+      -84
+     ],
+     "h": 9,
+     "rotY": 0,
+     "visible": true,
+     "drift": 0.24,
+     "span": 110
+    },
+    {
+     "id": "cloud_a#1",
+     "t": "cloud_a",
+     "layer": 0,
+     "pos": [
+      22,
+      33,
+      -90
+     ],
+     "h": 8,
+     "rotY": 0,
+     "visible": true,
+     "dim": 0.9,
+     "drift": 0.18,
+     "span": 110
+    },
+    {
+     "id": "hero_tree_a#1",
+     "t": "hero_tree_a",
+     "layer": 0,
+     "pos": [
+      -31,
+      null,
+      -56
+     ],
+     "h": 14,
+     "rotY": 0,
+     "visible": true,
+     "dim": 0.7
+    },
+    {
+     "id": "biome_pine_b#1",
+     "t": "biome_pine_b",
+     "layer": 0,
+     "pos": [
+      26,
+      null,
+      -46
+     ],
+     "h": 13,
+     "rotY": 0,
+     "visible": true,
+     "dim": 0.68
+    },
+    {
+     "id": "hero_house_b#1",
+     "t": "hero_house_b",
+     "layer": 1,
+     "pos": [
+      -10,
+      null,
+      -16
+     ],
+     "h": 7.6,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "hero_tree_a#2",
+     "t": "hero_tree_a",
+     "layer": 1,
+     "pos": [
+      -1.5,
+      null,
+      -21
+     ],
+     "h": 8,
+     "rotY": 0,
+     "visible": true,
+     "sway": true
+    },
+    {
+     "id": "hero_house_a#1",
+     "t": "hero_house_a",
+     "layer": 1,
+     "pos": [
+      14.5,
+      null,
+      -15
+     ],
+     "h": 8.4,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "prop_lantern#1",
+     "t": "prop_lantern",
+     "layer": 2,
+     "pos": [
+      1.4,
+      null,
+      -3
+     ],
+     "h": 3.6,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "chest#1",
+     "t": "chest",
+     "layer": 2,
+     "pos": [
+      -3.6,
+      null,
+      -6
+     ],
+     "h": 1.4,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "hero_fence#1",
+     "t": "hero_fence",
+     "layer": 2,
+     "pos": [
+      -8.2,
+      null,
+      -10
+     ],
+     "h": 1.5,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "hero_fence#2",
+     "t": "hero_fence",
+     "layer": 2,
+     "pos": [
+      -8.2,
+      null,
+      -16
+     ],
+     "h": 1.5,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "haystack#1",
+     "t": "haystack",
+     "layer": 2,
+     "pos": [
+      10.8,
+      null,
+      -5
+     ],
+     "h": 2.3,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "grass_tuft_b#1",
+     "t": "grass_tuft_b",
+     "layer": 2,
+     "pos": [
+      -5.4,
+      null,
+      -3
+     ],
+     "h": 0.9,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "grass_tuft_a#1",
+     "t": "grass_tuft_a",
+     "layer": 2,
+     "pos": [
+      5.8,
+      null,
+      -13
+     ],
+     "h": 0.8,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "hero_tree_b#1",
+     "t": "hero_tree_b",
+     "layer": 3,
+     "pos": [
+      -12,
+      null,
+      9
+     ],
+     "h": 10,
+     "rotY": 0,
+     "visible": true,
+     "dim": 0.24,
+     "blur": 2.6
+    },
+    {
+     "id": "grass_tuft_a#2",
+     "t": "grass_tuft_a",
+     "layer": 2,
+     "pos": [
+      -4.8,
+      null,
+      -26
+     ],
+     "h": 0.8,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "rock_s#1",
+     "t": "rock_s",
+     "layer": 2,
+     "pos": [
+      5,
+      null,
+      -33
+     ],
+     "h": 0.7,
+     "rotY": 0,
+     "visible": true
+    },
+    {
+     "id": "grass_tuft_b#2",
+     "t": "grass_tuft_b",
+     "layer": 2,
+     "pos": [
+      -5.2,
+      null,
+      -43
+     ],
+     "h": 0.8,
+     "rotY": 0,
+     "visible": true,
+     "dim": 0.95
+    },
+    {
+     "id": "rock_m#1",
+     "t": "rock_m",
+     "layer": 2,
+     "pos": [
+      5.4,
+      null,
+      -54
+     ],
+     "h": 1.2,
+     "rotY": 0,
+     "visible": true,
+     "dim": 0.9
+    }
+   ],
+   "boards": [
+    {
+     "id": "board:home_factions",
+     "key": "home_factions",
+     "kind": "stone",
+     "pos": [
+      -6.4,
+      null,
+      -4
+     ],
+     "h": 4.6,
+     "rotY": 0.22,
+     "visible": true
+    },
+    {
+     "id": "board:home",
+     "key": "home",
+     "kind": "wood",
+     "pos": [
+      6.2,
+      null,
+      -19
+     ],
+     "h": 5,
+     "rotY": -0.24,
+     "visible": true
+    }
+   ],
+   "counter": {
+    "id": "counter",
+    "stall": {
+     "t": "feat_world",
+     "x": -8.6,
+     "z": -25,
+     "h": 6,
+     "layer": 1
+    },
+    "items": [
+     "res_iron",
+     "res_gold",
+     "res_diamond",
+     "res_wood",
+     "res_herbs",
+     "res_fish",
+     "res_sword",
+     "res_staff"
+    ],
+    "x0": -10.8,
+    "step": 0.62,
+    "y": 3.15,
+    "z": -24.2,
+    "h": 0.72,
+    "visible": true
+   }
+  }
+ }
+}

@@ -48,6 +48,38 @@
   leaves») дал целое дерево на 8 кадрах из 8 на обеих моделях — закрыт, ушёл в
   заметки к датасету v3.
 
+## Сборка сайта
+
+`journey3/node_modules` и `journey3/dist` в репозитории **не хранятся** — они
+лежали в истории и стоили 70 МБ на каждый клон. Поэтому в свежем клоне первым
+делом ставятся зависимости:
+
+```
+cd journey3
+npm ci                      # ровно версии из package-lock.json, не npm install
+npx vite build              # -> journey3/dist
+cd ..
+python tools/build_journey3.py deploy   # dist -> next/, next/ и коммитится
+```
+
+Если правились страницы или копия ассетов, перед сборкой:
+
+```
+python tools/build_journey3.py pages
+```
+
+Полный цикл с нуля, одной лентой:
+
+```
+git clone --single-branch --branch main https://github.com/p1pk4/fellmise-site.git
+cd fellmise-site/journey3 && npm ci && npx vite build && cd ..
+python tools/build_journey3.py deploy
+```
+
+`npm ci` требует `package-lock.json` и стирает `node_modules` перед установкой —
+это и нужно: сборка обязана быть воспроизводимой, а `npm install` может тихо
+подтянуть другие патч-версии.
+
 ## Порядок обработки
 
 1. `gen_*.py` — кадры в `out/site_assets/_raw/<id>/`

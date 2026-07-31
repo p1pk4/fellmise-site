@@ -1,0 +1,556 @@
+[
+ {
+  "loc": "en",
+  "biome": "village",
+  "shot": "en_village.png",
+  "boxes": [
+   {
+    "sel": "a.logo",
+    "text": "FELLMISE",
+    "color": "rgb(253, 246, 224)",
+    "size": "24px",
+    "weight": "700",
+    "x": 40,
+    "y": 13,
+    "w": 137,
+    "h": 38
+   },
+   {
+    "sel": "p.clock",
+    "text": "in Fellmise now: day",
+    "color": "rgb(253, 246, 224)",
+    "size": "11.52px",
+    "weight": "400",
+    "x": 663,
+    "y": 16,
+    "w": 177,
+    "h": 32
+   },
+   {
+    "sel": "span.-",
+    "text": "EN",
+    "color": "rgb(56, 59, 45)",
+    "size": "12px",
+    "weight": "400",
+    "x": 1326,
+    "y": 20,
+    "w": 34,
+    "h": 24
+   },
+   {
+    "sel": "a.-",
+    "text": "RU",
+    "color": "rgb(253, 246, 224)",
+    "size": "12px",
+    "weight": "400",
+    "x": 1366,
+    "y": 20,
+    "w": 34,
+    "h": 24
+   }
+  ]
+ },
+ {
+  "loc": "en",
+  "biome": "forest",
+  "shot": "en_forest.png",
+  "boxes": [
+   {
+    "sel": "a.logo",
+    "text": "FELLMISE",
+    "color": "rgb(253, 246, 224)",
+    "size": "24px",
+    "weight": "700",
+    "x": 40,
+    "y": 13,
+    "w": 137,
+    "h": 38
+   },
+   {
+    "sel": "p.clock",
+    "text": "in Fellmise now: day",
+    "color": "rgb(253, 246, 224)",
+    "size": "11.52px",
+    "weight": "400",
+    "x": 663,
+    "y": 16,
+    "w": 177,
+    "h": 32
+   },
+   {
+    "sel": "span.-",
+    "text": "EN",
+    "color": "rgb(56, 59, 45)",
+    "size": "12px",
+    "weight": "400",
+    "x": 1326,
+    "y": 20,
+    "w": 34,
+    "h": 24
+   },
+   {
+    "sel": "a.-",
+    "text": "RU",
+    "color": "rgb(253, 246, 224)",
+    "size": "12px",
+    "weight": "400",
+    "x": 1366,
+    "y": 20,
+    "w": 34,
+    "h": 24
+   }
+  ]
+ },
+ {
+  "loc": "en",
+  "biome": "mine",
+  "shot": "en_mine.png",
+  "boxes": [
+   {
+    "sel": "a.logo",
+    "text": "FELLMISE",
+    "color": "rgb(253, 246, 224)",
+    "size": "24px",
+    "weight": "700",
+    "x": 40,
+    "y": 13,
+    "w": 137,
+    "h": 38
+   },
+   {
+    "sel": "p.clock",
+    "text": "in Fellmise now: day",
+    "color": "rgb(253, 246, 224)",
+    "size": "11.52px",
+    "weight": "400",
+    "x": 663,
+    "y": 16,
+    "w": 177,
+    "h": 32
+   },
+   {
+    "sel": "span.-",
+    "text": "EN",
+    "color": "rgb(56, 59, 45)",
+    "size": "12px",
+    "weight": "400",
+    "x": 1326,
+    "y": 20,
+    "w": 34,
+    "h": 24
+   },
+   {
+    "sel": "a.-",
+    "text": "RU",
+    "color": "rgb(253, 246, 224)",
+    "size": "12px",
+    "weight": "400",
+    "x": 1366,
+    "y": 20,
+    "w": 34,
+    "h": 24
+   }
+  ]
+ },
+ {
+  "loc": "en",
+  "biome": "spirit",
+  "shot": "en_spirit.png",
+  "boxes": [
+   {
+    "sel": "a.logo",
+    "text": "FELLMISE",
+    "color": "rgb(253, 246, 224)",
+    "size": "24px",
+    "weight": "700",
+    "x": 40,
+    "y": 13,
+    "w": 137,
+    "h": 38
+   },
+   {
+    "sel": "p.clock",
+    "text": "in Fellmise now: day",
+    "color": "rgb(253, 246, 224)",
+    "size": "11.52px",
+    "weight": "400",
+    "x": 663,
+    "y": 16,
+    "w": 177,
+    "h": 32
+   },
+   {
+    "sel": "span.-",
+    "text": "EN",
+    "color": "rgb(56, 59, 45)",
+    "size": "12px",
+    "weight": "400",
+    "x": 1326,
+    "y": 20,
+    "w": 34,
+    "h": 24
+   },
+   {
+    "sel": "a.-",
+    "text": "RU",
+    "color": "rgb(253, 246, 224)",
+    "size": "12px",
+    "weight": "400",
+    "x": 1366,
+    "y": 20,
+    "w": 34,
+    "h": 24
+   }
+  ]
+ },
+ {
+  "loc": "en",
+  "biome": "home",
+  "shot": "en_home.png",
+  "boxes": [
+   {
+    "sel": "a.logo",
+    "text": "FELLMISE",
+    "color": "rgb(253, 246, 224)",
+    "size": "24px",
+    "weight": "700",
+    "x": 40,
+    "y": 13,
+    "w": 137,
+    "h": 38
+   },
+   {
+    "sel": "p.clock",
+    "text": "in Fellmise now: day",
+    "color": "rgb(253, 246, 224)",
+    "size": "11.52px",
+    "weight": "400",
+    "x": 663,
+    "y": 16,
+    "w": 177,
+    "h": 32
+   },
+   {
+    "sel": "span.-",
+    "text": "EN",
+    "color": "rgb(56, 59, 45)",
+    "size": "12px",
+    "weight": "400",
+    "x": 1326,
+    "y": 20,
+    "w": 34,
+    "h": 24
+   },
+   {
+    "sel": "a.-",
+    "text": "RU",
+    "color": "rgb(253, 246, 224)",
+    "size": "12px",
+    "weight": "400",
+    "x": 1366,
+    "y": 20,
+    "w": 34,
+    "h": 24
+   },
+   {
+    "sel": "button.btn btn--steam",
+    "text": "Wishlist on Steam — soon",
+    "color": "rgb(56, 59, 45)",
+    "size": "16.32px",
+    "weight": "700",
+    "x": 532,
+    "y": 616,
+    "w": 250,
+    "h": 60
+   },
+   {
+    "sel": "a.btn btn--discord",
+    "text": "Discord",
+    "color": "rgb(56, 59, 45)",
+    "size": "16.32px",
+    "weight": "700",
+    "x": 797,
+    "y": 616,
+    "w": 111,
+    "h": 60
+   }
+  ]
+ },
+ {
+  "loc": "ru",
+  "biome": "village",
+  "shot": "ru_village.png",
+  "boxes": [
+   {
+    "sel": "a.logo",
+    "text": "FELLMISE",
+    "color": "rgb(253, 246, 224)",
+    "size": "24px",
+    "weight": "700",
+    "x": 40,
+    "y": 13,
+    "w": 137,
+    "h": 38
+   },
+   {
+    "sel": "p.clock",
+    "text": "в Fellmise сейчас: день",
+    "color": "rgb(253, 246, 224)",
+    "size": "11.52px",
+    "weight": "400",
+    "x": 653,
+    "y": 16,
+    "w": 198,
+    "h": 32
+   },
+   {
+    "sel": "span.-",
+    "text": "RU",
+    "color": "rgb(56, 59, 45)",
+    "size": "12px",
+    "weight": "400",
+    "x": 1326,
+    "y": 20,
+    "w": 34,
+    "h": 24
+   },
+   {
+    "sel": "a.-",
+    "text": "EN",
+    "color": "rgb(253, 246, 224)",
+    "size": "12px",
+    "weight": "400",
+    "x": 1366,
+    "y": 20,
+    "w": 34,
+    "h": 24
+   }
+  ]
+ },
+ {
+  "loc": "ru",
+  "biome": "forest",
+  "shot": "ru_forest.png",
+  "boxes": [
+   {
+    "sel": "a.logo",
+    "text": "FELLMISE",
+    "color": "rgb(253, 246, 224)",
+    "size": "24px",
+    "weight": "700",
+    "x": 40,
+    "y": 13,
+    "w": 137,
+    "h": 38
+   },
+   {
+    "sel": "p.clock",
+    "text": "в Fellmise сейчас: день",
+    "color": "rgb(253, 246, 224)",
+    "size": "11.52px",
+    "weight": "400",
+    "x": 653,
+    "y": 16,
+    "w": 198,
+    "h": 32
+   },
+   {
+    "sel": "span.-",
+    "text": "RU",
+    "color": "rgb(56, 59, 45)",
+    "size": "12px",
+    "weight": "400",
+    "x": 1326,
+    "y": 20,
+    "w": 34,
+    "h": 24
+   },
+   {
+    "sel": "a.-",
+    "text": "EN",
+    "color": "rgb(253, 246, 224)",
+    "size": "12px",
+    "weight": "400",
+    "x": 1366,
+    "y": 20,
+    "w": 34,
+    "h": 24
+   }
+  ]
+ },
+ {
+  "loc": "ru",
+  "biome": "mine",
+  "shot": "ru_mine.png",
+  "boxes": [
+   {
+    "sel": "a.logo",
+    "text": "FELLMISE",
+    "color": "rgb(253, 246, 224)",
+    "size": "24px",
+    "weight": "700",
+    "x": 40,
+    "y": 13,
+    "w": 137,
+    "h": 38
+   },
+   {
+    "sel": "p.clock",
+    "text": "в Fellmise сейчас: день",
+    "color": "rgb(253, 246, 224)",
+    "size": "11.52px",
+    "weight": "400",
+    "x": 653,
+    "y": 16,
+    "w": 198,
+    "h": 32
+   },
+   {
+    "sel": "span.-",
+    "text": "RU",
+    "color": "rgb(56, 59, 45)",
+    "size": "12px",
+    "weight": "400",
+    "x": 1326,
+    "y": 20,
+    "w": 34,
+    "h": 24
+   },
+   {
+    "sel": "a.-",
+    "text": "EN",
+    "color": "rgb(253, 246, 224)",
+    "size": "12px",
+    "weight": "400",
+    "x": 1366,
+    "y": 20,
+    "w": 34,
+    "h": 24
+   }
+  ]
+ },
+ {
+  "loc": "ru",
+  "biome": "spirit",
+  "shot": "ru_spirit.png",
+  "boxes": [
+   {
+    "sel": "a.logo",
+    "text": "FELLMISE",
+    "color": "rgb(253, 246, 224)",
+    "size": "24px",
+    "weight": "700",
+    "x": 40,
+    "y": 13,
+    "w": 137,
+    "h": 38
+   },
+   {
+    "sel": "p.clock",
+    "text": "в Fellmise сейчас: день",
+    "color": "rgb(253, 246, 224)",
+    "size": "11.52px",
+    "weight": "400",
+    "x": 653,
+    "y": 16,
+    "w": 198,
+    "h": 32
+   },
+   {
+    "sel": "span.-",
+    "text": "RU",
+    "color": "rgb(56, 59, 45)",
+    "size": "12px",
+    "weight": "400",
+    "x": 1326,
+    "y": 20,
+    "w": 34,
+    "h": 24
+   },
+   {
+    "sel": "a.-",
+    "text": "EN",
+    "color": "rgb(253, 246, 224)",
+    "size": "12px",
+    "weight": "400",
+    "x": 1366,
+    "y": 20,
+    "w": 34,
+    "h": 24
+   }
+  ]
+ },
+ {
+  "loc": "ru",
+  "biome": "home",
+  "shot": "ru_home.png",
+  "boxes": [
+   {
+    "sel": "a.logo",
+    "text": "FELLMISE",
+    "color": "rgb(253, 246, 224)",
+    "size": "24px",
+    "weight": "700",
+    "x": 40,
+    "y": 13,
+    "w": 137,
+    "h": 38
+   },
+   {
+    "sel": "p.clock",
+    "text": "в Fellmise сейчас: день",
+    "color": "rgb(253, 246, 224)",
+    "size": "11.52px",
+    "weight": "400",
+    "x": 653,
+    "y": 16,
+    "w": 198,
+    "h": 32
+   },
+   {
+    "sel": "span.-",
+    "text": "RU",
+    "color": "rgb(56, 59, 45)",
+    "size": "12px",
+    "weight": "400",
+    "x": 1326,
+    "y": 20,
+    "w": 34,
+    "h": 24
+   },
+   {
+    "sel": "a.-",
+    "text": "EN",
+    "color": "rgb(253, 246, 224)",
+    "size": "12px",
+    "weight": "400",
+    "x": 1366,
+    "y": 20,
+    "w": 34,
+    "h": 24
+   },
+   {
+    "sel": "button.btn btn--steam",
+    "text": "Wishlist в Steam — скоро",
+    "color": "rgb(56, 59, 45)",
+    "size": "16.32px",
+    "weight": "700",
+    "x": 533,
+    "y": 616,
+    "w": 248,
+    "h": 60
+   },
+   {
+    "sel": "a.btn btn--discord",
+    "text": "Discord",
+    "color": "rgb(56, 59, 45)",
+    "size": "16.32px",
+    "weight": "700",
+    "x": 796,
+    "y": 616,
+    "w": 111,
+    "h": 60
+   }
+  ]
+ }
+]

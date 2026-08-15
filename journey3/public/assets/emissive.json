@@ -1,11 +1,11 @@
 {
  "biome_brazier": {
   "kind": "fire",
-  "strength": 0.32,
+  "strength": 0.47,
   "colour": [
-   247,
-   171,
-   87
+   245,
+   164,
+   73
   ]
  },
  "biome_portal": {
@@ -13,7 +13,7 @@
   "strength": 0.32,
   "colour": [
    80,
-   236,
+   235,
    223
   ]
  },
@@ -21,9 +21,9 @@
   "kind": "pulse",
   "strength": 0.32,
   "colour": [
-   200,
-   81,
-   241
+   203,
+   83,
+   245
   ]
  },
  "prop_lantern": {
@@ -32,15 +32,15 @@
   "colour": [
    254,
    226,
-   62
+   63
   ]
  },
  "hero_house_a": {
   "kind": "steady",
-  "strength": 0.87,
+  "strength": 0.88,
   "colour": [
    253,
-   225,
+   223,
    149
   ]
  },
@@ -55,20 +55,20 @@
  },
  "feat_tavern": {
   "kind": "steady",
-  "strength": 0.67,
+  "strength": 0.8,
   "colour": [
-   254,
-   238,
-   148
+   252,
+   227,
+   97
   ]
  },
  "feat_death": {
   "kind": "fire",
-  "strength": 0.75,
+  "strength": 0.88,
   "colour": [
-   243,
-   220,
-   148
+   237,
+   166,
+   120
   ]
  },
  "biome_orevein": {
@@ -82,11 +82,11 @@
  },
  "feat_mining": {
   "kind": "pulse",
-  "strength": 0.62,
+  "strength": 0.53,
   "colour": [
-   88,
-   181,
-   214
+   95,
+   180,
+   212
   ]
  },
  "lantern_chain": {
@@ -103,7 +103,7 @@
   "strength": 0.32,
   "colour": [
    254,
-   220,
+   219,
    115
   ]
  }

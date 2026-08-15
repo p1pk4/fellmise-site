@@ -63,6 +63,15 @@ export async function createWorld({ canvas, tod }) {
     return p;
   }
 
+  /* Where everything stands. Placement is data, not code: this file is what
+     ?editor=1 writes back, and biomes.js keeps only the atmosphere. */
+  let LAYOUT = { biomes: {} };
+  try {
+    LAYOUT = await fetch(`${ASSETS}layout.json`).then((r) => r.json());
+  } catch {
+    console.warn('[j3] нет assets/layout.json — сцены будут пустыми');
+  }
+
   /* How much empty space each sprite has below its art, as a fraction of its
      height (tools/make_baselines.py). Without this a chest or a haystack floats
      by however much padding the cut happened to leave. */
@@ -81,13 +90,24 @@ export async function createWorld({ canvas, tod }) {
 
   const state = {
     renderer, scene, camera, tod,
-    groups: [], gates: [], sway: [], lights: [], emitters: [], boards: [], drift: [], backdrops: [],
+    groups: [], gates: [], sway: [], lights: [], emitters: [], boards: [], drift: [], backdrops: [], editable: [],
     ready: new Set(), loading: new Map(),
     clock: new THREE.Clock(), progress: 0, mouse: { x: 0, y: 0, cx: 0, cy: 0 },
+    layout: LAYOUT,          // the editor writes this back out
   };
+
+  /* Everything the editor is allowed to touch, by id. `spec` is the very object
+     that came out of layout.json, so writing the file back is a matter of
+     copying the mesh's transform into it — no second source of truth. `extra`
+     is for parts that must follow the main mesh, like a board's blank back. */
+  function register(id, kind, mesh, spec, group, extra = []) {
+    state.editable.push({ id, kind, mesh, spec: spec.src || spec, group, extra });
+  }
 
   /* ------------------------------------------------------------- primitives */
   async function makeSprite(spec, group) {
+    // the editor addresses objects by id; anything built without one is
+    // scenery the editor does not own (the counter's goods, for instance)
     const tex = await loadTex(spec.t);
     if (!tex) return null;
     const aspect = tex.image.width / tex.image.height;
@@ -113,8 +133,13 @@ export async function createWorld({ canvas, tod }) {
     // an explicit `y` means the thing is not on the floor — a cloud, the moon, a
     // lantern on a chain, goods on a counter. The ground test reads this rather
     // than keeping its own list of names.
+    mesh.userData.h0 = h;                       // высота, на которую построена геометрия
+    mesh.userData.gap = BASELINE[spec.t] || 0;   // пустота снизу, для пересадки при масштабе
+    mesh.rotation.y = spec.rotY || 0;
+    mesh.visible = spec.visible !== false;
     mesh.userData.standsOnGround = spec.y === undefined;
     group.add(mesh);
+    if (spec.id) register(spec.id, 'sprite', mesh, spec, group);
     // things hanging in the air cast nothing we could honestly place
     if (spec.shadow !== false && spec.y === undefined
         && spec.layer >= 1 && spec.layer <= 2) {
@@ -133,7 +158,7 @@ export async function createWorld({ canvas, tod }) {
       state.drift.push({ mesh, speed: spec.drift, span: spec.span || 90, x0: spec.x });
     }
     if (spec.sway) state.sway.push({ mesh, phase: Math.random() * 6.28 });
-    if (EMISSIVE[spec.t]) await addLight(group, spec, EMISSIVE[spec.t]);
+    if (EMISSIVE[spec.t]) await addLight(mesh, spec, EMISSIVE[spec.t]);
     return mesh;
   }
 
@@ -145,7 +170,7 @@ export async function createWorld({ canvas, tod }) {
 
      They are the only things above the bloom threshold, which is what makes the
      bloom selective without a second render pass. */
-  async function addLight(group, spec, info) {
+  async function addLight(host, spec, info) {
     const bleedTex = await loadTex(`${spec.t}_bleed`);
     const emTex = await loadTex(`${spec.t}_em`);
     if (!emTex) return;
@@ -158,17 +183,19 @@ export async function createWorld({ canvas, tod }) {
     // sprite already glows (see tools/make_emissive.py)
     const level = (spec.dim !== undefined ? spec.dim : 1) * (info.strength || 0.7);
 
+    /* The glow is a CHILD of the sprite it belongs to, at local (0,0,dz).
+       Parented to the biome instead, it stayed behind the moment a house was
+       moved — windows lighting up a tree, a fence, the bare ground. Now it
+       cannot come apart from its own wall, including when the editor drags
+       the house around. */
     const add = (role, tex, dz, opacity) => {
       const m = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({
         map: tex, transparent: true, opacity,
         blending: THREE.AdditiveBlending, depthWrite: false, fog: false,
       }));
-      // exactly where the sprite is, including things hung above the ground
-      const dy = spec.y !== undefined ? spec.y
-               : spec.h / 2 - (BASELINE[spec.t] || 0) * spec.h;
-      m.position.set(spec.x, dy, spec.z + dz);
+      m.position.set(0, 0, dz);
       m.renderOrder = 9;
-      group.add(m);
+      host.add(m);
       entry.parts.push({ role, mesh: m, base: opacity });
     };
 
@@ -276,12 +303,15 @@ export async function createWorld({ canvas, tod }) {
     back.rotation.y = def.ry || 0;
     back.renderOrder = 2;
     group.add(back);
+    mesh.visible = def.visible !== false;
+    back.visible = def.visible !== false;
     mesh.position.set(def.x, def.h / 2, def.z);
     // turned a little towards the road, so it reads as placed rather than pasted
     mesh.rotation.y = def.ry || 0;
     mesh.renderOrder = 2;
     group.add(mesh);
     state.boards.push({ key: def.key, mesh, fit: canvas.__fit });
+    if (def.id) register(def.id, 'board', mesh, def, group, [back]);
     return mesh;
   }
 
@@ -378,6 +408,21 @@ export async function createWorld({ canvas, tod }) {
     geo.setAttribute('color', new THREE.BufferAttribute(col, 4));
   }
 
+  /* layout.json keeps position as one array, which is what a person reads and
+     what the editor writes; the builders below want it spread out. */
+  /* `src` is deliberately the ORIGINAL entry out of layout.json, not a copy.
+     The editor writes a mesh's transform back into it, and Export stringifies
+     the same document that was loaded — so there is exactly one object per
+     thing on screen, and no step where the two can drift apart. */
+  function fromLayout(o) {
+    const [x, y, z] = o.pos;
+    return { ...o, x, y: y === null ? undefined : y, z, src: o };
+  }
+  function fromBoard(o) {
+    const [x, , z] = o.pos;
+    return { ...o, x, z, ry: o.rotY, src: o };
+  }
+
   /* ------------------------------------------------------------ biome build */
   async function buildBiome(i) {
     if (state.ready.has(i)) return;
@@ -390,11 +435,12 @@ export async function createWorld({ canvas, tod }) {
     scene.add(group);
     state.groups[i] = { group, def: b };
 
+    const L = LAYOUT.biomes[b.id] || {};
     const job = (async () => {
       await makeGround(b, group, i);
-      for (const s of b.sprites) await makeSprite(s, group);
-      for (const bd of (b.boards || [])) await makeBoard(bd, group);
-      if (b.counter) await makeCounter(b.counter, group);
+      for (const s of (L.sprites || [])) await makeSprite(fromLayout(s), group);
+      for (const bd of (L.boards || [])) await makeBoard(fromBoard(bd), group);
+      if (L.counter) await makeCounter(L.counter, group);
       const { makeEmitters } = await import('./life.js');
       state.emitters.push(...makeEmitters(THREE, group, b, dotTex));
       state.ready.add(i);

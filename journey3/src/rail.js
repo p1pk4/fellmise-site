@@ -119,6 +119,7 @@ export function bindRail({ gsap, ScrollTrigger, stage }) {
 
     updateAtmosphere(stage, progress);
     updateGates(stage, progress);
+    if (stage.editing) return;      // the editor owns the camera while it runs
     updateOccluders(stage);
     updateText(stage, progress);
   }

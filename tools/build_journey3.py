@@ -220,7 +220,7 @@ def pages():
     n = 0
     for p in (ROOT / "assets").iterdir():
         if p.suffix == ".webp" or p.name in ("favicon-32.png", "manifest.json", "og.jpg",
-                            "emissive.json", "baselines.json"):
+                            "emissive.json", "baselines.json", "layout.json"):
             shutil.copy2(p, pub / p.name)
             n += 1
     print(f"pages: index.html {(J3/'index.html').stat().st_size/1024:.1f} KB, "

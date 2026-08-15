@@ -115,6 +115,15 @@ async function boot() {
   await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
   document.body.classList.add('is-ready');
   window.__J3 = stage;             // handles for the smoke tests
+
+  /* The editor is a separate chunk that a normal visit never asks for: no
+     import, no bytes, no code path. It only exists behind ?editor=1. */
+  if (new URLSearchParams(location.search).has('editor')) {
+    const [{ startEditor }, THREE] = await Promise.all([
+      import('./editor.js'), import('three'),
+    ]);
+    await startEditor(stage, THREE);
+  }
 }
 
 /* ----------------------------------------------------- mobile menu-less nav */

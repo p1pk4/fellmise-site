@@ -40,15 +40,15 @@ import sys
 import time
 import traceback
 
-PIPELINE = pathlib.Path(r"D:\Dev\ART_Fellmise")
-sys.path.insert(0, str(PIPELINE / "scripts"))
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+import pipeline  # noqa: E402  — находит пайплайн, где бы он ни лежал
 import comfy_client as cc  # noqa: E402
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 OUT = ROOT / "out" / "lora_v2"
 ERRLOG = OUT / "errors.log"
-WORKFLOW = PIPELINE / "workflows" / "objects_battle_v1_archived.json"
-BORROW = PIPELINE / "archive" / "v1_era" / "output" / "acceptance_v2"
+WORKFLOW = pipeline.workflow("objects_battle_v1_archived.json")
+BORROW = pipeline.ROOT / "archive" / "v1_era" / "output" / "acceptance_v2"
 
 LORA_V1 = "fellmise_objects_v1.safetensors"
 LORA_V2 = "fellmise_sprite_v2.safetensors"

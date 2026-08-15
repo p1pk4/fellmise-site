@@ -18,14 +18,14 @@ import sys
 import time
 import traceback
 
-PIPELINE = pathlib.Path(r"D:\Dev\ART_Fellmise")
-sys.path.insert(0, str(PIPELINE / "scripts"))
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+import pipeline  # noqa: E402  — находит пайплайн, где бы он ни лежал
 import comfy_client as cc  # noqa: E402
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 RAW = ROOT / "out" / "site_assets" / "_raw"
 ERRLOG = ROOT / "out" / "site_assets" / "gen_errors.log"
-WORKFLOW = PIPELINE / "workflows" / "objects_battle_v1_archived.json"
+WORKFLOW = pipeline.workflow("objects_battle_v1_archived.json")
 
 SEEDS = [1001, 2002, 3003, 4004]
 PROMPT = "fllmse style, {obj}, game asset, top-down view, plain gray background"

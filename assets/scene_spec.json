@@ -1,0 +1,285 @@
+{
+  "version": 1,
+  "note": "Правила процедурной расстановки. Источник истины для generate_layout.py. Координаты: Z — ось движения камеры (0 = вход в биом, отрицательные = вглубь), X — поперёк дороги (0 = центр), Y считается посадкой на грунт.",
+
+  "global": {
+    "road_half_width": 3.2,
+    "lanes": {
+      "verge":  4.6,
+      "near":   7.4,
+      "mid":   11.5,
+      "far":   17.0,
+      "back":  26.0
+    },
+    "lane_jitter": { "x": 0.6, "z": 1.4 },
+    "seed": 20260731,
+    "camera_eye_height": 3.4,
+
+    "heights": {
+      "house":    7.4,
+      "barn":     8.6,
+      "tavern":   8.0,
+      "tree_big": 12.0,
+      "tree_mid":  8.4,
+      "pine":     13.0,
+      "bush":      2.2,
+      "fence":     1.6,
+      "well":      4.4,
+      "cart":      2.6,
+      "haystack":  2.4,
+      "crates":    1.8,
+      "lantern":   4.2,
+      "signpost":  3.0,
+      "board":     4.8,
+      "rock_s":    1.2,
+      "rock_m":    2.0,
+      "rock_l":    3.4,
+      "tuft":      1.1,
+      "grave":     2.2,
+      "candles":   1.0,
+      "brazier":   2.6,
+      "crystals":  4.6,
+      "orevein":   6.0,
+      "mining":    4.0,
+      "stalagmite":3.6,
+      "beam":      7.0,
+      "minecart":  2.8,
+      "ore_pile":  1.6,
+      "lantern_chain": 3.2,
+      "anvil":     2.4,
+      "stump":     1.6,
+      "fern":      1.4,
+      "mushrooms": 0.9,
+      "deadtree":  9.0,
+      "ship":      7.0,
+      "crypt":     6.0,
+      "totem":     5.2,
+      "chest":     1.6,
+      "cloud":     8.0,
+      "moon":      6.0,
+      "hill":     16.0
+    },
+
+    "rules": [
+      "Ничего не ставится в |X| < road_half_width + 0.8, кроме списка road_props.",
+      "Слой (layer) выводится из полосы: verge/near = 1, mid = 0.5, far/back = 0.",
+      "Объект дальше 60 по Z от камеры — только из группы 'backdrop'.",
+      "У каждой группы фиксированная внутренняя геометрия: смещения внутри группы НЕ джиттерятся.",
+      "rotY: объекты у левой обочины смотрят вправо-вниз (rotY -12..-4), у правой — влево-вниз (rotY 4..12), фасадом к дороге.",
+      "Вывеска (board) всегда в полосе verge своей остановки, rotY к камере ±10, никогда не за объектом, который описывает."
+    ],
+
+    "validator": {
+      "max_gap_z": 26,
+      "min_bbox_gap": 0.8,
+      "forbid_on_road": true,
+      "require_ground_contact": true,
+      "fail_on_violation": true
+    }
+  },
+
+  "road_props": ["prop_stones", "grass_tuft_a", "grass_tuft_b", "prop_signpost"],
+
+  "groups": {
+    "homestead": {
+      "desc": "усадьба: дом фасадом к дороге, забор перед ним, куст и травяной пучок",
+      "anchor": "house",
+      "members": [
+        { "t": "house", "dx": 0,    "dz": 0,   "h": "house" },
+        { "t": "hero_fence", "dx": -2.6, "dz": 3.4, "h": "fence" },
+        { "t": "hero_fence", "dx":  2.6, "dz": 3.4, "h": "fence" },
+        { "t": "hero_tree_b", "dx": 4.2, "dz": 1.2, "h": "bush" },
+        { "t": "grass_tuft_a", "dx": -3.6, "dz": 2.2, "h": "tuft" }
+      ]
+    },
+    "farmyard": {
+      "desc": "хозяйство: амбар, стог поодаль, телега",
+      "anchor": "barn",
+      "members": [
+        { "t": "barn", "dx": 0, "dz": 0, "h": "barn" },
+        { "t": "haystack", "dx": 4.0, "dz": 2.0, "h": "haystack" },
+        { "t": "hero_cart", "dx": -3.4, "dz": 3.0, "h": "cart" }
+      ]
+    },
+    "square": {
+      "desc": "площадь: колодец, фонарь, ящики",
+      "anchor": "hero_well",
+      "members": [
+        { "t": "hero_well", "dx": 0, "dz": 0, "h": "well" },
+        { "t": "prop_lantern", "dx": 3.0, "dz": -1.0, "h": "lantern" },
+        { "t": "prop_crates", "dx": -2.4, "dz": 1.4, "h": "crates" }
+      ]
+    },
+    "grove": {
+      "desc": "роща: большое дерево + подлесок",
+      "anchor": "hero_tree_a",
+      "members": [
+        { "t": "hero_tree_a", "dx": 0, "dz": 0, "h": "tree_mid", "sway": true },
+        { "t": "hero_tree_b", "dx": 3.0, "dz": 1.6, "h": "bush" },
+        { "t": "grass_tuft_b", "dx": -2.2, "dz": 1.8, "h": "tuft" }
+      ]
+    },
+    "pine_stand": {
+      "desc": "участок хвойного леса",
+      "anchor": "biome_pine_a",
+      "members": [
+        { "t": "biome_pine_a", "dx": 0, "dz": 0, "h": "pine", "sway": true },
+        { "t": "biome_pine_b", "dx": 4.4, "dz": -2.6, "h": "pine" },
+        { "t": "fern", "dx": -2.0, "dz": 2.2, "h": "fern" },
+        { "t": "mushrooms", "dx": 2.4, "dz": 3.0, "h": "mushrooms" }
+      ]
+    },
+    "cutting": {
+      "desc": "вырубка: пень, брёвна, папоротник",
+      "anchor": "biome_stump",
+      "members": [
+        { "t": "biome_stump", "dx": 0, "dz": 0, "h": "stump" },
+        { "t": "res_wood", "dx": 2.2, "dz": 1.0, "h": "crates" },
+        { "t": "fern", "dx": -1.8, "dz": 1.6, "h": "fern" }
+      ]
+    },
+    "mine_section": {
+      "desc": "секция штольни: крепь над дорогой, фонарь на цепи, куча руды",
+      "anchor": "beam_frame",
+      "members": [
+        { "t": "beam_frame", "dx": 0, "dz": 0, "h": "beam", "over_road": true },
+        { "t": "lantern_chain", "dx": 2.2, "dz": 0.4, "h": "lantern_chain", "hanging": true },
+        { "t": "ore_pile", "dx": 3.6, "dz": 2.4, "h": "ore_pile" }
+      ]
+    },
+    "vein_pocket": {
+      "desc": "карман с жилой: руда, кристаллы, сталагмит",
+      "anchor": "feat_mining",
+      "members": [
+        { "t": "feat_mining", "dx": 0, "dz": 0, "h": "mining" },
+        { "t": "biome_crystals", "dx": 3.4, "dz": -1.6, "h": "crystals" },
+        { "t": "stalagmite_a", "dx": -2.6, "dz": 1.8, "h": "stalagmite" }
+      ]
+    },
+    "graveplot": {
+      "desc": "погост: два-три надгробия и свечи",
+      "anchor": "grave_a",
+      "members": [
+        { "t": "grave_a", "dx": 0, "dz": 0, "h": "grave" },
+        { "t": "grave_b", "dx": 2.4, "dz": 1.4, "h": "grave" },
+        { "t": "candles", "dx": -1.4, "dz": 1.8, "h": "candles" }
+      ]
+    },
+    "backdrop_pines": {
+      "desc": "стена леса на заднике",
+      "anchor": "biome_pine_b",
+      "members": [
+        { "t": "biome_pine_b", "dx": 0, "dz": 0, "h": "pine", "dim": 0.7 },
+        { "t": "biome_pine_b", "dx": 6.0, "dz": -3.0, "h": "pine", "dim": 0.62 },
+        { "t": "biome_pine_a", "dx": -5.4, "dz": -2.0, "h": "pine", "dim": 0.66 }
+      ]
+    }
+  },
+
+  "biomes": {
+    "village": {
+      "length_z": 100,
+      "whitelist": ["hero_house_b", "hero_house_a", "barn", "feat_tavern", "hero_well", "hero_fence", "hero_cart", "haystack", "prop_crates", "prop_lantern", "prop_signpost", "hero_tree_a", "hero_tree_b", "grass_tuft_a", "grass_tuft_b", "rock_s", "rock_m", "prop_stones", "cloud_a", "cloud_b", "cloud_c", "biome_pine_b", "biome_pine_a", "hill_green"],
+      "blacklist_reason": "хвойные и холмы — только в полосе back как задник; надгробия, кристаллы, шахтное — запрещены",
+      "rhythm": [
+        { "z": -8,  "side": "L", "lane": "near", "group": "homestead", "house": "hero_house_b" },
+        { "z": -12, "side": "R", "lane": "verge", "group": "square" },
+        { "z": -22, "side": "R", "lane": "near", "group": "homestead", "house": "hero_house_b" },
+        { "z": -30, "side": "L", "lane": "mid",  "group": "grove" },
+        { "z": -38, "side": "L", "lane": "near", "group": "farmyard" },
+        { "z": -46, "side": "R", "lane": "near", "single": "feat_tavern", "h": "tavern" },
+        { "z": -56, "side": "R", "lane": "mid",  "group": "grove" },
+        { "z": -64, "side": "L", "lane": "near", "group": "homestead", "house": "hero_house_b" }
+      ],
+      "boards": [
+        { "z": -16, "side": "R", "key": "slogan" },
+        { "z": -42, "side": "L", "key": "world_plays_itself" }
+      ],
+      "backdrop": { "lane": "back", "group": "backdrop_pines", "every_z": 24, "from_z": -20, "to_z": -95 },
+      "sky": { "clouds": 4, "z_range": [-95, -60], "y_range": [26, 36] },
+      "scatter": { "types": ["grass_tuft_a", "grass_tuft_b", "rock_s", "prop_stones"], "count": 14, "lanes": ["verge", "near"], "avoid_road": true }
+    },
+
+    "forest": {
+      "length_z": 95,
+      "whitelist": ["biome_pine_a", "biome_pine_b", "biome_deadtree", "biome_stump", "fern", "mushrooms", "rock_s", "rock_m", "grass_tuft_a", "res_wood", "cloud_c"],
+      "rhythm": [
+        { "z": -10, "side": "L", "lane": "near", "group": "pine_stand" },
+        { "z": -18, "side": "R", "lane": "near", "group": "pine_stand" },
+        { "z": -28, "side": "R", "lane": "verge", "group": "cutting" },
+        { "z": -36, "side": "L", "lane": "mid",  "group": "pine_stand" },
+        { "z": -46, "side": "L", "lane": "near", "single": "biome_deadtree", "h": "deadtree" },
+        { "z": -54, "side": "R", "lane": "near", "group": "pine_stand" },
+        { "z": -64, "side": "L", "lane": "verge", "group": "cutting" }
+      ],
+      "boards": [ { "z": -24, "side": "L", "key": "skills_no_levels" } ],
+      "backdrop": { "lane": "back", "group": "backdrop_pines", "every_z": 18, "from_z": -14, "to_z": -92 },
+      "sky": { "clouds": 2, "z_range": [-90, -70], "y_range": [28, 34] },
+      "scatter": { "types": ["mushrooms", "fern", "rock_s", "grass_tuft_a"], "count": 16, "lanes": ["verge", "near"], "avoid_road": true }
+    },
+
+    "mine": {
+      "length_z": 75,
+      "whitelist": ["beam_frame", "lantern_chain", "biome_orevein", "feat_mining", "biome_crystals", "stalagmite_a", "stalagmite_b", "minecart", "ore_pile", "biome_brazier", "feat_craft"],
+      "note": "узкий коридор: полосы far/back не используются, стены штольни ограничивают X",
+      "lane_override": { "verge": 4.2, "near": 6.4, "mid": 8.8 },
+      "rhythm": [
+        { "z": -8,  "side": "C", "lane": "verge", "group": "mine_section" },
+        { "z": -16, "side": "L", "lane": "near",  "single": "biome_brazier", "h": "brazier" },
+        { "z": -22, "side": "R", "lane": "near",  "group": "vein_pocket" },
+        { "z": -32, "side": "C", "lane": "verge", "group": "mine_section" },
+        { "z": -40, "side": "L", "lane": "near",  "single": "minecart", "h": "minecart" },
+        { "z": -46, "side": "R", "lane": "near",  "single": "feat_craft", "h": "anvil" },
+        { "z": -56, "side": "L", "lane": "near",  "group": "vein_pocket" }
+      ],
+      "boards": [
+        { "z": -26, "side": "L", "key": "mining" },
+        { "z": -36, "side": "R", "key": "fights_that_last" },
+        { "z": -50, "side": "L", "key": "crafting" }
+      ],
+      "backdrop": null,
+      "sky": null,
+      "scatter": { "types": ["ore_pile", "stalagmite_b", "rock_s"], "count": 10, "lanes": ["verge"], "avoid_road": true }
+    },
+
+    "spirit": {
+      "length_z": 75,
+      "whitelist": ["biome_deadtree", "grave_a", "grave_b", "grave_c", "candles", "feat_death", "feat_death_alt", "feat_vendetta", "biome_brazier", "rock_l", "rock_m"],
+      "rhythm": [
+        { "z": -10, "side": "L", "lane": "near", "single": "feat_death_alt", "h": "ship" },
+        { "z": -16, "side": "R", "lane": "verge", "group": "graveplot" },
+        { "z": -26, "side": "L", "lane": "mid",  "single": "biome_deadtree", "h": "deadtree" },
+        { "z": -34, "side": "R", "lane": "near", "single": "feat_vendetta", "h": "totem" },
+        { "z": -44, "side": "L", "lane": "verge", "group": "graveplot" },
+        { "z": -52, "side": "R", "lane": "near", "single": "biome_brazier", "h": "brazier" },
+        { "z": -62, "side": "C", "lane": "near", "single": "feat_death", "h": "crypt", "is_gate": true }
+      ],
+      "boards": [
+        { "z": -30, "side": "R", "key": "vendetta" },
+        { "z": -48, "side": "L", "key": "death_is_a_place" }
+      ],
+      "backdrop": { "lane": "back", "single": "biome_deadtree", "every_z": 22, "from_z": -20, "to_z": -70, "dim": 0.5 },
+      "sky": null,
+      "scatter": { "types": ["grave_c", "candles", "rock_m"], "count": 12, "lanes": ["verge", "near"], "avoid_road": true }
+    },
+
+    "home": {
+      "length_z": 90,
+      "whitelist": ["hero_house_b", "hero_fence", "hero_tree_a", "hero_tree_b", "chest", "prop_lantern", "haystack", "grass_tuft_a", "grass_tuft_b", "rock_s", "rock_m", "cloud_a", "cloud_b", "moon", "biome_pine_b", "counter"],
+      "rhythm": [
+        { "z": -10, "side": "L", "lane": "near", "group": "grove" },
+        { "z": -18, "side": "R", "lane": "near", "single": "counter", "h": "cart", "desc": "прилавок ресурсов" },
+        { "z": -28, "side": "L", "lane": "verge", "single": "chest", "h": "chest" },
+        { "z": -36, "side": "R", "lane": "mid",  "group": "grove" },
+        { "z": -48, "side": "C", "lane": "near", "group": "homestead", "house": "hero_house_b", "desc": "финальный дом по центру пути" }
+      ],
+      "boards": [
+        { "z": -24, "side": "R", "key": "humans_and_monsters" },
+        { "z": -42, "side": "L", "key": "a_home_to_come_back_to" }
+      ],
+      "backdrop": { "lane": "back", "group": "backdrop_pines", "every_z": 26, "from_z": -30, "to_z": -88 },
+      "sky": { "clouds": 3, "z_range": [-88, -60], "y_range": [26, 34], "moon": { "x": 14, "y": 30, "z": -80 } },
+      "scatter": { "types": ["grass_tuft_a", "grass_tuft_b", "rock_s"], "count": 10, "lanes": ["verge", "near"], "avoid_road": true }
+    }
+  }
+}

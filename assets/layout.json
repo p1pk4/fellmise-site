@@ -1,134 +1,47 @@
 {
  "version": 1,
- "generated": "tools/dump_layout.mjs",
+ "generated": "tools/generate_layout.py по assets/scene_spec.json",
+ "seed": 20260731,
  "biomes": {
   "village": {
    "sprites": [
-    {
-     "id": "cloud_a#1",
-     "t": "cloud_a",
-     "layer": 0,
-     "pos": [
-      -22,
-      30,
-      -86
-     ],
-     "h": 9,
-     "rotY": 0,
-     "visible": true,
-     "drift": 0.3,
-     "span": 110
-    },
-    {
-     "id": "cloud_b#1",
-     "t": "cloud_b",
-     "layer": 0,
-     "pos": [
-      16,
-      35,
-      -94
-     ],
-     "h": 8,
-     "rotY": 0,
-     "visible": true,
-     "drift": 0.22,
-     "span": 110
-    },
-    {
-     "id": "cloud_c#1",
-     "t": "cloud_c",
-     "layer": 0,
-     "pos": [
-      40,
-      27,
-      -78
-     ],
-     "h": 7,
-     "rotY": 0,
-     "visible": true,
-     "dim": 0.9,
-     "drift": 0.38,
-     "span": 110
-    },
-    {
-     "id": "hero_tree_a#1",
-     "t": "hero_tree_a",
-     "layer": 0,
-     "pos": [
-      -34,
-      null,
-      -52
-     ],
-     "h": 14,
-     "rotY": 0,
-     "visible": true,
-     "dim": 0.74
-    },
-    {
-     "id": "biome_pine_b#1",
-     "t": "biome_pine_b",
-     "layer": 0,
-     "pos": [
-      31,
-      null,
-      -64
-     ],
-     "h": 13,
-     "rotY": 0,
-     "visible": true,
-     "dim": 0.7
-    },
     {
      "id": "hero_house_b#1",
      "t": "hero_house_b",
      "layer": 1,
      "pos": [
-      -11,
+      -7.455,
       null,
-      -14
+      -6.813
      ],
      "h": 7.4,
-     "rotY": 0,
+     "rotY": -0.1744,
      "visible": true
     },
     {
-     "id": "hero_tree_a#2",
-     "t": "hero_tree_a",
+     "id": "hero_fence#1",
+     "t": "hero_fence",
      "layer": 1,
      "pos": [
-      -7.2,
+      -4.855,
       null,
-      -22
+      -3.413
      ],
-     "h": 8.2,
-     "rotY": 0,
-     "visible": true,
-     "sway": true
-    },
-    {
-     "id": "hero_well#1",
-     "t": "hero_well",
-     "layer": 1,
-     "pos": [
-      1.5,
-      null,
-      -11
-     ],
-     "h": 4.4,
-     "rotY": 0,
+     "h": 1.6,
+     "rotY": -0.0764,
      "visible": true
     },
     {
-     "id": "hero_house_a#1",
-     "t": "hero_house_a",
+     "id": "hero_fence#2",
+     "t": "hero_fence",
      "layer": 1,
      "pos": [
-      15,
+      -10.055,
       null,
-      -16
+      -3.413
      ],
-     "h": 8.2,
-     "rotY": 0,
+     "h": 1.6,
+     "rotY": -0.0731,
      "visible": true
     },
     {
@@ -136,26 +49,208 @@
      "t": "hero_tree_b",
      "layer": 1,
      "pos": [
-      17,
+      -11.655,
       null,
-      -20
+      -5.613
      ],
-     "h": 3.2,
-     "rotY": 0,
+     "h": 2.2,
+     "rotY": -0.1335,
+     "visible": true
+    },
+    {
+     "id": "grass_tuft_a#1",
+     "t": "grass_tuft_a",
+     "layer": 1,
+     "pos": [
+      -3.855,
+      null,
+      -4.613
+     ],
+     "h": 1.1,
+     "rotY": -0.1393,
+     "visible": true
+    },
+    {
+     "id": "hero_well#1",
+     "t": "hero_well",
+     "layer": 1,
+     "pos": [
+      5.137,
+      null,
+      -12.19
+     ],
+     "h": 4.4,
+     "rotY": 0.1086,
+     "visible": true
+    },
+    {
+     "id": "prop_lantern#1",
+     "t": "prop_lantern",
+     "layer": 1,
+     "pos": [
+      8.137,
+      null,
+      -13.19
+     ],
+     "h": 4.2,
+     "rotY": 0.1543,
+     "visible": true
+    },
+    {
+     "id": "prop_crates#1",
+     "t": "prop_crates",
+     "layer": 1,
+     "pos": [
+      2.737,
+      null,
+      -10.79
+     ],
+     "h": 1.8,
+     "rotY": 0.0923,
+     "visible": true
+    },
+    {
+     "id": "hero_house_b#2",
+     "t": "hero_house_b",
+     "layer": 1,
+     "pos": [
+      6.894,
+      null,
+      -22.125
+     ],
+     "h": 7.4,
+     "rotY": 0.1468,
+     "visible": true
+    },
+    {
+     "id": "hero_fence#3",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      4.294,
+      null,
+      -18.725
+     ],
+     "h": 1.6,
+     "rotY": 0.1616,
+     "visible": true
+    },
+    {
+     "id": "hero_fence#4",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      9.494,
+      null,
+      -18.725
+     ],
+     "h": 1.6,
+     "rotY": 0.2036,
+     "visible": true
+    },
+    {
+     "id": "hero_tree_b#2",
+     "t": "hero_tree_b",
+     "layer": 1,
+     "pos": [
+      11.094,
+      null,
+      -20.925
+     ],
+     "h": 2.2,
+     "rotY": 0.1377,
+     "visible": true
+    },
+    {
+     "id": "grass_tuft_a#2",
+     "t": "grass_tuft_a",
+     "layer": 1,
+     "pos": [
+      3.294,
+      null,
+      -19.925
+     ],
+     "h": 1.1,
+     "rotY": 0.088,
+     "visible": true
+    },
+    {
+     "id": "hero_tree_a#1",
+     "t": "hero_tree_a",
+     "layer": 0.5,
+     "pos": [
+      -12.039,
+      null,
+      -30.918
+     ],
+     "h": 8.4,
+     "rotY": -0.1135,
      "visible": true,
      "sway": true
+    },
+    {
+     "id": "hero_tree_b#3",
+     "t": "hero_tree_b",
+     "layer": 0.5,
+     "pos": [
+      -15.039,
+      null,
+      -29.318
+     ],
+     "h": 2.2,
+     "rotY": -0.0915,
+     "visible": true
+    },
+    {
+     "id": "grass_tuft_b#1",
+     "t": "grass_tuft_b",
+     "layer": 0.5,
+     "pos": [
+      -9.839,
+      null,
+      -29.118
+     ],
+     "h": 1.1,
+     "rotY": -0.1739,
+     "visible": true
     },
     {
      "id": "barn#1",
      "t": "barn",
      "layer": 1,
      "pos": [
-      -19,
+      -7.717,
       null,
-      -26
+      -36.956
      ],
-     "h": 7.6,
-     "rotY": 0,
+     "h": 8.6,
+     "rotY": -0.0734,
+     "visible": true
+    },
+    {
+     "id": "haystack#1",
+     "t": "haystack",
+     "layer": 1,
+     "pos": [
+      -11.717,
+      null,
+      -34.956
+     ],
+     "h": 2.4,
+     "rotY": -0.1176,
+     "visible": true
+    },
+    {
+     "id": "hero_cart#1",
+     "t": "hero_cart",
+     "layer": 1,
+     "pos": [
+      -4.317,
+      null,
+      -33.956
+     ],
+     "h": 2.6,
+     "rotY": -0.1986,
      "visible": true
     },
     {
@@ -163,321 +258,516 @@
      "t": "feat_tavern",
      "layer": 1,
      "pos": [
-      -11.5,
+      7.728,
       null,
-      -32
+      -46.37
      ],
-     "h": 6.4,
-     "rotY": 0,
+     "h": 8.0,
+     "rotY": 0.1154,
      "visible": true
     },
     {
-     "id": "haystack#1",
-     "t": "haystack",
-     "layer": 2,
+     "id": "hero_tree_a#2",
+     "t": "hero_tree_a",
+     "layer": 0.5,
      "pos": [
-      -13.2,
+      10.901,
       null,
-      -10
+      -54.797
      ],
-     "h": 2.4,
-     "rotY": 0,
-     "visible": true
+     "h": 8.4,
+     "rotY": 0.1974,
+     "visible": true,
+     "sway": true
     },
     {
-     "id": "prop_crates#1",
-     "t": "prop_crates",
-     "layer": 2,
+     "id": "hero_tree_b#4",
+     "t": "hero_tree_b",
+     "layer": 0.5,
      "pos": [
-      16.5,
+      13.901,
       null,
-      -8
-     ],
-     "h": 2.4,
-     "rotY": 0,
-     "visible": true
-    },
-    {
-     "id": "hero_fence#1",
-     "t": "hero_fence",
-     "layer": 2,
-     "pos": [
-      -8.6,
-      null,
-      -6
-     ],
-     "h": 1.5,
-     "rotY": 0,
-     "visible": true
-    },
-    {
-     "id": "hero_fence#2",
-     "t": "hero_fence",
-     "layer": 2,
-     "pos": [
-      -8.6,
-      null,
-      -12
-     ],
-     "h": 1.5,
-     "rotY": 0,
-     "visible": true
-    },
-    {
-     "id": "hero_fence#3",
-     "t": "hero_fence",
-     "layer": 2,
-     "pos": [
-      -8.6,
-      null,
-      -18
-     ],
-     "h": 1.5,
-     "rotY": 0,
-     "visible": true
-    },
-    {
-     "id": "prop_signpost#1",
-     "t": "prop_signpost",
-     "layer": 2,
-     "pos": [
-      -6.5,
-      null,
-      -2
-     ],
-     "h": 3.2,
-     "rotY": 0,
-     "visible": true
-    },
-    {
-     "id": "prop_lantern#1",
-     "t": "prop_lantern",
-     "layer": 2,
-     "pos": [
-      5.2,
-      null,
-      -4
-     ],
-     "h": 3.6,
-     "rotY": 0,
-     "visible": true
-    },
-    {
-     "id": "hero_cart#1",
-     "t": "hero_cart",
-     "layer": 2,
-     "pos": [
-      9.5,
-      null,
-      -6
+      -53.197
      ],
      "h": 2.2,
-     "rotY": 0,
+     "rotY": 0.1074,
      "visible": true
-    },
-    {
-     "id": "prop_stones#1",
-     "t": "prop_stones",
-     "layer": 2,
-     "pos": [
-      -2.2,
-      null,
-      1.5
-     ],
-     "h": 0.9,
-     "rotY": 0,
-     "visible": true
-    },
-    {
-     "id": "grass_tuft_a#1",
-     "t": "grass_tuft_a",
-     "layer": 2,
-     "pos": [
-      -5.4,
-      null,
-      -3
-     ],
-     "h": 0.8,
-     "rotY": 0,
-     "visible": true
-    },
-    {
-     "id": "grass_tuft_b#1",
-     "t": "grass_tuft_b",
-     "layer": 2,
-     "pos": [
-      5.6,
-      null,
-      -9
-     ],
-     "h": 0.9,
-     "rotY": 0,
-     "visible": true
-    },
-    {
-     "id": "grass_tuft_a#2",
-     "t": "grass_tuft_a",
-     "layer": 2,
-     "pos": [
-      -5.8,
-      null,
-      -15
-     ],
-     "h": 0.8,
-     "rotY": 0,
-     "visible": true
-    },
-    {
-     "id": "rock_s#1",
-     "t": "rock_s",
-     "layer": 2,
-     "pos": [
-      7.4,
-      null,
-      0
-     ],
-     "h": 0.7,
-     "rotY": 0,
-     "visible": true
-    },
-    {
-     "id": "hero_tree_a#3",
-     "t": "hero_tree_a",
-     "layer": 3,
-     "pos": [
-      -13,
-      null,
-      9
-     ],
-     "h": 20,
-     "rotY": 0,
-     "visible": true,
-     "dim": 0.22,
-     "blur": 2.6
-    },
-    {
-     "id": "hero_tree_b#2",
-     "t": "hero_tree_b",
-     "layer": 3,
-     "pos": [
-      12.5,
-      null,
-      11
-     ],
-     "h": 9,
-     "rotY": 0,
-     "visible": true,
-     "dim": 0.26,
-     "blur": 2.6
     },
     {
      "id": "grass_tuft_b#2",
      "t": "grass_tuft_b",
-     "layer": 2,
+     "layer": 0.5,
      "pos": [
-      -4.6,
+      8.701,
       null,
-      -28
+      -52.997
      ],
-     "h": 0.8,
-     "rotY": 0,
+     "h": 1.1,
+     "rotY": 0.1528,
      "visible": true
     },
     {
-     "id": "rock_s#2",
-     "t": "rock_s",
-     "layer": 2,
+     "id": "hero_house_b#3",
+     "t": "hero_house_b",
+     "layer": 1,
      "pos": [
-      4.8,
+      -7.975,
       null,
-      -34
+      -64.518
      ],
-     "h": 0.7,
-     "rotY": 0,
+     "h": 7.4,
+     "rotY": -0.1144,
+     "visible": true
+    },
+    {
+     "id": "hero_fence#5",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      -5.375,
+      null,
+      -61.118
+     ],
+     "h": 1.6,
+     "rotY": -0.0962,
+     "visible": true
+    },
+    {
+     "id": "hero_fence#6",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      -10.575,
+      null,
+      -61.118
+     ],
+     "h": 1.6,
+     "rotY": -0.1765,
+     "visible": true
+    },
+    {
+     "id": "hero_tree_b#5",
+     "t": "hero_tree_b",
+     "layer": 1,
+     "pos": [
+      -12.175,
+      null,
+      -63.318
+     ],
+     "h": 2.2,
+     "rotY": -0.1338,
      "visible": true
     },
     {
      "id": "grass_tuft_a#3",
      "t": "grass_tuft_a",
-     "layer": 2,
+     "layer": 1,
      "pos": [
-      -5,
+      -4.375,
       null,
-      -42
+      -62.318
      ],
-     "h": 0.8,
-     "rotY": 0,
-     "visible": true,
-     "dim": 0.95
+     "h": 1.1,
+     "rotY": -0.1754,
+     "visible": true
     },
     {
-     "id": "rock_m#1",
-     "t": "rock_m",
-     "layer": 2,
+     "id": "biome_pine_b#1",
+     "t": "biome_pine_b",
+     "layer": 0,
      "pos": [
-      5.4,
+      -26.0,
       null,
-      -52
+      -20
      ],
-     "h": 1.2,
-     "rotY": 0,
+     "h": 13.0,
+     "rotY": 0.0,
      "visible": true,
-     "dim": 0.9
+     "dim": 0.7
+    },
+    {
+     "id": "biome_pine_b#2",
+     "t": "biome_pine_b",
+     "layer": 0,
+     "pos": [
+      -20.0,
+      null,
+      -23.0
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.62
+    },
+    {
+     "id": "biome_pine_a#1",
+     "t": "biome_pine_a",
+     "layer": 0,
+     "pos": [
+      -31.4,
+      null,
+      -22.0
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.66
+    },
+    {
+     "id": "biome_pine_b#3",
+     "t": "biome_pine_b",
+     "layer": 0,
+     "pos": [
+      26.0,
+      null,
+      -44
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.7
+    },
+    {
+     "id": "biome_pine_b#4",
+     "t": "biome_pine_b",
+     "layer": 0,
+     "pos": [
+      32.0,
+      null,
+      -47.0
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.62
+    },
+    {
+     "id": "biome_pine_a#2",
+     "t": "biome_pine_a",
+     "layer": 0,
+     "pos": [
+      20.6,
+      null,
+      -46.0
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.66
+    },
+    {
+     "id": "biome_pine_b#5",
+     "t": "biome_pine_b",
+     "layer": 0,
+     "pos": [
+      -26.0,
+      null,
+      -68
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.7
+    },
+    {
+     "id": "biome_pine_b#6",
+     "t": "biome_pine_b",
+     "layer": 0,
+     "pos": [
+      -20.0,
+      null,
+      -71.0
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.62
+    },
+    {
+     "id": "biome_pine_a#3",
+     "t": "biome_pine_a",
+     "layer": 0,
+     "pos": [
+      -31.4,
+      null,
+      -70.0
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.66
+    },
+    {
+     "id": "biome_pine_b#7",
+     "t": "biome_pine_b",
+     "layer": 0,
+     "pos": [
+      26.0,
+      null,
+      -92
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.7
+    },
+    {
+     "id": "biome_pine_b#8",
+     "t": "biome_pine_b",
+     "layer": 0,
+     "pos": [
+      32.0,
+      null,
+      -95.0
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.62
+    },
+    {
+     "id": "biome_pine_a#4",
+     "t": "biome_pine_a",
+     "layer": 0,
+     "pos": [
+      20.6,
+      null,
+      -94.0
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.66
+    },
+    {
+     "id": "cloud_a#1",
+     "t": "cloud_a",
+     "layer": 0,
+     "pos": [
+      -12.586,
+      30.919,
+      -66.028
+     ],
+     "h": 8.0,
+     "rotY": 0.0,
+     "visible": true,
+     "drift": 0.241,
+     "span": 110
+    },
+    {
+     "id": "cloud_b#1",
+     "t": "cloud_b",
+     "layer": 0,
+     "pos": [
+      -27.058,
+      29.067,
+      -62.723
+     ],
+     "h": 8.0,
+     "rotY": 0.0,
+     "visible": true,
+     "drift": 0.184,
+     "span": 110
+    },
+    {
+     "id": "cloud_c#1",
+     "t": "cloud_c",
+     "layer": 0,
+     "pos": [
+      18.523,
+      26.363,
+      -74.039
+     ],
+     "h": 8.0,
+     "rotY": 0.0,
+     "visible": true,
+     "drift": 0.363,
+     "span": 110
+    },
+    {
+     "id": "cloud_a#2",
+     "t": "cloud_a",
+     "layer": 0,
+     "pos": [
+      3.709,
+      34.02,
+      -86.171
+     ],
+     "h": 8.0,
+     "rotY": 0.0,
+     "visible": true,
+     "drift": 0.305,
+     "span": 110
+    },
+    {
+     "id": "grass_tuft_a#4",
+     "t": "grass_tuft_a",
+     "layer": 1,
+     "pos": [
+      4.088,
+      null,
+      -63.247
+     ],
+     "h": 1.1,
+     "rotY": 0.1508,
+     "visible": true
     },
     {
      "id": "grass_tuft_b#3",
      "t": "grass_tuft_b",
-     "layer": 2,
+     "layer": 1,
      "pos": [
-      -5.2,
+      -6.629,
       null,
-      -62
+      -90.848
      ],
-     "h": 0.8,
-     "rotY": 0,
-     "visible": true,
-     "dim": 0.85
+     "h": 1.1,
+     "rotY": -0.1765,
+     "visible": true
+    },
+    {
+     "id": "rock_s#1",
+     "t": "rock_s",
+     "layer": 1,
+     "pos": [
+      8.007,
+      null,
+      -27.615
+     ],
+     "h": 1.2,
+     "rotY": 0.1834,
+     "visible": true
+    },
+    {
+     "id": "grass_tuft_a#5",
+     "t": "grass_tuft_a",
+     "layer": 1,
+     "pos": [
+      -6.222,
+      null,
+      -31.048
+     ],
+     "h": 1.1,
+     "rotY": -0.1695,
+     "visible": true
+    },
+    {
+     "id": "grass_tuft_b#4",
+     "t": "grass_tuft_b",
+     "layer": 1,
+     "pos": [
+      5.788,
+      null,
+      -44.587
+     ],
+     "h": 1.1,
+     "rotY": 0.1636,
+     "visible": true
+    },
+    {
+     "id": "rock_s#2",
+     "t": "rock_s",
+     "layer": 1,
+     "pos": [
+      6.651,
+      null,
+      -95.37
+     ],
+     "h": 1.2,
+     "rotY": 0.1861,
+     "visible": true
+    },
+    {
+     "id": "grass_tuft_a#6",
+     "t": "grass_tuft_a",
+     "layer": 1,
+     "pos": [
+      -7.389,
+      null,
+      -66.96
+     ],
+     "h": 1.1,
+     "rotY": -0.0991,
+     "visible": true
+    },
+    {
+     "id": "grass_tuft_b#5",
+     "t": "grass_tuft_b",
+     "layer": 1,
+     "pos": [
+      -7.069,
+      null,
+      -69.361
+     ],
+     "h": 1.1,
+     "rotY": -0.1734,
+     "visible": true
     },
     {
      "id": "rock_s#3",
      "t": "rock_s",
-     "layer": 2,
+     "layer": 1,
      "pos": [
-      5,
+      -7.452,
       null,
-      -70
+      -87.533
      ],
-     "h": 0.7,
-     "rotY": 0,
-     "visible": true,
-     "dim": 0.8
+     "h": 1.2,
+     "rotY": -0.1212,
+     "visible": true
+    },
+    {
+     "id": "grass_tuft_a#7",
+     "t": "grass_tuft_a",
+     "layer": 1,
+     "pos": [
+      6.625,
+      null,
+      -72.734
+     ],
+     "h": 1.1,
+     "rotY": 0.2009,
+     "visible": true
+    },
+    {
+     "id": "grass_tuft_b#6",
+     "t": "grass_tuft_b",
+     "layer": 1,
+     "pos": [
+      7.129,
+      null,
+      -93.007
+     ],
+     "h": 1.1,
+     "rotY": 0.1039,
+     "visible": true
     }
    ],
    "boards": [
     {
-     "id": "board:village",
-     "key": "village",
+     "id": "board:slogan",
+     "key": "slogan",
      "kind": "wood",
      "pos": [
-      6.4,
+      5.122,
       null,
-      -18
+      -16
      ],
-     "h": 5,
-     "rotY": -0.24,
+     "h": 4.8,
+     "rotY": 0.0977,
      "visible": true
     },
     {
-     "id": "board:village_world",
-     "key": "village_world",
+     "id": "board:world_plays_itself",
+     "key": "world_plays_itself",
      "kind": "wood",
      "pos": [
-      -6.4,
+      -4.238,
       null,
-      -31
+      -42
      ],
      "h": 4.8,
-     "rotY": 0.24,
+     "rotY": -0.1659,
      "visible": true
     }
    ]
@@ -485,349 +775,769 @@
   "forest": {
    "sprites": [
     {
-     "id": "hill_dark#1",
-     "t": "hill_dark",
-     "layer": 0,
-     "pos": [
-      -13,
-      -2,
-      -78
-     ],
-     "h": 32,
-     "rotY": 0,
-     "visible": true,
-     "dim": 0.34
-    },
-    {
-     "id": "hill_dark#2",
-     "t": "hill_dark",
-     "layer": 0,
-     "pos": [
-      13,
-      -2,
-      -78
-     ],
-     "h": 32,
-     "rotY": 0,
-     "visible": true,
-     "dim": 0.34
-    },
-    {
-     "id": "cloud_c#1",
-     "t": "cloud_c",
-     "layer": 0,
-     "pos": [
-      -18,
-      32,
-      -90
-     ],
-     "h": 8,
-     "rotY": 0,
-     "visible": true,
-     "dim": 0.7,
-     "drift": 0.2,
-     "span": 110
-    },
-    {
-     "id": "biome_pine_a#1",
-     "t": "biome_pine_a",
-     "layer": 0,
-     "pos": [
-      -31,
-      null,
-      -44
-     ],
-     "h": 16,
-     "rotY": 0,
-     "visible": true,
-     "dim": 0.66
-    },
-    {
-     "id": "biome_pine_b#1",
-     "t": "biome_pine_b",
-     "layer": 0,
-     "pos": [
-      27,
-      null,
-      -36
-     ],
-     "h": 14,
-     "rotY": 0,
-     "visible": true,
-     "dim": 0.72
-    },
-    {
-     "id": "biome_deadtree#1",
-     "t": "biome_deadtree",
-     "layer": 0,
-     "pos": [
-      -17,
-      null,
-      -50
-     ],
-     "h": 12,
-     "rotY": 0,
-     "visible": true,
-     "dim": 0.6
-    },
-    {
-     "id": "biome_pine_b#2",
-     "t": "biome_pine_b",
-     "layer": 1,
-     "pos": [
-      -17,
-      null,
-      -15
-     ],
-     "h": 12,
-     "rotY": 0,
-     "visible": true,
-     "sway": true
-    },
-    {
-     "id": "biome_deadtree#2",
-     "t": "biome_deadtree",
-     "layer": 1,
-     "pos": [
-      1.5,
-      null,
-      -20
-     ],
-     "h": 9,
-     "rotY": 0,
-     "visible": true,
-     "sway": true
-    },
-    {
-     "id": "biome_pine_a#2",
+     "id": "biome_pine_a#5",
      "t": "biome_pine_a",
      "layer": 1,
      "pos": [
-      11,
+      -7.795,
       null,
-      -16
+      -8.604
      ],
-     "h": 13.5,
-     "rotY": 0,
+     "h": 13.0,
+     "rotY": -0.1551,
      "visible": true,
      "sway": true
     },
     {
-     "id": "rock_m#1",
-     "t": "rock_m",
-     "layer": 2,
+     "id": "biome_pine_b#9",
+     "t": "biome_pine_b",
+     "layer": 1,
      "pos": [
-      -8.5,
+      -12.195,
       null,
-      -13
+      -11.204
      ],
-     "h": 1.9,
-     "rotY": 0,
+     "h": 13.0,
+     "rotY": -0.077,
      "visible": true
     },
     {
      "id": "fern#1",
      "t": "fern",
-     "layer": 2,
+     "layer": 1,
      "pos": [
-      -5.2,
+      -5.795,
       null,
-      -9
+      -6.404
      ],
-     "h": 1.2,
-     "rotY": 0,
+     "h": 1.4,
+     "rotY": -0.1973,
      "visible": true
     },
     {
      "id": "mushrooms#1",
      "t": "mushrooms",
-     "layer": 2,
+     "layer": 1,
      "pos": [
-      -3.4,
+      -10.195,
       null,
-      -4
+      -5.604
      ],
-     "h": 0.8,
-     "rotY": 0,
+     "h": 0.9,
+     "rotY": -0.1609,
      "visible": true
     },
     {
-     "id": "biome_stump#1",
-     "t": "biome_stump",
-     "layer": 2,
+     "id": "biome_pine_a#6",
+     "t": "biome_pine_a",
+     "layer": 1,
      "pos": [
-      1.2,
+      7.09,
       null,
-      -6
+      -17.437
      ],
-     "h": 1.9,
-     "rotY": 0,
+     "h": 13.0,
+     "rotY": 0.1629,
+     "visible": true,
+     "sway": true
+    },
+    {
+     "id": "biome_pine_b#10",
+     "t": "biome_pine_b",
+     "layer": 1,
+     "pos": [
+      11.49,
+      null,
+      -20.037
+     ],
+     "h": 13.0,
+     "rotY": 0.1009,
      "visible": true
     },
     {
      "id": "fern#2",
      "t": "fern",
-     "layer": 2,
+     "layer": 1,
      "pos": [
-      4.6,
+      5.09,
       null,
-      -11
+      -15.237
      ],
-     "h": 1.1,
-     "rotY": 0,
+     "h": 1.4,
+     "rotY": 0.1122,
      "visible": true
     },
     {
      "id": "mushrooms#2",
      "t": "mushrooms",
-     "layer": 2,
+     "layer": 1,
      "pos": [
-      6.2,
+      9.49,
       null,
-      -3
+      -14.437
      ],
      "h": 0.9,
-     "rotY": 0,
+     "rotY": 0.103,
      "visible": true
     },
     {
-     "id": "rock_s#1",
-     "t": "rock_s",
-     "layer": 2,
+     "id": "biome_stump#1",
+     "t": "biome_stump",
+     "layer": 1,
      "pos": [
-      8.4,
+      4.962,
       null,
-      -17
+      -28.53
      ],
-     "h": 1,
-     "rotY": 0,
+     "h": 1.6,
+     "rotY": 0.152,
      "visible": true
     },
     {
-     "id": "biome_pine_a#3",
-     "t": "biome_pine_a",
-     "layer": 3,
+     "id": "res_wood#1",
+     "t": "res_wood",
+     "layer": 1,
      "pos": [
-      -11,
+      7.162,
       null,
-      8
+      -27.53
      ],
-     "h": 22,
-     "rotY": 0,
-     "visible": true,
-     "dim": 0.2,
-     "blur": 2.6
-    },
-    {
-     "id": "biome_pine_b#3",
-     "t": "biome_pine_b",
-     "layer": 3,
-     "pos": [
-      10.5,
-      null,
-      10
-     ],
-     "h": 19,
-     "rotY": 0,
-     "visible": true,
-     "dim": 0.22,
-     "blur": 2.6
-    },
-    {
-     "id": "mushrooms#3",
-     "t": "mushrooms",
-     "layer": 2,
-     "pos": [
-      -4.6,
-      null,
-      -24
-     ],
-     "h": 0.8,
-     "rotY": 0,
-     "visible": true
-    },
-    {
-     "id": "rock_s#2",
-     "t": "rock_s",
-     "layer": 2,
-     "pos": [
-      4.8,
-      null,
-      -31
-     ],
-     "h": 0.9,
-     "rotY": 0,
+     "h": 1.8,
+     "rotY": 0.1319,
      "visible": true
     },
     {
      "id": "fern#3",
      "t": "fern",
-     "layer": 2,
+     "layer": 1,
      "pos": [
-      -5,
+      3.162,
       null,
-      -39
+      -26.93
      ],
-     "h": 1,
-     "rotY": 0,
-     "visible": true,
-     "dim": 0.95
+     "h": 1.4,
+     "rotY": 0.1368,
+     "visible": true
     },
     {
-     "id": "rock_m#2",
-     "t": "rock_m",
-     "layer": 2,
+     "id": "biome_pine_a#7",
+     "t": "biome_pine_a",
+     "layer": 0.5,
      "pos": [
-      5.2,
+      -11.292,
       null,
-      -48
+      -34.704
      ],
-     "h": 1.3,
-     "rotY": 0,
+     "h": 13.0,
+     "rotY": -0.1552,
      "visible": true,
-     "dim": 0.9
+     "sway": true
     },
     {
-     "id": "mushrooms#4",
-     "t": "mushrooms",
-     "layer": 2,
+     "id": "biome_pine_b#11",
+     "t": "biome_pine_b",
+     "layer": 0.5,
      "pos": [
-      -5,
+      -15.692,
       null,
-      -58
+      -37.304
      ],
-     "h": 0.8,
-     "rotY": 0,
-     "visible": true,
-     "dim": 0.85
+     "h": 13.0,
+     "rotY": -0.0728,
+     "visible": true
     },
     {
      "id": "fern#4",
      "t": "fern",
-     "layer": 2,
+     "layer": 0.5,
      "pos": [
-      4.8,
+      -9.292,
+      null,
+      -32.504
+     ],
+     "h": 1.4,
+     "rotY": -0.144,
+     "visible": true
+    },
+    {
+     "id": "mushrooms#3",
+     "t": "mushrooms",
+     "layer": 0.5,
+     "pos": [
+      -13.692,
+      null,
+      -31.704
+     ],
+     "h": 0.9,
+     "rotY": -0.1523,
+     "visible": true
+    },
+    {
+     "id": "biome_deadtree#1",
+     "t": "biome_deadtree",
+     "layer": 1,
+     "pos": [
+      -7.351,
+      null,
+      -46.239
+     ],
+     "h": 9.0,
+     "rotY": -0.154,
+     "visible": true
+    },
+    {
+     "id": "biome_pine_a#8",
+     "t": "biome_pine_a",
+     "layer": 1,
+     "pos": [
+      7.421,
+      null,
+      -53.684
+     ],
+     "h": 13.0,
+     "rotY": 0.0699,
+     "visible": true,
+     "sway": true
+    },
+    {
+     "id": "biome_pine_b#12",
+     "t": "biome_pine_b",
+     "layer": 1,
+     "pos": [
+      11.821,
+      null,
+      -56.284
+     ],
+     "h": 13.0,
+     "rotY": 0.1495,
+     "visible": true
+    },
+    {
+     "id": "fern#5",
+     "t": "fern",
+     "layer": 1,
+     "pos": [
+      5.421,
+      null,
+      -51.484
+     ],
+     "h": 1.4,
+     "rotY": 0.166,
+     "visible": true
+    },
+    {
+     "id": "mushrooms#4",
+     "t": "mushrooms",
+     "layer": 1,
+     "pos": [
+      9.821,
+      null,
+      -50.684
+     ],
+     "h": 0.9,
+     "rotY": 0.1015,
+     "visible": true
+    },
+    {
+     "id": "biome_stump#2",
+     "t": "biome_stump",
+     "layer": 1,
+     "pos": [
+      -4.617,
+      null,
+      -65.263
+     ],
+     "h": 1.6,
+     "rotY": -0.16,
+     "visible": true
+    },
+    {
+     "id": "res_wood#2",
+     "t": "res_wood",
+     "layer": 1,
+     "pos": [
+      -6.817,
+      null,
+      -64.263
+     ],
+     "h": 1.8,
+     "rotY": -0.1458,
+     "visible": true
+    },
+    {
+     "id": "fern#6",
+     "t": "fern",
+     "layer": 1,
+     "pos": [
+      -2.817,
+      null,
+      -63.663
+     ],
+     "h": 1.4,
+     "rotY": -0.139,
+     "visible": true
+    },
+    {
+     "id": "biome_pine_b#13",
+     "t": "biome_pine_b",
+     "layer": 0,
+     "pos": [
+      -26.0,
+      null,
+      -14
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.7
+    },
+    {
+     "id": "biome_pine_b#14",
+     "t": "biome_pine_b",
+     "layer": 0,
+     "pos": [
+      -20.0,
+      null,
+      -17.0
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.62
+    },
+    {
+     "id": "biome_pine_a#9",
+     "t": "biome_pine_a",
+     "layer": 0,
+     "pos": [
+      -31.4,
+      null,
+      -16.0
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.66
+    },
+    {
+     "id": "biome_pine_b#15",
+     "t": "biome_pine_b",
+     "layer": 0,
+     "pos": [
+      26.0,
+      null,
+      -32
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.7
+    },
+    {
+     "id": "biome_pine_b#16",
+     "t": "biome_pine_b",
+     "layer": 0,
+     "pos": [
+      32.0,
+      null,
+      -35.0
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.62
+    },
+    {
+     "id": "biome_pine_a#10",
+     "t": "biome_pine_a",
+     "layer": 0,
+     "pos": [
+      20.6,
+      null,
+      -34.0
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.66
+    },
+    {
+     "id": "biome_pine_b#17",
+     "t": "biome_pine_b",
+     "layer": 0,
+     "pos": [
+      -26.0,
+      null,
+      -50
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.7
+    },
+    {
+     "id": "biome_pine_b#18",
+     "t": "biome_pine_b",
+     "layer": 0,
+     "pos": [
+      -20.0,
+      null,
+      -53.0
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.62
+    },
+    {
+     "id": "biome_pine_a#11",
+     "t": "biome_pine_a",
+     "layer": 0,
+     "pos": [
+      -31.4,
+      null,
+      -52.0
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.66
+    },
+    {
+     "id": "biome_pine_b#19",
+     "t": "biome_pine_b",
+     "layer": 0,
+     "pos": [
+      26.0,
       null,
       -68
      ],
-     "h": 1,
-     "rotY": 0,
+     "h": 13.0,
+     "rotY": 0.0,
      "visible": true,
-     "dim": 0.8
+     "dim": 0.7
+    },
+    {
+     "id": "biome_pine_b#20",
+     "t": "biome_pine_b",
+     "layer": 0,
+     "pos": [
+      32.0,
+      null,
+      -71.0
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.62
+    },
+    {
+     "id": "biome_pine_a#12",
+     "t": "biome_pine_a",
+     "layer": 0,
+     "pos": [
+      20.6,
+      null,
+      -70.0
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.66
+    },
+    {
+     "id": "biome_pine_b#21",
+     "t": "biome_pine_b",
+     "layer": 0,
+     "pos": [
+      -26.0,
+      null,
+      -86
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.7
+    },
+    {
+     "id": "biome_pine_b#22",
+     "t": "biome_pine_b",
+     "layer": 0,
+     "pos": [
+      -20.0,
+      null,
+      -89.0
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.62
+    },
+    {
+     "id": "biome_pine_a#13",
+     "t": "biome_pine_a",
+     "layer": 0,
+     "pos": [
+      -31.4,
+      null,
+      -88.0
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.66
+    },
+    {
+     "id": "cloud_c#2",
+     "t": "cloud_c",
+     "layer": 0,
+     "pos": [
+      -13.502,
+      32.405,
+      -75.69
+     ],
+     "h": 8.0,
+     "rotY": 0.0,
+     "visible": true,
+     "drift": 0.237,
+     "span": 110
+    },
+    {
+     "id": "cloud_c#3",
+     "t": "cloud_c",
+     "layer": 0,
+     "pos": [
+      -24.091,
+      32.868,
+      -81.445
+     ],
+     "h": 8.0,
+     "rotY": 0.0,
+     "visible": true,
+     "drift": 0.195,
+     "span": 110
+    },
+    {
+     "id": "mushrooms#5",
+     "t": "mushrooms",
+     "layer": 1,
+     "pos": [
+      -4.47,
+      null,
+      -48.66
+     ],
+     "h": 0.9,
+     "rotY": -0.1948,
+     "visible": true
+    },
+    {
+     "id": "fern#7",
+     "t": "fern",
+     "layer": 1,
+     "pos": [
+      7.879,
+      null,
+      -71.783
+     ],
+     "h": 1.4,
+     "rotY": 0.1782,
+     "visible": true
+    },
+    {
+     "id": "rock_s#4",
+     "t": "rock_s",
+     "layer": 1,
+     "pos": [
+      8.291,
+      null,
+      -58.962
+     ],
+     "h": 1.2,
+     "rotY": 0.1739,
+     "visible": true
+    },
+    {
+     "id": "grass_tuft_a#8",
+     "t": "grass_tuft_a",
+     "layer": 1,
+     "pos": [
+      -6.848,
+      null,
+      -37.868
+     ],
+     "h": 1.1,
+     "rotY": -0.1288,
+     "visible": true
+    },
+    {
+     "id": "mushrooms#6",
+     "t": "mushrooms",
+     "layer": 1,
+     "pos": [
+      7.423,
+      null,
+      -63.88
+     ],
+     "h": 0.9,
+     "rotY": 0.1652,
+     "visible": true
+    },
+    {
+     "id": "fern#8",
+     "t": "fern",
+     "layer": 1,
+     "pos": [
+      -7.603,
+      null,
+      -49.496
+     ],
+     "h": 1.4,
+     "rotY": -0.1112,
+     "visible": true
+    },
+    {
+     "id": "rock_s#5",
+     "t": "rock_s",
+     "layer": 1,
+     "pos": [
+      -6.5,
+      null,
+      -44.006
+     ],
+     "h": 1.2,
+     "rotY": -0.1144,
+     "visible": true
+    },
+    {
+     "id": "grass_tuft_a#9",
+     "t": "grass_tuft_a",
+     "layer": 1,
+     "pos": [
+      7.719,
+      null,
+      -69.032
+     ],
+     "h": 1.1,
+     "rotY": 0.1685,
+     "visible": true
+    },
+    {
+     "id": "mushrooms#7",
+     "t": "mushrooms",
+     "layer": 1,
+     "pos": [
+      -7.806,
+      null,
+      -23.107
+     ],
+     "h": 0.9,
+     "rotY": -0.1521,
+     "visible": true
+    },
+    {
+     "id": "fern#9",
+     "t": "fern",
+     "layer": 1,
+     "pos": [
+      7.183,
+      null,
+      -38.416
+     ],
+     "h": 1.4,
+     "rotY": 0.1413,
+     "visible": true
+    },
+    {
+     "id": "rock_s#6",
+     "t": "rock_s",
+     "layer": 1,
+     "pos": [
+      7.255,
+      null,
+      -76.148
+     ],
+     "h": 1.2,
+     "rotY": 0.0959,
+     "visible": true
+    },
+    {
+     "id": "grass_tuft_a#10",
+     "t": "grass_tuft_a",
+     "layer": 1,
+     "pos": [
+      7.97,
+      null,
+      -79.172
+     ],
+     "h": 1.1,
+     "rotY": 0.1743,
+     "visible": true
+    },
+    {
+     "id": "mushrooms#8",
+     "t": "mushrooms",
+     "layer": 1,
+     "pos": [
+      -6.161,
+      null,
+      -77.919
+     ],
+     "h": 0.9,
+     "rotY": -0.1687,
+     "visible": true
+    },
+    {
+     "id": "fern#10",
+     "t": "fern",
+     "layer": 1,
+     "pos": [
+      -4.581,
+      null,
+      -40.11
+     ],
+     "h": 1.4,
+     "rotY": -0.1008,
+     "visible": true
+    },
+    {
+     "id": "rock_s#7",
+     "t": "rock_s",
+     "layer": 1,
+     "pos": [
+      -4.609,
+      null,
+      -68.251
+     ],
+     "h": 1.2,
+     "rotY": -0.1584,
+     "visible": true
+    },
+    {
+     "id": "grass_tuft_a#11",
+     "t": "grass_tuft_a",
+     "layer": 1,
+     "pos": [
+      -5.305,
+      null,
+      -75.208
+     ],
+     "h": 1.1,
+     "rotY": -0.0907,
+     "visible": true
     }
    ],
    "boards": [
     {
-     "id": "board:forest",
-     "key": "forest",
+     "id": "board:skills_no_levels",
+     "key": "skills_no_levels",
      "kind": "wood",
      "pos": [
-      -6.6,
+      -4.792,
       null,
-      -17
+      -24
      ],
      "h": 4.8,
-     "rotY": 0.24,
+     "rotY": -0.0952,
      "visible": true
     }
    ]
@@ -835,44 +1545,57 @@
   "mine": {
    "sprites": [
     {
-     "id": "biome_orevein#1",
-     "t": "biome_orevein",
-     "layer": 0,
-     "pos": [
-      -13,
-      null,
-      -44
-     ],
-     "h": 24,
-     "rotY": 0,
-     "visible": true,
-     "dim": 0.58
-    },
-    {
-     "id": "biome_orevein#2",
-     "t": "biome_orevein",
-     "layer": 0,
-     "pos": [
-      12,
-      null,
-      -40
-     ],
-     "h": 21,
-     "rotY": 0,
-     "visible": true,
-     "dim": 0.54
-    },
-    {
-     "id": "biome_orevein#3",
-     "t": "biome_orevein",
+     "id": "beam_frame#1",
+     "t": "beam_frame",
      "layer": 1,
      "pos": [
-      -15,
-      null,
-      -15
+      -0.227,
+      6.9,
+      -8.079
      ],
-     "h": 10,
-     "rotY": 0,
+     "h": 7.0,
+     "rotY": 0.0,
+     "visible": true,
+     "over_road": true
+    },
+    {
+     "id": "lantern_chain#1",
+     "t": "lantern_chain",
+     "layer": 1,
+     "pos": [
+      1.973,
+      1.6,
+      -7.679
+     ],
+     "h": 3.2,
+     "rotY": 0.0,
+     "visible": true,
+     "hanging": true
+    },
+    {
+     "id": "ore_pile#1",
+     "t": "ore_pile",
+     "layer": 1,
+     "pos": [
+      3.373,
+      null,
+      -5.679
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "biome_brazier#1",
+     "t": "biome_brazier",
+     "layer": 1,
+     "pos": [
+      -6.197,
+      null,
+      -16.375
+     ],
+     "h": 2.6,
+     "rotY": -0.0932,
      "visible": true
     },
     {
@@ -880,12 +1603,12 @@
      "t": "feat_mining",
      "layer": 1,
      "pos": [
-      3.5,
+      6.034,
       null,
-      -13
+      -21.247
      ],
-     "h": 5.2,
-     "rotY": 0,
+     "h": 4.0,
+     "rotY": 0.1245,
      "visible": true
     },
     {
@@ -893,131 +1616,79 @@
      "t": "biome_crystals",
      "layer": 1,
      "pos": [
-      15.5,
+      9.434,
       null,
-      -15
+      -22.847
      ],
-     "h": 7.2,
-     "rotY": 0,
+     "h": 4.6,
+     "rotY": 0.2013,
      "visible": true
     },
     {
-     "id": "beam_frame#1",
-     "t": "beam_frame",
-     "layer": 2,
+     "id": "stalagmite_a#1",
+     "t": "stalagmite_a",
+     "layer": 1,
      "pos": [
-      0,
-      8.2,
-      -9
+      3.434,
+      null,
+      -19.447
      ],
-     "h": 5.6,
-     "rotY": 0,
+     "h": 3.6,
+     "rotY": 0.1026,
      "visible": true
     },
     {
      "id": "beam_frame#2",
      "t": "beam_frame",
-     "layer": 2,
+     "layer": 1,
      "pos": [
-      0,
-      8.6,
-      -25
+      0.405,
+      6.9,
+      -31.797
      ],
-     "h": 5.8,
-     "rotY": 0,
+     "h": 7.0,
+     "rotY": 0.0,
      "visible": true,
-     "dim": 0.8
-    },
-    {
-     "id": "lantern_chain#1",
-     "t": "lantern_chain",
-     "layer": 2,
-     "pos": [
-      -4.4,
-      5,
-      -19
-     ],
-     "h": 2.4,
-     "rotY": 0,
-     "visible": true
+     "over_road": true
     },
     {
      "id": "lantern_chain#2",
      "t": "lantern_chain",
-     "layer": 2,
+     "layer": 1,
      "pos": [
-      4.8,
-      5.4,
-      -31
+      2.605,
+      1.6,
+      -31.397
      ],
-     "h": 2.4,
-     "rotY": 0,
+     "h": 3.2,
+     "rotY": 0.0,
      "visible": true,
-     "dim": 0.9
+     "hanging": true
     },
     {
-     "id": "stalagmite_a#1",
-     "t": "stalagmite_a",
-     "layer": 2,
+     "id": "ore_pile#2",
+     "t": "ore_pile",
+     "layer": 1,
      "pos": [
-      -7.2,
+      4.005,
       null,
-      -11
+      -29.397
      ],
-     "h": 2.6,
-     "rotY": 0,
-     "visible": true
-    },
-    {
-     "id": "stalagmite_b#1",
-     "t": "stalagmite_b",
-     "layer": 2,
-     "pos": [
-      -5.6,
-      null,
-      -7
-     ],
-     "h": 1.5,
-     "rotY": 0,
-     "visible": true
-    },
-    {
-     "id": "stalagmite_a#2",
-     "t": "stalagmite_a",
-     "layer": 2,
-     "pos": [
-      7.8,
-      null,
-      -21
-     ],
-     "h": 2.4,
-     "rotY": 0,
-     "visible": true
-    },
-    {
-     "id": "stalagmite_b#2",
-     "t": "stalagmite_b",
-     "layer": 2,
-     "pos": [
-      6.4,
-      null,
-      -8
-     ],
-     "h": 1.4,
-     "rotY": 0,
+     "h": 1.6,
+     "rotY": 0.0,
      "visible": true
     },
     {
      "id": "minecart#1",
      "t": "minecart",
-     "layer": 2,
+     "layer": 1,
      "pos": [
-      -5.8,
+      -6.37,
       null,
-      -14
+      -39.673
      ],
-     "h": 1.9,
-     "rotY": 0,
+     "h": 2.8,
+     "rotY": -0.0923,
      "visible": true
     },
     {
@@ -1025,206 +1696,183 @@
      "t": "feat_craft",
      "layer": 1,
      "pos": [
-      -11.2,
+      6.902,
       null,
-      -35
+      -47.117
      ],
-     "h": 4,
-     "rotY": 0,
+     "h": 2.4,
+     "rotY": 0.1468,
      "visible": true
     },
     {
-     "id": "ore_pile#1",
-     "t": "ore_pile",
-     "layer": 2,
+     "id": "feat_mining#2",
+     "t": "feat_mining",
+     "layer": 1,
      "pos": [
-      5.4,
+      -6.465,
       null,
-      -11
+      -57.374
      ],
-     "h": 1.1,
-     "rotY": 0,
-     "visible": true
-    },
-    {
-     "id": "ore_pile#2",
-     "t": "ore_pile",
-     "layer": 2,
-     "pos": [
-      -2.6,
-      null,
-      -24
-     ],
-     "h": 1,
-     "rotY": 0,
-     "visible": true,
-     "dim": 0.9
-    },
-    {
-     "id": "biome_brazier#1",
-     "t": "biome_brazier",
-     "layer": 2,
-     "pos": [
-      -3.4,
-      null,
-      -5
-     ],
-     "h": 2.9,
-     "rotY": 0,
+     "h": 4.0,
+     "rotY": -0.1447,
      "visible": true
     },
     {
      "id": "biome_crystals#2",
      "t": "biome_crystals",
-     "layer": 2,
+     "layer": 1,
      "pos": [
-      12,
+      -9.865,
       null,
-      -3
+      -58.974
      ],
-     "h": 3.4,
-     "rotY": 0,
+     "h": 4.6,
+     "rotY": -0.1768,
      "visible": true
     },
     {
-     "id": "biome_orevein#4",
-     "t": "biome_orevein",
-     "layer": 3,
+     "id": "stalagmite_a#2",
+     "t": "stalagmite_a",
+     "layer": 1,
      "pos": [
-      -14,
+      -3.865,
       null,
-      9
+      -55.574
      ],
-     "h": 20,
-     "rotY": 0,
-     "visible": true,
-     "dim": 0.18,
-     "blur": 2.6
-    },
-    {
-     "id": "biome_orevein#5",
-     "t": "biome_orevein",
-     "layer": 3,
-     "pos": [
-      13,
-      null,
-      11
-     ],
-     "h": 18,
-     "rotY": 0,
-     "visible": true,
-     "dim": 0.2,
-     "blur": 2.6
+     "h": 3.6,
+     "rotY": -0.1416,
+     "visible": true
     },
     {
      "id": "ore_pile#3",
      "t": "ore_pile",
-     "layer": 2,
+     "layer": 1,
      "pos": [
-      -4.6,
+      4.544,
       null,
-      -30
+      -34.316
      ],
-     "h": 0.9,
-     "rotY": 0,
-     "visible": true,
-     "dim": 0.95
+     "h": 1.6,
+     "rotY": 0.0929,
+     "visible": true
     },
     {
-     "id": "stalagmite_b#3",
+     "id": "stalagmite_b#1",
      "t": "stalagmite_b",
-     "layer": 2,
+     "layer": 1,
      "pos": [
-      5,
+      -4.517,
       null,
-      -38
+      -58.922
      ],
-     "h": 1.2,
-     "rotY": 0,
-     "visible": true,
-     "dim": 0.9
+     "h": 3.6,
+     "rotY": -0.199,
+     "visible": true
     },
     {
      "id": "ore_pile#4",
      "t": "ore_pile",
-     "layer": 2,
+     "layer": 1,
      "pos": [
-      -5.2,
+      -4.156,
       null,
-      -48
-     ],
-     "h": 0.9,
-     "rotY": 0,
-     "visible": true,
-     "dim": 0.85
-    },
-    {
-     "id": "stalagmite_a#3",
-     "t": "stalagmite_a",
-     "layer": 2,
-     "pos": [
-      5.4,
-      null,
-      -58
+      -23.276
      ],
      "h": 1.6,
-     "rotY": 0,
-     "visible": true,
-     "dim": 0.8
+     "rotY": -0.1668,
+     "visible": true
+    },
+    {
+     "id": "stalagmite_b#2",
+     "t": "stalagmite_b",
+     "layer": 1,
+     "pos": [
+      -4.378,
+      null,
+      -36.934
+     ],
+     "h": 3.6,
+     "rotY": -0.1558,
+     "visible": true
     },
     {
      "id": "ore_pile#5",
      "t": "ore_pile",
-     "layer": 2,
+     "layer": 1,
      "pos": [
-      -4.8,
+      -4.926,
       null,
-      -68
+      -5.81
      ],
-     "h": 0.8,
-     "rotY": 0,
-     "visible": true,
-     "dim": 0.75
+     "h": 1.6,
+     "rotY": -0.1149,
+     "visible": true
+    },
+    {
+     "id": "stalagmite_b#3",
+     "t": "stalagmite_b",
+     "layer": 1,
+     "pos": [
+      -4.519,
+      null,
+      -46.51
+     ],
+     "h": 3.6,
+     "rotY": -0.0949,
+     "visible": true
+    },
+    {
+     "id": "ore_pile#6",
+     "t": "ore_pile",
+     "layer": 1,
+     "pos": [
+      4.643,
+      null,
+      -39.707
+     ],
+     "h": 1.6,
+     "rotY": 0.076,
+     "visible": true
     }
    ],
    "boards": [
     {
-     "id": "board:mine_mining",
-     "key": "mine_mining",
+     "id": "board:mining",
+     "key": "mining",
      "kind": "wood",
      "pos": [
-      -6.2,
+      -3.99,
       null,
-      -13
+      -26
      ],
-     "h": 4.6,
-     "rotY": 0.26,
+     "h": 4.8,
+     "rotY": -0.0922,
      "visible": true
     },
     {
-     "id": "board:mine_pvp",
-     "key": "mine_pvp",
+     "id": "board:fights_that_last",
+     "key": "fights_that_last",
      "kind": "wood",
      "pos": [
-      6.4,
+      4.203,
       null,
-      -23
+      -36
      ],
-     "h": 4.6,
-     "rotY": -0.26,
+     "h": 4.8,
+     "rotY": 0.086,
      "visible": true
     },
     {
-     "id": "board:mine_craft",
-     "key": "mine_craft",
+     "id": "board:crafting",
+     "key": "crafting",
      "kind": "wood",
      "pos": [
-      -6.4,
+      -4.056,
       null,
-      -32
+      -50
      ],
-     "h": 4.6,
-     "rotY": 0.26,
+     "h": 4.8,
+     "rotY": -0.1083,
      "visible": true
     }
    ]
@@ -1232,71 +1880,133 @@
   "spirit": {
    "sprites": [
     {
-     "id": "biome_deadtree#1",
-     "t": "biome_deadtree",
-     "layer": 0,
-     "pos": [
-      -25,
-      null,
-      -50
-     ],
-     "h": 13,
-     "rotY": 0,
-     "visible": true,
-     "dim": 0.58
-    },
-    {
      "id": "feat_death_alt#1",
-     "t": "feat_death_alt",
-     "layer": 0,
-     "pos": [
-      24,
-      null,
-      -58
-     ],
-     "h": 11,
-     "rotY": 0,
-     "visible": true,
-     "dim": 0.56
-    },
-    {
-     "id": "feat_death_alt#2",
      "t": "feat_death_alt",
      "layer": 1,
      "pos": [
-      -16.5,
+      -7.501,
       null,
-      -17
+      -9.351
      ],
-     "h": 7.6,
-     "rotY": 0,
+     "h": 7.0,
+     "rotY": -0.2027,
+     "visible": true
+    },
+    {
+     "id": "grave_a#1",
+     "t": "grave_a",
+     "layer": 1,
+     "pos": [
+      4.771,
+      null,
+      -16.708
+     ],
+     "h": 2.2,
+     "rotY": 0.1612,
+     "visible": true
+    },
+    {
+     "id": "grave_b#1",
+     "t": "grave_b",
+     "layer": 1,
+     "pos": [
+      7.171,
+      null,
+      -15.308
+     ],
+     "h": 2.2,
+     "rotY": 0.1637,
+     "visible": true
+    },
+    {
+     "id": "candles#1",
+     "t": "candles",
+     "layer": 1,
+     "pos": [
+      3.371,
+      null,
+      -14.908
+     ],
+     "h": 1.0,
+     "rotY": 0.1529,
      "visible": true
     },
     {
      "id": "biome_deadtree#2",
      "t": "biome_deadtree",
-     "layer": 1,
+     "layer": 0.5,
      "pos": [
-      -1.5,
+      -11.647,
       null,
-      -18
+      -26.918
      ],
-     "h": 9.5,
-     "rotY": 0,
-     "visible": true,
-     "sway": true
+     "h": 9.0,
+     "rotY": -0.1397,
+     "visible": true
     },
     {
      "id": "feat_vendetta#1",
      "t": "feat_vendetta",
      "layer": 1,
      "pos": [
-      1.5,
+      7.408,
       null,
-      -14
+      -34.661
      ],
-     "h": 7.4,
-     "rotY": 0,
+     "h": 5.2,
+     "rotY": 0.0848,
+     "visible": true
+    },
+    {
+     "id": "grave_a#2",
+     "t": "grave_a",
+     "layer": 1,
+     "pos": [
+      -4.32,
+      null,
+      -44.063
+     ],
+     "h": 2.2,
+     "rotY": -0.1822,
+     "visible": true
+    },
+    {
+     "id": "grave_b#2",
+     "t": "grave_b",
+     "layer": 1,
+     "pos": [
+      -6.72,
+      null,
+      -42.663
+     ],
+     "h": 2.2,
+     "rotY": -0.0714,
+     "visible": true
+    },
+    {
+     "id": "candles#2",
+     "t": "candles",
+     "layer": 1,
+     "pos": [
+      -2.92,
+      null,
+      -42.263
+     ],
+     "h": 1.0,
+     "rotY": -0.0994,
+     "visible": true
+    },
+    {
+     "id": "biome_brazier#2",
+     "t": "biome_brazier",
+     "layer": 1,
+     "pos": [
+      7.039,
+      null,
+      -50.813
+     ],
+     "h": 2.6,
+     "rotY": 0.2027,
      "visible": true
     },
     {
@@ -1304,245 +2014,238 @@
      "t": "feat_death",
      "layer": 1,
      "pos": [
-      16,
+      -0.004,
       null,
-      -19
+      -60.947
      ],
-     "h": 7.6,
-     "rotY": 0,
-     "visible": true
-    },
-    {
-     "id": "grave_a#1",
-     "t": "grave_a",
-     "layer": 2,
-     "pos": [
-      -8.2,
-      null,
-      -11
-     ],
-     "h": 1.9,
-     "rotY": 0,
-     "visible": true
-    },
-    {
-     "id": "grave_b#1",
-     "t": "grave_b",
-     "layer": 2,
-     "pos": [
-      -6.4,
-      null,
-      -8
-     ],
-     "h": 1.6,
-     "rotY": 0,
-     "visible": true
-    },
-    {
-     "id": "grave_c#1",
-     "t": "grave_c",
-     "layer": 2,
-     "pos": [
-      -9.6,
-      null,
-      -7
-     ],
-     "h": 1.7,
-     "rotY": 0,
-     "visible": true,
-     "dim": 0.9
-    },
-    {
-     "id": "grave_a#2",
-     "t": "grave_a",
-     "layer": 2,
-     "pos": [
-      -3,
-      null,
-      -20
-     ],
-     "h": 1.8,
-     "rotY": 0,
-     "visible": true,
-     "dim": 0.9
-    },
-    {
-     "id": "grave_b#2",
-     "t": "grave_b",
-     "layer": 2,
-     "pos": [
-      -1.2,
-      null,
-      -23
-     ],
-     "h": 1.5,
-     "rotY": 0,
-     "visible": true,
-     "dim": 0.85
-    },
-    {
-     "id": "candles#1",
-     "t": "candles",
-     "layer": 2,
-     "pos": [
-      -7,
-      null,
-      -5
-     ],
-     "h": 0.9,
-     "rotY": 0,
-     "visible": true
-    },
-    {
-     "id": "candles#2",
-     "t": "candles",
-     "layer": 2,
-     "pos": [
-      2.6,
-      null,
-      -17
-     ],
-     "h": 0.8,
-     "rotY": 0,
-     "visible": true
-    },
-    {
-     "id": "rock_l#1",
-     "t": "rock_l",
-     "layer": 2,
-     "pos": [
-      10.5,
-      null,
-      -9
-     ],
-     "h": 2.6,
-     "rotY": 0,
-     "visible": true,
-     "dim": 0.9
-    },
-    {
-     "id": "biome_brazier#1",
-     "t": "biome_brazier",
-     "layer": 2,
-     "pos": [
-      4.5,
-      null,
-      -5
-     ],
-     "h": 2.7,
-     "rotY": 0,
+     "h": 6.0,
+     "rotY": 0.0,
      "visible": true
     },
     {
      "id": "biome_deadtree#3",
      "t": "biome_deadtree",
-     "layer": 3,
+     "layer": 0,
      "pos": [
-      -12,
+      -25.995,
       null,
-      9
+      -19.553
      ],
-     "h": 21,
-     "rotY": 0,
+     "h": 9.0,
+     "rotY": 0.0,
      "visible": true,
-     "dim": 0.18,
-     "blur": 2.6
+     "dim": 0.5
     },
     {
-     "id": "grave_b#3",
-     "t": "grave_b",
-     "layer": 2,
+     "id": "biome_deadtree#4",
+     "t": "biome_deadtree",
+     "layer": 0,
      "pos": [
-      -4.8,
+      25.927,
       null,
-      -30
+      -42.756
      ],
-     "h": 1.3,
-     "rotY": 0,
+     "h": 9.0,
+     "rotY": 0.0,
      "visible": true,
-     "dim": 0.95
+     "dim": 0.5
+    },
+    {
+     "id": "biome_deadtree#5",
+     "t": "biome_deadtree",
+     "layer": 0,
+     "pos": [
+      -25.65,
+      null,
+      -64.42
+     ],
+     "h": 9.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.5
+    },
+    {
+     "id": "grave_c#1",
+     "t": "grave_c",
+     "layer": 1,
+     "pos": [
+      7.96,
+      null,
+      -63.975
+     ],
+     "h": 2.2,
+     "rotY": 0.1007,
+     "visible": true
     },
     {
      "id": "candles#3",
      "t": "candles",
-     "layer": 2,
+     "layer": 1,
      "pos": [
-      4.6,
+      -5.503,
       null,
-      -37
+      -68.538
      ],
-     "h": 0.7,
-     "rotY": 0,
+     "h": 1.0,
+     "rotY": -0.1991,
      "visible": true
     },
     {
-     "id": "grave_a#3",
-     "t": "grave_a",
-     "layer": 2,
+     "id": "rock_m#1",
+     "t": "rock_m",
+     "layer": 1,
      "pos": [
-      -5.2,
+      -7.752,
       null,
-      -46
+      -5.038
      ],
-     "h": 1.4,
-     "rotY": 0,
-     "visible": true,
-     "dim": 0.9
+     "h": 2.0,
+     "rotY": -0.1396,
+     "visible": true
     },
     {
      "id": "grave_c#2",
      "t": "grave_c",
-     "layer": 2,
+     "layer": 1,
      "pos": [
-      5,
+      6.424,
       null,
-      -56
+      -27.668
      ],
-     "h": 1.3,
-     "rotY": 0,
-     "visible": true,
-     "dim": 0.85
+     "h": 2.2,
+     "rotY": 0.1562,
+     "visible": true
     },
     {
-     "id": "grave_b#4",
-     "t": "grave_b",
-     "layer": 2,
+     "id": "candles#4",
+     "t": "candles",
+     "layer": 1,
      "pos": [
-      -4.8,
+      -7.457,
       null,
-      -66
+      -48.323
      ],
-     "h": 1.2,
-     "rotY": 0,
-     "visible": true,
-     "dim": 0.8
+     "h": 1.0,
+     "rotY": -0.1653,
+     "visible": true
+    },
+    {
+     "id": "rock_m#2",
+     "t": "rock_m",
+     "layer": 1,
+     "pos": [
+      6.03,
+      null,
+      -41.64
+     ],
+     "h": 2.0,
+     "rotY": 0.1529,
+     "visible": true
+    },
+    {
+     "id": "grave_c#3",
+     "t": "grave_c",
+     "layer": 1,
+     "pos": [
+      8.317,
+      null,
+      -2.269
+     ],
+     "h": 2.2,
+     "rotY": 0.0862,
+     "visible": true
+    },
+    {
+     "id": "candles#5",
+     "t": "candles",
+     "layer": 1,
+     "pos": [
+      7.645,
+      null,
+      -6.681
+     ],
+     "h": 1.0,
+     "rotY": 0.181,
+     "visible": true
+    },
+    {
+     "id": "rock_m#3",
+     "t": "rock_m",
+     "layer": 1,
+     "pos": [
+      -4.598,
+      null,
+      -3.28
+     ],
+     "h": 2.0,
+     "rotY": -0.1388,
+     "visible": true
+    },
+    {
+     "id": "grave_c#4",
+     "t": "grave_c",
+     "layer": 1,
+     "pos": [
+      5.599,
+      null,
+      -18.091
+     ],
+     "h": 2.2,
+     "rotY": 0.1895,
+     "visible": true
+    },
+    {
+     "id": "candles#6",
+     "t": "candles",
+     "layer": 1,
+     "pos": [
+      4.959,
+      null,
+      -11.025
+     ],
+     "h": 1.0,
+     "rotY": 0.1889,
+     "visible": true
+    },
+    {
+     "id": "rock_m#4",
+     "t": "rock_m",
+     "layer": 1,
+     "pos": [
+      -8.104,
+      null,
+      -28.4
+     ],
+     "h": 2.0,
+     "rotY": -0.1653,
+     "visible": true
     }
    ],
    "boards": [
     {
-     "id": "board:spirit_vendetta",
-     "key": "spirit_vendetta",
+     "id": "board:vendetta",
+     "key": "vendetta",
      "kind": "stone",
      "pos": [
-      -6.2,
+      4.094,
       null,
-      -15
+      -30
      ],
      "h": 4.8,
-     "rotY": 0.24,
+     "rotY": 0.0795,
      "visible": true
     },
     {
-     "id": "board:spirit_death",
-     "key": "spirit_death",
+     "id": "board:death_is_a_place",
+     "key": "death_is_a_place",
      "kind": "stone",
      "pos": [
-      6.6,
+      -4.111,
       null,
-      -24
+      -48
      ],
      "h": 4.8,
-     "rotY": -0.24,
+     "rotY": -0.1607,
      "visible": true
     }
    ]
@@ -1550,314 +2253,473 @@
   "home": {
    "sprites": [
     {
-     "id": "moon#1",
-     "t": "moon",
-     "layer": 0,
-     "pos": [
-      15,
-      31,
-      -92
-     ],
-     "h": 5.5,
-     "rotY": 0,
-     "visible": true,
-     "nofog": true
-    },
-    {
-     "id": "cloud_b#1",
-     "t": "cloud_b",
-     "layer": 0,
-     "pos": [
-      -20,
-      28,
-      -84
-     ],
-     "h": 9,
-     "rotY": 0,
-     "visible": true,
-     "drift": 0.24,
-     "span": 110
-    },
-    {
-     "id": "cloud_a#1",
-     "t": "cloud_a",
-     "layer": 0,
-     "pos": [
-      22,
-      33,
-      -90
-     ],
-     "h": 8,
-     "rotY": 0,
-     "visible": true,
-     "dim": 0.9,
-     "drift": 0.18,
-     "span": 110
-    },
-    {
-     "id": "hero_tree_a#1",
-     "t": "hero_tree_a",
-     "layer": 0,
-     "pos": [
-      -31,
-      null,
-      -56
-     ],
-     "h": 14,
-     "rotY": 0,
-     "visible": true,
-     "dim": 0.7
-    },
-    {
-     "id": "biome_pine_b#1",
-     "t": "biome_pine_b",
-     "layer": 0,
-     "pos": [
-      26,
-      null,
-      -46
-     ],
-     "h": 13,
-     "rotY": 0,
-     "visible": true,
-     "dim": 0.68
-    },
-    {
-     "id": "hero_house_b#1",
-     "t": "hero_house_b",
-     "layer": 1,
-     "pos": [
-      -10,
-      null,
-      -16
-     ],
-     "h": 7.6,
-     "rotY": 0,
-     "visible": true
-    },
-    {
-     "id": "hero_tree_a#2",
+     "id": "hero_tree_a#3",
      "t": "hero_tree_a",
      "layer": 1,
      "pos": [
-      -1.5,
+      -7.895,
       null,
-      -21
+      -9.398
      ],
-     "h": 8,
-     "rotY": 0,
+     "h": 8.4,
+     "rotY": -0.1392,
      "visible": true,
      "sway": true
     },
     {
-     "id": "hero_house_a#1",
-     "t": "hero_house_a",
+     "id": "hero_tree_b#6",
+     "t": "hero_tree_b",
      "layer": 1,
      "pos": [
-      14.5,
+      -10.895,
       null,
-      -15
+      -7.798
      ],
-     "h": 8.4,
-     "rotY": 0,
+     "h": 2.2,
+     "rotY": -0.1433,
      "visible": true
     },
     {
-     "id": "prop_lantern#1",
-     "t": "prop_lantern",
-     "layer": 2,
+     "id": "grass_tuft_b#7",
+     "t": "grass_tuft_b",
+     "layer": 1,
      "pos": [
-      1.4,
+      -5.695,
       null,
-      -3
+      -7.598
      ],
-     "h": 3.6,
-     "rotY": 0,
+     "h": 1.1,
+     "rotY": -0.1808,
      "visible": true
     },
     {
      "id": "chest#1",
      "t": "chest",
-     "layer": 2,
+     "layer": 1,
      "pos": [
-      -3.6,
+      -4.004,
       null,
-      -6
+      -27.413
      ],
-     "h": 1.4,
-     "rotY": 0,
+     "h": 1.6,
+     "rotY": -0.1684,
      "visible": true
     },
     {
-     "id": "hero_fence#1",
-     "t": "hero_fence",
-     "layer": 2,
+     "id": "hero_tree_a#4",
+     "t": "hero_tree_a",
+     "layer": 0.5,
      "pos": [
-      -8.2,
+      11.307,
       null,
-      -10
+      -36.473
      ],
-     "h": 1.5,
-     "rotY": 0,
-     "visible": true
+     "h": 8.4,
+     "rotY": 0.1145,
+     "visible": true,
+     "sway": true
     },
     {
-     "id": "hero_fence#2",
-     "t": "hero_fence",
-     "layer": 2,
-     "pos": [
-      -8.2,
-      null,
-      -16
-     ],
-     "h": 1.5,
-     "rotY": 0,
-     "visible": true
-    },
-    {
-     "id": "haystack#1",
-     "t": "haystack",
-     "layer": 2,
-     "pos": [
-      10.8,
-      null,
-      -5
-     ],
-     "h": 2.3,
-     "rotY": 0,
-     "visible": true
-    },
-    {
-     "id": "grass_tuft_b#1",
-     "t": "grass_tuft_b",
-     "layer": 2,
-     "pos": [
-      -5.4,
-      null,
-      -3
-     ],
-     "h": 0.9,
-     "rotY": 0,
-     "visible": true
-    },
-    {
-     "id": "grass_tuft_a#1",
-     "t": "grass_tuft_a",
-     "layer": 2,
-     "pos": [
-      5.8,
-      null,
-      -13
-     ],
-     "h": 0.8,
-     "rotY": 0,
-     "visible": true
-    },
-    {
-     "id": "hero_tree_b#1",
+     "id": "hero_tree_b#7",
      "t": "hero_tree_b",
-     "layer": 3,
+     "layer": 0.5,
      "pos": [
-      -12,
+      14.307,
       null,
-      9
+      -34.873
      ],
-     "h": 10,
-     "rotY": 0,
-     "visible": true,
-     "dim": 0.24,
-     "blur": 2.6
-    },
-    {
-     "id": "grass_tuft_a#2",
-     "t": "grass_tuft_a",
-     "layer": 2,
-     "pos": [
-      -4.8,
-      null,
-      -26
-     ],
-     "h": 0.8,
-     "rotY": 0,
+     "h": 2.2,
+     "rotY": 0.099,
      "visible": true
     },
     {
-     "id": "rock_s#1",
-     "t": "rock_s",
-     "layer": 2,
-     "pos": [
-      5,
-      null,
-      -33
-     ],
-     "h": 0.7,
-     "rotY": 0,
-     "visible": true
-    },
-    {
-     "id": "grass_tuft_b#2",
+     "id": "grass_tuft_b#8",
      "t": "grass_tuft_b",
-     "layer": 2,
+     "layer": 0.5,
      "pos": [
-      -5.2,
+      9.107,
       null,
-      -43
+      -34.673
      ],
-     "h": 0.8,
-     "rotY": 0,
-     "visible": true,
-     "dim": 0.95
+     "h": 1.1,
+     "rotY": 0.0737,
+     "visible": true
     },
     {
-     "id": "rock_m#1",
-     "t": "rock_m",
-     "layer": 2,
+     "id": "hero_house_b#4",
+     "t": "hero_house_b",
+     "layer": 1,
      "pos": [
-      5.4,
+      0.276,
       null,
-      -54
+      -48.073
+     ],
+     "h": 7.4,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "hero_fence#7",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      -2.324,
+      null,
+      -44.673
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "hero_fence#8",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      2.876,
+      null,
+      -44.673
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "hero_tree_b#8",
+     "t": "hero_tree_b",
+     "layer": 1,
+     "pos": [
+      4.476,
+      null,
+      -46.873
+     ],
+     "h": 2.2,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "grass_tuft_a#12",
+     "t": "grass_tuft_a",
+     "layer": 1,
+     "pos": [
+      -3.324,
+      null,
+      -45.873
+     ],
+     "h": 1.1,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "biome_pine_b#23",
+     "t": "biome_pine_b",
+     "layer": 0,
+     "pos": [
+      -26.0,
+      null,
+      -30
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.7
+    },
+    {
+     "id": "biome_pine_b#24",
+     "t": "biome_pine_b",
+     "layer": 0,
+     "pos": [
+      -20.0,
+      null,
+      -33.0
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.62
+    },
+    {
+     "id": "biome_pine_b#25",
+     "t": "biome_pine_b",
+     "layer": 0,
+     "pos": [
+      26.0,
+      null,
+      -56
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.7
+    },
+    {
+     "id": "biome_pine_b#26",
+     "t": "biome_pine_b",
+     "layer": 0,
+     "pos": [
+      32.0,
+      null,
+      -59.0
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.62
+    },
+    {
+     "id": "biome_pine_b#27",
+     "t": "biome_pine_b",
+     "layer": 0,
+     "pos": [
+      -26.0,
+      null,
+      -82
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.7
+    },
+    {
+     "id": "biome_pine_b#28",
+     "t": "biome_pine_b",
+     "layer": 0,
+     "pos": [
+      -20.0,
+      null,
+      -85.0
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.62
+    },
+    {
+     "id": "cloud_a#3",
+     "t": "cloud_a",
+     "layer": 0,
+     "pos": [
+      18.655,
+      30.651,
+      -85.319
+     ],
+     "h": 8.0,
+     "rotY": 0.0,
+     "visible": true,
+     "drift": 0.363,
+     "span": 110
+    },
+    {
+     "id": "cloud_b#2",
+     "t": "cloud_b",
+     "layer": 0,
+     "pos": [
+      -14.461,
+      30.76,
+      -69.65
+     ],
+     "h": 8.0,
+     "rotY": 0.0,
+     "visible": true,
+     "drift": 0.233,
+     "span": 110
+    },
+    {
+     "id": "cloud_a#4",
+     "t": "cloud_a",
+     "layer": 0,
+     "pos": [
+      2.163,
+      31.165,
+      -80.614
+     ],
+     "h": 8.0,
+     "rotY": 0.0,
+     "visible": true,
+     "drift": 0.298,
+     "span": 110
+    },
+    {
+     "id": "moon#1",
+     "t": "moon",
+     "layer": 0,
+     "pos": [
+      14,
+      30,
+      -80
+     ],
+     "h": 6.0,
+     "rotY": 0.0,
+     "visible": true,
+     "nofog": true
+    },
+    {
+     "id": "grass_tuft_a#13",
+     "t": "grass_tuft_a",
+     "layer": 1,
+     "pos": [
+      -6.975,
+      null,
+      -42.094
+     ],
+     "h": 1.1,
+     "rotY": -0.1522,
+     "visible": true
+    },
+    {
+     "id": "grass_tuft_b#9",
+     "t": "grass_tuft_b",
+     "layer": 1,
+     "pos": [
+      4.1,
+      null,
+      -41.431
+     ],
+     "h": 1.1,
+     "rotY": 0.1185,
+     "visible": true
+    },
+    {
+     "id": "rock_s#8",
+     "t": "rock_s",
+     "layer": 1,
+     "pos": [
+      -8.255,
+      null,
+      -79.748
      ],
      "h": 1.2,
-     "rotY": 0,
-     "visible": true,
-     "dim": 0.9
+     "rotY": -0.0802,
+     "visible": true
+    },
+    {
+     "id": "grass_tuft_a#14",
+     "t": "grass_tuft_a",
+     "layer": 1,
+     "pos": [
+      -4.382,
+      null,
+      -83.3
+     ],
+     "h": 1.1,
+     "rotY": -0.1927,
+     "visible": true
+    },
+    {
+     "id": "grass_tuft_b#10",
+     "t": "grass_tuft_b",
+     "layer": 1,
+     "pos": [
+      5.666,
+      null,
+      -7.619
+     ],
+     "h": 1.1,
+     "rotY": 0.1588,
+     "visible": true
+    },
+    {
+     "id": "rock_s#9",
+     "t": "rock_s",
+     "layer": 1,
+     "pos": [
+      4.332,
+      null,
+      -33.608
+     ],
+     "h": 1.2,
+     "rotY": 0.0954,
+     "visible": true
+    },
+    {
+     "id": "grass_tuft_a#15",
+     "t": "grass_tuft_a",
+     "layer": 1,
+     "pos": [
+      -5.847,
+      null,
+      -39.701
+     ],
+     "h": 1.1,
+     "rotY": -0.078,
+     "visible": true
+    },
+    {
+     "id": "grass_tuft_b#11",
+     "t": "grass_tuft_b",
+     "layer": 1,
+     "pos": [
+      5.608,
+      null,
+      -77.697
+     ],
+     "h": 1.1,
+     "rotY": 0.0981,
+     "visible": true
+    },
+    {
+     "id": "rock_s#10",
+     "t": "rock_s",
+     "layer": 1,
+     "pos": [
+      5.559,
+      null,
+      -54.867
+     ],
+     "h": 1.2,
+     "rotY": 0.1907,
+     "visible": true
+    },
+    {
+     "id": "grass_tuft_a#16",
+     "t": "grass_tuft_a",
+     "layer": 1,
+     "pos": [
+      -5.865,
+      null,
+      -72.583
+     ],
+     "h": 1.1,
+     "rotY": -0.1103,
+     "visible": true
     }
    ],
    "boards": [
     {
-     "id": "board:home_factions",
-     "key": "home_factions",
-     "kind": "stone",
+     "id": "board:humans_and_monsters",
+     "key": "humans_and_monsters",
+     "kind": "wood",
      "pos": [
-      -6.4,
+      5.148,
       null,
-      -4
+      -24
      ],
-     "h": 4.6,
-     "rotY": 0.22,
+     "h": 4.8,
+     "rotY": 0.1237,
      "visible": true
     },
     {
-     "id": "board:home",
-     "key": "home",
+     "id": "board:a_home_to_come_back_to",
+     "key": "a_home_to_come_back_to",
      "kind": "wood",
      "pos": [
-      6.2,
+      -4.703,
       null,
-      -19
+      -42
      ],
-     "h": 5,
-     "rotY": -0.24,
+     "h": 4.8,
+     "rotY": -0.17,
      "visible": true
     }
    ],
    "counter": {
     "id": "counter",
+    "visible": true,
     "stall": {
      "t": "feat_world",
-     "x": -8.6,
-     "z": -25,
-     "h": 6,
+     "x": 7.4,
+     "z": -18,
+     "h": 5.72,
      "layer": 1
     },
     "items": [
@@ -1870,12 +2732,11 @@
      "res_sword",
      "res_staff"
     ],
-    "x0": -10.8,
+    "x0": 5.1,
     "step": 0.62,
-    "y": 3.15,
-    "z": -24.2,
-    "h": 0.72,
-    "visible": true
+    "y": 2.974,
+    "z": -17.2,
+    "h": 0.72
    }
   }
  }

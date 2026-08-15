@@ -30,8 +30,8 @@ import sys
 import time
 import traceback
 
-PIPELINE = pathlib.Path(r"D:\Dev\ART_Fellmise")
-sys.path.insert(0, str(PIPELINE / "scripts"))
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+import pipeline  # noqa: E402  — находит пайплайн, где бы он ни лежал
 import comfy_client as cc  # noqa: E402
 
 # The client hard-codes 127.0.0.1:8188. The headless instance that used to sit
@@ -42,7 +42,7 @@ cc.SERVER = "http://127.0.0.1:8189"
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 RAW = ROOT / "out" / "site_assets" / "_raw"
 ERRLOG = ROOT / "out" / "site_assets" / "gen_errors.log"
-WORKFLOW = PIPELINE / "workflows" / "objects_battle_v2.json"
+WORKFLOW = pipeline.workflow("objects_battle_v2.json")
 
 LORA = "fellmise_sprite_v2.safetensors"
 WEIGHT = 0.7

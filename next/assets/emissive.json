@@ -31,26 +31,26 @@
   "strength": 0.8,
   "colour": [
    254,
-   226,
+   225,
    63
   ]
  },
  "hero_house_a": {
   "kind": "steady",
-  "strength": 0.88,
+  "strength": 0.86,
   "colour": [
    253,
-   223,
-   149
+   241,
+   172
   ]
  },
  "hero_house_b": {
   "kind": "steady",
-  "strength": 0.86,
+  "strength": 0.71,
   "colour": [
    254,
-   230,
-   145
+   243,
+   148
   ]
  },
  "feat_tavern": {
@@ -58,8 +58,8 @@
   "strength": 0.8,
   "colour": [
    252,
-   227,
-   97
+   226,
+   99
   ]
  },
  "feat_death": {
@@ -67,7 +67,7 @@
   "strength": 0.88,
   "colour": [
    237,
-   166,
+   167,
    120
   ]
  },
@@ -82,7 +82,7 @@
  },
  "feat_mining": {
   "kind": "pulse",
-  "strength": 0.53,
+  "strength": 0.52,
   "colour": [
    95,
    180,
@@ -91,11 +91,11 @@
  },
  "lantern_chain": {
   "kind": "steady",
-  "strength": 0.42,
+  "strength": 0.43,
   "colour": [
    249,
-   222,
-   97
+   223,
+   98
   ]
  },
  "candles": {

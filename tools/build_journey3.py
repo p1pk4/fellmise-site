@@ -44,17 +44,20 @@ BIOME_TEXT = [
 # board key -> where the words come from. `tagline` is the slogan pair; anything
 # else is a feature id out of build_site.FEATURES.
 BOARD_COPY = {
-    "village": "tagline",
-    "forest": "skills",
-    "mine_mining": "mining",
-    "mine_pvp": "pvp",
-    "spirit_death": "death",
-    "spirit_vendetta": "vendetta",
-    "home": "home",
-    # the three that had no board, and the counter's own title
-    "village_world": "world",
-    "mine_craft": "craft",
-    "home_factions": "factions",
+    # Keyed by the SPEC's names, not by our own: assets/scene_spec.json decides
+    # which board stands where, and one vocabulary beats a translation table
+    # nobody remembers to update. `tagline` is the slogan pair; the rest are
+    # feature ids out of build_site.FEATURES.
+    "slogan": "tagline",
+    "world_plays_itself": "world",
+    "skills_no_levels": "skills",
+    "mining": "mining",
+    "fights_that_last": "pvp",
+    "crafting": "craft",
+    "vendetta": "vendetta",
+    "death_is_a_place": "death",
+    "humans_and_monsters": "factions",
+    "a_home_to_come_back_to": "home",
 }
 
 BIOME_NAME = {

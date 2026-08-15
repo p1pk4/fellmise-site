@@ -1,0 +1,110 @@
+{
+ "biome_brazier": {
+  "kind": "fire",
+  "strength": 0.47,
+  "colour": [
+   245,
+   164,
+   73
+  ]
+ },
+ "biome_portal": {
+  "kind": "pulse",
+  "strength": 0.32,
+  "colour": [
+   80,
+   235,
+   223
+  ]
+ },
+ "biome_crystals": {
+  "kind": "pulse",
+  "strength": 0.32,
+  "colour": [
+   203,
+   83,
+   245
+  ]
+ },
+ "prop_lantern": {
+  "kind": "steady",
+  "strength": 0.8,
+  "colour": [
+   254,
+   226,
+   63
+  ]
+ },
+ "hero_house_a": {
+  "kind": "steady",
+  "strength": 0.88,
+  "colour": [
+   253,
+   223,
+   149
+  ]
+ },
+ "hero_house_b": {
+  "kind": "steady",
+  "strength": 0.86,
+  "colour": [
+   254,
+   230,
+   145
+  ]
+ },
+ "feat_tavern": {
+  "kind": "steady",
+  "strength": 0.8,
+  "colour": [
+   252,
+   227,
+   97
+  ]
+ },
+ "feat_death": {
+  "kind": "fire",
+  "strength": 0.88,
+  "colour": [
+   237,
+   166,
+   120
+  ]
+ },
+ "biome_orevein": {
+  "kind": "pulse",
+  "strength": 0.74,
+  "colour": [
+   70,
+   156,
+   189
+  ]
+ },
+ "feat_mining": {
+  "kind": "pulse",
+  "strength": 0.53,
+  "colour": [
+   95,
+   180,
+   212
+  ]
+ },
+ "lantern_chain": {
+  "kind": "steady",
+  "strength": 0.42,
+  "colour": [
+   249,
+   222,
+   97
+  ]
+ },
+ "candles": {
+  "kind": "fire",
+  "strength": 0.32,
+  "colour": [
+   254,
+   219,
+   115
+  ]
+ }
+}

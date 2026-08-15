@@ -1,0 +1,656 @@
+{
+ "rows": [
+  {
+   "id": "barn",
+   "view": "изометрия",
+   "biomes": [
+    "village"
+   ],
+   "verdict": "перегенерить",
+   "why": "изометрия на вертикальной плоскости: видна верхняя грань"
+  },
+  {
+   "id": "beam_frame",
+   "view": "изометрия",
+   "biomes": [
+    "mine"
+   ],
+   "verdict": "не использовать",
+   "why": "сплошной щит, а не арка: под ним не пролететь, а рядом он читается воротами в никуда"
+  },
+  {
+   "id": "biome_brazier",
+   "view": "изометрия",
+   "biomes": [
+    "mine",
+    "spirit"
+   ],
+   "verdict": "перегенерить",
+   "why": "изометрия на вертикальной плоскости: видна верхняя грань"
+  },
+  {
+   "id": "biome_crystals",
+   "view": "изометрия",
+   "biomes": [
+    "mine"
+   ],
+   "verdict": "перегенерить",
+   "why": "изометрия на вертикальной плоскости: видна верхняя грань"
+  },
+  {
+   "id": "biome_deadtree",
+   "view": "фронт",
+   "biomes": [
+    "forest",
+    "spirit"
+   ],
+   "verdict": "ok",
+   "why": ""
+  },
+  {
+   "id": "biome_orevein",
+   "view": "фронт",
+   "biomes": [
+    "mine"
+   ],
+   "verdict": "ok",
+   "why": ""
+  },
+  {
+   "id": "biome_pine_a",
+   "view": "фронт",
+   "biomes": [
+    "forest"
+   ],
+   "verdict": "ok",
+   "why": ""
+  },
+  {
+   "id": "biome_pine_b",
+   "view": "фронт",
+   "biomes": [
+    "forest",
+    "home",
+    "village"
+   ],
+   "verdict": "ok",
+   "why": ""
+  },
+  {
+   "id": "biome_portal",
+   "view": "изометрия",
+   "biomes": [],
+   "verdict": "ok",
+   "why": "в сцене не стоит — на полке"
+  },
+  {
+   "id": "biome_stump",
+   "view": "изометрия",
+   "biomes": [
+    "forest"
+   ],
+   "verdict": "перегенерить",
+   "why": "изометрия на вертикальной плоскости: видна верхняя грань"
+  },
+  {
+   "id": "branch_canopy",
+   "view": "фронт",
+   "biomes": [],
+   "verdict": "ok",
+   "why": ""
+  },
+  {
+   "id": "candles",
+   "view": "фронт",
+   "biomes": [
+    "spirit"
+   ],
+   "verdict": "ok",
+   "why": ""
+  },
+  {
+   "id": "chest",
+   "view": "изометрия",
+   "biomes": [
+    "home"
+   ],
+   "verdict": "перегенерить",
+   "why": "изометрия на вертикальной плоскости: видна верхняя грань"
+  },
+  {
+   "id": "cloud_a",
+   "view": "плоский",
+   "biomes": [
+    "home",
+    "village"
+   ],
+   "verdict": "ok",
+   "why": ""
+  },
+  {
+   "id": "cloud_b",
+   "view": "плоский",
+   "biomes": [
+    "home",
+    "village"
+   ],
+   "verdict": "ok",
+   "why": ""
+  },
+  {
+   "id": "cloud_c",
+   "view": "плоский",
+   "biomes": [
+    "forest",
+    "village"
+   ],
+   "verdict": "ok",
+   "why": ""
+  },
+  {
+   "id": "feat_craft",
+   "view": "изометрия",
+   "biomes": [
+    "mine"
+   ],
+   "verdict": "перегенерить",
+   "why": "изометрия на вертикальной плоскости: видна верхняя грань"
+  },
+  {
+   "id": "feat_death",
+   "view": "изометрия",
+   "biomes": [
+    "spirit"
+   ],
+   "verdict": "перегенерить",
+   "why": "изометрия на вертикальной плоскости: видна верхняя грань"
+  },
+  {
+   "id": "feat_death_alt",
+   "view": "изометрия",
+   "biomes": [
+    "spirit"
+   ],
+   "verdict": "перегенерить",
+   "why": "изометрия на вертикальной плоскости: видна верхняя грань"
+  },
+  {
+   "id": "feat_home",
+   "view": "изометрия",
+   "biomes": [],
+   "verdict": "ok",
+   "why": "в сцене не стоит — на полке"
+  },
+  {
+   "id": "feat_mining",
+   "view": "изометрия",
+   "biomes": [
+    "mine"
+   ],
+   "verdict": "перегенерить",
+   "why": "изометрия на вертикальной плоскости: видна верхняя грань"
+  },
+  {
+   "id": "feat_pvp",
+   "view": "фронт",
+   "biomes": [],
+   "verdict": "ok",
+   "why": ""
+  },
+  {
+   "id": "feat_skills",
+   "view": "фронт",
+   "biomes": [],
+   "verdict": "ok",
+   "why": ""
+  },
+  {
+   "id": "feat_tavern",
+   "view": "изометрия",
+   "biomes": [
+    "village"
+   ],
+   "verdict": "перегенерить",
+   "why": "изометрия на вертикальной плоскости: видна верхняя грань"
+  },
+  {
+   "id": "feat_vendetta",
+   "view": "изометрия",
+   "biomes": [
+    "spirit"
+   ],
+   "verdict": "перегенерить",
+   "why": "изометрия на вертикальной плоскости: видна верхняя грань"
+  },
+  {
+   "id": "feat_world",
+   "view": "изометрия",
+   "biomes": [
+    "home"
+   ],
+   "verdict": "ok",
+   "why": "прилавок, стоит боком к дороге; купол вида сверху читается как навес"
+  },
+  {
+   "id": "fence_seg",
+   "view": "фронт",
+   "biomes": [],
+   "verdict": "ok",
+   "why": ""
+  },
+  {
+   "id": "fern",
+   "view": "фронт",
+   "biomes": [
+    "forest"
+   ],
+   "verdict": "ok",
+   "why": ""
+  },
+  {
+   "id": "grass_tuft_a",
+   "view": "фронт",
+   "biomes": [
+    "home",
+    "village"
+   ],
+   "verdict": "ok",
+   "why": ""
+  },
+  {
+   "id": "grass_tuft_b",
+   "view": "фронт",
+   "biomes": [
+    "home",
+    "village"
+   ],
+   "verdict": "ok",
+   "why": ""
+  },
+  {
+   "id": "grave_a",
+   "view": "фронт",
+   "biomes": [
+    "spirit"
+   ],
+   "verdict": "ok",
+   "why": ""
+  },
+  {
+   "id": "grave_b",
+   "view": "фронт",
+   "biomes": [
+    "spirit"
+   ],
+   "verdict": "ok",
+   "why": ""
+  },
+  {
+   "id": "grave_c",
+   "view": "изометрия",
+   "biomes": [
+    "spirit"
+   ],
+   "verdict": "перегенерить",
+   "why": "изометрия на вертикальной плоскости: видна верхняя грань"
+  },
+  {
+   "id": "haystack",
+   "view": "изометрия",
+   "biomes": [
+    "home",
+    "village"
+   ],
+   "verdict": "перегенерить",
+   "why": "изометрия на вертикальной плоскости: видна верхняя грань"
+  },
+  {
+   "id": "hero_cart",
+   "view": "изометрия",
+   "biomes": [
+    "village"
+   ],
+   "verdict": "перегенерить",
+   "why": "изометрия на вертикальной плоскости: видна верхняя грань"
+  },
+  {
+   "id": "hero_fence",
+   "view": "фронт",
+   "biomes": [
+    "home",
+    "village"
+   ],
+   "verdict": "ok",
+   "why": ""
+  },
+  {
+   "id": "hero_house_a",
+   "view": "изометрия",
+   "biomes": [
+    "home",
+    "village"
+   ],
+   "verdict": "перегенерить",
+   "why": "изометрия на вертикальной плоскости: видна верхняя грань"
+  },
+  {
+   "id": "hero_house_b",
+   "view": "изометрия",
+   "biomes": [
+    "home",
+    "village"
+   ],
+   "verdict": "перегенерить",
+   "why": "изометрия на вертикальной плоскости: видна верхняя грань"
+  },
+  {
+   "id": "hero_tree_a",
+   "view": "фронт",
+   "biomes": [
+    "home",
+    "village"
+   ],
+   "verdict": "ok",
+   "why": ""
+  },
+  {
+   "id": "hero_tree_b",
+   "view": "фронт",
+   "biomes": [
+    "home",
+    "village"
+   ],
+   "verdict": "ok",
+   "why": ""
+  },
+  {
+   "id": "hero_well",
+   "view": "изометрия",
+   "biomes": [
+    "village"
+   ],
+   "verdict": "перегенерить",
+   "why": "изометрия на вертикальной плоскости: видна верхняя грань"
+  },
+  {
+   "id": "hill_dark",
+   "view": "фронт",
+   "biomes": [
+    "forest"
+   ],
+   "verdict": "ok",
+   "why": ""
+  },
+  {
+   "id": "hill_green",
+   "view": "изометрия",
+   "biomes": [],
+   "verdict": "ok",
+   "why": "задник за линией горизонта, ниже уровня земли — верхняя грань не видна"
+  },
+  {
+   "id": "lantern_chain",
+   "view": "фронт",
+   "biomes": [
+    "mine"
+   ],
+   "verdict": "ok",
+   "why": ""
+  },
+  {
+   "id": "minecart",
+   "view": "изометрия",
+   "biomes": [
+    "mine"
+   ],
+   "verdict": "перегенерить",
+   "why": "изометрия на вертикальной плоскости: видна верхняя грань"
+  },
+  {
+   "id": "moon",
+   "view": "плоский",
+   "biomes": [
+    "home"
+   ],
+   "verdict": "ok",
+   "why": ""
+  },
+  {
+   "id": "mushrooms",
+   "view": "фронт",
+   "biomes": [
+    "forest"
+   ],
+   "verdict": "ok",
+   "why": ""
+  },
+  {
+   "id": "ore_pile",
+   "view": "изометрия",
+   "biomes": [
+    "mine"
+   ],
+   "verdict": "перегенерить",
+   "why": "изометрия на вертикальной плоскости: видна верхняя грань"
+  },
+  {
+   "id": "prop_crates",
+   "view": "изометрия",
+   "biomes": [
+    "village"
+   ],
+   "verdict": "перегенерить",
+   "why": "изометрия на вертикальной плоскости: видна верхняя грань"
+  },
+  {
+   "id": "prop_lantern",
+   "view": "фронт",
+   "biomes": [
+    "home",
+    "village"
+   ],
+   "verdict": "ok",
+   "why": ""
+  },
+  {
+   "id": "prop_signpost",
+   "view": "фронт",
+   "biomes": [
+    "village"
+   ],
+   "verdict": "ok",
+   "why": ""
+  },
+  {
+   "id": "prop_stones",
+   "view": "изометрия",
+   "biomes": [
+    "village"
+   ],
+   "verdict": "не использовать",
+   "why": "дорожка камней сверху — на вертикальной плоскости это просто пятно; в сцене её роль уже закрывают rock_s и grass_tuft"
+  },
+  {
+   "id": "res_axe",
+   "view": "плоский",
+   "biomes": [],
+   "verdict": "ok",
+   "why": ""
+  },
+  {
+   "id": "res_bow",
+   "view": "плоский",
+   "biomes": [],
+   "verdict": "ok",
+   "why": ""
+  },
+  {
+   "id": "res_dagger",
+   "view": "плоский",
+   "biomes": [],
+   "verdict": "ok",
+   "why": ""
+  },
+  {
+   "id": "res_diamond",
+   "view": "плоский",
+   "biomes": [
+    "home"
+   ],
+   "verdict": "ok",
+   "why": ""
+  },
+  {
+   "id": "res_fish",
+   "view": "плоский",
+   "biomes": [
+    "home"
+   ],
+   "verdict": "ok",
+   "why": ""
+  },
+  {
+   "id": "res_gold",
+   "view": "плоский",
+   "biomes": [
+    "home"
+   ],
+   "verdict": "ok",
+   "why": ""
+  },
+  {
+   "id": "res_herbs",
+   "view": "плоский",
+   "biomes": [
+    "home"
+   ],
+   "verdict": "ok",
+   "why": ""
+  },
+  {
+   "id": "res_iron",
+   "view": "плоский",
+   "biomes": [
+    "home"
+   ],
+   "verdict": "ok",
+   "why": ""
+  },
+  {
+   "id": "res_pickaxe",
+   "view": "плоский",
+   "biomes": [],
+   "verdict": "ok",
+   "why": ""
+  },
+  {
+   "id": "res_potion",
+   "view": "плоский",
+   "biomes": [],
+   "verdict": "ok",
+   "why": ""
+  },
+  {
+   "id": "res_runes",
+   "view": "плоский",
+   "biomes": [],
+   "verdict": "ok",
+   "why": ""
+  },
+  {
+   "id": "res_shield",
+   "view": "плоский",
+   "biomes": [],
+   "verdict": "ok",
+   "why": ""
+  },
+  {
+   "id": "res_spellbook",
+   "view": "плоский",
+   "biomes": [],
+   "verdict": "ok",
+   "why": ""
+  },
+  {
+   "id": "res_staff",
+   "view": "плоский",
+   "biomes": [
+    "home"
+   ],
+   "verdict": "ok",
+   "why": ""
+  },
+  {
+   "id": "res_sword",
+   "view": "плоский",
+   "biomes": [
+    "home"
+   ],
+   "verdict": "ok",
+   "why": ""
+  },
+  {
+   "id": "res_wood",
+   "view": "плоский",
+   "biomes": [
+    "home"
+   ],
+   "verdict": "ok",
+   "why": ""
+  },
+  {
+   "id": "rock_l",
+   "view": "изометрия",
+   "biomes": [
+    "spirit"
+   ],
+   "verdict": "перегенерить",
+   "why": "изометрия на вертикальной плоскости: видна верхняя грань"
+  },
+  {
+   "id": "rock_m",
+   "view": "изометрия",
+   "biomes": [
+    "forest",
+    "home",
+    "village"
+   ],
+   "verdict": "перегенерить",
+   "why": "изометрия на вертикальной плоскости: видна верхняя грань"
+  },
+  {
+   "id": "rock_s",
+   "view": "изометрия",
+   "biomes": [
+    "forest",
+    "home",
+    "village"
+   ],
+   "verdict": "перегенерить",
+   "why": "изометрия на вертикальной плоскости: видна верхняя грань"
+  },
+  {
+   "id": "stalagmite_a",
+   "view": "изометрия",
+   "biomes": [
+    "mine"
+   ],
+   "verdict": "перегенерить",
+   "why": "изометрия на вертикальной плоскости: видна верхняя грань"
+  },
+  {
+   "id": "stalagmite_b",
+   "view": "изометрия",
+   "biomes": [
+    "mine"
+   ],
+   "verdict": "перегенерить",
+   "why": "изометрия на вертикальной плоскости: видна верхняя грань"
+  }
+ ],
+ "totals": {
+  "перегенерить": 25,
+  "не использовать": 2,
+  "ok": 46
+ }
+}

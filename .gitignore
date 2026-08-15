@@ -6,6 +6,7 @@ out/
 # который и коммитится как результат.
 journey3/node_modules/
 journey3/dist/
+dist/
 
 __pycache__/
 *.pyc

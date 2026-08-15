@@ -1,7 +1,7 @@
 {
  "biome_brazier": {
   "kind": "fire",
-  "strength": 0.47,
+  "strength": 0.46,
   "colour": [
    245,
    164,
@@ -12,9 +12,9 @@
   "kind": "pulse",
   "strength": 0.32,
   "colour": [
-   80,
-   235,
-   223
+   83,
+   230,
+   226
   ]
  },
  "biome_crystals": {
@@ -40,7 +40,7 @@
   "strength": 0.86,
   "colour": [
    253,
-   241,
+   240,
    172
   ]
  },
@@ -58,8 +58,8 @@
   "strength": 0.8,
   "colour": [
    252,
-   226,
-   99
+   225,
+   100
   ]
  },
  "feat_death": {
@@ -68,7 +68,7 @@
   "colour": [
    237,
    167,
-   120
+   121
   ]
  },
  "biome_orevein": {
@@ -84,7 +84,7 @@
   "kind": "pulse",
   "strength": 0.52,
   "colour": [
-   95,
+   94,
    180,
    212
   ]
@@ -103,7 +103,7 @@
   "strength": 0.32,
   "colour": [
    254,
-   219,
+   218,
    115
   ]
  }

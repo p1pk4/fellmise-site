@@ -118,6 +118,16 @@ async function boot() {
 
   /* The editor is a separate chunk that a normal visit never asks for: no
      import, no bytes, no code path. It only exists behind ?editor=1. */
+  const q = new URLSearchParams(location.search);
+  /* Same rule as the editor: a normal visit does not ask for the chunk. */
+  if (q.has('debug')) {
+    const modes = new Set((q.get('debug') || 'rows').split(',').map((s) => s.trim()));
+    const [{ startDebug }, THREE] = await Promise.all([
+      import('./debug.js'), import('three'),
+    ]);
+    await startDebug(stage, THREE, modes);
+  }
+
   if (new URLSearchParams(location.search).has('editor')) {
     const [{ startEditor }, THREE] = await Promise.all([
       import('./editor.js'), import('three'),

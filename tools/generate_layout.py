@@ -189,6 +189,7 @@ class Builder:
                 ax = x0 + jitter(self.seed, f"{bid}:{i}:x", self.g["lane_jitter"]["x"])
                 az = z + jitter(self.seed, f"{bid}:{i}:z", self.g["lane_jitter"]["z"])
                 made = []
+                gname = beat["group"]
                 for m in grp["members"]:
                     t = beat.get(m["t"], m["t"])       # `house` picks which house
                     mirror = -1 if side == "L" else 1  # a group reads outward from the road
@@ -200,7 +201,10 @@ class Builder:
                            if m.get("over_road") else None),
                         extra={**{k: m[k] for k in ("sway", "dim") if k in m},
                                **({"hanging": True} if m.get("hanging") else {}),
-                               **({"over_road": True} if m.get("over_road") else {})}))
+                               **({"over_road": True} if m.get("over_road") else {}),
+                               "_from": f"группа {gname}, член {m['t']} dx={m['dx']}, "
+                                        f"полоса {lane}={self.lane_x(bid, lane, 'R'):.1f}",
+                               "_jit": round(abs(ax - x0), 3)}))
                 out["sprites"] += self.tag(made, f"{bid}:{i}", side == "C")
                 continue
 
@@ -356,15 +360,35 @@ class Builder:
         return out
 
     def build(self):
+        biomes = {bid: self.biome(bid) for bid in self.spec["biomes"]}
         return {
             "version": 1,
             "generated": "tools/generate_layout.py по assets/scene_spec.json",
             "seed": self.seed,
-            "biomes": {bid: self.biome(bid) for bid in self.spec["biomes"]},
+            # What ?debug=lanes and ?debug=rows draw. Written here because the
+            # scene never reads the spec — it would have to guess the numbers,
+            # and a debug overlay that guesses is worse than none.
+            "debug": {
+                "road_half_width": self.road,
+                "lanes": {bid: {**self.lanes,
+                                **self.spec["biomes"][bid].get("lane_override", {})}
+                          for bid in self.spec["biomes"]},
+                "rows": {bid: [b["z"] for b in self.spec["biomes"][bid]["rhythm"]]
+                         for bid in self.spec["biomes"]},
+                "length": {bid: self.spec["biomes"][bid]["length_z"]
+                           for bid in self.spec["biomes"]},
+            },
+            "biomes": biomes,
         }
 
 
 # ----------------------------------------------------------------- validator
+def jitter_of(o):
+    """How much of this object's offset is jitter rather than the spec's own
+    numbers — so a report can quote the spec's value, not a jittered one."""
+    return o.get("_jit", 0.0)
+
+
 def validate(layout, spec):
     v = spec["global"]["validator"]
     road = spec["global"]["road_half_width"]
@@ -382,7 +406,16 @@ def validate(layout, spec):
             if (v.get("forbid_on_road") and o["t"] not in spec["road_props"]
                     and not o.get("_axis")):
                 if abs(x) < road + 0.8 and o["layer"] >= 0.5 and y is None:
-                    bad.append(f"{bid}/{o['id']}: на дороге, x={x} (порог {road + 0.8})")
+                    # A violation is only useful if it says what to change. The
+                    # binding number is lane + dx, and it has to clear the road
+                    # margin even at the worst jitter — so the fix is one of two
+                    # numbers in the spec, and both are named here.
+                    need = road + 0.8 + spec["global"]["lane_jitter"]["x"]
+                    src = o.get("_from", "")
+                    bad.append(
+                        f"{bid}/{o['id']}: на дороге, x={x} (порог {road + 0.8})"
+                        + (f"\n      {src}: нужно |полоса + dx| >= {need:.1f}, "
+                           f"сейчас {abs(x) - jitter_of(o):.1f}" if src else ""))
 
             if v.get("require_ground_contact"):
                 sky = o["t"].startswith("cloud") or o["t"] == "moon"
@@ -465,8 +498,8 @@ def main():
 
     for b in layout["biomes"].values():
         for o in b["sprites"]:
-            o.pop("_grp", None)
-            o.pop("_axis", None)
+            for k in ("_grp", "_axis", "_from", "_jit"):
+                o.pop(k, None)
 
     if args.dry:
         print("\n--dry: файл не записан")

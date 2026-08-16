@@ -215,6 +215,120 @@ class Builder:
         k = min(max(target / span, 0.7), 2.4) if span else 1.0
         return [{**o, "z": round(o["z"] * k, 2)} for o in out]
 
+    # -- one run of fence -------------------------------------------------
+    def run(self, bid, b, ri, run, anchors, placed):
+        """A run laid relative to the beat that owns it.
+
+        Absolute metres do not survive: the spacing formula relays every beat
+        and keeps only their order, so a fence authored at z=-44 stayed put
+        while the house it belonged to moved down the road. Owning the run by a
+        beat means the fence goes wherever that house goes, whatever the
+        respace does.
+        """
+        kinds = self.g["run_kinds"]
+        if run["run"] not in kinds:
+            raise SystemExit(f"[{bid}] отрезок '{run['run']}' — такого вида нет "
+                             f"в global.run_kinds")
+        kind = kinds[run["run"]]
+        t = kind["t"]
+        h = self.height(kind["h"])
+        step = h * (aspect(t) or 1.0) * 0.94    # a hair of overlap, so no gaps show
+
+        i = run["owner_tact"]
+        if i not in anchors:
+            raise SystemExit(f"[{bid}] отрезок '{run['run']}' привязан к такту "
+                             f"{i}, которого в ритме нет (тактов "
+                             f"{len(b['rhythm'])})")
+        ax, az, aside = anchors[i]
+        # A run may sit on the other bank from its owner, but never on both: the
+        # side is declared once, here, and the validator holds it to that.
+        side = run.get("side", aside)
+        if side == "C":
+            raise SystemExit(f"[{bid}] отрезок '{run['run']}' у такта {i} на "
+                             f"оси дороги — забор ставится на сторону, укажи "
+                             f"\"side\": \"L\" или \"R\"")
+        axis = run.get("axis", "z")
+        layer = self.layer_of(run["lane"])
+        sign = -1 if side == "L" else 1
+        made, spots = [], []
+
+        if axis == "z":
+            x = self.lane_x(bid, run["lane"], side)
+            lo, hi = sorted((az + run["from_dz"], az + run["to_dz"]))
+            z = hi
+            while z >= lo - 1e-6:
+                spots.append((x, z))
+                z -= step
+        elif axis == "x":
+            # a closing section across the yard, away from the road
+            lo, hi = sorted((abs(run["from_dx"]), abs(run["to_dx"])))
+            z = az + run.get("dz", 0.0)
+            d = lo
+            while d <= hi + 1e-6:
+                spots.append((sign * d, z))
+                d += step
+        else:
+            raise SystemExit(f"[{bid}] отрезок '{run['run']}': ось '{axis}' — "
+                             f"бывает 'z' (вдоль дороги) или 'x' (поперёк)")
+
+        for x, z in spots:
+            made.append(self.place(bid, t, x, z, h, side=side, layer=layer,
+                                   jit=False, rot=0.0))
+        made = [o for o in made if o is not None]
+        for o in made:
+            o["_line"] = True
+            o["_run"] = {"i": ri, "name": run["run"], "axis": axis, "owner": i}
+
+        if len(made) < 2:
+            self.notes.append(f"{bid}: отрезок {run['run']} у такта {i} уместил "
+                              f"{len(made)} сегмент — это уже не линия")
+
+        made += self.end_posts(bid, run, ri, kind, axis, side, spots, step,
+                               placed, made)
+        return self.tag(made, f"{bid}:run{ri}", False)
+
+    def end_posts(self, bid, run, ri, kind, axis, side, spots, step,
+                  placed, segs):
+        """A run must not stop in mid-air.
+
+        Either the end butts into something solid — a house, a barn, the thing
+        the yard belongs to — or it gets a post, which is what a real fence
+        does. The post art is cut from the fence itself (tools/make_end_post.py)
+        so the join does not show.
+        """
+        if not spots or not kind.get("end"):
+            return []
+        post_t = kind["end"]
+        post_h = self.height(kind.get("end_h", kind["h"]))
+        # what counts as something to end against: a building, not a bush
+        solids = [o for o in placed
+                  if o["layer"] >= 0.5 and o["h"] >= 4.0 and o not in segs]
+        out = []
+        for end, out_dir in ((spots[0], +1), (spots[-1], -1)):
+            ex, ez = end
+            if axis == "z":
+                px, pz = ex, ez + out_dir * step * 0.5
+            else:
+                px, pz = ex + (-out_dir) * step * 0.5 * (1 if side == "R" else -1), ez
+            # "butts into" is geometry, not a fixed tolerance: a barn reaches
+            # much further towards the fence than a well does, and a flat
+            # allowance either lets a run stop short of a narrow thing or
+            # refuses a post next to a wide one.
+            pw = post_h * (aspect(post_t) or 1.0) / 2
+            near = any(abs(o["pos"][0] - px) <= pw + o["h"] * (aspect(o["t"]) or 1.0) / 2 + 1.2
+                       and abs(o["pos"][2] - pz) <= step * 1.6
+                       for o in solids)
+            if near:
+                continue
+            o = self.place(bid, post_t, px, pz, post_h, side=side,
+                           layer=self.layer_of(run["lane"]), jit=False, rot=0.0)
+            if o is not None:
+                o["_line"] = True
+                o["_run"] = {"i": ri, "name": run["run"], "axis": axis,
+                             "owner": run["owner_tact"], "post": True}
+                out.append(o)
+        return out
+
     # -- one biome --------------------------------------------------------
     def biome(self, bid):
         b = self.spec["biomes"][bid]
@@ -222,6 +336,11 @@ class Builder:
 
         # --- rhythm: the beats along the road ----------------------------
         beats = self.respace(b)
+        # Where each beat actually ended up, jitter and all. A run of fence is
+        # authored against the beat it belongs to, so it needs the beat's final
+        # position rather than the number the spec wrote down — the spacing
+        # formula relays every beat and keeps only their order.
+        anchors = {}
         for i, beat in enumerate(beats):
             z, side, lane = beat["z"], beat["side"], beat["lane"]
             x0 = self.lane_x(bid, lane, side)
@@ -251,39 +370,25 @@ class Builder:
                                         f"полоса {lane}={self.lane_x(bid, lane, 'R'):.1f}",
                                "_jit": round(abs(ax - x0), 3)}))
                 out["sprites"] += self.tag(made, f"{bid}:{i}", side == "C")
+                anchors[i] = (ax, az, side)
                 continue
 
             single = beat["single"]
             if single == "counter":
                 out["counter"] = self.counter(bid, x0, z)
+                anchors[i] = (x0, z, side)
                 continue
             h = self.height(beat["h"]) * self.depth_scale(b, z)
             o = self.place(bid, single, x0, z, h, side=side, layer=layer,
                            y=beat["hanging"] if beat.get("hanging") else None,
                            extra={"hanging": True} if beat.get("hanging") else None)
             out["sprites"] += self.tag([o], f"{bid}:{i}", side == "C")
+            anchors[i] = ((o["pos"][0], o["pos"][2], side) if o
+                          else (x0, z, side))
 
-        # --- runs: a fence is a line, not a piece ------------------------
+        # --- runs: a fence is a line, and the line belongs to a house -----
         for ri, run in enumerate(b.get("runs", [])):
-            h = self.height(run["h"])
-            asp = aspect(run["t"]) or 1.0
-            step = h * asp * 0.94          # a hair of overlap, so no gaps show
-            x0 = self.lane_x(bid, run["lane"], run["side"])
-            z, n = float(run["z0"]), 0
-            made = []
-            while z >= run["z1"]:
-                made.append(self.place(bid, run["t"], x0, z, h, side=run["side"],
-                                       layer=self.layer_of(run["lane"]), jit=False,
-                                       rot=0.0))
-                z -= step
-                n += 1
-            for o in made:
-                if o is not None:
-                    o["_line"] = True
-            out["sprites"] += self.tag(made, f"{bid}:run{ri}", False)
-            if n < 2:
-                self.notes.append(f"{bid}: отрезок {run['t']} уместил {n} сегмент — "
-                                  f"это уже не линия")
+            out["sprites"] += self.run(bid, b, ri, run, anchors, out["sprites"])
 
         # --- boards ------------------------------------------------------
         for bd in b["boards"]:
@@ -444,7 +549,8 @@ class Builder:
                 "lanes": {bid: {**self.lanes,
                                 **self.spec["biomes"][bid].get("lane_override", {})}
                           for bid in self.spec["biomes"]},
-                "rows": {bid: [b["z"] for b in self.spec["biomes"][bid]["rhythm"]]
+                "rows": {bid: [b["z"] for b in
+                               self.respace(self.spec["biomes"][bid])]
                          for bid in self.spec["biomes"]},
                 "length": {bid: self.spec["biomes"][bid]["length_z"]
                            for bid in self.spec["biomes"]},
@@ -530,6 +636,48 @@ def validate(layout, spec):
                     bad.append(f"{bid}: {a['id']} и {c['id']} перекрываются на "
                                f"{overlap:.2f} м (нужен зазор {gap})")
 
+        # --- runs: a line, on one bank, off the road ---------------------
+        # A fence is the one thing in the scene laid by a loop rather than
+        # placed one piece at a time, so a bad number does not misplace an
+        # object — it walks a whole line across the road. These are hard
+        # failures for that reason.
+        lanes = dict(spec["global"]["lanes"])
+        lanes.update(spec["biomes"][bid].get("lane_override", {}))
+        near = lanes["near"]
+        keep = road + v.get("run_road_gap", 0.8)
+        runs = {}
+        for o in b["sprites"]:
+            r = o.get("_run")
+            if r:
+                runs.setdefault((r["i"], r["name"], r["axis"], r["owner"]), []).append(o)
+
+        for (ri, name, axis, owner), segs in sorted(runs.items()):
+            tag = f"{bid}: отрезок {name}#{ri} (такт {owner})"
+            xs = [o["pos"][0] for o in segs]
+            body = [o for o in segs if not o["_run"].get("post")]
+
+            close = min(segs, key=lambda o: abs(o["pos"][0]))
+            if abs(close["pos"][0]) < keep:
+                bad.append(f"{tag}: сегмент {close['id']} на |x|="
+                           f"{abs(close['pos'][0]):.2f} — ближе {keep:.1f} м "
+                           f"к оси (дорога {road} + зазор), забор лезет на дорогу")
+            if min(xs) < 0 < max(xs):
+                bad.append(f"{tag}: сегменты по обе стороны дороги "
+                           f"(x от {min(xs):.1f} до {max(xs):.1f}) — отрезок "
+                           f"не может менять сторону")
+            if axis == "x":
+                far = min(abs(o["pos"][0]) for o in segs)
+                if far <= near:
+                    bad.append(f"{tag}: поперечная секция подходит к дороге на "
+                               f"|x|={far:.1f} — замыкание двора разрешено "
+                               f"только дальше полосы near ({near})")
+                if len(body) > 3:
+                    bad.append(f"{tag}: поперечная секция из {len(body)} "
+                               f"сегментов — не больше 3")
+            elif axis != "z":
+                bad.append(f"{tag}: ось '{axis}' — забор идёт вдоль дороги "
+                           f"('z') или поперёк неё ('x')")
+
         # no dead stretch along the road
         # walk INTO the biome: 0 is the entrance and -length the far end
         zs = sorted({round(o["pos"][2]) for o in b["sprites"] if o["layer"] >= 0.5},
@@ -582,7 +730,7 @@ def main():
 
     for b in layout["biomes"].values():
         for o in b["sprites"]:
-            for k in ("_grp", "_axis", "_from", "_jit", "_line"):
+            for k in ("_grp", "_axis", "_from", "_jit", "_line", "_run"):
                 o.pop(k, None)
 
     if args.dry:

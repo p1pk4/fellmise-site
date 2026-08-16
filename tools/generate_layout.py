@@ -172,6 +172,21 @@ class Builder:
                 o["_axis"] = on_axis
         return [o for o in objs if o is not None]
 
+    def depth_scale(self, b, z):
+        """Near things a touch bigger, far things a touch smaller.
+
+        Perspective already shrinks distance, but when every object has the same
+        nominal height the far ones still read as the same object simply moved —
+        the row looks like a rank rather than a corridor. A gentle size gradient
+        on top of perspective restores the sense of depth.
+        """
+        rs = b.get("rhythm_spacing") or {}
+        k = rs.get("depth_scale")
+        if not k:
+            return 1.0
+        t = min(abs(z) / max(b["length_z"], 1), 1.0)
+        return 1.0 + k * (0.5 - t)
+
     def respace(self, b):
         """Re-lay the beats so the gap grows with distance.
 
@@ -194,8 +209,11 @@ class Builder:
             z = cursor[side]
             step = rs["base_step"] * (1 + abs(z) / rs["falloff"])
             cursor[side] = z - step
-            out.append({**beat, "z": round(z, 2)})
-        return out
+            out.append({**beat, "z": z})
+        span = max((abs(o["z"]) for o in out), default=0.0)
+        target = b["length_z"] * 0.9
+        k = min(max(target / span, 0.7), 2.4) if span else 1.0
+        return [{**o, "z": round(o["z"] * k, 2)} for o in out]
 
     # -- one biome --------------------------------------------------------
     def biome(self, bid):
@@ -216,12 +234,13 @@ class Builder:
                 az = z + jitter(self.seed, f"{bid}:{i}:z", self.g["lane_jitter"]["z"])
                 made = []
                 gname = beat["group"]
+                scale = self.depth_scale(b, az)
                 for m in grp["members"]:
                     t = beat.get(m["t"], m["t"])       # `house` picks which house
                     mirror = -1 if side == "L" else 1  # a group reads outward from the road
                     made.append(self.place(
                         bid, t, ax + mirror * m["dx"], az + m["dz"],
-                        self.height(m["h"]), side=side, layer=layer, jit=False,
+                        self.height(m["h"]) * scale, side=side, layer=layer, jit=False,
                         y=self.height(m["h"]) * 0.5 if m.get("hanging") else
                           (self.g["camera_eye_height"] + 1.6 + self.height(m["h"]) * 0.5
                            if m.get("over_road") else None),
@@ -238,8 +257,10 @@ class Builder:
             if single == "counter":
                 out["counter"] = self.counter(bid, x0, z)
                 continue
-            o = self.place(bid, single, x0, z, self.height(beat["h"]),
-                           side=side, layer=layer)
+            h = self.height(beat["h"]) * self.depth_scale(b, z)
+            o = self.place(bid, single, x0, z, h, side=side, layer=layer,
+                           y=beat["hanging"] if beat.get("hanging") else None,
+                           extra={"hanging": True} if beat.get("hanging") else None)
             out["sprites"] += self.tag([o], f"{bid}:{i}", side == "C")
 
         # --- runs: a fence is a line, not a piece ------------------------

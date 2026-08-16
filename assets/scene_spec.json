@@ -32,7 +32,7 @@
    "crates": 1.8,
    "lantern": 4.2,
    "signpost": 3.0,
-   "board": 4.8,
+   "board": 8.0,
    "rock_s": 1.2,
    "rock_m": 2.0,
    "rock_l": 3.4,
@@ -70,8 +70,8 @@
    "Вывеска (board) всегда в полосе verge своей остановки, rotY к камере ±10, никогда не за объектом, который описывает.",
    "Полосовое правило применяется к ЯКОРЮ группы. Члены группы позиционируются от якоря и из-под правила выведены; на дорогу они всё равно попасть не могут — за это отвечает validator.forbid_on_road.",
    "Вывески стоят в собственной полосе sign, а не на обочине: на verge доска проходит вплотную к камере и закрывает кадр.",
-   "Забор — линейный элемент (runs), а не отдельный кусок: сегменты идут подряд с шагом в ширину спрайта вдоль отрезка Z. Одиночных кусков забора в сцене быть не должно.",
-   "Шаг ритма растёт с удалением: base_step * (1 + |z| / 60). Вблизи такты чаще, вдали реже — иначе перспектива сжимает дальние в кучу."
+   "Шаг ритма растёт с удалением: base_step * (1 + |z| / 60). Вблизи такты чаще, вдали реже — иначе перспектива сжимает дальние в кучу.",
+   "Забор — линейный элемент (runs) в абсолютных метрах: такты ритма перекладываются формулой и авторский Z у них не сохраняется, поэтому отрезки задаются по факту разложенной сцены и проверяются валидатором на перекрытие с постройками."
   ],
   "validator": {
    "max_gap_z": 26,
@@ -250,15 +250,7 @@
      "t": "beam_frame",
      "dx": 0,
      "dz": 0,
-     "h": "beam",
-     "over_road": true
-    },
-    {
-     "t": "lantern_chain",
-     "dx": 2.2,
-     "dz": 0.4,
-     "h": "lantern_chain",
-     "hanging": true
+     "h": "beam"
     },
     {
      "t": "ore_pile",
@@ -498,16 +490,16 @@
      "h": "fence",
      "lane": "verge",
      "side": "R",
-     "z0": -10,
-     "z1": -34
+     "z0": -32,
+     "z1": -44
     },
     {
      "t": "hero_fence",
      "h": "fence",
      "lane": "verge",
      "side": "L",
-     "z0": -44,
-     "z1": -62
+     "z0": -52,
+     "z1": -63
     }
    ]
   },
@@ -618,7 +610,7 @@
    }
   },
   "mine": {
-   "length_z": 75,
+   "length_z": 100,
    "whitelist": [
     "beam_frame",
     "lantern_chain",
@@ -634,9 +626,9 @@
    ],
    "note": "узкий коридор: полосы far/back не используются, стены штольни ограничивают X",
    "lane_override": {
-    "verge": 4.2,
-    "near": 7.0,
-    "mid": 8.8
+    "verge": 6.0,
+    "near": 9.0,
+    "mid": 13.5
    },
    "rhythm": [
     {
@@ -656,76 +648,114 @@
      "z": -18,
      "side": "R",
      "lane": "near",
-     "group": "vein_pocket"
+     "single": "lantern_chain",
+     "h": "lantern_chain",
+     "hanging": 5.4
     },
     {
      "z": -24,
+     "side": "R",
+     "lane": "near",
+     "group": "vein_pocket"
+    },
+    {
+     "z": -30,
+     "side": "L",
+     "lane": "mid",
+     "single": "stalagmite_a",
+     "h": "stalagmite"
+    },
+    {
+     "z": -36,
      "side": "C",
      "lane": "verge",
      "group": "mine_section"
     },
     {
-     "z": -30,
+     "z": -42,
      "side": "L",
      "lane": "near",
      "single": "minecart",
      "h": "minecart"
     },
     {
-     "z": -36,
+     "z": -48,
+     "side": "L",
+     "lane": "near",
+     "single": "lantern_chain",
+     "h": "lantern_chain",
+     "hanging": 5.8
+    },
+    {
+     "z": -54,
      "side": "R",
      "lane": "near",
      "single": "biome_crystals",
      "h": "crystals"
     },
     {
-     "z": -42,
+     "z": -60,
+     "side": "R",
+     "lane": "mid",
+     "single": "stalagmite_b",
+     "h": "stalagmite"
+    },
+    {
+     "z": -66,
      "side": "C",
      "lane": "verge",
      "group": "mine_section"
     },
     {
-     "z": -48,
+     "z": -72,
      "side": "L",
      "lane": "near",
      "group": "vein_pocket"
     },
     {
-     "z": -54,
+     "z": -78,
      "side": "R",
      "lane": "near",
      "single": "feat_craft",
      "h": "anvil"
     },
     {
-     "z": -60,
-     "side": "C",
-     "lane": "verge",
-     "group": "mine_section"
+     "z": -84,
+     "side": "R",
+     "lane": "near",
+     "single": "lantern_chain",
+     "h": "lantern_chain",
+     "hanging": 5.2
     },
     {
-     "z": -66,
+     "z": -90,
      "side": "L",
      "lane": "near",
      "single": "biome_crystals",
      "h": "crystals"
+    },
+    {
+     "z": -96,
+     "side": "C",
+     "lane": "verge",
+     "group": "mine_section"
     }
    ],
    "boards": [
     {
-     "z": -26,
+     "z": -20,
      "side": "L",
      "key": "mining",
      "lane": "sign"
     },
     {
-     "z": -36,
+     "z": -52,
      "side": "R",
      "key": "fights_that_last",
      "lane": "sign"
     },
     {
-     "z": -50,
+     "z": -84,
      "side": "L",
      "key": "crafting",
      "lane": "sign"
@@ -737,18 +767,20 @@
     "types": [
      "ore_pile",
      "stalagmite_b",
-     "rock_s"
+     "rock_s",
+     "rock_m"
     ],
-    "count": 16,
+    "count": 22,
     "lanes": [
      "verge"
     ],
     "avoid_road": true
    },
    "rhythm_spacing": {
-    "base_step": 7.5,
+    "base_step": 6.5,
     "start_z": -6,
-    "falloff": 60
+    "falloff": 60,
+    "depth_scale": 0.3
    }
   },
   "spirit": {
@@ -923,7 +955,7 @@
      "lane": "sign"
     },
     {
-     "z": -42,
+     "z": -30,
      "side": "L",
      "key": "a_home_to_come_back_to",
      "lane": "sign"
@@ -976,8 +1008,8 @@
      "h": "fence",
      "lane": "verge",
      "side": "L",
-     "z0": -12,
-     "z1": -30
+     "z0": -20,
+     "z1": -36
     }
    ]
   }

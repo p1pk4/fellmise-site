@@ -106,10 +106,16 @@ export function drawBoardBack({ kind, width = 900, boardH = 700, legs = 260 }) {
 
 export function drawBoard({ kind, title, sub, width = 900, boardH = 700, legs = 260,
                             blank = false }) {
+  /* The board is drawn in design units and rendered at `SS` times that, so the
+     texture carries enough texels to survive being read from twenty metres
+     away. Everything below keeps working in the old coordinates — only the
+     number of pixels behind them changes. */
+  const SS = 2048 / width;
   const c = document.createElement('canvas');
-  c.width = width;
-  c.height = boardH + legs;
+  c.width = Math.round(width * SS);
+  c.height = Math.round((boardH + legs) * SS);
   const ctx = c.getContext('2d');
+  ctx.scale(SS, SS);
 
   const B = 14;                       // frame thickness, matching the DOM sign
   const legW = Math.round(width * 0.075);
@@ -128,7 +134,7 @@ export function drawBoard({ kind, title, sub, width = 900, boardH = 700, legs = 
   ctx.fillRect(0, 0, width, boardH);
   (kind === 'stone' ? stone : planks)(ctx, B, B, width - 2 * B, boardH - 2 * B);
 
-  const pad = Math.round(width * 0.07);
+  const pad = Math.round(width * 0.055);
   const maxW = width - 2 * pad;
   if (blank) {
     c.__fit = { pad, width, boardH, titlePx: 0, subPx: 0, titleW: 0, subW: 0,
@@ -142,14 +148,26 @@ export function drawBoard({ kind, title, sub, width = 900, boardH = 700, legs = 
   const subFont = (px) => face(px, 600, 'Vollkorn', 'Georgia, serif');
   // The board is read from ten to twenty metres away, so the subtitle needs a
   // real share of the height, not a footnote's worth.
-  const t = fitLines(ctx, title, maxW, boardH * 0.44, 88, 34, 1.18, titleFont);
-  const s = sub ? fitLines(ctx, sub, maxW, boardH * 0.40, 56, 30, 1.28, subFont)
-                : { px: 0, lines: [] };
+  /* The floors are legibility floors, not layout floors: below them the text
+     is too small to read from the road at any resolution, so if a line of copy
+     ever fails to fit at the floor the fit test must fail loudly rather than
+     the board quietly becoming decoration.
 
-  const titleH = t.lines.length * t.px * 1.18;
+     The two blocks are fitted against one plank, so they cannot be given fixed
+     shares of it independently — two generous shares overflow, and the title
+     rides off the top. The paragraph is set first, because it carries the
+     legibility floor, and the title then gets whatever height is actually
+     left. */
+  const AIR = Math.round(boardH * 0.08);            // air above and below
+  const s = sub ? fitLines(ctx, sub, maxW, boardH * 0.52, 82, 62, 1.28, subFont)
+                : { px: 0, lines: [] };
   const subH = s.lines.length * s.px * 1.28;
-  const gap = sub ? Math.round(boardH * 0.11) : 0;   // rule plus air on both sides
-  let y = Math.round((boardH - titleH - subH - gap) / 2);
+  const gap = sub ? Math.round(boardH * 0.09) : 0;   // rule plus air on both sides
+  const room = Math.max(boardH - subH - gap - AIR, boardH * 0.18);
+  const t = fitLines(ctx, title, maxW, room, 116, 52, 1.18, titleFont);
+  const titleH = t.lines.length * t.px * 1.18;
+  let y = Math.max(Math.round((boardH - titleH - subH - gap) / 2),
+                   Math.round(AIR / 2));
 
   ctx.font = titleFont(t.px);
   for (const line of t.lines) {

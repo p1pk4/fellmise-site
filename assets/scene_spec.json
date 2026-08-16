@@ -69,14 +69,18 @@
    "rotY: объекты у левой обочины смотрят вправо-вниз (rotY -12..-4), у правой — влево-вниз (rotY 4..12), фасадом к дороге.",
    "Вывеска (board) всегда в полосе verge своей остановки, rotY к камере ±10, никогда не за объектом, который описывает.",
    "Полосовое правило применяется к ЯКОРЮ группы. Члены группы позиционируются от якоря и из-под правила выведены; на дорогу они всё равно попасть не могут — за это отвечает validator.forbid_on_road.",
-   "Вывески стоят в собственной полосе sign, а не на обочине: на verge доска проходит вплотную к камере и закрывает кадр."
+   "Вывески стоят в собственной полосе sign, а не на обочине: на verge доска проходит вплотную к камере и закрывает кадр.",
+   "Забор — линейный элемент (runs), а не отдельный кусок: сегменты идут подряд с шагом в ширину спрайта вдоль отрезка Z. Одиночных кусков забора в сцене быть не должно.",
+   "Шаг ритма растёт с удалением: base_step * (1 + |z| / 60). Вблизи такты чаще, вдали реже — иначе перспектива сжимает дальние в кучу."
   ],
   "validator": {
    "max_gap_z": 26,
    "min_bbox_gap": 0.8,
    "forbid_on_road": true,
    "require_ground_contact": true,
-   "fail_on_violation": true
+   "fail_on_violation": true,
+   "min_in_view": 3,
+   "view_ahead": 55
   }
  },
  "road_props": [
@@ -95,18 +99,6 @@
      "dx": 0,
      "dz": 0,
      "h": "house"
-    },
-    {
-     "t": "hero_fence",
-     "dx": -2.6,
-     "dz": 3.4,
-     "h": "fence"
-    },
-    {
-     "t": "hero_fence",
-     "dx": 2.6,
-     "dz": 3.4,
-     "h": "fence"
     },
     {
      "t": "hero_tree_b",
@@ -140,7 +132,7 @@
     },
     {
      "t": "hero_cart",
-     "dx": -3.4,
+     "dx": -2.8,
      "dz": 3.0,
      "h": "cart"
     }
@@ -176,7 +168,7 @@
    "members": [
     {
      "t": "hero_tree_a",
-     "dx": 0,
+     "dx": 5.4,
      "dz": 0,
      "h": "tree_mid",
      "sway": true
@@ -270,8 +262,8 @@
     },
     {
      "t": "ore_pile",
-     "dx": 3.6,
-     "dz": 2.4,
+     "dx": 5.2,
+     "dz": 3.2,
      "h": "ore_pile"
     }
    ]
@@ -294,8 +286,8 @@
     },
     {
      "t": "stalagmite_a",
-     "dx": -2.6,
-     "dz": 1.8,
+     "dx": 3.6,
+     "dz": 3.4,
      "h": "stalagmite"
     }
    ]
@@ -384,56 +376,69 @@
    "blacklist_reason": "хвойные и холмы — только в полосе back как задник; надгробия, кристаллы, шахтное — запрещены",
    "rhythm": [
     {
-     "z": -8,
+     "z": -10,
      "side": "L",
      "lane": "near",
      "group": "homestead",
      "house": "hero_house_b"
     },
     {
-     "z": -12,
-     "side": "R",
-     "lane": "verge",
-     "group": "square"
-    },
-    {
-     "z": -22,
-     "side": "R",
-     "lane": "near",
-     "group": "homestead",
-     "house": "hero_house_b"
-    },
-    {
-     "z": -30,
-     "side": "L",
-     "lane": "mid",
-     "group": "grove"
-    },
-    {
-     "z": -38,
+     "z": -20,
      "side": "L",
      "lane": "near",
      "group": "farmyard"
     },
     {
-     "z": -46,
-     "side": "R",
+     "z": -30,
+     "side": "L",
+     "lane": "near",
+     "group": "homestead",
+     "house": "hero_house_a"
+    },
+    {
+     "z": -42,
+     "side": "L",
      "lane": "near",
      "single": "feat_tavern",
      "h": "tavern"
     },
     {
-     "z": -56,
+     "z": -54,
+     "side": "L",
+     "lane": "near",
+     "group": "homestead",
+     "house": "hero_house_b"
+    },
+    {
+     "z": -14,
+     "side": "R",
+     "lane": "verge",
+     "group": "square"
+    },
+    {
+     "z": -26,
+     "side": "R",
+     "lane": "near",
+     "group": "grove"
+    },
+    {
+     "z": -38,
+     "side": "R",
+     "lane": "near",
+     "group": "homestead",
+     "house": "hero_house_a"
+    },
+    {
+     "z": -50,
      "side": "R",
      "lane": "mid",
      "group": "grove"
     },
     {
-     "z": -64,
-     "side": "L",
+     "z": -62,
+     "side": "R",
      "lane": "near",
-     "group": "homestead",
-     "house": "hero_house_b"
+     "group": "farmyard"
     }
    ],
    "boards": [
@@ -475,13 +480,36 @@
      "rock_s",
      "prop_stones"
     ],
-    "count": 14,
+    "count": 22,
     "lanes": [
      "verge",
      "near"
     ],
     "avoid_road": true
-   }
+   },
+   "rhythm_spacing": {
+    "base_step": 7.0,
+    "start_z": -6,
+    "falloff": 60
+   },
+   "runs": [
+    {
+     "t": "hero_fence",
+     "h": "fence",
+     "lane": "verge",
+     "side": "R",
+     "z0": -10,
+     "z1": -34
+    },
+    {
+     "t": "hero_fence",
+     "h": "fence",
+     "lane": "verge",
+     "side": "L",
+     "z0": -44,
+     "z1": -62
+    }
+   ]
   },
   "forest": {
    "length_z": 95,
@@ -576,12 +604,17 @@
      "rock_s",
      "grass_tuft_a"
     ],
-    "count": 16,
+    "count": 20,
     "lanes": [
      "verge",
      "near"
     ],
     "avoid_road": true
+   },
+   "rhythm_spacing": {
+    "base_step": 7.0,
+    "start_z": -6,
+    "falloff": 60
    }
   },
   "mine": {
@@ -607,49 +640,75 @@
    },
    "rhythm": [
     {
-     "z": -8,
+     "z": -6,
      "side": "C",
      "lane": "verge",
      "group": "mine_section"
     },
     {
-     "z": -16,
+     "z": -12,
      "side": "L",
      "lane": "near",
      "single": "biome_brazier",
      "h": "brazier"
     },
     {
-     "z": -22,
+     "z": -18,
      "side": "R",
      "lane": "near",
      "group": "vein_pocket"
     },
     {
-     "z": -32,
+     "z": -24,
      "side": "C",
      "lane": "verge",
      "group": "mine_section"
     },
     {
-     "z": -40,
+     "z": -30,
      "side": "L",
      "lane": "near",
      "single": "minecart",
      "h": "minecart"
     },
     {
-     "z": -46,
+     "z": -36,
+     "side": "R",
+     "lane": "near",
+     "single": "biome_crystals",
+     "h": "crystals"
+    },
+    {
+     "z": -42,
+     "side": "C",
+     "lane": "verge",
+     "group": "mine_section"
+    },
+    {
+     "z": -48,
+     "side": "L",
+     "lane": "near",
+     "group": "vein_pocket"
+    },
+    {
+     "z": -54,
      "side": "R",
      "lane": "near",
      "single": "feat_craft",
      "h": "anvil"
     },
     {
-     "z": -56,
+     "z": -60,
+     "side": "C",
+     "lane": "verge",
+     "group": "mine_section"
+    },
+    {
+     "z": -66,
      "side": "L",
      "lane": "near",
-     "group": "vein_pocket"
+     "single": "biome_crystals",
+     "h": "crystals"
     }
    ],
    "boards": [
@@ -680,11 +739,16 @@
      "stalagmite_b",
      "rock_s"
     ],
-    "count": 10,
+    "count": 16,
     "lanes": [
      "verge"
     ],
     "avoid_road": true
+   },
+   "rhythm_spacing": {
+    "base_step": 7.5,
+    "start_z": -6,
+    "falloff": 60
    }
   },
   "spirit": {
@@ -781,12 +845,17 @@
      "candles",
      "rock_m"
     ],
-    "count": 12,
+    "count": 16,
     "lanes": [
      "verge",
      "near"
     ],
     "avoid_road": true
+   },
+   "rhythm_spacing": {
+    "base_step": 7.0,
+    "start_z": -6,
+    "falloff": 60
    }
   },
   "home": {
@@ -889,13 +958,28 @@
      "grass_tuft_b",
      "rock_s"
     ],
-    "count": 10,
+    "count": 14,
     "lanes": [
      "verge",
      "near"
     ],
     "avoid_road": true
-   }
+   },
+   "rhythm_spacing": {
+    "base_step": 9.5,
+    "start_z": -6,
+    "falloff": 60
+   },
+   "runs": [
+    {
+     "t": "hero_fence",
+     "h": "fence",
+     "lane": "verge",
+     "side": "L",
+     "z0": -12,
+     "z1": -30
+    }
+   ]
   }
  }
 }

@@ -48,14 +48,16 @@
   },
   "rows": {
    "village": [
-    -8,
-    -12,
-    -22,
+    -10,
+    -20,
     -30,
+    -42,
+    -54,
+    -14,
+    -26,
     -38,
-    -46,
-    -56,
-    -64
+    -50,
+    -62
    ],
    "forest": [
     -10,
@@ -67,13 +69,17 @@
     -64
    ],
    "mine": [
-    -8,
-    -16,
-    -22,
-    -32,
-    -40,
-    -46,
-    -56
+    -6,
+    -12,
+    -18,
+    -24,
+    -30,
+    -36,
+    -42,
+    -48,
+    -54,
+    -60,
+    -66
    ],
    "spirit": [
     -10,
@@ -110,36 +116,10 @@
      "pos": [
       -7.455,
       null,
-      -6.813
+      -4.813
      ],
      "h": 9.0,
      "rotY": -0.1744,
-     "visible": true
-    },
-    {
-     "id": "hero_fence#1",
-     "t": "hero_fence",
-     "layer": 1,
-     "pos": [
-      -4.855,
-      null,
-      -3.413
-     ],
-     "h": 1.6,
-     "rotY": -0.0764,
-     "visible": true
-    },
-    {
-     "id": "hero_fence#2",
-     "t": "hero_fence",
-     "layer": 1,
-     "pos": [
-      -10.055,
-      null,
-      -3.413
-     ],
-     "h": 1.6,
-     "rotY": -0.0731,
      "visible": true
     },
     {
@@ -149,7 +129,7 @@
      "pos": [
       -11.655,
       null,
-      -5.613
+      -3.613
      ],
      "h": 2.2,
      "rotY": -0.1335,
@@ -162,154 +142,10 @@
      "pos": [
       -3.855,
       null,
-      -4.613
+      -2.613
      ],
      "h": 1.1,
      "rotY": -0.1393,
-     "visible": true
-    },
-    {
-     "id": "hero_well#1",
-     "t": "hero_well",
-     "layer": 1,
-     "pos": [
-      5.737,
-      null,
-      -12.19
-     ],
-     "h": 4.4,
-     "rotY": 0.1086,
-     "visible": true
-    },
-    {
-     "id": "prop_lantern#1",
-     "t": "prop_lantern",
-     "layer": 1,
-     "pos": [
-      8.737,
-      null,
-      -13.19
-     ],
-     "h": 4.2,
-     "rotY": 0.1543,
-     "visible": true
-    },
-    {
-     "id": "prop_crates#1",
-     "t": "prop_crates",
-     "layer": 1,
-     "pos": [
-      5.137,
-      null,
-      -10.79
-     ],
-     "h": 1.8,
-     "rotY": 0.0923,
-     "visible": true
-    },
-    {
-     "id": "hero_house_b#2",
-     "t": "hero_house_b",
-     "layer": 1,
-     "pos": [
-      6.894,
-      null,
-      -22.125
-     ],
-     "h": 9.0,
-     "rotY": 0.1468,
-     "visible": true
-    },
-    {
-     "id": "hero_fence#3",
-     "t": "hero_fence",
-     "layer": 1,
-     "pos": [
-      4.294,
-      null,
-      -18.725
-     ],
-     "h": 1.6,
-     "rotY": 0.1616,
-     "visible": true
-    },
-    {
-     "id": "hero_fence#4",
-     "t": "hero_fence",
-     "layer": 1,
-     "pos": [
-      9.494,
-      null,
-      -18.725
-     ],
-     "h": 1.6,
-     "rotY": 0.2036,
-     "visible": true
-    },
-    {
-     "id": "hero_tree_b#2",
-     "t": "hero_tree_b",
-     "layer": 1,
-     "pos": [
-      11.094,
-      null,
-      -20.925
-     ],
-     "h": 2.2,
-     "rotY": 0.1377,
-     "visible": true
-    },
-    {
-     "id": "grass_tuft_a#2",
-     "t": "grass_tuft_a",
-     "layer": 1,
-     "pos": [
-      3.294,
-      null,
-      -19.925
-     ],
-     "h": 1.1,
-     "rotY": 0.088,
-     "visible": true
-    },
-    {
-     "id": "hero_tree_a#1",
-     "t": "hero_tree_a",
-     "layer": 0.5,
-     "pos": [
-      -12.039,
-      null,
-      -30.918
-     ],
-     "h": 8.4,
-     "rotY": -0.1135,
-     "visible": true,
-     "sway": true
-    },
-    {
-     "id": "hero_tree_b#3",
-     "t": "hero_tree_b",
-     "layer": 0.5,
-     "pos": [
-      -15.039,
-      null,
-      -29.318
-     ],
-     "h": 2.2,
-     "rotY": -0.0915,
-     "visible": true
-    },
-    {
-     "id": "grass_tuft_b#1",
-     "t": "grass_tuft_b",
-     "layer": 0.5,
-     "pos": [
-      -9.839,
-      null,
-      -29.118
-     ],
-     "h": 1.1,
-     "rotY": -0.1739,
      "visible": true
     },
     {
@@ -317,9 +153,9 @@
      "t": "barn",
      "layer": 1,
      "pos": [
-      -7.717,
+      -6.863,
       null,
-      -36.956
+      -13.89
      ],
      "h": 10.0,
      "rotY": -0.0734,
@@ -330,9 +166,9 @@
      "t": "haystack",
      "layer": 1,
      "pos": [
-      -11.717,
+      -10.863,
       null,
-      -34.956
+      -11.89
      ],
      "h": 2.4,
      "rotY": -0.1176,
@@ -343,12 +179,51 @@
      "t": "hero_cart",
      "layer": 1,
      "pos": [
-      -4.317,
+      -4.063,
       null,
-      -33.956
+      -10.89
      ],
      "h": 2.6,
      "rotY": -0.1986,
+     "visible": true
+    },
+    {
+     "id": "hero_house_a#1",
+     "t": "hero_house_a",
+     "layer": 1,
+     "pos": [
+      -7.906,
+      null,
+      -22.425
+     ],
+     "h": 9.0,
+     "rotY": -0.1171,
+     "visible": true
+    },
+    {
+     "id": "hero_tree_b#2",
+     "t": "hero_tree_b",
+     "layer": 1,
+     "pos": [
+      -12.106,
+      null,
+      -21.225
+     ],
+     "h": 2.2,
+     "rotY": -0.1377,
+     "visible": true
+    },
+    {
+     "id": "grass_tuft_a#2",
+     "t": "grass_tuft_a",
+     "layer": 1,
+     "pos": [
+      -4.306,
+      null,
+      -20.225
+     ],
+     "h": 1.1,
+     "rotY": -0.088,
      "visible": true
     },
     {
@@ -356,104 +231,38 @@
      "t": "feat_tavern",
      "layer": 1,
      "pos": [
-      7.728,
+      -7.072,
       null,
-      -46.37
+      -32.27
      ],
      "h": 9.5,
-     "rotY": 0.1154,
+     "rotY": -0.1154,
      "visible": true
     },
     {
-     "id": "hero_tree_a#2",
-     "t": "hero_tree_a",
-     "layer": 0.5,
-     "pos": [
-      10.901,
-      null,
-      -54.797
-     ],
-     "h": 8.4,
-     "rotY": 0.1974,
-     "visible": true,
-     "sway": true
-    },
-    {
-     "id": "hero_tree_b#4",
-     "t": "hero_tree_b",
-     "layer": 0.5,
-     "pos": [
-      13.901,
-      null,
-      -53.197
-     ],
-     "h": 2.2,
-     "rotY": 0.1074,
-     "visible": true
-    },
-    {
-     "id": "grass_tuft_b#2",
-     "t": "grass_tuft_b",
-     "layer": 0.5,
-     "pos": [
-      8.701,
-      null,
-      -52.997
-     ],
-     "h": 1.1,
-     "rotY": 0.1528,
-     "visible": true
-    },
-    {
-     "id": "hero_house_b#3",
+     "id": "hero_house_b#2",
      "t": "hero_house_b",
      "layer": 1,
      "pos": [
-      -7.975,
+      -7.717,
       null,
-      -64.518
+      -41.576
      ],
      "h": 9.0,
-     "rotY": -0.1144,
+     "rotY": -0.1468,
      "visible": true
     },
     {
-     "id": "hero_fence#5",
-     "t": "hero_fence",
-     "layer": 1,
-     "pos": [
-      -5.375,
-      null,
-      -61.118
-     ],
-     "h": 1.6,
-     "rotY": -0.0962,
-     "visible": true
-    },
-    {
-     "id": "hero_fence#6",
-     "t": "hero_fence",
-     "layer": 1,
-     "pos": [
-      -10.575,
-      null,
-      -61.118
-     ],
-     "h": 1.6,
-     "rotY": -0.1765,
-     "visible": true
-    },
-    {
-     "id": "hero_tree_b#5",
+     "id": "hero_tree_b#3",
      "t": "hero_tree_b",
      "layer": 1,
      "pos": [
-      -12.175,
+      -11.917,
       null,
-      -63.318
+      -40.376
      ],
      "h": 2.2,
-     "rotY": -0.1338,
+     "rotY": -0.0915,
      "visible": true
     },
     {
@@ -461,12 +270,417 @@
      "t": "grass_tuft_a",
      "layer": 1,
      "pos": [
-      -4.375,
+      -4.117,
       null,
-      -62.318
+      -39.376
      ],
      "h": 1.1,
      "rotY": -0.1754,
+     "visible": true
+    },
+    {
+     "id": "hero_well#1",
+     "t": "hero_well",
+     "layer": 1,
+     "pos": [
+      5.028,
+      null,
+      -7.307
+     ],
+     "h": 4.4,
+     "rotY": 0.1086,
+     "visible": true
+    },
+    {
+     "id": "prop_lantern#1",
+     "t": "prop_lantern",
+     "layer": 1,
+     "pos": [
+      8.028,
+      null,
+      -8.307
+     ],
+     "h": 4.2,
+     "rotY": 0.1543,
+     "visible": true
+    },
+    {
+     "id": "prop_crates#1",
+     "t": "prop_crates",
+     "layer": 1,
+     "pos": [
+      4.428,
+      null,
+      -5.907
+     ],
+     "h": 1.8,
+     "rotY": 0.0923,
+     "visible": true
+    },
+    {
+     "id": "hero_tree_a#1",
+     "t": "hero_tree_a",
+     "layer": 1,
+     "pos": [
+      12.201,
+      null,
+      -12.497
+     ],
+     "h": 8.4,
+     "rotY": 0.1135,
+     "visible": true,
+     "sway": true
+    },
+    {
+     "id": "hero_tree_b#4",
+     "t": "hero_tree_b",
+     "layer": 1,
+     "pos": [
+      9.801,
+      null,
+      -10.897
+     ],
+     "h": 2.2,
+     "rotY": 0.1074,
+     "visible": true
+    },
+    {
+     "id": "grass_tuft_b#1",
+     "t": "grass_tuft_b",
+     "layer": 1,
+     "pos": [
+      4.601,
+      null,
+      -10.697
+     ],
+     "h": 1.1,
+     "rotY": 0.1739,
+     "visible": true
+    },
+    {
+     "id": "hero_house_a#2",
+     "t": "hero_house_a",
+     "layer": 1,
+     "pos": [
+      6.825,
+      null,
+      -22.818
+     ],
+     "h": 9.0,
+     "rotY": 0.1567,
+     "visible": true
+    },
+    {
+     "id": "hero_tree_b#5",
+     "t": "hero_tree_b",
+     "layer": 1,
+     "pos": [
+      11.025,
+      null,
+      -21.618
+     ],
+     "h": 2.2,
+     "rotY": 0.1338,
+     "visible": true
+    },
+    {
+     "id": "grass_tuft_a#4",
+     "t": "grass_tuft_a",
+     "layer": 1,
+     "pos": [
+      3.225,
+      null,
+      -20.618
+     ],
+     "h": 1.1,
+     "rotY": 0.1508,
+     "visible": true
+    },
+    {
+     "id": "hero_tree_a#2",
+     "t": "hero_tree_a",
+     "layer": 0.5,
+     "pos": [
+      16.935,
+      null,
+      -32.193
+     ],
+     "h": 8.4,
+     "rotY": 0.1974,
+     "visible": true,
+     "sway": true
+    },
+    {
+     "id": "hero_tree_b#6",
+     "t": "hero_tree_b",
+     "layer": 0.5,
+     "pos": [
+      14.535,
+      null,
+      -30.593
+     ],
+     "h": 2.2,
+     "rotY": 0.1433,
+     "visible": true
+    },
+    {
+     "id": "grass_tuft_b#2",
+     "t": "grass_tuft_b",
+     "layer": 0.5,
+     "pos": [
+      9.335,
+      null,
+      -30.393
+     ],
+     "h": 1.1,
+     "rotY": 0.1528,
+     "visible": true
+    },
+    {
+     "id": "barn#2",
+     "t": "barn",
+     "layer": 1,
+     "pos": [
+      7.502,
+      null,
+      -42.083
+     ],
+     "h": 10.0,
+     "rotY": 0.1982,
+     "visible": true
+    },
+    {
+     "id": "haystack#2",
+     "t": "haystack",
+     "layer": 1,
+     "pos": [
+      11.502,
+      null,
+      -40.083
+     ],
+     "h": 2.4,
+     "rotY": 0.1487,
+     "visible": true
+    },
+    {
+     "id": "hero_cart#2",
+     "t": "hero_cart",
+     "layer": 1,
+     "pos": [
+      4.702,
+      null,
+      -39.083
+     ],
+     "h": 2.6,
+     "rotY": 0.148,
+     "visible": true
+    },
+    {
+     "id": "hero_fence#1",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      5.2,
+      null,
+      -10.0
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "hero_fence#2",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      5.2,
+      null,
+      -12.845
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "hero_fence#3",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      5.2,
+      null,
+      -15.691
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "hero_fence#4",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      5.2,
+      null,
+      -18.536
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "hero_fence#5",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      5.2,
+      null,
+      -21.382
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "hero_fence#6",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      5.2,
+      null,
+      -24.227
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "hero_fence#7",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      5.2,
+      null,
+      -27.072
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "hero_fence#8",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      5.2,
+      null,
+      -29.918
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "hero_fence#9",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      5.2,
+      null,
+      -32.763
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "hero_fence#10",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      -5.2,
+      null,
+      -44.0
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "hero_fence#11",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      -5.2,
+      null,
+      -46.845
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "hero_fence#12",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      -5.2,
+      null,
+      -49.691
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "hero_fence#13",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      -5.2,
+      null,
+      -52.536
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "hero_fence#14",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      -5.2,
+      null,
+      -55.382
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "hero_fence#15",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      -5.2,
+      null,
+      -58.227
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "hero_fence#16",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      -5.2,
+      null,
+      -61.072
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
      "visible": true
     },
     {
@@ -698,7 +912,7 @@
      "span": 110
     },
     {
-     "id": "grass_tuft_a#4",
+     "id": "grass_tuft_a#5",
      "t": "grass_tuft_a",
      "layer": 1,
      "pos": [
@@ -707,7 +921,7 @@
       -63.247
      ],
      "h": 1.1,
-     "rotY": 0.1508,
+     "rotY": 0.1695,
      "visible": true
     },
     {
@@ -728,25 +942,25 @@
      "t": "rock_s",
      "layer": 1,
      "pos": [
-      8.056,
+      -6.674,
       null,
-      -27.615
+      -27.445
      ],
      "h": 1.2,
-     "rotY": 0.1834,
+     "rotY": -0.1834,
      "visible": true
     },
     {
-     "id": "grass_tuft_a#5",
+     "id": "grass_tuft_a#6",
      "t": "grass_tuft_a",
      "layer": 1,
      "pos": [
-      -6.495,
+      6.114,
       null,
-      -31.048
+      -44.587
      ],
      "h": 1.1,
-     "rotY": -0.1695,
+     "rotY": 0.0991,
      "visible": true
     },
     {
@@ -754,9 +968,9 @@
      "t": "grass_tuft_b",
      "layer": 1,
      "pos": [
-      6.114,
+      6.87,
       null,
-      -44.587
+      -95.37
      ],
      "h": 1.1,
      "rotY": 0.1636,
@@ -767,51 +981,12 @@
      "t": "rock_s",
      "layer": 1,
      "pos": [
-      6.87,
-      null,
-      -95.37
-     ],
-     "h": 1.2,
-     "rotY": 0.1861,
-     "visible": true
-    },
-    {
-     "id": "grass_tuft_a#6",
-     "t": "grass_tuft_a",
-     "layer": 1,
-     "pos": [
       -7.515,
       null,
       -66.96
      ],
-     "h": 1.1,
-     "rotY": -0.0991,
-     "visible": true
-    },
-    {
-     "id": "grass_tuft_b#5",
-     "t": "grass_tuft_b",
-     "layer": 1,
-     "pos": [
-      -7.235,
-      null,
-      -69.361
-     ],
-     "h": 1.1,
-     "rotY": -0.1734,
-     "visible": true
-    },
-    {
-     "id": "rock_s#3",
-     "t": "rock_s",
-     "layer": 1,
-     "pos": [
-      -7.571,
-      null,
-      -87.533
-     ],
      "h": 1.2,
-     "rotY": -0.1212,
+     "rotY": -0.1861,
      "visible": true
     },
     {
@@ -819,12 +994,51 @@
      "t": "grass_tuft_a",
      "layer": 1,
      "pos": [
+      -7.571,
+      null,
+      -87.533
+     ],
+     "h": 1.1,
+     "rotY": -0.2009,
+     "visible": true
+    },
+    {
+     "id": "grass_tuft_b#5",
+     "t": "grass_tuft_b",
+     "layer": 1,
+     "pos": [
       6.847,
       null,
       -72.734
      ],
      "h": 1.1,
-     "rotY": 0.2009,
+     "rotY": 0.1734,
+     "visible": true
+    },
+    {
+     "id": "rock_s#3",
+     "t": "rock_s",
+     "layer": 1,
+     "pos": [
+      7.288,
+      null,
+      -93.007
+     ],
+     "h": 1.2,
+     "rotY": 0.1212,
+     "visible": true
+    },
+    {
+     "id": "grass_tuft_a#8",
+     "t": "grass_tuft_a",
+     "layer": 1,
+     "pos": [
+      4.788,
+      null,
+      -59.339
+     ],
+     "h": 1.1,
+     "rotY": 0.1288,
      "visible": true
     },
     {
@@ -832,12 +1046,90 @@
      "t": "grass_tuft_b",
      "layer": 1,
      "pos": [
-      7.288,
+      -7.181,
       null,
-      -93.007
+      -82.494
      ],
      "h": 1.1,
-     "rotY": 0.1039,
+     "rotY": -0.1039,
+     "visible": true
+    },
+    {
+     "id": "rock_s#4",
+     "t": "rock_s",
+     "layer": 1,
+     "pos": [
+      -4.561,
+      null,
+      -79.542
+     ],
+     "h": 1.2,
+     "rotY": -0.1739,
+     "visible": true
+    },
+    {
+     "id": "grass_tuft_a#9",
+     "t": "grass_tuft_a",
+     "layer": 1,
+     "pos": [
+      4.952,
+      null,
+      -84.812
+     ],
+     "h": 1.1,
+     "rotY": 0.1685,
+     "visible": true
+    },
+    {
+     "id": "grass_tuft_b#7",
+     "t": "grass_tuft_b",
+     "layer": 1,
+     "pos": [
+      4.353,
+      null,
+      -92.58
+     ],
+     "h": 1.1,
+     "rotY": 0.1808,
+     "visible": true
+    },
+    {
+     "id": "rock_s#5",
+     "t": "rock_s",
+     "layer": 1,
+     "pos": [
+      6.943,
+      null,
+      -64.052
+     ],
+     "h": 1.2,
+     "rotY": 0.1144,
+     "visible": true
+    },
+    {
+     "id": "grass_tuft_a#10",
+     "t": "grass_tuft_a",
+     "layer": 1,
+     "pos": [
+      -8.156,
+      null,
+      -16.432
+     ],
+     "h": 1.1,
+     "rotY": -0.1743,
+     "visible": true
+    },
+    {
+     "id": "grass_tuft_b#8",
+     "t": "grass_tuft_b",
+     "layer": 1,
+     "pos": [
+      6.514,
+      null,
+      -67.378
+     ],
+     "h": 1.1,
+     "rotY": 0.0737,
      "visible": true
     }
    ],
@@ -879,7 +1171,7 @@
      "pos": [
       -7.795,
       null,
-      -8.604
+      -4.604
      ],
      "h": 13.0,
      "rotY": -0.1551,
@@ -893,7 +1185,7 @@
      "pos": [
       -12.195,
       null,
-      -11.204
+      -7.204
      ],
      "h": 13.0,
      "rotY": -0.077,
@@ -906,7 +1198,7 @@
      "pos": [
       -5.795,
       null,
-      -6.404
+      -2.404
      ],
      "h": 1.4,
      "rotY": -0.1973,
@@ -919,7 +1211,7 @@
      "pos": [
       -10.195,
       null,
-      -5.604
+      -1.604
      ],
      "h": 0.9,
      "rotY": -0.1609,
@@ -932,7 +1224,7 @@
      "pos": [
       7.09,
       null,
-      -17.437
+      -5.437
      ],
      "h": 13.0,
      "rotY": 0.1629,
@@ -946,7 +1238,7 @@
      "pos": [
       11.49,
       null,
-      -20.037
+      -8.037
      ],
      "h": 13.0,
      "rotY": 0.1009,
@@ -959,7 +1251,7 @@
      "pos": [
       5.09,
       null,
-      -15.237
+      -3.237
      ],
      "h": 1.4,
      "rotY": 0.1122,
@@ -972,7 +1264,7 @@
      "pos": [
       9.49,
       null,
-      -14.437
+      -2.437
      ],
      "h": 0.9,
      "rotY": 0.103,
@@ -985,7 +1277,7 @@
      "pos": [
       5.562,
       null,
-      -28.53
+      -14.23
      ],
      "h": 1.6,
      "rotY": 0.152,
@@ -998,7 +1290,7 @@
      "pos": [
       7.762,
       null,
-      -27.53
+      -13.23
      ],
      "h": 1.8,
      "rotY": 0.1319,
@@ -1011,7 +1303,7 @@
      "pos": [
       4.962,
       null,
-      -26.93
+      -12.63
      ],
      "h": 1.4,
      "rotY": 0.1368,
@@ -1024,7 +1316,7 @@
      "pos": [
       -11.292,
       null,
-      -34.704
+      -12.404
      ],
      "h": 13.0,
      "rotY": -0.1552,
@@ -1038,7 +1330,7 @@
      "pos": [
       -15.692,
       null,
-      -37.304
+      -15.004
      ],
      "h": 13.0,
      "rotY": -0.0728,
@@ -1051,7 +1343,7 @@
      "pos": [
       -9.292,
       null,
-      -32.504
+      -10.204
      ],
      "h": 1.4,
      "rotY": -0.144,
@@ -1064,7 +1356,7 @@
      "pos": [
       -13.692,
       null,
-      -31.704
+      -9.404
      ],
      "h": 0.9,
      "rotY": -0.1523,
@@ -1077,7 +1369,7 @@
      "pos": [
       -7.351,
       null,
-      -46.239
+      -22.539
      ],
      "h": 9.0,
      "rotY": -0.154,
@@ -1090,7 +1382,7 @@
      "pos": [
       7.421,
       null,
-      -53.684
+      -21.984
      ],
      "h": 13.0,
      "rotY": 0.0699,
@@ -1104,7 +1396,7 @@
      "pos": [
       11.821,
       null,
-      -56.284
+      -24.584
      ],
      "h": 13.0,
      "rotY": 0.1495,
@@ -1117,7 +1409,7 @@
      "pos": [
       5.421,
       null,
-      -51.484
+      -19.784
      ],
      "h": 1.4,
      "rotY": 0.166,
@@ -1130,7 +1422,7 @@
      "pos": [
       9.821,
       null,
-      -50.684
+      -18.984
      ],
      "h": 0.9,
      "rotY": 0.1015,
@@ -1143,7 +1435,7 @@
      "pos": [
       -5.217,
       null,
-      -65.263
+      -33.163
      ],
      "h": 1.6,
      "rotY": -0.16,
@@ -1156,7 +1448,7 @@
      "pos": [
       -7.417,
       null,
-      -64.263
+      -32.163
      ],
      "h": 1.8,
      "rotY": -0.1458,
@@ -1169,7 +1461,7 @@
      "pos": [
       -4.617,
       null,
-      -63.663
+      -31.563
      ],
      "h": 1.4,
      "rotY": -0.139,
@@ -1442,7 +1734,7 @@
      "visible": true
     },
     {
-     "id": "rock_s#4",
+     "id": "rock_s#6",
      "t": "rock_s",
      "layer": 1,
      "pos": [
@@ -1451,11 +1743,11 @@
       -58.962
      ],
      "h": 1.2,
-     "rotY": 0.1739,
+     "rotY": 0.0959,
      "visible": true
     },
     {
-     "id": "grass_tuft_a#8",
+     "id": "grass_tuft_a#11",
      "t": "grass_tuft_a",
      "layer": 1,
      "pos": [
@@ -1464,7 +1756,7 @@
       -37.868
      ],
      "h": 1.1,
-     "rotY": -0.1288,
+     "rotY": -0.0907,
      "visible": true
     },
     {
@@ -1472,9 +1764,9 @@
      "t": "mushrooms",
      "layer": 1,
      "pos": [
-      7.545,
+      6.941,
       null,
-      -63.88
+      -27.227
      ],
      "h": 0.9,
      "rotY": 0.1652,
@@ -1485,38 +1777,38 @@
      "t": "fern",
      "layer": 1,
      "pos": [
+      7.545,
+      null,
+      -63.88
+     ],
+     "h": 1.4,
+     "rotY": 0.1112,
+     "visible": true
+    },
+    {
+     "id": "rock_s#7",
+     "t": "rock_s",
+     "layer": 1,
+     "pos": [
       -7.703,
       null,
       -49.496
      ],
-     "h": 1.4,
-     "rotY": -0.1112,
+     "h": 1.2,
+     "rotY": -0.1584,
      "visible": true
     },
     {
-     "id": "rock_s#5",
-     "t": "rock_s",
+     "id": "grass_tuft_a#12",
+     "t": "grass_tuft_a",
      "layer": 1,
      "pos": [
       -6.737,
       null,
       -44.006
      ],
-     "h": 1.2,
-     "rotY": -0.1144,
-     "visible": true
-    },
-    {
-     "id": "grass_tuft_a#9",
-     "t": "grass_tuft_a",
-     "layer": 1,
-     "pos": [
-      7.804,
-      null,
-      -69.032
-     ],
      "h": 1.1,
-     "rotY": 0.1685,
+     "rotY": -0.1636,
      "visible": true
     },
     {
@@ -1524,12 +1816,12 @@
      "t": "mushrooms",
      "layer": 1,
      "pos": [
-      -7.88,
+      7.804,
       null,
-      -23.107
+      -69.032
      ],
      "h": 0.9,
-     "rotY": -0.1521,
+     "rotY": 0.1521,
      "visible": true
     },
     {
@@ -1546,29 +1838,29 @@
      "visible": true
     },
     {
-     "id": "rock_s#6",
+     "id": "rock_s#8",
      "t": "rock_s",
+     "layer": 1,
+     "pos": [
+      -5.156,
+      null,
+      -12.095
+     ],
+     "h": 1.2,
+     "rotY": -0.0802,
+     "visible": true
+    },
+    {
+     "id": "grass_tuft_a#13",
+     "t": "grass_tuft_a",
      "layer": 1,
      "pos": [
       7.398,
       null,
       -76.148
      ],
-     "h": 1.2,
-     "rotY": 0.0959,
-     "visible": true
-    },
-    {
-     "id": "grass_tuft_a#10",
-     "t": "grass_tuft_a",
-     "layer": 1,
-     "pos": [
-      8.024,
-      null,
-      -79.172
-     ],
      "h": 1.1,
-     "rotY": 0.1743,
+     "rotY": 0.1522,
      "visible": true
     },
     {
@@ -1576,12 +1868,12 @@
      "t": "mushrooms",
      "layer": 1,
      "pos": [
-      -6.441,
+      8.024,
       null,
-      -77.919
+      -79.172
      ],
      "h": 0.9,
-     "rotY": -0.1687,
+     "rotY": 0.1687,
      "visible": true
     },
     {
@@ -1589,38 +1881,90 @@
      "t": "fern",
      "layer": 1,
      "pos": [
-      4.478,
+      7.506,
       null,
-      -73.344
+      -54.711
      ],
      "h": 1.4,
      "rotY": 0.1008,
      "visible": true
     },
     {
-     "id": "rock_s#7",
+     "id": "rock_s#9",
      "t": "rock_s",
+     "layer": 1,
+     "pos": [
+      -6.441,
+      null,
+      -77.919
+     ],
+     "h": 1.2,
+     "rotY": -0.0954,
+     "visible": true
+    },
+    {
+     "id": "grass_tuft_a#14",
+     "t": "grass_tuft_a",
+     "layer": 1,
+     "pos": [
+      4.478,
+      null,
+      -73.344
+     ],
+     "h": 1.1,
+     "rotY": 0.1927,
+     "visible": true
+    },
+    {
+     "id": "mushrooms#9",
+     "t": "mushrooms",
      "layer": 1,
      "pos": [
       -5.059,
       null,
       -40.11
      ],
-     "h": 1.2,
-     "rotY": -0.1584,
+     "h": 0.9,
+     "rotY": -0.0753,
      "visible": true
     },
     {
-     "id": "grass_tuft_a#11",
-     "t": "grass_tuft_a",
+     "id": "fern#11",
+     "t": "fern",
      "layer": 1,
      "pos": [
       -5.083,
       null,
       -68.251
      ],
+     "h": 1.4,
+     "rotY": -0.1362,
+     "visible": true
+    },
+    {
+     "id": "rock_s#10",
+     "t": "rock_s",
+     "layer": 1,
+     "pos": [
+      -5.692,
+      null,
+      -75.208
+     ],
+     "h": 1.2,
+     "rotY": -0.1907,
+     "visible": true
+    },
+    {
+     "id": "grass_tuft_a#15",
+     "t": "grass_tuft_a",
+     "layer": 1,
+     "pos": [
+      -7.289,
+      null,
+      -27.949
+     ],
      "h": 1.1,
-     "rotY": -0.0907,
+     "rotY": -0.078,
      "visible": true
     }
    ],
@@ -1648,8 +1992,8 @@
      "layer": 1,
      "pos": [
       -0.227,
-      6.9,
-      -8.079
+      8.5,
+      -6.079
      ],
      "h": 7.0,
      "rotY": 0.0,
@@ -1663,7 +2007,7 @@
      "pos": [
       1.973,
       1.6,
-      -7.679
+      -5.679
      ],
      "h": 3.2,
      "rotY": 0.0,
@@ -1675,9 +2019,9 @@
      "t": "ore_pile",
      "layer": 1,
      "pos": [
-      3.373,
+      4.973,
       null,
-      -5.679
+      -2.879
      ],
      "h": 1.6,
      "rotY": 0.0,
@@ -1690,7 +2034,7 @@
      "pos": [
       -6.797,
       null,
-      -16.375
+      -6.375
      ],
      "h": 2.6,
      "rotY": -0.0932,
@@ -1703,7 +2047,7 @@
      "pos": [
       6.634,
       null,
-      -21.247
+      -5.247
      ],
      "h": 4.0,
      "rotY": 0.1245,
@@ -1716,7 +2060,7 @@
      "pos": [
       10.034,
       null,
-      -22.847
+      -6.847
      ],
      "h": 4.6,
      "rotY": 0.2013,
@@ -1727,9 +2071,9 @@
      "t": "stalagmite_a",
      "layer": 1,
      "pos": [
-      4.034,
+      10.234,
       null,
-      -19.447
+      -1.847
      ],
      "h": 3.6,
      "rotY": 0.1026,
@@ -1741,8 +2085,8 @@
      "layer": 1,
      "pos": [
       0.405,
-      6.9,
-      -31.797
+      8.5,
+      -14.047
      ],
      "h": 7.0,
      "rotY": 0.0,
@@ -1756,7 +2100,7 @@
      "pos": [
       2.605,
       1.6,
-      -31.397
+      -13.647
      ],
      "h": 3.2,
      "rotY": 0.0,
@@ -1768,9 +2112,9 @@
      "t": "ore_pile",
      "layer": 1,
      "pos": [
-      4.005,
+      5.605,
       null,
-      -29.397
+      -10.847
      ],
      "h": 1.6,
      "rotY": 0.0,
@@ -1783,10 +2127,103 @@
      "pos": [
       -6.97,
       null,
-      -39.673
+      -13.923
      ],
      "h": 2.8,
      "rotY": -0.0923,
+     "visible": true
+    },
+    {
+     "id": "biome_crystals#2",
+     "t": "biome_crystals",
+     "layer": 1,
+     "pos": [
+      6.679,
+      null,
+      -15.081
+     ],
+     "h": 4.6,
+     "rotY": 0.1768,
+     "visible": true
+    },
+    {
+     "id": "beam_frame#3",
+     "t": "beam_frame",
+     "layer": 1,
+     "pos": [
+      -0.065,
+      8.5,
+      -24.904
+     ],
+     "h": 7.0,
+     "rotY": 0.0,
+     "visible": true,
+     "over_road": true
+    },
+    {
+     "id": "lantern_chain#3",
+     "t": "lantern_chain",
+     "layer": 1,
+     "pos": [
+      2.135,
+      1.6,
+      -24.504
+     ],
+     "h": 3.2,
+     "rotY": 0.0,
+     "visible": true,
+     "hanging": true
+    },
+    {
+     "id": "ore_pile#3",
+     "t": "ore_pile",
+     "layer": 1,
+     "pos": [
+      5.135,
+      null,
+      -21.704
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "feat_mining#2",
+     "t": "feat_mining",
+     "layer": 1,
+     "pos": [
+      -7.591,
+      null,
+      -23.851
+     ],
+     "h": 4.0,
+     "rotY": -0.1447,
+     "visible": true
+    },
+    {
+     "id": "biome_crystals#3",
+     "t": "biome_crystals",
+     "layer": 1,
+     "pos": [
+      -10.991,
+      null,
+      -25.451
+     ],
+     "h": 4.6,
+     "rotY": -0.192,
+     "visible": true
+    },
+    {
+     "id": "stalagmite_a#2",
+     "t": "stalagmite_a",
+     "layer": 1,
+     "pos": [
+      -11.191,
+      null,
+      -20.451
+     ],
+     "h": 3.6,
+     "rotY": -0.1416,
      "visible": true
     },
     {
@@ -1796,62 +2233,77 @@
      "pos": [
       7.502,
       null,
-      -47.117
+      -24.647
      ],
      "h": 2.4,
      "rotY": 0.1468,
      "visible": true
     },
     {
-     "id": "feat_mining#2",
-     "t": "feat_mining",
+     "id": "beam_frame#4",
+     "t": "beam_frame",
      "layer": 1,
      "pos": [
-      -7.065,
-      null,
-      -57.374
+      -0.212,
+      8.5,
+      -34.053
      ],
-     "h": 4.0,
-     "rotY": -0.1447,
-     "visible": true
+     "h": 7.0,
+     "rotY": 0.0,
+     "visible": true,
+     "over_road": true
     },
     {
-     "id": "biome_crystals#2",
-     "t": "biome_crystals",
+     "id": "lantern_chain#4",
+     "t": "lantern_chain",
      "layer": 1,
      "pos": [
-      -10.465,
-      null,
-      -58.974
+      1.988,
+      1.6,
+      -33.653
      ],
-     "h": 4.6,
-     "rotY": -0.1768,
-     "visible": true
+     "h": 3.2,
+     "rotY": 0.0,
+     "visible": true,
+     "hanging": true
     },
     {
-     "id": "stalagmite_a#2",
-     "t": "stalagmite_a",
-     "layer": 1,
-     "pos": [
-      -4.465,
-      null,
-      -55.574
-     ],
-     "h": 3.6,
-     "rotY": -0.1416,
-     "visible": true
-    },
-    {
-     "id": "ore_pile#3",
+     "id": "ore_pile#4",
      "t": "ore_pile",
      "layer": 1,
      "pos": [
-      4.544,
+      4.988,
       null,
-      -34.316
+      -30.853
      ],
      "h": 1.6,
-     "rotY": 0.0929,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "biome_crystals#4",
+     "t": "biome_crystals",
+     "layer": 1,
+     "pos": [
+      -6.881,
+      null,
+      -33.459
+     ],
+     "h": 4.6,
+     "rotY": -0.1858,
+     "visible": true
+    },
+    {
+     "id": "ore_pile#5",
+     "t": "ore_pile",
+     "layer": 1,
+     "pos": [
+      -4.134,
+      null,
+      -54.727
+     ],
+     "h": 1.6,
+     "rotY": -0.1149,
      "visible": true
     },
     {
@@ -1868,16 +2320,16 @@
      "visible": true
     },
     {
-     "id": "ore_pile#4",
+     "id": "ore_pile#6",
      "t": "ore_pile",
      "layer": 1,
      "pos": [
-      -4.156,
+      4.47,
       null,
-      -23.276
+      -27.302
      ],
      "h": 1.6,
-     "rotY": -0.1668,
+     "rotY": 0.076,
      "visible": true
     },
     {
@@ -1885,25 +2337,25 @@
      "t": "stalagmite_b",
      "layer": 1,
      "pos": [
-      -4.378,
+      -4.985,
       null,
-      -36.934
+      -31.118
      ],
      "h": 3.6,
      "rotY": -0.1558,
      "visible": true
     },
     {
-     "id": "ore_pile#5",
+     "id": "ore_pile#7",
      "t": "ore_pile",
      "layer": 1,
      "pos": [
-      -4.926,
+      -4.519,
       null,
-      -5.81
+      -46.51
      ],
      "h": 1.6,
-     "rotY": -0.1149,
+     "rotY": -0.1727,
      "visible": true
     },
     {
@@ -1911,25 +2363,77 @@
      "t": "stalagmite_b",
      "layer": 1,
      "pos": [
-      -4.519,
+      4.068,
       null,
-      -46.51
+      -58.224
      ],
      "h": 3.6,
-     "rotY": -0.0949,
+     "rotY": 0.0949,
      "visible": true
     },
     {
-     "id": "ore_pile#6",
+     "id": "ore_pile#8",
      "t": "ore_pile",
      "layer": 1,
      "pos": [
-      4.643,
+      -4.6,
       null,
-      -39.707
+      -4.153
      ],
      "h": 1.6,
-     "rotY": 0.076,
+     "rotY": -0.113,
+     "visible": true
+    },
+    {
+     "id": "stalagmite_b#4",
+     "t": "stalagmite_b",
+     "layer": 1,
+     "pos": [
+      4.906,
+      null,
+      -52.512
+     ],
+     "h": 3.6,
+     "rotY": 0.1204,
+     "visible": true
+    },
+    {
+     "id": "ore_pile#9",
+     "t": "ore_pile",
+     "layer": 1,
+     "pos": [
+      -4.153,
+      null,
+      -27.646
+     ],
+     "h": 1.6,
+     "rotY": -0.0768,
+     "visible": true
+    },
+    {
+     "id": "stalagmite_b#5",
+     "t": "stalagmite_b",
+     "layer": 1,
+     "pos": [
+      -4.801,
+      null,
+      -15.618
+     ],
+     "h": 3.6,
+     "rotY": -0.1002,
+     "visible": true
+    },
+    {
+     "id": "ore_pile#10",
+     "t": "ore_pile",
+     "layer": 1,
+     "pos": [
+      -4.335,
+      null,
+      -70.733
+     ],
+     "h": 1.6,
+     "rotY": -0.1833,
      "visible": true
     }
    ],
@@ -1984,7 +2488,7 @@
      "pos": [
       -7.501,
       null,
-      -9.351
+      -5.351
      ],
      "h": 7.0,
      "rotY": -0.2027,
@@ -1997,7 +2501,7 @@
      "pos": [
       5.371,
       null,
-      -16.708
+      -6.708
      ],
      "h": 2.2,
      "rotY": 0.1612,
@@ -2010,7 +2514,7 @@
      "pos": [
       7.771,
       null,
-      -15.308
+      -5.308
      ],
      "h": 2.2,
      "rotY": 0.1637,
@@ -2023,7 +2527,7 @@
      "pos": [
       4.771,
       null,
-      -14.908
+      -4.908
      ],
      "h": 1.0,
      "rotY": 0.1529,
@@ -2036,7 +2540,7 @@
      "pos": [
       -11.647,
       null,
-      -26.918
+      -14.618
      ],
      "h": 9.0,
      "rotY": -0.1397,
@@ -2049,7 +2553,7 @@
      "pos": [
       7.408,
       null,
-      -34.661
+      -14.361
      ],
      "h": 5.2,
      "rotY": 0.0848,
@@ -2062,7 +2566,7 @@
      "pos": [
       -4.92,
       null,
-      -44.063
+      -22.363
      ],
      "h": 2.2,
      "rotY": -0.1822,
@@ -2075,7 +2579,7 @@
      "pos": [
       -7.32,
       null,
-      -42.663
+      -20.963
      ],
      "h": 2.2,
      "rotY": -0.0714,
@@ -2088,7 +2592,7 @@
      "pos": [
       -4.32,
       null,
-      -42.263
+      -20.563
      ],
      "h": 1.0,
      "rotY": -0.0994,
@@ -2101,7 +2605,7 @@
      "pos": [
       7.039,
       null,
-      -50.813
+      -21.113
      ],
      "h": 2.6,
      "rotY": 0.2027,
@@ -2114,7 +2618,7 @@
      "pos": [
       -0.004,
       null,
-      -60.947
+      -4.947
      ],
      "h": 6.0,
      "rotY": 0.0,
@@ -2193,9 +2697,9 @@
      "t": "rock_m",
      "layer": 1,
      "pos": [
-      -7.833,
+      -5.096,
       null,
-      -5.038
+      -44.304
      ],
      "h": 2.0,
      "rotY": -0.1396,
@@ -2284,12 +2788,12 @@
      "t": "grave_c",
      "layer": 1,
      "pos": [
-      5.949,
+      -8.313,
       null,
-      -18.091
+      -26.015
      ],
      "h": 2.2,
-     "rotY": 0.1895,
+     "rotY": -0.1895,
      "visible": true
     },
     {
@@ -2297,9 +2801,9 @@
      "t": "candles",
      "layer": 1,
      "pos": [
-      5.389,
+      5.949,
       null,
-      -11.025
+      -18.091
      ],
      "h": 1.0,
      "rotY": 0.1889,
@@ -2310,12 +2814,64 @@
      "t": "rock_m",
      "layer": 1,
      "pos": [
+      -7.018,
+      null,
+      -42.867
+     ],
+     "h": 2.0,
+     "rotY": -0.1653,
+     "visible": true
+    },
+    {
+     "id": "grave_c#5",
+     "t": "grave_c",
+     "layer": 1,
+     "pos": [
+      5.389,
+      null,
+      -11.025
+     ],
+     "h": 2.2,
+     "rotY": 0.1456,
+     "visible": true
+    },
+    {
+     "id": "candles#7",
+     "t": "candles",
+     "layer": 1,
+     "pos": [
       -4.387,
       null,
       -59.023
      ],
+     "h": 1.0,
+     "rotY": -0.2031,
+     "visible": true
+    },
+    {
+     "id": "rock_m#5",
+     "t": "rock_m",
+     "layer": 1,
+     "pos": [
+      7.226,
+      null,
+      -45.641
+     ],
      "h": 2.0,
-     "rotY": -0.1653,
+     "rotY": 0.0738,
+     "visible": true
+    },
+    {
+     "id": "grave_c#6",
+     "t": "grave_c",
+     "layer": 1,
+     "pos": [
+      7.04,
+      null,
+      -55.58
+     ],
+     "h": 2.2,
+     "rotY": 0.1861,
      "visible": true
     }
    ],
@@ -2355,9 +2911,9 @@
      "t": "hero_tree_a",
      "layer": 1,
      "pos": [
-      -7.895,
+      -13.295,
       null,
-      -9.398
+      -5.398
      ],
      "h": 8.4,
      "rotY": -0.1392,
@@ -2365,29 +2921,29 @@
      "sway": true
     },
     {
-     "id": "hero_tree_b#6",
+     "id": "hero_tree_b#7",
      "t": "hero_tree_b",
      "layer": 1,
      "pos": [
       -10.895,
       null,
-      -7.798
+      -3.798
      ],
      "h": 2.2,
-     "rotY": -0.1433,
+     "rotY": -0.099,
      "visible": true
     },
     {
-     "id": "grass_tuft_b#7",
+     "id": "grass_tuft_b#9",
      "t": "grass_tuft_b",
      "layer": 1,
      "pos": [
       -5.695,
       null,
-      -7.598
+      -3.598
      ],
      "h": 1.1,
-     "rotY": -0.1808,
+     "rotY": -0.1185,
      "visible": true
     },
     {
@@ -2397,7 +2953,7 @@
      "pos": [
       -4.604,
       null,
-      -27.413
+      -15.863
      ],
      "h": 1.6,
      "rotY": -0.1684,
@@ -2408,9 +2964,9 @@
      "t": "hero_tree_a",
      "layer": 0.5,
      "pos": [
-      11.307,
+      16.707,
       null,
-      -36.473
+      -16.923
      ],
      "h": 8.4,
      "rotY": 0.1145,
@@ -2418,93 +2974,158 @@
      "sway": true
     },
     {
-     "id": "hero_tree_b#7",
+     "id": "hero_tree_b#8",
      "t": "hero_tree_b",
      "layer": 0.5,
      "pos": [
       14.307,
       null,
-      -34.873
+      -15.323
      ],
      "h": 2.2,
-     "rotY": 0.099,
+     "rotY": 0.1766,
      "visible": true
     },
     {
-     "id": "grass_tuft_b#8",
+     "id": "grass_tuft_b#10",
      "t": "grass_tuft_b",
      "layer": 0.5,
      "pos": [
       9.107,
       null,
-      -34.673
+      -15.123
      ],
      "h": 1.1,
-     "rotY": 0.0737,
+     "rotY": 0.1588,
      "visible": true
     },
     {
-     "id": "hero_house_b#4",
+     "id": "hero_house_b#3",
      "t": "hero_house_b",
      "layer": 1,
      "pos": [
       0.276,
       null,
-      -48.073
+      -6.073
      ],
      "h": 9.0,
      "rotY": 0.0,
      "visible": true
     },
     {
-     "id": "hero_fence#7",
-     "t": "hero_fence",
-     "layer": 1,
-     "pos": [
-      -2.324,
-      null,
-      -44.673
-     ],
-     "h": 1.6,
-     "rotY": 0.0,
-     "visible": true
-    },
-    {
-     "id": "hero_fence#8",
-     "t": "hero_fence",
-     "layer": 1,
-     "pos": [
-      2.876,
-      null,
-      -44.673
-     ],
-     "h": 1.6,
-     "rotY": 0.0,
-     "visible": true
-    },
-    {
-     "id": "hero_tree_b#8",
+     "id": "hero_tree_b#9",
      "t": "hero_tree_b",
      "layer": 1,
      "pos": [
       4.476,
       null,
-      -46.873
+      -4.873
      ],
      "h": 2.2,
      "rotY": 0.0,
      "visible": true
     },
     {
-     "id": "grass_tuft_a#12",
+     "id": "grass_tuft_a#16",
      "t": "grass_tuft_a",
      "layer": 1,
      "pos": [
       -3.324,
       null,
-      -45.873
+      -3.873
      ],
      "h": 1.1,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "hero_fence#17",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      -5.2,
+      null,
+      -12.0
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "hero_fence#18",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      -5.2,
+      null,
+      -14.845
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "hero_fence#19",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      -5.2,
+      null,
+      -17.691
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "hero_fence#20",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      -5.2,
+      null,
+      -20.536
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "hero_fence#21",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      -5.2,
+      null,
+      -23.382
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "hero_fence#22",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      -5.2,
+      null,
+      -26.227
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "hero_fence#23",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      -5.2,
+      null,
+      -29.072
+     ],
+     "h": 1.6,
      "rotY": 0.0,
      "visible": true
     },
@@ -2652,7 +3273,7 @@
      "nofog": true
     },
     {
-     "id": "grass_tuft_a#13",
+     "id": "grass_tuft_a#17",
      "t": "grass_tuft_a",
      "layer": 1,
      "pos": [
@@ -2661,11 +3282,11 @@
       -42.094
      ],
      "h": 1.1,
-     "rotY": -0.1522,
+     "rotY": -0.1852,
      "visible": true
     },
     {
-     "id": "grass_tuft_b#9",
+     "id": "grass_tuft_b#11",
      "t": "grass_tuft_b",
      "layer": 1,
      "pos": [
@@ -2674,11 +3295,11 @@
       -41.431
      ],
      "h": 1.1,
-     "rotY": 0.1185,
+     "rotY": 0.0981,
      "visible": true
     },
     {
-     "id": "rock_s#8",
+     "id": "rock_s#11",
      "t": "rock_s",
      "layer": 1,
      "pos": [
@@ -2687,11 +3308,11 @@
       -79.748
      ],
      "h": 1.2,
-     "rotY": -0.0802,
+     "rotY": -0.089,
      "visible": true
     },
     {
-     "id": "grass_tuft_a#14",
+     "id": "grass_tuft_a#18",
      "t": "grass_tuft_a",
      "layer": 1,
      "pos": [
@@ -2700,11 +3321,11 @@
       -83.3
      ],
      "h": 1.1,
-     "rotY": -0.1927,
+     "rotY": -0.1189,
      "visible": true
     },
     {
-     "id": "grass_tuft_b#10",
+     "id": "grass_tuft_b#12",
      "t": "grass_tuft_b",
      "layer": 1,
      "pos": [
@@ -2713,11 +3334,11 @@
       -7.619
      ],
      "h": 1.1,
-     "rotY": 0.1588,
+     "rotY": 0.1843,
      "visible": true
     },
     {
-     "id": "rock_s#9",
+     "id": "rock_s#12",
      "t": "rock_s",
      "layer": 1,
      "pos": [
@@ -2726,11 +3347,11 @@
       -33.608
      ],
      "h": 1.2,
-     "rotY": 0.0954,
+     "rotY": 0.1193,
      "visible": true
     },
     {
-     "id": "grass_tuft_a#15",
+     "id": "grass_tuft_a#19",
      "t": "grass_tuft_a",
      "layer": 1,
      "pos": [
@@ -2739,11 +3360,11 @@
       -39.701
      ],
      "h": 1.1,
-     "rotY": -0.078,
+     "rotY": -0.1769,
      "visible": true
     },
     {
-     "id": "grass_tuft_b#11",
+     "id": "grass_tuft_b#13",
      "t": "grass_tuft_b",
      "layer": 1,
      "pos": [
@@ -2752,11 +3373,11 @@
       -77.697
      ],
      "h": 1.1,
-     "rotY": 0.0981,
+     "rotY": 0.1204,
      "visible": true
     },
     {
-     "id": "rock_s#10",
+     "id": "rock_s#13",
      "t": "rock_s",
      "layer": 1,
      "pos": [
@@ -2765,11 +3386,11 @@
       -54.867
      ],
      "h": 1.2,
-     "rotY": 0.1907,
+     "rotY": 0.1259,
      "visible": true
     },
     {
-     "id": "grass_tuft_a#16",
+     "id": "grass_tuft_a#20",
      "t": "grass_tuft_a",
      "layer": 1,
      "pos": [
@@ -2778,7 +3399,59 @@
       -72.583
      ],
      "h": 1.1,
-     "rotY": -0.1103,
+     "rotY": -0.1959,
+     "visible": true
+    },
+    {
+     "id": "grass_tuft_b#14",
+     "t": "grass_tuft_b",
+     "layer": 1,
+     "pos": [
+      -5.135,
+      null,
+      -76.157
+     ],
+     "h": 1.1,
+     "rotY": -0.1283,
+     "visible": true
+    },
+    {
+     "id": "rock_s#14",
+     "t": "rock_s",
+     "layer": 1,
+     "pos": [
+      -7.001,
+      null,
+      -47.296
+     ],
+     "h": 1.2,
+     "rotY": -0.1156,
+     "visible": true
+    },
+    {
+     "id": "grass_tuft_a#21",
+     "t": "grass_tuft_a",
+     "layer": 1,
+     "pos": [
+      -7.464,
+      null,
+      -83.035
+     ],
+     "h": 1.1,
+     "rotY": -0.1709,
+     "visible": true
+    },
+    {
+     "id": "grass_tuft_b#15",
+     "t": "grass_tuft_b",
+     "layer": 1,
+     "pos": [
+      -4.778,
+      null,
+      -44.427
+     ],
+     "h": 1.1,
+     "rotY": -0.1817,
      "visible": true
     }
    ],
@@ -2816,7 +3489,7 @@
     "stall": {
      "t": "feat_world",
      "x": 7.4,
-     "z": -18,
+     "z": -6.0,
      "h": 5.72,
      "layer": 1
     },
@@ -2833,7 +3506,7 @@
     "x0": 5.1,
     "step": 0.62,
     "y": 2.974,
-    "z": -17.2,
+    "z": -5.2,
     "h": 0.72
    }
   }

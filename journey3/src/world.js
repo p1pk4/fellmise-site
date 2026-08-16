@@ -330,67 +330,6 @@ export async function createWorld({ canvas, tod }) {
     }
   }
 
-  async function makeGround(b, group, index) {
-    // A ground plane must cover its own biome and reach into the gate, but NOT
-    // sit on top of the next biome's ground: they are coplanar at y=0, and the
-    // neighbour's tint was winning the depth test (the mine rendered on grass).
-    // Hence a shorter plane plus a hair of Y separation per biome, so where two
-    // do overlap the nearer-in-order one deterministically wins.
-    // A biome's floor must begin just after the PREVIOUS opening and end just
-    // after its own, so the floor changes underfoot exactly while passing
-    // through. Sitting it under the biome only meant the forest's grass ran on
-    // under the mine's cave mouth. Later biomes sit a hair higher, so in the
-    // overlap the destination's floor wins — which is the direction of travel.
-    // Long enough that neighbouring biomes OVERLAP: their floors used to abut
-    // exactly, and a hard line where near-black cave stone met bright grass ran
-    // across the frame a few metres from the camera. Now each floor fades out
-    // over its last stretch while the next fades in, and the crossover lands on
-    // the gate. The Y stagger still decides who wins where both are solid.
-    const LEN = 190, CZ = -5, FADE = 24;
-    const y = index * 0.004;
-
-    const tex = (await loadTex(b.ground)).clone();
-    tex.needsUpdate = true;
-    tex.anisotropy = maxAniso;
-    tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-    tex.repeat.set(24, 22);        // tile at half size: denser, so it holds up close
-    const mat = new THREE.MeshBasicMaterial({
-      map: tex, fog: true, vertexColors: true,
-      transparent: true, depthWrite: false,
-    });
-    mat.color.setHex(b.groundTint);
-    const geo = new THREE.PlaneGeometry(170, LEN, 1, 32);
-    fadeEnds(geo, LEN, FADE);
-    const g = new THREE.Mesh(geo, mat);
-    g.rotation.x = -Math.PI / 2;
-    g.position.set(0, y, CZ);
-    g.renderOrder = -10;
-    group.add(g);
-
-    if (b.road) {
-      // tile_path is the sand interior of the road tile, cut out by
-      // tools/make_path_tile.py: the tile itself has grass painted along its
-      // edges, and repeating it laid that grass across the road every few
-      // metres. Mirrored wrapping makes an ordinary crop tile without a seam.
-      const rt = (await loadTex(b.road)).clone();
-      rt.needsUpdate = true;
-      rt.anisotropy = maxAniso;
-      rt.wrapS = rt.wrapT = THREE.MirroredRepeatWrapping;
-      rt.repeat.set(4, 40);        // tile at half size: denser, so it holds up close
-      const rm = new THREE.MeshBasicMaterial({
-        map: rt, transparent: true, fog: true, depthWrite: false, vertexColors: true,
-      });
-      rm.color.setHex(0xdccbaa);          // tint, not repaint: 0xf2ca78 turned it orange
-      const rgeo = new THREE.PlaneGeometry(11, LEN, 8, 32);
-      fadeEnds(rgeo, LEN, FADE, 11, 1.6);   // and soften the verges into the grass
-      const r = new THREE.Mesh(rgeo, rm);
-      r.rotation.x = -Math.PI / 2;
-      r.position.set(0, y + 0.02, CZ);
-      r.renderOrder = -9;
-      group.add(r);
-    }
-  }
-
   /* Per-vertex alpha ramp along the plane's length, so a floor arrives and
      leaves instead of starting at a straight edge. Written into the colour
      attribute as RGBA — the material's own colour still tints on top. */
@@ -407,6 +346,53 @@ export async function createWorld({ canvas, tod }) {
     }
     geo.setAttribute('color', new THREE.BufferAttribute(col, 4));
   }
+
+  async function makeGround(b, group, index) {
+    // A floor must cover its own biome and reach into the gate, but not sit on
+    // top of the next one's: they are coplanar at y=0 and the neighbour used to
+    // win the depth test (the mine rendered on grass). Hence a shorter plane, a
+    // hair of Y separation per biome so the destination wins in the overlap,
+    // and an alpha ramp at each end so the change happens at the opening rather
+    // than along a ruled line across the frame.
+    const LEN = 190, CZ = -5, FADE = 24;
+    const y = index * 0.004;
+
+    const tex = (await loadTex(b.ground)).clone();
+    tex.needsUpdate = true;
+    tex.anisotropy = maxAniso;
+    tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+    tex.repeat.set(1, 1);          // UV is world-space now; repeat is not used
+
+    let roadTex = null;
+    if (b.road) {
+      roadTex = (await loadTex(b.road)).clone();
+      roadTex.needsUpdate = true;
+      roadTex.anisotropy = maxAniso;
+      roadTex.wrapS = roadTex.wrapT = THREE.RepeatWrapping;
+      roadTex.repeat.set(1, 1);
+    }
+
+    const { makeGroundMaterial } = await import('./ground.js');
+    const mat = makeGroundMaterial(THREE, {
+      groundMap: tex, roadMap: roadTex,
+      tint: b.groundTint, roadTint: b.roadTint || 0xdccbaa,
+      // the road is painted into the floor, so its width is a number here and
+      // not the size of a second plane
+      halfWidth: (LAYOUT.debug && LAYOUT.debug.road_half_width) || 3.2,
+    });
+    (state.groundMats ||= []).push(mat);
+
+    // more segments than before: the floor is one mesh now and its vertex ramp
+    // has to be smooth across a longer span
+    const geo = new THREE.PlaneGeometry(190, LEN, 1, 48);
+    fadeEnds(geo, LEN, FADE);
+    const g = new THREE.Mesh(geo, mat);
+    g.rotation.x = -Math.PI / 2;
+    g.position.set(0, y, CZ);
+    g.renderOrder = -10;
+    group.add(g);
+  }
+
 
   /* layout.json keeps position as one array, which is what a person reads and
      what the editor writes; the builders below want it spread out. */
@@ -681,6 +667,11 @@ export function startLoop(state) {
       let x = d.mesh.position.x + d.speed * dt;
       if (x > d.x0 + d.span / 2) x -= d.span;
       d.mesh.position.x = x;
+    }
+    if (state.groundMats) {
+      for (const m of state.groundMats) {
+        m.userData.uniforms.uCam.value.copy(camera.position);
+      }
     }
     for (const b of state.backdrops) {
       b.visible = b.getWorldPosition(_far).distanceTo(camera.position) < scene.fog.far;

@@ -172,13 +172,39 @@ class Builder:
                 o["_axis"] = on_axis
         return [o for o in objs if o is not None]
 
+    def respace(self, b):
+        """Re-lay the beats so the gap grows with distance.
+
+        Perspective compresses depth: beats spaced evenly in metres arrive ever
+        closer together on screen, and the far half of a biome turns into a
+        heap. `base_step * (1 + |z| / falloff)` opens the spacing out as the
+        biome recedes, which keeps the RATE the camera meets things roughly
+        constant. The authored order is kept exactly; only the Z values move.
+        """
+        rs = b.get("rhythm_spacing")
+        if not rs:
+            return b["rhythm"]
+        out, z = [], float(rs["start_z"])
+        # the two sides are laid independently, or the left bank would push the
+        # right one down the road and the street would stop being a street
+        cursor = {"L": float(rs["start_z"]), "R": float(rs["start_z"]),
+                  "C": float(rs["start_z"])}
+        for beat in b["rhythm"]:
+            side = beat["side"]
+            z = cursor[side]
+            step = rs["base_step"] * (1 + abs(z) / rs["falloff"])
+            cursor[side] = z - step
+            out.append({**beat, "z": round(z, 2)})
+        return out
+
     # -- one biome --------------------------------------------------------
     def biome(self, bid):
         b = self.spec["biomes"][bid]
         out = {"sprites": [], "boards": []}
 
         # --- rhythm: the beats along the road ----------------------------
-        for i, beat in enumerate(b["rhythm"]):
+        beats = self.respace(b)
+        for i, beat in enumerate(beats):
             z, side, lane = beat["z"], beat["side"], beat["lane"]
             x0 = self.lane_x(bid, lane, side)
             layer = self.layer_of(lane)
@@ -197,7 +223,7 @@ class Builder:
                         bid, t, ax + mirror * m["dx"], az + m["dz"],
                         self.height(m["h"]), side=side, layer=layer, jit=False,
                         y=self.height(m["h"]) * 0.5 if m.get("hanging") else
-                          (self.g["camera_eye_height"] + self.height(m["h"]) * 0.5
+                          (self.g["camera_eye_height"] + 1.6 + self.height(m["h"]) * 0.5
                            if m.get("over_road") else None),
                         extra={**{k: m[k] for k in ("sway", "dim") if k in m},
                                **({"hanging": True} if m.get("hanging") else {}),
@@ -215,6 +241,28 @@ class Builder:
             o = self.place(bid, single, x0, z, self.height(beat["h"]),
                            side=side, layer=layer)
             out["sprites"] += self.tag([o], f"{bid}:{i}", side == "C")
+
+        # --- runs: a fence is a line, not a piece ------------------------
+        for ri, run in enumerate(b.get("runs", [])):
+            h = self.height(run["h"])
+            asp = aspect(run["t"]) or 1.0
+            step = h * asp * 0.94          # a hair of overlap, so no gaps show
+            x0 = self.lane_x(bid, run["lane"], run["side"])
+            z, n = float(run["z0"]), 0
+            made = []
+            while z >= run["z1"]:
+                made.append(self.place(bid, run["t"], x0, z, h, side=run["side"],
+                                       layer=self.layer_of(run["lane"]), jit=False,
+                                       rot=0.0))
+                z -= step
+                n += 1
+            for o in made:
+                if o is not None:
+                    o["_line"] = True
+            out["sprites"] += self.tag(made, f"{bid}:run{ri}", False)
+            if n < 2:
+                self.notes.append(f"{bid}: отрезок {run['t']} уместил {n} сегмент — "
+                                  f"это уже не линия")
 
         # --- boards ------------------------------------------------------
         for bd in b["boards"]:
@@ -441,7 +489,20 @@ def validate(layout, spec):
                 # Only unrelated objects are held apart.
                 if a.get("_grp") and a.get("_grp") == c.get("_grp"):
                     continue
+                # a fence is a line the scene is built around: grass at its foot
+                # is right, a house through it is not. Small dressing is allowed
+                # to touch it; anything of size still has to clear it.
+                line, other = (a, c) if a.get("_line") else (c, a)
+                if line.get("_line") and not other.get("_line") and other["h"] < 2.4:
+                    continue
                 if abs(az - cz) > 1.2:
+                    continue
+                # and they have to share some height: a beam hung over the road
+                # does not overlap a crystal on the floor, however much their
+                # footprints agree. The test was flat and said they did.
+                ay0 = 0.0 if a["pos"][1] is None else a["pos"][1] - a["h"] / 2
+                cy0 = 0.0 if c["pos"][1] is None else c["pos"][1] - c["h"] / 2
+                if ay0 > cy0 + c["h"] or cy0 > ay0 + a["h"]:
                     continue
                 overlap = (aw + cw + gap) - abs(ax - cx)
                 if overlap > 0:
@@ -500,7 +561,7 @@ def main():
 
     for b in layout["biomes"].values():
         for o in b["sprites"]:
-            for k in ("_grp", "_axis", "_from", "_jit"):
+            for k in ("_grp", "_axis", "_from", "_jit", "_line"):
                 o.pop(k, None)
 
     if args.dry:

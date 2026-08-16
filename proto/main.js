@@ -32,19 +32,29 @@ const TILE_M = 1.75 / 1.5;                  // метров в одном тай
 const GAME_ORTHO_SIZE = 5;                  // боевое значение из Bootstrap.unity
 const GAME_FRAME_M = GAME_ORTHO_SIZE * 2 * TILE_M;   // 11.67 м по высоте кадра
 
-/* Близкий зум = игровой кадр один в один. Обзорный — так, чтобы такт помещался
-   целиком: шаг между тактами одного берега в деревне доходит до 18 м (замер по
-   layout.json), плюс поля. */
-const ZOOM = { обзор: 12, близко: GAME_FRAME_M / 2 };
+/* ПРИВЯЗКА К ИГРОВОМУ КАДРУ ОТМЕНЕНА (ground-3).
+ *
+ * Привязка была сделана и дала отрицательный результат: при кадре 11.7 м
+ * дорога занимает 60% экрана, два дома в кадр не помещаются, а спрайты идут в
+ * мыло — пака такого разрешения не существует (медиана пака 128 px/м против
+ * 219 px/м по GDD, см. tools/measure_foreshortening.py). Метод пересчёта
+ * сохранён и работает: GAME_FRAME_M ниже по-прежнему считается и показывается
+ * в панели как диагностика расхождения, а не как подпись к режиму.
+ *
+ * Зумы заданы тем, что реально читается на экране: 16 м — дом с окружением,
+ * 40 м — усадьба с соседями и куском дороги. */
+const ZOOM = { обзор: 40 / 2, близко: 16 / 2 };
 const BIOME_SPACING = 150;                  // как в боевой сцене
 const SEED = 'fellmise-proto-1';
 
 /* Полуширина дороги — НЕ из scene_spec.json (там 3.2 и трогать его не в этом
-   батче), а константой пробы. 3.2 м против домов в 9 м сверху читается тропинкой
-   между усадьбами, тогда как по сцене это улица деревни: две встречные телеги
-   плюс обочины — это 11 м в ширину. */
-const ROAD_HALF = 5.5;
-const RUT_HALF = 0.7;                       // колея телеги, 1.4 м между колёсами
+   батче), а константой пробы.
+     3.2  читалась тропинкой между усадьбами;
+     5.5  съедала треть кадра при двух домах (wide_2.png прошлого батча);
+     4.2  улица, которая не спорит с постройками.
+   Колея держит ту же долю ширины, что и при 5.5. */
+const ROAD_HALF = 4.2;
+const RUT_HALF = 0.53;                      // та же доля дороги, что была при 5.5
 
 /* Единое направление света на всю сцену. Тень уезжает на 0.2 м — этого хватает,
    чтобы объект отделился от земли, и мало, чтобы не читаться вторым предметом. */
@@ -202,15 +212,19 @@ const GROUND_FS = `
     // Один градиент читается мылом. Промежуточный слой даёт ДВА края, и каждый
     // сбит шумом двух частот: медленная задаёт форму тропы, быстрая — языки
     // травы, вгрызающиеся в грунт.
-    float jag = (fbm(vec2(vWorld.y * 0.035, 0.0)) - 0.5) * 2.2
-              + (fbm(vec2(vWorld.y * 0.31, vWorld.x * 0.12)) - 0.5) * 1.1;
+    // Крупная волна раньше доминировала, и трава обрывалась круглыми фестонами —
+    // читалось вырезанным ножницами. Теперь она вдвое тише, а решают две мелкие
+    // частоты: одна даёт языки, вторая крошит их край.
+    float jag = (fbm(vec2(vWorld.y * 0.035, 0.0)) - 0.5) * 1.1
+              + (fbm(vec2(vWorld.y * 0.62, vWorld.x * 0.24)) - 0.5) * 1.5
+              + (fbm(vec2(vWorld.y * 1.70, vWorld.x * 0.70)) - 0.5) * 0.55;
     float eIn = hw + jag;
     float eOut = eIn + 0.8;                            // полоса 0.8 м
     vec3 trampled = mix(grass, road, 0.55) * 0.96;
 
     vec3 col = grass;
-    col = mix(col, trampled, 1.0 - smoothstep(eOut - 0.45, eOut + 0.45, d));
-    col = mix(col, road, 1.0 - smoothstep(eIn - 0.35, eIn + 0.35, d));
+    col = mix(col, trampled, 1.0 - smoothstep(eOut - 0.28, eOut + 0.28, d));
+    col = mix(col, road, 1.0 - smoothstep(eIn - 0.20, eIn + 0.20, d));
 
     gl_FragColor = vec4(col, 1.0);
   }
@@ -415,8 +429,15 @@ const DECALS = [
     share: 0.16, order: ORDER.decalFar, onRoad: true, plain: true },
   { key: 'patch2', tex: (img) => patchTexture('dark', img), size: [0.9, 1.9],
     share: 0.10, order: ORDER.decalFar, onRoad: true, plain: true },
-  { key: 'grass_tuft_a', size: [0.9, 1.7], share: 0.30, order: ORDER.decalNear },
-  { key: 'grass_tuft_b', size: [0.9, 1.7], share: 0.24, order: ORDER.decalNear },
+  { key: 'grass_tuft_a', size: [0.9, 1.7], share: 0.24, order: ORDER.decalNear },
+  { key: 'grass_tuft_b', size: [0.9, 1.7], share: 0.18, order: ORDER.decalNear },
+  /* Кромка должна быть зубчатой ОБЪЕКТАМИ, а не только маской: маска сколь
+     угодно рваная всё равно читается краем заливки. Эти кустики сидят поперёк
+     границы и заходят на землю. */
+  { key: 'grass_tuft_a', name: 'verge_a', size: [0.6, 1.2], share: 0.08,
+    order: ORDER.decalNear, verge: true },
+  { key: 'grass_tuft_b', name: 'verge_b', size: [0.6, 1.2], share: 0.06,
+    order: ORDER.decalNear, verge: true },
   { key: 'rock_s', size: [0.6, 1.2], share: 0.12, order: ORDER.decalNear },
   { key: 'mushrooms', size: [0.5, 0.9], share: 0.04, order: ORDER.decalNear },
   { key: 'fern', size: [0.8, 1.5], share: 0.04, order: ORDER.decalNear },
@@ -437,6 +458,7 @@ async function buildDecals(len, roadAt, roadImg) {
     let art = null;
     if (spec.tex) art = { map: spec.tex(roadImg), aspect: 1 };
     else art = await sprite(spec.key);
+    const dname = spec.name || spec.key;
     if (!art) continue;
 
     const geo = new THREE.PlaneGeometry(1, 1);
@@ -453,11 +475,17 @@ async function buildDecals(len, roadAt, roadImg) {
 
     let k = 0;
     for (let i = 0; i < n; i++) {
-      const x = (h01('dx', di, i) * 2 - 1) * FIELD_X;
-      const z = 20 - h01('dz', di, i) * (len + 40);
+      const x = (h01('dx', dname, i) * 2 - 1) * FIELD_X;
+      const z = 20 - h01('dz', dname, i) * (len + 40);
       const { cx, hw } = roadAt(z);
-      // трава и камни на дороге не растут; проплешины — растут, это грязь
-      if (!spec.onRoad && Math.abs(x - cx) < hw * 1.25) continue;
+      let px = x;
+      if (spec.verge) {
+        // сажаем поперёк кромки: гладкая hw плюс разброс шире, чем ходит шум
+        // края, поэтому часть кустов оказывается на земле, часть на траве
+        px = cx + (x < 0 ? -1 : 1) * (hw + (h01('dv2', dname, i) - 0.5) * 1.9);
+      } else if (!spec.onRoad && Math.abs(x - cx) < hw * 1.25) {
+        continue;
+      }
 
       /* Решётку вычистили из тайла — и собрали новую из декалей: один кустик,
          повторённый сотни раз в одном размере и одной ориентации. Одинаковая
@@ -465,17 +493,17 @@ async function buildDecals(len, roadAt, roadImg) {
          экземпляру своя вариация — и вся она из того же хеша, что и позиция,
          так что земля воспроизводится от загрузки к загрузке. */
       const base = (spec.size[0] + spec.size[1]) / 2;
-      const s = base * (0.7 + h01('ds', di, i) * 0.7);        // 0.7…1.4
-      const flip = h01('df', di, i) < 0.5 ? -1 : 1;           // зеркало по X
-      dummy.position.set(x, 0.4, z);
-      dummy.rotation.set(-Math.PI / 2, 0, h01('dr', di, i) * Math.PI * 2);
+      const s = base * (0.7 + h01('ds', dname, i) * 0.7);        // 0.7…1.4
+      const flip = h01('df', dname, i) < 0.5 ? -1 : 1;           // зеркало по X
+      dummy.position.set(px, 0.4, z);
+      dummy.rotation.set(-Math.PI / 2, 0, h01('dr', dname, i) * Math.PI * 2);
       dummy.scale.set(s * art.aspect * flip, s, 1);
       dummy.updateMatrix();
       mesh.setMatrixAt(k, dummy.matrix);
 
       // оттенок ±8%, яркость ±10% — тем же способом
-      const hue = (h01('dh', di, i) - 0.5) * 0.16;
-      const val = 1 + (h01('dv', di, i) - 0.5) * 0.20;
+      const hue = (h01('dh', dname, i) - 0.5) * 0.16;
+      const val = 1 + (h01('dv', dname, i) - 0.5) * 0.20;
       col.setRGB(val * (1 + hue), val, val * (1 - hue)).convertSRGBToLinear();
       mesh.setColorAt(k, col);
       k++;
@@ -671,6 +699,7 @@ function draw() {
     + `<b>${asOrtho.toFixed(1)}</b>${same ? ' <b>(игровой кадр)</b>' : ''} — клавиша Z\n`
     + `кадр ${(halfM * 2).toFixed(1)} м = ${tiles.toFixed(1)} тайла игры · `
     + `1 м сайта = ${(1 / TILE_M).toFixed(2)} тайла\n`
+    + `<b>игровой кадр = ${GAME_FRAME_M.toFixed(1)} м — недостижим при текущем разрешении пака</b>\n`
     + `камера z = <b>${state.z.toFixed(0)}</b> — колесо мыши\n`
     + `${state.objects} объектов, ${state.decals} декалей, ${state.biomes} биомов\n`
     + `тест сортировки: <b>${state.sortTest}</b>`;
@@ -692,6 +721,42 @@ addEventListener('keydown', (e) => {
 
 addEventListener('resize', () => { resize(); draw(); });
 
+/* Где НА САМОМ ДЕЛЕ проходит кромка дороги.
+   Полуширина 4.2 — это гладкая ось; видимый край гуляет от неё на шум. Забор
+   стоит на полосе verge = 5.2, и вопрос «снаружи ли он» решается не вычитанием
+   4.2 из 5.2, а замером. Формулы те же, что в шейдере; точность двойная вместо
+   одинарной, поэтому число представительное, а не побитовое. */
+function edgeStats(z0, z1) {
+  const h21 = (x, y) => {
+    const v = Math.sin(x * 41.3 + y * 289.1) * 43758.5453;
+    return v - Math.floor(v);
+  };
+  const vnoise = (x, y) => {
+    const ix = Math.floor(x), iy = Math.floor(y);
+    let fx = x - ix, fy = y - iy;
+    fx = fx * fx * (3 - 2 * fx); fy = fy * fy * (3 - 2 * fy);
+    const a = h21(ix, iy), b = h21(ix + 1, iy);
+    const c = h21(ix, iy + 1), d = h21(ix + 1, iy + 1);
+    const top = a + (b - a) * fx, bot = c + (d - c) * fx;
+    return top + (bot - top) * fy;
+  };
+  const fbm = (x, y) => vnoise(x, y) * 0.6 + vnoise(x * 2.1, y * 2.1) * 0.3
+                      + vnoise(x * 4.3, y * 4.3) * 0.1;
+  const VERGE = 5.2;
+  let mx = 0, sum = 0, n = 0, over = 0;
+  for (let z = z0; z >= z1; z -= 0.1) {
+    const { cx, hw } = roadAt(z);
+    const jag = (fbm(z * 0.035, 0) - 0.5) * 1.1
+              + (fbm(z * 0.62, cx * 0.24) - 0.5) * 1.5
+              + (fbm(z * 1.70, cx * 0.70) - 0.5) * 0.55;
+    const edge = Math.abs(cx) + hw + jag;
+    mx = Math.max(mx, edge); sum += edge; n++;
+    if (edge > VERGE) over++;
+  }
+  return { max: +mx.toFixed(2), mean: +(sum / n).toFixed(2),
+           overVerge: +(over / n * 100).toFixed(1), verge: VERGE };
+}
+
 /* Ручка для скриншотов: та же камера, тот же путь, без анимаций. */
 window.__PROTO = {
   go(z, zoom) {
@@ -701,6 +766,7 @@ window.__PROTO = {
     draw();
   },
   sortTest,
+  edgeStats,
   state,
 };
 

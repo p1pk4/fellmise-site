@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Fellmise — проба top-down</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #4d7a3a; overflow: hidden; }
+  canvas { display: block; }
+  #hud {
+    position: fixed; left: 12px; top: 12px; z-index: 10;
+    padding: 8px 12px; background: rgba(18,22,24,.86); color: #fdf6e0;
+    font: 12px/1.5 ui-monospace, monospace; white-space: pre;
+    pointer-events: none;
+  }
+  #hud b { color: #ffc857; font-weight: 700; }
+</style>
+</head>
+<body>
+<div id="hud">загрузка…</div>
+<script type="module" src="./main.js"></script>
+</body>
+</html>

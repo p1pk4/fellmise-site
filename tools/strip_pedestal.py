@@ -34,6 +34,7 @@ from PIL import Image
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 ASSETS = ROOT / "assets"
 OUT = ROOT / "proto" / "sprites_stripped"
+MARKS = pathlib.Path(__file__).with_name("pedestal_marks.json")
 
 ALPHA = 8
 BAND = 0.18          # доля высоты снизу, в которой вообще ищем цоколь
@@ -67,7 +68,7 @@ def load(p):
     return im, a
 
 
-def strip(path):
+def strip(path, mark=None):
     """Вернуть (изображение или None, отчёт)."""
     im, a = load(path)
     rgb, alpha = a[..., :3], a[..., 3]
@@ -125,11 +126,23 @@ def strip(path):
     rows_idx = np.arange(col.shape[0])[:, None]
     sel[band] = np.where(strong[None, :] & (rows_idx >= first[None, :]), m, col)
 
+    # Ручной потолок из pedestal_marks.json — ПОСЛЕ всех правил и жёстко.
+    # У амбара и таверны низ стены по яркости близок к плите и проходит порог,
+    # а вырез идёт по строкам во всю ширину, поэтому стена срезалась вместе с
+    # землёй. Метрику под этот случай не подгоняем: две строки в файле честнее
+    # седьмого порога.
+    capped = 0
+    if mark and mark.get("max_cut_row") is not None:
+        cap = int(mark["max_cut_row"])
+        capped = int(sel[:cap].sum())
+        sel[:cap] = False
+
     out = a.copy()
     out[..., 3][sel] = 0.0
     # мягкий верх выреза, иначе на месте цоколя остаётся ровная ступенька
+    top_cut = int(np.argmax(sel.any(axis=1))) if sel.any() else band0
     for i in range(FEATHER):
-        r = band0 - FEATHER + i
+        r = top_cut - FEATHER + i
         if 0 <= r < a.shape[0]:
             k = i / FEATHER
             out[r, :, 3] = np.where(solid[r], out[r, :, 3] * (k * 0.6 + 0.4),
@@ -140,8 +153,11 @@ def strip(path):
         return None, f"вырезалось бы {100 - kept / solid.sum() * 100:.0f}% спрайта"
 
     img = Image.fromarray(out.clip(0, 255).astype(np.uint8), "RGBA")
-    return img, (f"вырезано {sel.sum()} px, {share*100:.0f}% нижней полосы, "
-                 f"низ шире тела в {widen:.2f}×")
+    note = (f"вырезано {sel.sum()} px, {share*100:.0f}% нижней полосы, "
+            f"низ шире тела в {widen:.2f}×")
+    if capped:
+        note += f"; потолок r{mark['max_cut_row']} вернул {capped} px стены"
+    return img, note
 
 
 def main():
@@ -153,6 +169,10 @@ def main():
                                  if not p.stem.endswith(("_em", "_bleed")))
     OUT.mkdir(parents=True, exist_ok=True)
 
+    marks = {}
+    if MARKS.exists():
+        marks = json.loads(MARKS.read_text(encoding="utf-8")).get("sprites", {})
+
     done, skip = {}, {}
     for n in names:
         p = ASSETS / f"{n}.webp"
@@ -162,7 +182,7 @@ def main():
         if n in MANUAL_REJECT:
             skip[n] = f"отвергнуто глазами: {MANUAL_REJECT[n]}"
             continue
-        img, why = strip(p)
+        img, why = strip(p, marks.get(n))
         if img is None:
             skip[n] = why
         else:

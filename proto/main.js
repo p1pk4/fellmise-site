@@ -16,9 +16,35 @@ const HUD = document.getElementById('hud');
 const ASSETS = '../assets/';
 const STRIPPED = './sprites_stripped/';
 
-const ZOOM = { обзор: 48, близко: 18 };    // половина высоты кадра в метрах
+/* Масштаб игры, выведенный из фактов, а не подобранный.
+ *
+ *   игра   камера ортографическая, orthographicSize 5 по умолчанию (замер:
+ *          client/Assets/_Fellmise/Scenes/Bootstrap.unity, объект Main Camera).
+ *          Значит высота кадра — 10 юнитов, и 1 юнит = 1 тайл: GDD говорит
+ *          «камера ~16 тайлов», а 2*5*16/9 = 17.8 юнита по ширине.
+ *   тайл   GDD 2896: «Высота персонажа — 1.5 тайла». Взрослый человек ~1.75 м,
+ *          отсюда тайл ≈ 1.17 м. Это единственное допущение в цепочке, и оно
+ *          названо: ошибка в росте линейно тянет за собой весь пересчёт.
+ *
+ * Итог: 1 метр сайта = 0.86 тайла игры, игровой кадр = 11.7 м по высоте.
+ */
+const TILE_M = 1.75 / 1.5;                  // метров в одном тайле игры
+const GAME_ORTHO_SIZE = 5;                  // боевое значение из Bootstrap.unity
+const GAME_FRAME_M = GAME_ORTHO_SIZE * 2 * TILE_M;   // 11.67 м по высоте кадра
+
+/* Близкий зум = игровой кадр один в один. Обзорный — так, чтобы такт помещался
+   целиком: шаг между тактами одного берега в деревне доходит до 18 м (замер по
+   layout.json), плюс поля. */
+const ZOOM = { обзор: 12, близко: GAME_FRAME_M / 2 };
 const BIOME_SPACING = 150;                  // как в боевой сцене
 const SEED = 'fellmise-proto-1';
+
+/* Полуширина дороги — НЕ из scene_spec.json (там 3.2 и трогать его не в этом
+   батче), а константой пробы. 3.2 м против домов в 9 м сверху читается тропинкой
+   между усадьбами, тогда как по сцене это улица деревни: две встречные телеги
+   плюс обочины — это 11 м в ширину. */
+const ROAD_HALF = 5.5;
+const RUT_HALF = 0.7;                       // колея телеги, 1.4 м между колёсами
 
 /* Единое направление света на всю сцену. Тень уезжает на 0.2 м — этого хватает,
    чтобы объект отделился от земли, и мало, чтобы не читаться вторым предметом. */
@@ -92,6 +118,7 @@ const GROUND_FS = `
   uniform float uHalf;
   uniform float uTile;
   uniform float uRoadTile;
+  uniform float uRutHalf;
   uniform float uCentre[NPTS];
   uniform float uWidth[NPTS];
   uniform float uZ0;
@@ -164,10 +191,12 @@ const GROUND_FS = `
 
     // Колея: две продольные полосы в 0.9 м друг от друга, прерывистые по шуму.
     // Именно колея, а не пятна, читается сверху как «по дороге ездят».
-    float rut = min(abs(d - 0.45), abs(d - 0.45));
-    float rutMask = (1.0 - smoothstep(0.0, 0.16, abs(d - 0.45)))
-                  * smoothstep(0.35, 0.62, fbm(vec2(vWorld.y * 0.14, 0.0)));
-    road *= 1.0 - rutMask * 0.22;
+    // d уже отсчитан от оси сплайна, поэтому колея виляет вместе с дорогой.
+    // Разрывы сделаны заметными: сплошные полосы усиливают ощущение трубы.
+    float rutBreak = smoothstep(0.30, 0.52, fbm(vec2(vWorld.y * 0.09, 0.0)))
+                   * smoothstep(0.28, 0.60, fbm(vec2(vWorld.y * 0.37, 11.3)));
+    float rutMask = (1.0 - smoothstep(0.0, 0.22, abs(d - uRutHalf))) * rutBreak;
+    road *= 1.0 - rutMask * 0.30;
 
     // --- край: трава -> вытоптанная полоса -> земля -------------------------
     // Один градиент читается мылом. Промежуточный слой даёт ДВА края, и каждый
@@ -279,8 +308,9 @@ function shadowTexture() {
   c.width = c.height = S;
   const cx = c.getContext('2d');
   const g = cx.createRadialGradient(S / 2, S / 2, 0, S / 2, S / 2, S / 2);
+  // мягкий край вдвое уже прежнего: тень должна читаться пятном, а не дымкой
   g.addColorStop(0, 'rgba(0,0,0,1)');
-  g.addColorStop(0.55, 'rgba(0,0,0,0.85)');
+  g.addColorStop(0.74, 'rgba(0,0,0,0.94)');
   g.addColorStop(1, 'rgba(0,0,0,0)');
   cx.fillStyle = g;
   cx.fillRect(0, 0, S, S);
@@ -289,11 +319,11 @@ function shadowTexture() {
 }
 
 function shadowFor(art, o, z) {
-  const w = o.h * art.aspect * art.base * 1.05;
+  const w = o.h * art.aspect * art.base * 0.94;   // плотнее к основанию силуэта
   const q = new THREE.Mesh(
-    new THREE.PlaneGeometry(w, w * 0.62),
+    new THREE.PlaneGeometry(w, w * 0.48),
     new THREE.MeshBasicMaterial({
-      map: shadowTexture(), transparent: true, opacity: 0.35,
+      map: shadowTexture(), transparent: true, opacity: 0.5,
       depthTest: false, depthWrite: false, color: 0x1a1a14,
     }));
   q.rotation.x = -Math.PI / 2;
@@ -327,37 +357,64 @@ function groupRuns(segs) {
 /* Главный ломатель регулярности. Проплешина земли рисуется здесь же, потому что
    в паке её нет, а именно она работает лучше всех: пятно другого материала,
    которое не повторяется. Остальное — мелочь из пака. */
-function patchTexture(kind) {
-  const S = 128;
+function patchTexture(kind, roadImg) {
+  const S = 256;
   const c = document.createElement('canvas');
   c.width = c.height = S;
   const cx = c.getContext('2d');
-  const g = cx.createRadialGradient(S / 2, S / 2, S * 0.1, S / 2, S / 2, S / 2);
-  const tone = kind === 'dark' ? '92,74,48' : '124,102,66';
-  g.addColorStop(0, `rgba(${tone},0.85)`);
-  g.addColorStop(0.6, `rgba(${tone},0.5)`);
-  g.addColorStop(1, `rgba(${tone},0)`);
-  cx.fillStyle = g;
+
+  // Внутри проплешины — та же земля, что на дороге. Размытая клякса рядом с
+  // чёткими декалями конфликтовала по резкости: пятно без текстуры читается
+  // дефектом рендера, а не грязью.
+  const tile = document.createElement('canvas');
+  const T = kind === 'dark' ? 96 : 128;      // два-три повтора на проплешину
+  tile.width = tile.height = T;
+  tile.getContext('2d').drawImage(roadImg, 0, 0, T, T);
+  cx.save();
+  cx.translate(S / 2, S / 2);
+  cx.rotate(h01('patchrot', kind) * Math.PI * 2);
+  cx.fillStyle = cx.createPattern(tile, 'repeat');
+  cx.fillRect(-S, -S, S * 2, S * 2);
+  cx.restore();
+  // Проплешина — голая земля: она ТЕМНЕЕ травы. Дорожный тайл сам по себе
+  // светлее её, и без этого проплешины читались копнами сена на лугу.
+  cx.globalCompositeOperation = 'multiply';
+  cx.fillStyle = kind === 'dark' ? '#4e4126' : '#6d5c39';
+  cx.fillRect(0, 0, S, S);
+  cx.globalCompositeOperation = 'source-over';
+
+  // Край — по шуму двух частот, как кромка дороги: медленная задаёт форму
+  // пятна, быстрая грызёт его языками. Решение то же, только в полярных
+  // координатах, потому что тут край замкнут.
+  cx.globalCompositeOperation = 'destination-in';
   cx.beginPath();
-  // рваный контур, иначе проплешина читается ровным кругом
-  for (let i = 0; i <= 40; i++) {
-    const a = (i / 40) * Math.PI * 2;
-    const r = S / 2 * (0.62 + 0.3 * h01('patch', kind, i));
-    const x = S / 2 + Math.cos(a) * r, y = S / 2 + Math.sin(a) * r * 0.8;
+  const N = 96;
+  for (let i = 0; i <= N; i++) {
+    const a = (i / N) * Math.PI * 2;
+    const slow = h01('slow', kind, Math.floor(i / 12)) - 0.5;
+    const fast = h01('fast', kind, i) - 0.5;
+    const r = S / 2 * (0.80 + slow * 0.34 + fast * 0.12);
+    const x = S / 2 + Math.cos(a) * r, y = S / 2 + Math.sin(a) * r * 0.82;
     i ? cx.lineTo(x, y) : cx.moveTo(x, y);
   }
   cx.closePath();
+  const g = cx.createRadialGradient(S / 2, S / 2, S * 0.22, S / 2, S / 2, S / 2);
+  g.addColorStop(0, 'rgba(0,0,0,1)');
+  g.addColorStop(0.72, 'rgba(0,0,0,0.9)');
+  g.addColorStop(1, 'rgba(0,0,0,0)');
+  cx.fillStyle = g;
   cx.fill();
+
   const t = new THREE.CanvasTexture(c);
   t.colorSpace = THREE.SRGBColorSpace;
   return t;
 }
 
 const DECALS = [
-  { key: 'patch', tex: () => patchTexture('light'), size: [2.4, 5.0], share: 0.16,
-    order: ORDER.decalFar, onRoad: true },
-  { key: 'patch2', tex: () => patchTexture('dark'), size: [1.6, 3.2], share: 0.10,
-    order: ORDER.decalFar, onRoad: true },
+  { key: 'patch', tex: (img) => patchTexture('light', img), size: [1.3, 2.8],
+    share: 0.16, order: ORDER.decalFar, onRoad: true, plain: true },
+  { key: 'patch2', tex: (img) => patchTexture('dark', img), size: [0.9, 1.9],
+    share: 0.10, order: ORDER.decalFar, onRoad: true, plain: true },
   { key: 'grass_tuft_a', size: [0.9, 1.7], share: 0.30, order: ORDER.decalNear },
   { key: 'grass_tuft_b', size: [0.9, 1.7], share: 0.24, order: ORDER.decalNear },
   { key: 'rock_s', size: [0.6, 1.2], share: 0.12, order: ORDER.decalNear },
@@ -365,10 +422,12 @@ const DECALS = [
   { key: 'fern', size: [0.8, 1.5], share: 0.04, order: ORDER.decalNear },
 ];
 
-const DECAL_DENSITY = 0.15;      // штук на квадратный метр
+/* Плотность пересмотрена после того, как у декалей появилась вариация: тот же
+   счёт с разными формами читается заметно гуще и превращается в сыпь. */
+const DECAL_DENSITY = 0.085;     // штук на квадратный метр (было 0.15)
 const FIELD_X = 55;              // полуширина засеваемой полосы
 
-async function buildDecals(len, roadAt) {
+async function buildDecals(len, roadAt, roadImg) {
   const area = FIELD_X * 2 * (len + 40);
   const total = Math.round(area * DECAL_DENSITY);
   const dummy = new THREE.Object3D();
@@ -376,18 +435,21 @@ async function buildDecals(len, roadAt) {
   for (const [di, spec] of DECALS.entries()) {
     const n = Math.round(total * spec.share);
     let art = null;
-    if (spec.tex) art = { map: spec.tex(), aspect: 1 };
+    if (spec.tex) art = { map: spec.tex(roadImg), aspect: 1 };
     else art = await sprite(spec.key);
     if (!art) continue;
 
     const geo = new THREE.PlaneGeometry(1, 1);
     const mat = new THREE.MeshBasicMaterial({
       map: art.map, transparent: true, alphaTest: spec.tex ? 0.0 : 0.04,
+      // проплешина — тональная подмена грунта, а не предмет на нём
+      opacity: spec.tex ? 0.72 : 1.0,
       depthTest: false, depthWrite: false, side: THREE.DoubleSide,
     });
     const mesh = new THREE.InstancedMesh(geo, mat, n);
     mesh.renderOrder = spec.order;
     mesh.frustumCulled = false;
+    const col = new THREE.Color();
 
     let k = 0;
     for (let i = 0; i < n; i++) {
@@ -396,13 +458,29 @@ async function buildDecals(len, roadAt) {
       const { cx, hw } = roadAt(z);
       // трава и камни на дороге не растут; проплешины — растут, это грязь
       if (!spec.onRoad && Math.abs(x - cx) < hw * 1.25) continue;
-      const s = spec.size[0] + h01('ds', di, i) * (spec.size[1] - spec.size[0]);
+
+      /* Решётку вычистили из тайла — и собрали новую из декалей: один кустик,
+         повторённый сотни раз в одном размере и одной ориентации. Одинаковая
+         ФОРМА ловится глазом быстрее, чем одинаковый шаг, поэтому каждому
+         экземпляру своя вариация — и вся она из того же хеша, что и позиция,
+         так что земля воспроизводится от загрузки к загрузке. */
+      const base = (spec.size[0] + spec.size[1]) / 2;
+      const s = base * (0.7 + h01('ds', di, i) * 0.7);        // 0.7…1.4
+      const flip = h01('df', di, i) < 0.5 ? -1 : 1;           // зеркало по X
       dummy.position.set(x, 0.4, z);
       dummy.rotation.set(-Math.PI / 2, 0, h01('dr', di, i) * Math.PI * 2);
-      dummy.scale.set(s * art.aspect, s, 1);
+      dummy.scale.set(s * art.aspect * flip, s, 1);
       dummy.updateMatrix();
-      mesh.setMatrixAt(k++, dummy.matrix);
+      mesh.setMatrixAt(k, dummy.matrix);
+
+      // оттенок ±8%, яркость ±10% — тем же способом
+      const hue = (h01('dh', di, i) - 0.5) * 0.16;
+      const val = 1 + (h01('dv', di, i) - 0.5) * 0.20;
+      col.setRGB(val * (1 + hue), val, val * (1 - hue)).convertSRGBToLinear();
+      mesh.setColorAt(k, col);
+      k++;
     }
+    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
     mesh.count = k;
     state.decals += k;
     scene.add(mesh);
@@ -441,7 +519,7 @@ async function main() {
     const t = Math.min(Math.max((0 - z) / zStep, 0), NPTS - 1.001);
     const i = Math.floor(t), f = t - i;
     return { cx: centre[i] + (centre[i + 1] - centre[i]) * f,
-             hw: dbg.road_half_width * (width[i] + (width[i + 1] - width[i]) * f) };
+             hw: ROAD_HALF * (width[i] + (width[i + 1] - width[i]) * f) };
   };
 
   const [grass, grass2, road] = await Promise.all([
@@ -462,8 +540,9 @@ async function main() {
       uniforms: {
         uGrass: { value: grass }, uGrass2: { value: grass2 },
         uRoad: { value: road }, uRoadMean: { value: new THREE.Vector3(mean.r, mean.g, mean.b) },
-        uHalf: { value: dbg.road_half_width },
+        uHalf: { value: ROAD_HALF },
         uTile: { value: 9.0 }, uRoadTile: { value: 6.5 },
+        uRutHalf: { value: RUT_HALF },
         uCentre: { value: centre }, uWidth: { value: width },
         uZ0: { value: 0 }, uZStep: { value: zStep },
       },
@@ -473,7 +552,7 @@ async function main() {
   ground.renderOrder = ORDER.ground;
   scene.add(ground);
 
-  await buildDecals(state.len, roadAt);
+  await buildDecals(state.len, roadAt, road.image);
 
   /* Первый кадр — это земля и первый биом: ровно то, что видно при открытии.
      Остальные четыре догружаются фоном, пока страница уже нарисована. Иначе
@@ -583,8 +662,15 @@ function draw() {
   camera.up.set(0, 0, -1);
   camera.updateMatrixWorld();
   renderer.render(scene, camera);
+  const halfM = ZOOM[state.zoom];
+  const tiles = (halfM * 2) / TILE_M;                 // высота кадра в тайлах
+  const asOrtho = halfM / TILE_M;                     // тот же кадр у камеры игры
+  const same = Math.abs(asOrtho - GAME_ORTHO_SIZE) < 0.15;
   HUD.innerHTML = 'top-down проба · ортокамера, взгляд вниз\n'
-    + `зум: <b>${state.zoom}</b> (${ZOOM[state.zoom]} м в полкадра) — клавиша Z\n`
+    + `зум: <b>${state.zoom}</b> — эквивалент orthographicSize `
+    + `<b>${asOrtho.toFixed(1)}</b>${same ? ' <b>(игровой кадр)</b>' : ''} — клавиша Z\n`
+    + `кадр ${(halfM * 2).toFixed(1)} м = ${tiles.toFixed(1)} тайла игры · `
+    + `1 м сайта = ${(1 / TILE_M).toFixed(2)} тайла\n`
     + `камера z = <b>${state.z.toFixed(0)}</b> — колесо мыши\n`
     + `${state.objects} объектов, ${state.decals} декалей, ${state.biomes} биомов\n`
     + `тест сортировки: <b>${state.sortTest}</b>`;

@@ -30,7 +30,11 @@ from scipy import ndimage
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 SRC = ROOT / "assets"
-OUT = ROOT / "journey3" / "public" / "assets"
+# assets/ is the source of truth; build_journey3.py pages copies it into
+# public/. Writing straight to public/ meant the next `pages` run clobbered
+# these with whatever stale copy assets/ still held — and the scene then
+# asked for masks that no longer existed.
+OUT = ROOT / "assets"
 SHEET = ROOT / "out" / "night_report"
 
 # hue is degrees 0..360; val/sat are 0..1. `grow` dilates the mask a little so
@@ -44,12 +48,14 @@ RULES = {
     "biome_crystals": dict(hue=(255, 320), val=0.45, sat=0.28, grow=1),
     # lantern glass — warm yellow, small and bright
     "prop_lantern": dict(hue=(28, 62), val=0.62, sat=0.35, grow=1),
-    # windows: warm panes on both houses
-    "hero_house_a": dict(hue=(28, 58), val=0.62, sat=0.40, grow=0),
-    "hero_house_b": dict(hue=(28, 58), val=0.62, sat=0.40, grow=0),
+    # The two cottages had warm lit panes in the isometric art and have cool
+    # daylight glass in the front-on regeneration — there is no light in them to
+    # find. Left out rather than tuned: the rule was matching their sandy base.
     "feat_tavern": dict(hue=(28, 58), val=0.60, sat=0.38, grow=0),
-    # crypt candles
-    "feat_death": dict(hue=(20, 62), val=0.66, sat=0.30, grow=1),
+    # The crypt had candles in the old art and has none in the new one: the
+    # front-on regeneration is a plain stone facade with a wooden door. The rule
+    # was still finding ~1500 warm pixels on the door and lighting them, which
+    # is a glow with nothing behind it. Removed rather than tuned down.
     # the ore vein inside the cave mouth
     "biome_orevein": dict(hue=(150, 210), val=0.42, sat=0.28, grow=1),
     "feat_mining": dict(hue=(150, 210), val=0.42, sat=0.26, grow=1),
@@ -61,17 +67,28 @@ RULES = {
 # how each source behaves: fire flickers on noise, arcane light pulses slowly,
 # a window or a lantern pane is simply on
 KIND = {
-    "biome_brazier": "fire", "feat_death": "fire",
+    "biome_brazier": "fire",
     "biome_portal": "pulse", "biome_crystals": "pulse",
     "biome_orevein": "pulse", "feat_mining": "pulse",
-    "prop_lantern": "steady", "hero_house_a": "steady",
-    "hero_house_b": "steady", "feat_tavern": "steady",
+    "prop_lantern": "steady",
+    "feat_tavern": "steady",
     "lantern_chain": "steady", "candles": "fire",
 }
 
 MIN_PIXELS = 40          # below this the rule found nothing real
 BLEED_BLUR = 9           # sigma for the contact spill
 BLEED_GAIN = 0.55
+BLEED_FLOOR = 0.16      # ниже этой доли от максимума заражения нет
+# A mask that lives in the bottom sliver of the sprite is not a light, it is the
+# ground plate the art is standing on — warm sand matches a window's hue window
+# exactly. Caught here rather than in a screenshot: the front-on regeneration
+# gave the houses cool glass and a warm base, and the old rules happily lit the
+# base and called it a window.
+BASE_BAND = 0.15        # нижняя доля высоты, которую считаем цоколем
+# 0.75, не 0.5: у входа в шахту нижняя часть светится по-настоящему — там
+# лужа света на полу штольни, и 60% маски внизу это верно. Отсекаем только
+# случай «маска почти целиком цоколь», как у дома с песчаной подставкой (96%).
+BASE_MAX = 0.75
 
 
 def rgb_to_hsv(a):
@@ -116,6 +133,13 @@ def build(name, rule):
     if count < MIN_PIXELS:
         return dict(name=name, count=count, ok=False)
 
+    cut = int(mask.shape[0] * (1 - BASE_BAND))
+    in_base = mask[cut:].sum() / max(count, 1)
+    if in_base > BASE_MAX:
+        return dict(name=name, count=count, ok=False,
+                    why=f"{in_base*100:.0f}% маски в нижних {BASE_BAND*100:.0f}% "
+                        f"высоты — это цоколь, а не источник")
+
     if rule.get("grow"):
         mask = ndimage.binary_dilation(mask, iterations=rule["grow"])
 
@@ -128,10 +152,20 @@ def build(name, rule):
     Image.fromarray(em.astype(np.uint8), "RGBA").save(OUT / f"{name}_em.webp",
                                                       quality=90, method=6)
 
-    # bleed: the same shape, blurred wide and dimmed — the spill onto the object
+    # Bleed: the same shape, blurred wide and dimmed — the spill ONTO THE
+    # OBJECT. Clipped to the sprite's own silhouette, because a blur of a window
+    # reaches past the wall it is in, and once the plane is stood upright that
+    # overspill lands on the grass in front of the house as a bright patch.
+    # Light belongs on the thing that emits it.
     blur = ndimage.gaussian_filter(mask.astype(np.float32), BLEED_BLUR)
+    blur *= (alpha > 8)
     if blur.max() > 0:
         blur = blur / blur.max()
+    # A gaussian has no edge: every pixel of the sprite ends up with SOME value,
+    # and three percent of full brightness over a whole wall is a visible wash —
+    # on a nine-metre house near the camera it read as the ground glowing. The
+    # tail is cut so the spill stays where the light actually reaches.
+    blur = np.clip((blur - BLEED_FLOOR) / (1.0 - BLEED_FLOOR), 0.0, 1.0)
     tint = (lift * mask[..., None]).reshape(-1, 3)
     lit = tint[mask.reshape(-1)]
     colour = lit.mean(axis=0) if len(lit) else np.array([1.0, 0.8, 0.5])
@@ -195,7 +229,8 @@ def main():
             print(f"{name:<18} пикселей {r['count']:>6}  покрытие {r['cover']:.3f}"
                   f"  сила {r['strength']:.2f}  цвет {r['colour']}")
         else:
-            print(f"{name:<18} ПУСТО ({r['count']} px) — правило не поймало свет")
+            print(f"{name:<18} ОТКЛОНЁН ({r['count']} px) — "
+                  + r.get("why", "правило не поймало свет"))
     import json
     man = {r["name"]: {"kind": KIND.get(r["name"], "steady"),
                        "strength": r["strength"],

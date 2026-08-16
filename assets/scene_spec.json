@@ -8,7 +8,8 @@
    "near": 7.4,
    "mid": 11.5,
    "far": 17.0,
-   "back": 26.0
+   "back": 26.0,
+   "sign": 8.5
   },
   "lane_jitter": {
    "x": 0.6,
@@ -17,9 +18,9 @@
   "seed": 20260731,
   "camera_eye_height": 3.4,
   "heights": {
-   "house": 7.4,
-   "barn": 8.6,
-   "tavern": 8.0,
+   "house": 9.0,
+   "barn": 10.0,
+   "tavern": 9.5,
    "tree_big": 12.0,
    "tree_mid": 8.4,
    "pine": 13.0,
@@ -67,7 +68,8 @@
    "У каждой группы фиксированная внутренняя геометрия: смещения внутри группы НЕ джиттерятся.",
    "rotY: объекты у левой обочины смотрят вправо-вниз (rotY -12..-4), у правой — влево-вниз (rotY 4..12), фасадом к дороге.",
    "Вывеска (board) всегда в полосе verge своей остановки, rotY к камере ±10, никогда не за объектом, который описывает.",
-   "Полосовое правило применяется к ЯКОРЮ группы. Члены группы позиционируются от якоря и из-под правила выведены; на дорогу они всё равно попасть не могут — за это отвечает validator.forbid_on_road."
+   "Полосовое правило применяется к ЯКОРЮ группы. Члены группы позиционируются от якоря и из-под правила выведены; на дорогу они всё равно попасть не могут — за это отвечает validator.forbid_on_road.",
+   "Вывески стоят в собственной полосе sign, а не на обочине: на verge доска проходит вплотную к камере и закрывает кадр."
   ],
   "validator": {
    "max_gap_z": 26,
@@ -162,7 +164,7 @@
     },
     {
      "t": "prop_crates",
-     "dx": -2.4,
+     "dx": -0.6,
      "dz": 1.4,
      "h": "crates"
     }
@@ -242,7 +244,7 @@
     },
     {
      "t": "fern",
-     "dx": -1.8,
+     "dx": -0.6,
      "dz": 1.6,
      "h": "fern"
     }
@@ -316,7 +318,7 @@
     },
     {
      "t": "candles",
-     "dx": -1.4,
+     "dx": -0.6,
      "dz": 1.8,
      "h": "candles"
     }
@@ -438,12 +440,14 @@
     {
      "z": -16,
      "side": "R",
-     "key": "slogan"
+     "key": "slogan",
+     "lane": "sign"
     },
     {
      "z": -42,
      "side": "L",
-     "key": "world_plays_itself"
+     "key": "world_plays_itself",
+     "lane": "sign"
     }
    ],
    "backdrop": {
@@ -543,7 +547,8 @@
     {
      "z": -24,
      "side": "L",
-     "key": "skills_no_levels"
+     "key": "skills_no_levels",
+     "lane": "sign"
     }
    ],
    "backdrop": {
@@ -651,17 +656,20 @@
     {
      "z": -26,
      "side": "L",
-     "key": "mining"
+     "key": "mining",
+     "lane": "sign"
     },
     {
      "z": -36,
      "side": "R",
-     "key": "fights_that_last"
+     "key": "fights_that_last",
+     "lane": "sign"
     },
     {
      "z": -50,
      "side": "L",
-     "key": "crafting"
+     "key": "crafting",
+     "lane": "sign"
     }
    ],
    "backdrop": null,
@@ -748,12 +756,14 @@
     {
      "z": -30,
      "side": "R",
-     "key": "vendetta"
+     "key": "vendetta",
+     "lane": "sign"
     },
     {
      "z": -48,
      "side": "L",
-     "key": "death_is_a_place"
+     "key": "death_is_a_place",
+     "lane": "sign"
     }
    ],
    "backdrop": {
@@ -840,12 +850,14 @@
     {
      "z": -24,
      "side": "R",
-     "key": "humans_and_monsters"
+     "key": "humans_and_monsters",
+     "lane": "sign"
     },
     {
      "z": -42,
      "side": "L",
-     "key": "a_home_to_come_back_to"
+     "key": "a_home_to_come_back_to",
+     "lane": "sign"
     }
    ],
    "backdrop": {

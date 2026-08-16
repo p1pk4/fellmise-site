@@ -31,26 +31,8 @@
   "strength": 0.8,
   "colour": [
    254,
-   225,
+   224,
    63
-  ]
- },
- "hero_house_a": {
-  "kind": "steady",
-  "strength": 0.86,
-  "colour": [
-   253,
-   240,
-   172
-  ]
- },
- "hero_house_b": {
-  "kind": "steady",
-  "strength": 0.71,
-  "colour": [
-   254,
-   243,
-   148
   ]
  },
  "feat_tavern": {
@@ -59,16 +41,7 @@
   "colour": [
    252,
    225,
-   100
-  ]
- },
- "feat_death": {
-  "kind": "fire",
-  "strength": 0.88,
-  "colour": [
-   237,
-   167,
-   121
+   101
   ]
  },
  "biome_orevein": {
@@ -85,7 +58,7 @@
   "strength": 0.52,
   "colour": [
    94,
-   180,
+   179,
    212
   ]
  },
@@ -94,7 +67,7 @@
   "strength": 0.43,
   "colour": [
    249,
-   223,
+   224,
    98
   ]
  },
@@ -104,7 +77,7 @@
   "colour": [
    254,
    218,
-   115
+   114
   ]
  }
 }

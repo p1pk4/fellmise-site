@@ -474,7 +474,11 @@ export async function createWorld({ canvas, tod }) {
     // round blob: the crypt floods candle-shaped, the cave floods vein-shaped.
     // All four gate arts have a mask, but fall back to the frame's silhouette
     // if one is ever missing.
-    const floodTex = (await loadTex(`${g.art}_bleed`)) || tex;
+    // Only ask for masks the manifest says exist. Asking unconditionally meant
+    // a 404 apiece for every gate whose art stopped being a light source — the
+    // cottage and the crypt both lost their glow in the front-on regeneration.
+    const lit = !!EMISSIVE[g.art];
+    const floodTex = (lit && await loadTex(`${g.art}_bleed`)) || tex;
     const light = new THREE.Mesh(
       new THREE.PlaneGeometry(g.h * aspect * 1.35, g.h * 1.35),
       new THREE.MeshBasicMaterial({
@@ -491,7 +495,7 @@ export async function createWorld({ canvas, tod }) {
 
     // the opening's own emissive, always on — so the gate reads as lit from
     // far away, before the flood starts
-    const emTex = await loadTex(`${g.art}_em`);
+    const emTex = lit ? await loadTex(`${g.art}_em`) : null;
     if (emTex) {
       const em = new THREE.Mesh(
         new THREE.PlaneGeometry(g.h * aspect, g.h),
@@ -499,9 +503,12 @@ export async function createWorld({ canvas, tod }) {
           map: emTex, transparent: true, opacity: 1,
           blending: THREE.AdditiveBlending, depthWrite: false, fog: false,
         }));
-      em.position.set(0, g.h / 2, 0.04);
+      /* Child of the frame, like every other light in the scene: added to the
+         gate group it kept its own coordinates, and the audit could not tell it
+         apart from a glow that had come off its object. */
+      em.position.set(0, 0, 0.04);
       em.renderOrder = 9;
-      grp.add(em);
+      frame.add(em);
       state.lights.push({
         kind: (EMISSIVE[g.art] || {}).kind || 'steady',
         phase: Math.random() * 6.28, parts: [{ role: 'em', mesh: em, base: 1.0 }],

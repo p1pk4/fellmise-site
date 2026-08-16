@@ -10,35 +10,40 @@
     "near": 7.4,
     "mid": 11.5,
     "far": 17.0,
-    "back": 26.0
+    "back": 26.0,
+    "sign": 8.5
    },
    "forest": {
     "verge": 5.2,
     "near": 7.4,
     "mid": 11.5,
     "far": 17.0,
-    "back": 26.0
+    "back": 26.0,
+    "sign": 8.5
    },
    "mine": {
     "verge": 4.2,
     "near": 7.0,
     "mid": 8.8,
     "far": 17.0,
-    "back": 26.0
+    "back": 26.0,
+    "sign": 8.5
    },
    "spirit": {
     "verge": 5.2,
     "near": 7.4,
     "mid": 11.5,
     "far": 17.0,
-    "back": 26.0
+    "back": 26.0,
+    "sign": 8.5
    },
    "home": {
     "verge": 5.2,
     "near": 7.4,
     "mid": 11.5,
     "far": 17.0,
-    "back": 26.0
+    "back": 26.0,
+    "sign": 8.5
    }
   },
   "rows": {
@@ -107,7 +112,7 @@
       null,
       -6.813
      ],
-     "h": 7.4,
+     "h": 9.0,
      "rotY": -0.1744,
      "visible": true
     },
@@ -194,7 +199,7 @@
      "t": "prop_crates",
      "layer": 1,
      "pos": [
-      3.337,
+      5.137,
       null,
       -10.79
      ],
@@ -211,7 +216,7 @@
       null,
       -22.125
      ],
-     "h": 7.4,
+     "h": 9.0,
      "rotY": 0.1468,
      "visible": true
     },
@@ -316,7 +321,7 @@
       null,
       -36.956
      ],
-     "h": 8.6,
+     "h": 10.0,
      "rotY": -0.0734,
      "visible": true
     },
@@ -355,7 +360,7 @@
       null,
       -46.37
      ],
-     "h": 8.0,
+     "h": 9.5,
      "rotY": 0.1154,
      "visible": true
     },
@@ -408,7 +413,7 @@
       null,
       -64.518
      ],
-     "h": 7.4,
+     "h": 9.0,
      "rotY": -0.1144,
      "visible": true
     },
@@ -842,7 +847,7 @@
      "key": "slogan",
      "kind": "wood",
      "pos": [
-      5.722,
+      9.022,
       null,
       -16
      ],
@@ -855,7 +860,7 @@
      "key": "world_plays_itself",
      "kind": "wood",
      "pos": [
-      -4.838,
+      -8.138,
       null,
       -42
      ],
@@ -1004,7 +1009,7 @@
      "t": "fern",
      "layer": 1,
      "pos": [
-      3.762,
+      4.962,
       null,
       -26.93
      ],
@@ -1162,7 +1167,7 @@
      "t": "fern",
      "layer": 1,
      "pos": [
-      -3.417,
+      -4.617,
       null,
       -63.663
      ],
@@ -1625,7 +1630,7 @@
      "key": "skills_no_levels",
      "kind": "wood",
      "pos": [
-      -5.392,
+      -8.692,
       null,
       -24
      ],
@@ -1934,7 +1939,7 @@
      "key": "mining",
      "kind": "wood",
      "pos": [
-      -3.99,
+      -8.29,
       null,
       -26
      ],
@@ -1947,7 +1952,7 @@
      "key": "fights_that_last",
      "kind": "wood",
      "pos": [
-      4.203,
+      8.503,
       null,
       -36
      ],
@@ -1960,7 +1965,7 @@
      "key": "crafting",
      "kind": "wood",
      "pos": [
-      -4.056,
+      -8.356,
       null,
       -50
      ],
@@ -2016,7 +2021,7 @@
      "t": "candles",
      "layer": 1,
      "pos": [
-      3.971,
+      4.771,
       null,
       -14.908
      ],
@@ -2081,7 +2086,7 @@
      "t": "candles",
      "layer": 1,
      "pos": [
-      -3.52,
+      -4.32,
       null,
       -42.263
      ],
@@ -2320,7 +2325,7 @@
      "key": "vendetta",
      "kind": "stone",
      "pos": [
-      4.694,
+      7.994,
       null,
       -30
      ],
@@ -2333,7 +2338,7 @@
      "key": "death_is_a_place",
      "kind": "stone",
      "pos": [
-      -4.711,
+      -8.011,
       null,
       -48
      ],
@@ -2447,7 +2452,7 @@
       null,
       -48.073
      ],
-     "h": 7.4,
+     "h": 9.0,
      "rotY": 0.0,
      "visible": true
     },
@@ -2783,7 +2788,7 @@
      "key": "humans_and_monsters",
      "kind": "wood",
      "pos": [
-      5.748,
+      9.048,
       null,
       -24
      ],
@@ -2796,7 +2801,7 @@
      "key": "a_home_to_come_back_to",
      "kind": "wood",
      "pos": [
-      -5.303,
+      -8.603,
       null,
       -42
      ],

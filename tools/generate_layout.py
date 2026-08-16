@@ -218,7 +218,9 @@ class Builder:
 
         # --- boards ------------------------------------------------------
         for bd in b["boards"]:
-            x = self.lane_x(bid, "verge", bd["side"])
+            # boards have their own band now; "verge" was hard-coded here and
+            # quietly ignored the spec the moment it grew a `lane` field
+            x = self.lane_x(bid, bd.get("lane", "verge"), bd["side"])
             x += jitter(self.seed, f"board:{bd['key']}:x", self.g["lane_jitter"]["x"])
             deg = 4.0 + h01(self.seed, "board", bd["key"]) * 6.0
             out["boards"].append({

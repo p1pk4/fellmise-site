@@ -4,6 +4,8 @@ name: ci
 
 on:
   pull_request:
+    # labeled/unlabeled: the `visual-strict` label switches the visual mode
+    types: [opened, synchronize, reopened, labeled, unlabeled]
   push:
     branches: [main]
 
@@ -23,6 +25,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: git diff --check (base..head)
+        env:
+          BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          # DEVLOG.md is stored with CRLF; a CR at end of line is not an error
+          if [ -n "$BASE" ] && git cat-file -e "$BASE^{commit}" 2>/dev/null; then
+            git -c core.whitespace=cr-at-eol diff --check "$BASE" HEAD
+          else
+            echo "no base commit — skipped"
+          fi
       - uses: actions/setup-python@v5
         with:
           python-version-file: .python-version
@@ -71,3 +85,80 @@ jobs:
           if [ -n "$untracked" ]; then
             echo "next/ differs from the build:"; echo "$untracked"; exit 1
           fi
+
+  browser:
+    name: browser smoke + visual regression
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      CI: "1"
+      # report: pixel changes are measured and published, the job stays green.
+      # strict: any change fails — label a PR `visual-strict` for changes that
+      # are supposed to be invisible (refactors, tooling, CI).
+      VISUAL_MODE: ${{ contains(github.event.pull_request.labels.*.name, 'visual-strict') && 'strict' || 'report' }}
+      BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+      HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      CONTEXT: ${{ github.event_name == 'pull_request' && format('pr{0}', github.event.pull_request.number) || 'main' }}
+    defaults:
+      run:
+        working-directory: tests/browser
+    steps:
+      # the PR head itself, not the merge commit GitHub builds by default:
+      # head and base are then exactly the two commits being compared
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.HEAD_SHA }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: tests/browser/package-lock.json
+      - run: npm ci
+      - name: install Chromium (Playwright)
+        run: npx playwright install --with-deps chromium
+      - name: smoke
+        run: npx playwright test
+      - name: visual runner self-test
+        if: always()
+        run: node visual.mjs selftest --out ../../out/visual-selftest
+      - name: visual — PR base (or push before) -> head
+        if: always()
+        run: |
+          if [ -z "$BASE_SHA" ] || [ "$BASE_SHA" = "0000000000000000000000000000000000000000" ] \
+             || ! git cat-file -e "$BASE_SHA^{commit}" 2>/dev/null; then
+            echo "no base commit — visual comparison skipped" | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          node visual.mjs run --base "$BASE_SHA" --head . --mode "$VISUAL_MODE" \
+            --out ../../out/visual --smoke ../../out/smoke/results.json \
+            --title "visual: base ${BASE_SHA:0:7} -> head ${HEAD_SHA:0:7}"
+      - name: visual — production main -> head (stacked PRs)
+        if: always() && github.event_name == 'pull_request'
+        run: |
+          MAIN_SHA="$(git rev-parse origin/main)"
+          if [ "$MAIN_SHA" = "$BASE_SHA" ]; then
+            echo "base is main — covered above"; exit 0
+          fi
+          node visual.mjs run --base "$MAIN_SHA" --head . --mode "$VISUAL_MODE" \
+            --out ../../out/visual-vs-main --smoke ../../out/smoke/results.json \
+            --title "visual: production main ${MAIN_SHA:0:7} -> head ${HEAD_SHA:0:7}"
+      - name: upload screenshots and reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-${{ env.CONTEXT }}-run${{ github.run_id }}
+          path: |
+            out/visual
+            out/visual-vs-main
+            out/visual-selftest
+          retention-days: 14
+          if-no-files-found: warn
+      - name: upload smoke report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-${{ env.CONTEXT }}-run${{ github.run_id }}
+          path: out/smoke
+          retention-days: 14
+          if-no-files-found: warn

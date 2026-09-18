@@ -5,6 +5,33 @@
 
 ---
 
+## 2026-09-18 18:42 — visual-ci-1: браузерный smoke и visual regression в CI
+
+- **Что:** `tests/browser/` — Playwright 1.63.0 + Chromium, отдельно от
+  journey3. Smoke: `/`, `/ru/`, robots/sitemap, `/proto/`, `/next/` live и
+  fallback (<760px, reduced-motion, без WebGL), `/full/`. Visual:
+  `checkpoints.json` (10 кадров `/proto/` через `__PROTO.go`), `visual.mjs`
+  capture/compare/run/selftest, режимы report и strict. В CI — job `browser`:
+  base PR и head снимаются в одном окружении, отчёт в Job Summary, скрины
+  артефактом на 14 дней. PNG-эталонов в git нет. Плюс `git diff --check` в CI.
+- **Тип:** chore
+- **Проверка:** smoke 12/12 на ветке, на main и на foundation-1 · selftest:
+  повтор 0 px, мутация road ×1.6 поймана 10/10 · Foundation regression main →
+  foundation-1: 10/10 SAME, strict PASS · контрольная мутация (кромка 0.96 →
+  0.80, не коммитилась) поймана 10/10, 26–84 тыс. px, strict FAIL · runtime
+  сайта не тронут
+- **Commit:** 0d11b85
+
+**Найден дефект `/next/`, в продакшене уже сейчас:** в static-fallback (узкий
+экран, reduced-motion, без WebGL) сплэш `#boot` не снимается никогда —
+`is-ready` ставит только live-ветка, — и посетитель видит «loading the world…»
+вместо страницы. Runtime в батче не трогался; дефект закреплён тестом
+`KNOWN BUG` (`test.fail`), который покраснеет, когда его починят. Так же
+закреплено: `/proto/` без WebGL не показывает ничего, кроме «загрузка…».
+`/full/` отдаёт 18 × 404 на картинки — старая копия, записано аннотацией.
+
+---
+
 ## 2026-09-18 18:18 — foundation-1: CI, два target расстановки, стабильные id, overrides
 
 - **Что:** CI в GitHub Actions (только проверки, deploy остаётся за Pages).

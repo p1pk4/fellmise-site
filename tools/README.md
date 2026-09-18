@@ -167,6 +167,8 @@ python tools/check_run_rules.py
 python tools/measure_foreshortening.py
 cd journey3 && npm ci && npm run build && cd .. && python tools/build_journey3.py deploy
 git diff --exit-code -- next/            # next/ совпадает со сборкой
+npm run smoke --prefix tests/browser     # браузерный smoke (см. tests/browser/README.md)
+node tests/browser/visual.mjs run --base main   # visual regression против main
 ```
 
 CI ничего не деплоит: публикация остаётся за GitHub Pages (main:/).

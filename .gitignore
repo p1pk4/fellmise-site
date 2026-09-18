@@ -7,6 +7,9 @@ out/
 journey3/node_modules/
 journey3/dist/
 dist/
+# браузерные тесты: зависимости ставятся `npm ci --prefix tests/browser`,
+# скриншоты и отчёты пишутся в out/
+tests/browser/node_modules/
 
 __pycache__/
 *.pyc

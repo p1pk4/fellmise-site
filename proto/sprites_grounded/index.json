@@ -1,0 +1,44 @@
+{
+ "generated": "tools/topdown_grounding.py по assets/topdown/grounding.json",
+ "categories": {
+  "building": {
+   "kind": "contact_band",
+   "height_m": 0.9,
+   "below_m": 0.32,
+   "width": 1.04,
+   "opacity": 0.5
+  }
+ },
+ "sprites": {
+  "barn": {
+   "category": "building",
+   "contact_row": 0.9333,
+   "contact_width": 0.9083,
+   "contact_centre": -0.0021
+  },
+  "feat_tavern": {
+   "category": "building",
+   "contact_row": 0.8276,
+   "contact_width": 0.9643,
+   "contact_centre": 0.0022
+  },
+  "hero_house_a": {
+   "category": "building",
+   "contact_row": 0.9227,
+   "contact_width": 0.5446,
+   "contact_centre": 0.1813
+  },
+  "hero_house_b": {
+   "category": "building",
+   "contact_row": 0.8741,
+   "contact_width": 0.825,
+   "contact_centre": 0.0125
+  },
+  "hero_well": {
+   "category": "building",
+   "contact_row": 0.8534,
+   "contact_width": 0.6411,
+   "contact_centre": -0.1259
+  }
+ }
+}

@@ -190,9 +190,16 @@ export async function compare({ base, head, out, mode = 'report', title = 'visua
   if (mode === 'strict' && (changed.length || missingBase.length)) fail = true;
 
   const sheet = await contactSheet(head, hm, path.join(out, 'contact-sheet.png'));
+  const reviews = [];
+  for (const [name, ids] of Object.entries(CONFIG.review_sets || {})) {
+    if (!Array.isArray(ids)) continue;
+    const f = await reviewSheet(base, head, bm, hm, ids, path.join(out, `review-${name}.png`), name);
+    if (f) reviews.push(f);
+  }
   const report = {
     title, mode, visual, result: fail ? 'FAIL' : 'PASS', smoke,
     contactSheet: sheet ? `${sheet} (head, по маршруту)` : null,
+    reviewSheets: reviews,
     artifact: process.env.VISUAL_ARTIFACT || null,
     base: { dir: path.resolve(base), sha: bm.sha, browser: bm.browser, errors: bm.errors || [] },
     head: { dir: path.resolve(head), sha: hm.sha, browser: hm.browser, errors: hm.errors || [] },
@@ -248,6 +255,38 @@ async function contactSheet(dir, meta, file) {
   return path.basename(file);
 }
 
+/* A named selection, BASE | HEAD side by side, one checkpoint per row — the
+   frames a change is actually about, for a before/after look. */
+async function reviewSheet(base, head, bm, hm, ids, file, name) {
+  const rows = ids.filter((id) => fs.existsSync(path.join(head, `${id}.png`)));
+  if (!rows.length) return null;
+  const esc = (t) => String(t).replace(/[&<>]/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[ch]));
+  const w = CONFIG.viewport.width / 2, h = CONFIG.viewport.height / 2;
+  const cell = (dir, id, label) => fs.existsSync(path.join(dir, `${id}.png`))
+    ? `<figure><img src="${pathToFileURL(path.join(dir, `${id}.png`)).href}"><figcaption>${label}</figcaption></figure>`
+    : `<figure><div style="width:${w}px;height:${h}px;background:#333"></div><figcaption>${label}: нет</figcaption></figure>`;
+  const short = (sha) => (sha ? sha.slice(0, 10) : 'n/a');
+  const html = `<!doctype html><meta charset="utf-8"><style>
+    body{margin:0;background:#18191a;color:#e8e6dc;font:13px/1.35 ui-monospace,monospace}
+    main{display:grid;grid-template-columns:repeat(2,${w}px);gap:10px;padding:10px}
+    figure{margin:0} img{display:block;width:${w}px;height:${h}px} figcaption{padding:4px 2px 0}
+    header{padding:10px 10px 0;color:#ffc857}</style>
+    <header>${esc(name)}: BASE ${esc(short(bm.sha))} | HEAD ${esc(short(hm.sha))}</header>
+    <main>${rows.map((id) => cell(base, id, `BASE · ${esc(id)}`) + cell(head, id, `HEAD · ${esc(id)}`)).join('')}</main>`;
+  const htmlFile = file.replace(/\.png$/, '.html');
+  fs.writeFileSync(htmlFile, html);
+  const browser = await chromium.launch(LAUNCH);
+  try {
+    const page = await (await browser.newContext({ viewport: { width: w * 2 + 30, height: 600 } })).newPage();
+    await page.goto(pathToFileURL(htmlFile).href);
+    await page.evaluate(() => Promise.all([...document.images].map((i) => i.decode())));
+    await page.screenshot({ path: file, fullPage: true });
+  } finally {
+    await browser.close();
+  }
+  return path.basename(file);
+}
+
 function readMeta(dir) {
   try { return JSON.parse(fs.readFileSync(path.join(dir, 'meta.json'), 'utf8')); } catch { return {}; }
 }
@@ -271,7 +310,8 @@ function markdown(r) {
     '```');
   if (r.contactSheet || r.artifact) {
     L.push('', `Скрины, diff и contact sheet: artifact **${r.artifact || 'out/visual'}**`
-      + (r.contactSheet ? ` → \`${r.contactSheet.split(' ')[0]}\`` : ''));
+      + (r.contactSheet ? ` → \`${r.contactSheet.split(' ')[0]}\`` : '')
+      + (r.reviewSheets && r.reviewSheets.length ? `; до/после: ${r.reviewSheets.map((f) => '\`' + f + '\`').join(', ')}` : ''));
   }
   for (const [side, m] of [['base', r.base], ['head', r.head]]) {
     for (const e of m.errors) L.push(`- ${side}: ${e}`);

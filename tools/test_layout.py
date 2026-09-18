@@ -491,5 +491,54 @@ class RoadEnd(unittest.TestCase):
         self.assertTrue(TC.check_terminal(moved, CFG["biome_spacing"], CFG["road_end_z"]))
 
 
+class Grounding(unittest.TestCase):
+    """assets/topdown/grounding.json -> proto/sprites_grounded -> /proto/."""
+
+    def setUp(self):
+        import topdown_grounding as TG
+        self.TG = TG
+        self.cfg = TG.load_config()
+
+    def test_output_is_current(self):
+        """The committed grounded sprites and index are what the tool makes."""
+        images, index = self.TG.build()
+        self.assertEqual(read("proto/sprites_grounded/index.json"),
+                         json.dumps(index, ensure_ascii=False, indent=1) + "\n")
+        from PIL import Image
+        for t, img in images.items():
+            with Image.open(ROOT / "proto" / "sprites_grounded" / f"{t}.webp") as have:
+                self.assertTrue(self.TG.matches(have, img), t)
+
+    def test_every_building_in_the_scene_is_grounded(self):
+        """Every building-like sprite /proto/ draws has a grounding entry."""
+        buildings = {"hero_house_a", "hero_house_b", "barn", "feat_tavern", "hero_well"}
+        used = {o["t"] for o in T.objects(TOPDOWN).values() if o.get("t")}
+        self.assertEqual(buildings & used, buildings & set(self.cfg["sprites"]))
+        self.assertTrue(all(a for a in self.TG.affected(json.loads(read("proto/sprites_grounded/index.json"))).values()))
+
+    def test_contact_line_is_measured_not_the_canvas_edge(self):
+        """The contact line sits above the canvas bottom (the removed slab)
+        and spans most of the object — a stub would give a sliver."""
+        idx = json.loads(read("proto/sprites_grounded/index.json"))
+        for t, m in idx["sprites"].items():
+            self.assertTrue(0.75 < m["contact_row"] < 0.99, (t, m))
+            self.assertGreater(m["contact_width"], 0.4, (t, m))
+
+    def test_canvas_unchanged_so_layout_unchanged(self):
+        """Grounded sprites keep the canvas of the originals: positions,
+        footprints and y-sort of the layout do not move."""
+        from PIL import Image
+        for t in self.cfg["sprites"]:
+            with Image.open(ROOT / "assets" / f"{t}.webp") as a, \
+                 Image.open(ROOT / "proto" / "sprites_grounded" / f"{t}.webp") as g:
+                self.assertEqual(a.size, g.size, t)
+
+    def test_proto_reads_grounding_from_the_index(self):
+        proto = read("proto/main.js")
+        self.assertIn("GROUNDED + 'index.json'", proto)
+        self.assertIn("GROUNDING = grounded", proto)
+        self.assertIn("g.contact_row * o.h", proto)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

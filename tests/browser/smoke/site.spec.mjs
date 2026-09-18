@@ -89,8 +89,9 @@ test.describe('root', () => {
 /* ------------------------------------------------------------------ proto */
 test.describe('/proto/', () => {
   test('boots WebGL, loads the layout, reaches done, survives zoom and moves', async ({ page, watch }) => {
-    const layouts = [];
+    const layouts = [], grounded = [];
     page.on('response', (r) => { if (/\/layout[^/]*\.json$/.test(r.url())) layouts.push(r); });
+    page.on('response', (r) => { if (/\/sprites_grounded\/[^/]+\.webp$/.test(r.url())) grounded.push(r); });
     const r = await page.goto('/proto/');
     expect(r.status()).toBe(200);
     expect(await robots(page)).toContain('noindex');
@@ -102,6 +103,13 @@ test.describe('/proto/', () => {
     expect(state.decals).toBeGreaterThan(1000);
 
     expect(layouts.length, 'layout json requested').toBeGreaterThan(0);
+    // where this checkout grounds its buildings, every grounded sprite loads
+    const gi = await page.request.get('/proto/sprites_grounded/index.json');
+    if (gi.ok()) {
+      const want = Object.keys((await gi.json()).sprites);
+      expect(grounded.map((r) => r.url().split('/').pop().replace('.webp', '')).sort()).toEqual(want.sort());
+      for (const r of grounded) expect(r.status(), r.url()).toBe(200);
+    }
     for (const l of layouts) expect(l.status(), l.url()).toBe(200);
 
     const gl = await page.evaluate(() => {

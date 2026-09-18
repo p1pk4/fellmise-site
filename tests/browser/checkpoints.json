@@ -14,6 +14,10 @@
    "readyTimeoutMs": 120000
   }
  },
+ "review_sets": {
+  "note": "Мини-листы для человека: base | head рядом, по кадру в строке. Имя набора -> review-<имя>.png в отчёте.",
+  "key-buildings": ["proto-village-overview", "proto-village-close", "proto-home", "proto-home-close"]
+ },
  "checkpoints": [
   {"id": "proto-village-overview", "route": "/proto/", "z": -20, "zoom": "обзор", "note": "начало, вид при открытии"},
   {"id": "proto-village-close", "route": "/proto/", "z": -47.6, "zoom": "близко", "note": "два дома по берегам, y-sort и тени"},

@@ -17,6 +17,7 @@ const HUD = document.getElementById('hud');
 const ASSETS = '../assets/';
 const LAYOUT = ASSETS + 'topdown/layout.runtime.json';
 const STRIPPED = './sprites_stripped/';
+const GROUNDED = './sprites_grounded/';
 
 /* Масштаб игры, выведенный из фактов, а не подобранный.
  *
@@ -346,14 +347,20 @@ function baseWidth(img) {
 // ---------------------------------------------------------------- спрайты --
 const cache = new Map();
 let strippedSet = new Set();
+/* Постройки садятся на землю через tools/topdown_grounding.py
+   (assets/topdown/grounding.json): низ объекта целиком, тонкий нарисованный
+   контакт, измеренная линия контакта. Если спрайт есть там — берётся он. */
+let GROUNDING = { categories: {}, sprites: {} };
 
 function sprite(t) {
   if (!cache.has(t)) {
-    const url = (strippedSet.has(t) ? STRIPPED : ASSETS) + t + '.webp';
+    const g = GROUNDING.sprites[t];
+    const url = (g ? GROUNDED : strippedSet.has(t) ? STRIPPED : ASSETS) + t + '.webp';
     cache.set(t, tex(url).then((map) => ({
       map,
       aspect: map.image.width / map.image.height,
       base: baseWidth(map.image),
+      grounding: g ? { ...g, shadow: GROUNDING.categories[g.category] } : null,
     })).catch(() => null));
   }
   return cache.get(t);
@@ -402,7 +409,53 @@ function shadowTexture() {
   return shadowTex;
 }
 
+/* Контактная тень постройки. Эллипс у кромки холста у построек лежал ПЕРЕД
+   фасадом: видимый низ стоит выше кромки на высоту убранного цоколя, и объект
+   читался парящим над своей тенью. Здесь — узкая полоса по линии контакта,
+   измеренной инструментом: плотная под стеной (скрыта спрайтом), видимая
+   часть — только below_m перед основанием, со смягчёнными концами. */
+let bandTex = null;
+function contactBandTexture() {
+  if (bandTex) return bandTex;
+  const W = 256, H = 64;
+  const c = document.createElement('canvas');
+  c.width = W; c.height = H;
+  const cx = c.getContext('2d');
+  const img = cx.createImageData(W, H);
+  for (let y = 0; y < H; y++) {
+    // сверху (под стеной) плотно, к нижнему краю сходит на нет
+    const v = y / (H - 1);
+    const vy = 1 - Math.pow(Math.max(0, (v - 0.45) / 0.55), 0.8);
+    for (let x = 0; x < W; x++) {
+      const u = Math.min(x, W - 1 - x) / (W * 0.12);
+      const hx = Math.min(1, u) ** 1.5;
+      const i = (y * W + x) * 4;
+      img.data[i + 3] = Math.round(255 * vy * hx);
+    }
+  }
+  cx.putImageData(img, 0, 0);
+  bandTex = new THREE.CanvasTexture(c);
+  return bandTex;
+}
+
+function contactBand(art, o, z) {
+  const g = art.grounding, sh = g.shadow;
+  const w = o.h * art.aspect;
+  const contactZ = z - o.h / 2 + g.contact_row * o.h;       // линия контакта в мире
+  const q = new THREE.Mesh(
+    new THREE.PlaneGeometry(w * g.contact_width * sh.width, sh.height_m),
+    new THREE.MeshBasicMaterial({
+      map: contactBandTexture(), transparent: true, opacity: sh.opacity,
+      depthTest: false, depthWrite: false, color: 0x1a1a14,
+    }));
+  q.rotation.x = -Math.PI / 2;
+  q.position.set(o.pos[0] + g.contact_centre * w, 0.5, contactZ + sh.below_m - sh.height_m / 2);
+  q.renderOrder = ORDER.shadow;
+  return q;
+}
+
 function shadowFor(art, o, z) {
+  if (art.grounding && art.grounding.shadow.kind === 'contact_band') return contactBand(art, o, z);
   const w = o.h * art.aspect * art.base * 0.94;   // плотнее к основанию силуэта
   const q = new THREE.Mesh(
     new THREE.PlaneGeometry(w, w * 0.48),
@@ -637,12 +690,14 @@ function presentationAt(z) {
 let roadAt = () => ({ cx: 0, hw: 3.2 });
 
 async function main() {
-  const [layout, spline, index] = await Promise.all([
+  const [layout, spline, index, grounded] = await Promise.all([
     fetch(LAYOUT).then((r) => r.json()),
     fetch(ASSETS + 'road_spline.json').then((r) => r.json()),
     fetch(STRIPPED + 'index.json').then((r) => r.json()).catch(() => ({ stripped: [] })),
+    fetch(GROUNDED + 'index.json').then((r) => r.json()).catch(() => ({ categories: {}, sprites: {} })),
   ]);
   strippedSet = new Set(index.stripped);
+  GROUNDING = grounded;
   if (typeof layout.road_half_width !== 'number') {
     throw new Error('в ' + LAYOUT + ' нет road_half_width');
   }

@@ -173,8 +173,16 @@ def main():
     if MARKS.exists():
         marks = json.loads(MARKS.read_text(encoding="utf-8")).get("sprites", {})
 
+    # repaired after the strip (sprite bottom repair): the file in OUT is the
+    # source of truth now; re-stripping the original would bring the cut back
+    prev = json.loads((OUT / "index.json").read_text(encoding="utf-8")) if (OUT / "index.json").exists() else {}
+    repaired = prev.get("repaired", {})
+
     done, skip = {}, {}
     for n in names:
+        if n in repaired:
+            done[n] = "отремонтирован, не пересобирается (index.json repaired)"
+            continue
         p = ASSETS / f"{n}.webp"
         if not p.exists():
             skip[n] = "нет такого спрайта"

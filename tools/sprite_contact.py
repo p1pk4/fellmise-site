@@ -26,6 +26,10 @@ where the other one works, so the choice is made by what the sprite is:
              first try — put pine contact at the lowest branches, 18 % of the
              height above the trunk base.)
 
+Repaired sprites (index.json "repaired": the base was restored after the
+strip, see there) have a whole base again, so they are measured by the run
+rule: comparing with the original row would count its baked ground.
+
 Width and centre come from the opaque extent of the rows from 3 % of the
 height above the contact row down to it: the base itself.
 
@@ -67,13 +71,13 @@ def longest_runs(a):
     return out
 
 
-def measure(t, stripped):
+def measure(t, stripped, repaired=()):
     path = source(t, stripped)
     a = np.asarray(Image.open(path).convert("RGBA"))[..., 3] > ALPHA
     H, W = a.shape
     L = longest_runs(a)
     lower = range(H // 2, H)
-    if t in stripped:
+    if t in stripped and t not in repaired:
         o = np.asarray(Image.open(ASSETS / f"{t}.webp").convert("RGBA"))[..., 3] > ALPHA
         keep = [(a[y] & o[y]).sum() / o[y].sum() if o[y].any() else 0.0 for y in range(H)]
         rows = [y for y in lower if keep[y] >= KEEP and L[y] >= RUN * W]
@@ -98,15 +102,18 @@ def measure(t, stripped):
 
 
 def build():
-    stripped = set(json.loads((STRIPPED / "index.json").read_text(encoding="utf-8"))["stripped"])
+    index = json.loads((STRIPPED / "index.json").read_text(encoding="utf-8"))
+    stripped = set(index["stripped"])
+    repaired = set(index.get("repaired", {}))
     names = sorted(p.stem for p in ASSETS.glob("*.webp") if not p.stem.endswith(("_em", "_bleed")))
-    sprites = {t: measure(t, stripped) for t in names}
+    sprites = {t: measure(t, stripped, repaired) for t in names}
     return {
         "generated": "tools/sprite_contact.py по текстурам, которые грузит /proto/",
         "rule": (f"stripped: нижняя строка, где вырезанный спрайт сохранил >= {KEEP} "
                  f"непрозрачных пикселей исходной строки; run: нижняя строка со сплошным "
                  f"отрезком >= {RUN} ширины, устойчивым {STABLE} высоты; ширина и центр — "
-                 f"по полосе {BAND} высоты над строкой контакта"),
+                 f"по полосе {BAND} высоты над строкой контакта; отремонтированные "
+                 f"(index.json repaired) — по run"),
         "sprites": sprites,
     }
 

@@ -45,6 +45,7 @@ class CompositionError(ValueError):
 
 # -------------------------------------------------------------------- sprites
 _stripped = None
+_repaired = None
 _dims = {}
 
 
@@ -54,6 +55,17 @@ def stripped_set():
         idx = STRIPPED_DIR / "index.json"
         _stripped = set(json.loads(idx.read_text(encoding="utf-8"))["stripped"]) if idx.exists() else set()
     return _stripped
+
+
+def repaired():
+    """proto/sprites_stripped/index.json "repaired": sprites whose base was
+    restored after the strip. Their footprint width stays as measured before
+    the repair (`layout_foot`), so replacing the art does not move the layout."""
+    global _repaired
+    if _repaired is None:
+        idx = STRIPPED_DIR / "index.json"
+        _repaired = json.loads(idx.read_text(encoding="utf-8")).get("repaired", {}) if idx.exists() else {}
+    return _repaired
 
 
 def dims(t):
@@ -74,7 +86,10 @@ def dims(t):
             xs = [x for x in range(W) if px[x, y] > 16]
             if xs:
                 best = max(best, xs[-1] - xs[0] + 1)
-        _dims[t] = (aspect, max(best / W, 0.15))
+        foot = max(best / W, 0.15)
+        if "layout_foot" in repaired().get(t, {}):
+            foot = repaired()[t]["layout_foot"]
+        _dims[t] = (aspect, foot)
     return _dims[t]
 
 

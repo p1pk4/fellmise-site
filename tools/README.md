@@ -205,6 +205,14 @@ assets/topdown/config.json         (biome_spacing, road_end_z)
 смещения по свету; ширина — ширина основания, глубина мала и ограничена
 (`presentation.json → contact_shadow`). `--check` — в CI.
 
+Ремонт низа (sprite bottom repair): `hero_house_b`, `hero_house_a`, `hero_well`
+в `proto/sprites_stripped/` — вариант B: основание восстановлено из исходника
+без земли + inpaint только полосы основания, выше неё — исходные пиксели.
+Список — `index.json → repaired`; `strip_pedestal.py` их не пересобирает,
+`sprite_contact.py` меряет их по правилу run (основание снова цельное), а
+`topdown_compose.py` держит прежнюю ширину следа (`layout_foot`), чтобы layout
+не сдвинулся. Лист «PR #4 | PR #6 | repaired»: `node tests/browser/sprite_repair_review.mjs`.
+
 Диагностика: `node tests/browser/grounding_diag.mjs` (варианты тени A–E на 7
 объектах, маркеры контакта) и `--review <git ref>` («было | стало»,
 `grounding-final-review.png`). Proto подменяется в памяти, файлы не трогаются.

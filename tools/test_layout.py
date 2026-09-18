@@ -578,5 +578,63 @@ class ContactShadow(unittest.TestCase):
         return self._asp[t]
 
 
+class SpriteRepair(unittest.TestCase):
+    """hero_house_b, hero_house_a, hero_well: base restored after the strip."""
+
+    REPAIRED = ["hero_house_a", "hero_house_b", "hero_well"]
+
+    def setUp(self):
+        self.index = json.loads(read("proto/sprites_stripped/index.json"))
+        self.meta = json.loads(read("proto/sprite_contact.json"))["sprites"]
+
+    def test_exactly_the_three_are_repaired_and_still_loaded_from_stripped(self):
+        self.assertEqual(sorted(self.index.get("repaired", {})), self.REPAIRED)
+        for t in self.REPAIRED:
+            self.assertIn(t, self.index["stripped"])
+            self.assertEqual(self.meta[t]["src"], f"proto/sprites_stripped/{t}.webp")
+
+    def test_canvas_and_upper_part_unchanged(self):
+        """Same canvas as the original; above the repaired band it IS the
+        original (webp noise only), so nothing moved inside the picture."""
+        import numpy as np
+        from PIL import Image
+        for t in self.REPAIRED:
+            with Image.open(ROOT / "proto" / "sprites_stripped" / f"{t}.webp") as im:
+                r = np.asarray(im.convert("RGBA")).astype(int)
+            with Image.open(ROOT / "assets" / f"{t}.webp") as im:
+                o = np.asarray(im.convert("RGBA")).astype(int)
+            self.assertEqual(r.shape, o.shape, t)
+            top = self.index["repaired"][t]["unchanged_rows_from_top"]
+            self.assertGreater(top / r.shape[0], 0.7, t)
+            d = np.abs(r[:top] - o[:top])
+            self.assertLessEqual(d[..., 3].max(), 24, t)
+            self.assertLess(d[..., :3][r[:top, :, 3] > 200].mean(), 3.0, t)
+
+    def test_base_is_whole_no_residue_below(self):
+        """Contact by the run rule, and nothing opaque below it: no drips, no
+        comb, no ground skirt left under the base."""
+        import numpy as np
+        from PIL import Image
+        for t in self.REPAIRED:
+            m = self.meta[t]
+            self.assertEqual(m["rule"], "run", t)
+            with Image.open(ROOT / m["src"]) as im:
+                a = np.asarray(im.convert("RGBA"))[..., 3] > 16
+            low = (np.nonzero(a.any(axis=1))[0].max() + 1) / a.shape[0]
+            self.assertLess(low - m["contact_row"], 0.01, t)
+
+    def test_layout_footprint_pinned(self):
+        """The repair does not move the layout: the footprint width the
+        composer uses is the pre-repair one recorded in index.json."""
+        TC._dims.clear(); TC._repaired = None
+        for t in self.REPAIRED:
+            self.assertEqual(TC.dims(t)[1], self.index["repaired"][t]["layout_foot"], t)
+
+    def test_strip_does_not_overwrite_repairs(self):
+        src = read("tools/strip_pedestal.py")
+        self.assertIn('prev.get("repaired", {})', src)
+        self.assertIn("if n in repaired:", src)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

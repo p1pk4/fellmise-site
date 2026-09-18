@@ -7,9 +7,18 @@ button POSTs the file here and this writes it. Without this server the button
 still works — it falls back to a download — but then the file has to be moved by
 hand, and moving files by hand is how a layout gets lost.
 
-Only one route is special: POST /__layout writes the body to assets/layout.json,
-after checking it parses as JSON and has the shape the scene expects. Everything
-else is a plain static file out of the repository root.
+Two routes are special, everything else is a plain static file out of the
+repository root:
+
+  POST /__layout           legacy /next/ editor. Writes the body to
+                           assets/layout.json, after checking it parses as JSON
+                           and has the shape the scene expects.
+  POST /__topdown/layout   top-down. The body is the whole edited runtime
+                           layout; the server computes the overrides against
+                           assets/topdown/layout.generated.json, writes
+                           layout.overrides.json and rebuilds layout.runtime.json
+                           (tools/topdown_layout.py). The generated file is never
+                           written here — that is the generator's alone.
 
 Binds to localhost only. This writes to your working tree; it is not something
 to expose.
@@ -23,6 +32,8 @@ import shutil
 import socketserver
 import sys
 import time
+
+import topdown_layout            # tools/, next to this file
 
 # Launched from a .bat, stdout is cp1252 and the first Cyrillic line kills the
 # server before it binds. Fixed here rather than only in the launcher, so the
@@ -58,7 +69,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         super().end_headers()
 
     def do_POST(self):
-        if self.path.split("?")[0] != "/__layout":
+        route = self.path.split("?")[0]
+        if route not in ("/__layout", "/__topdown/layout"):
             self.send_error(404)
             return
         n = int(self.headers.get("content-length") or 0)
@@ -66,6 +78,9 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             self.send_error(413, "layout too large")
             return
         raw = self.rfile.read(n)
+        if route == "/__topdown/layout":
+            self.topdown(raw)
+            return
 
         try:
             data = json.loads(raw)
@@ -89,6 +104,30 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         print(f"  сохранено: {msg}", flush=True)
         body = msg.encode("utf-8")
         self.send_response(200)
+        self.send_header("content-type", "text/plain; charset=utf-8")
+        self.send_header("content-length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
+
+    def topdown(self, raw):
+        try:
+            edited = json.loads(raw)
+            assert isinstance(edited.get("biomes"), dict) and edited["biomes"], "нет биомов"
+            n = topdown_layout.export(edited, backups=BACKUPS)
+        except (topdown_layout.OverrideError, AssertionError, ValueError) as exc:
+            # the reason goes in the body: a status line is latin-1 only, and
+            # these messages are Cyrillic
+            print(f"  отклонено: {exc}", flush=True)
+            self.reply(400, f"not a top-down layout: {exc}")
+            return
+        msg = f"assets/topdown/layout.overrides.json ({n} объектов с правками)"
+        print(f"  сохранено: {msg}, runtime пересобран", flush=True)
+        self.reply(200, msg)
+
+    def reply(self, code, text):
+        body = text.encode("utf-8")
+        self.send_response(code)
         self.send_header("content-type", "text/plain; charset=utf-8")
         self.send_header("content-length", str(len(body)))
         self.end_headers()

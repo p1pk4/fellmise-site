@@ -1,0 +1,73 @@
+# Checks only. Deployment stays with GitHub Pages (legacy, main:/), which this
+# workflow neither triggers nor replaces.
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHONIOENCODING: utf-8
+
+jobs:
+  python:
+    name: layout, validators, static site
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version-file: .python-version
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: static site sanity
+        run: python tools/check_site_static.py
+      - name: generate layout (dry, both targets)
+        run: python tools/generate_layout.py --dry
+      - name: committed layouts are current
+        run: python tools/generate_layout.py --check
+      - name: top-down overrides merge
+        run: python tools/topdown_layout.py --check
+      - name: layout tests
+        run: python tools/test_layout.py
+      - name: run rules are enforced
+        run: python tools/check_run_rules.py
+      - name: foreshortening / pack sharpness report
+        run: python tools/measure_foreshortening.py
+
+  journey3:
+    name: /next/ builds and matches committed next/
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: journey3/package-lock.json
+      - uses: actions/setup-python@v5
+        with:
+          python-version-file: .python-version
+      - name: npm ci
+        working-directory: journey3
+        run: npm ci
+      - name: build
+        working-directory: journey3
+        run: npm run build
+      - name: dist -> next/ (ephemeral workspace)
+        run: python tools/build_journey3.py deploy
+      - name: next/ is in sync with journey3 source
+        run: |
+          git diff --stat --exit-code -- next/
+          untracked="$(git status --porcelain --untracked-files=all -- next/)"
+          if [ -n "$untracked" ]; then
+            echo "next/ differs from the build:"; echo "$untracked"; exit 1
+          fi

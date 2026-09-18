@@ -1,0 +1,5 @@
+{
+ "version": 1,
+ "note": "Ручные правки top-down расстановки: {stable id: {pos|h|rotY|visible}}. Только отличия от layout.generated.json. Пишет POST /__topdown/layout (tools/editor_serve.py) или человек; orphan id — ошибка сборки.",
+ "objects": {}
+}

@@ -5,6 +5,40 @@
 
 ---
 
+## 2026-09-18 18:18 — foundation-1: CI, два target расстановки, стабильные id, overrides
+
+- **Что:** CI в GitHub Actions (только проверки, deploy остаётся за Pages).
+  `generate_layout.py` получил target `legacy` (`assets/layout.json` для
+  `/next/`, байт-в-байт прежний) и `topdown` (`assets/topdown/layout.generated.json`
+  со стабильными семантическими id). Слой ручных правок
+  `layout.overrides.json` → `tools/topdown_layout.py` → `layout.runtime.json`,
+  его читает `/proto/`. `ROAD_HALF` 4.2 — один источник,
+  `assets/topdown/config.json`. Export для top-down — `POST /__topdown/layout`,
+  generated не пишет никогда. Зафиксированы `.nvmrc`, `.python-version`,
+  `requirements.txt`. Новые `tools/check_site_static.py`, `tools/test_layout.py`.
+- **Тип:** refactor
+- **Проверка:** build ✓ · `next/` = сборка ✓ (и в LF-клоне, как в CI) ·
+  test_layout 20/20 · `--check` оба target ✓ · check_run_rules 7/7 ·
+  check_site_static ✓ · `/proto/` до/после — 6 скринов headless Chrome
+  попиксельно равны, контроль (road 5.5 в runtime) даёт разницу, то есть скрины
+  читают новый файл · ветка `site-foundation-1`, PR без merge
+- **Commit:** —
+
+**Валидатор top-down на дороге 4.2 нашёл 15 объектов на видимой дороге** —
+тележки, ящики, папоротники, свечи, сундук и часть scatter. Это не новая
+проблема, а то, что `/proto/` уже показывает: раньше её никто не мерил. Scatter
+оставлен с отступом от spec-дороги 3.2, потому что перевод на 4.2 сдвигает ~60
+объектов, а батч сцену не меняет. Все 15 перечислены поимённо в
+`config.json → validator_known_violations`; новая находка или исчезнувшая
+запись валят сборку. Разбор — в композиционном батче.
+
+**Jitter по-прежнему ключуется легаси-id.** Id top-down стабилен, но позиция
+объекта с jitter может сдвинуться, если выше добавить объект того же спрайта:
+иначе сцена поменялась бы уже сейчас. Overrides хранят абсолютные значения,
+поэтому ручная правка от этого не теряется.
+
+---
+
 ## 2026-08-16 19:30 — откат зума, дорога 4.2, кромка, перезамер ракурса
 
 - **Что:** привязка зума к игровому кадру отменена — метод сохранён и считается,

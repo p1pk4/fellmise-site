@@ -1,0 +1,3516 @@
+{
+ "version": 1,
+ "target": "topdown",
+ "generated": "tools/generate_layout.py --target topdown по assets/scene_spec.json + assets/topdown/config.json. Руками не править: правки — в layout.overrides.json",
+ "road_half_width": 4.2,
+ "seed": 20260731,
+ "debug": {
+  "road_half_width": 4.2,
+  "lanes": {
+   "village": {
+    "verge": 5.2,
+    "near": 7.4,
+    "mid": 11.5,
+    "far": 17.0,
+    "back": 26.0,
+    "sign": 8.5
+   },
+   "forest": {
+    "verge": 5.2,
+    "near": 7.4,
+    "mid": 11.5,
+    "far": 17.0,
+    "back": 26.0,
+    "sign": 8.5
+   },
+   "mine": {
+    "verge": 6.0,
+    "near": 9.0,
+    "mid": 13.5,
+    "far": 17.0,
+    "back": 26.0,
+    "sign": 8.5
+   },
+   "spirit": {
+    "verge": 5.2,
+    "near": 7.4,
+    "mid": 11.5,
+    "far": 17.0,
+    "back": 26.0,
+    "sign": 8.5
+   },
+   "home": {
+    "verge": 5.2,
+    "near": 7.4,
+    "mid": 11.5,
+    "far": 17.0,
+    "back": 26.0,
+    "sign": 8.5
+   }
+  },
+  "rows": {
+   "village": [
+    -12.67,
+    -28.93,
+    -47.09,
+    -67.36,
+    -90.0,
+    -12.67,
+    -28.93,
+    -47.09,
+    -67.36,
+    -90.0
+   ],
+   "forest": [
+    -14.4,
+    -14.4,
+    -32.88,
+    -32.88,
+    -53.52,
+    -53.52,
+    -76.56
+   ],
+   "mine": [
+    -10.72,
+    -10.72,
+    -10.72,
+    -23.49,
+    -23.49,
+    -23.49,
+    -37.65,
+    -53.34,
+    -37.65,
+    -53.34,
+    -37.65,
+    -70.73,
+    -70.73,
+    -90.0,
+    -90.0,
+    -53.34
+   ],
+   "spirit": [
+    -14.4,
+    -14.4,
+    -32.88,
+    -32.88,
+    -53.52,
+    -53.52,
+    -14.4
+   ],
+   "home": [
+    -14.4,
+    -14.4,
+    -39.48,
+    -39.48,
+    -14.4
+   ]
+  },
+  "length": {
+   "village": 100,
+   "forest": 95,
+   "mine": 100,
+   "spirit": 75,
+   "home": 90
+  }
+ },
+ "biomes": {
+  "village": {
+   "sprites": [
+    {
+     "id": "village/homestead.1/hero_house_b.1",
+     "t": "hero_house_b",
+     "layer": 1,
+     "pos": [
+      -7.455,
+      null,
+      -11.483
+     ],
+     "h": 9.0,
+     "rotY": -0.1744,
+     "visible": true
+    },
+    {
+     "id": "village/homestead.1/hero_tree_b.1",
+     "t": "hero_tree_b",
+     "layer": 1,
+     "pos": [
+      -11.655,
+      null,
+      -10.283
+     ],
+     "h": 2.2,
+     "rotY": -0.1335,
+     "visible": true
+    },
+    {
+     "id": "village/homestead.1/grass_tuft_a.1",
+     "t": "grass_tuft_a",
+     "layer": 1,
+     "pos": [
+      -3.855,
+      null,
+      -9.283
+     ],
+     "h": 1.1,
+     "rotY": -0.1393,
+     "visible": true
+    },
+    {
+     "id": "village/farmyard.1/barn.1",
+     "t": "barn",
+     "layer": 1,
+     "pos": [
+      -6.863,
+      null,
+      -29.12
+     ],
+     "h": 10.0,
+     "rotY": -0.0734,
+     "visible": true
+    },
+    {
+     "id": "village/farmyard.1/haystack.1",
+     "t": "haystack",
+     "layer": 1,
+     "pos": [
+      -10.863,
+      null,
+      -27.12
+     ],
+     "h": 2.4,
+     "rotY": -0.1176,
+     "visible": true
+    },
+    {
+     "id": "village/farmyard.1/hero_cart.1",
+     "t": "hero_cart",
+     "layer": 1,
+     "pos": [
+      -4.063,
+      null,
+      -26.12
+     ],
+     "h": 2.6,
+     "rotY": -0.1986,
+     "visible": true
+    },
+    {
+     "id": "village/homestead.2/hero_house_a.1",
+     "t": "hero_house_a",
+     "layer": 1,
+     "pos": [
+      -7.906,
+      null,
+      -47.215
+     ],
+     "h": 9.0,
+     "rotY": -0.1171,
+     "visible": true
+    },
+    {
+     "id": "village/homestead.2/hero_tree_b.1",
+     "t": "hero_tree_b",
+     "layer": 1,
+     "pos": [
+      -12.106,
+      null,
+      -46.015
+     ],
+     "h": 2.2,
+     "rotY": -0.1377,
+     "visible": true
+    },
+    {
+     "id": "village/homestead.2/grass_tuft_a.1",
+     "t": "grass_tuft_a",
+     "layer": 1,
+     "pos": [
+      -4.306,
+      null,
+      -45.015
+     ],
+     "h": 1.1,
+     "rotY": -0.088,
+     "visible": true
+    },
+    {
+     "id": "village/feat_tavern.1",
+     "t": "feat_tavern",
+     "layer": 1,
+     "pos": [
+      -7.072,
+      null,
+      -67.73
+     ],
+     "h": 9.5,
+     "rotY": -0.1154,
+     "visible": true
+    },
+    {
+     "id": "village/homestead.3/hero_house_b.1",
+     "t": "hero_house_b",
+     "layer": 1,
+     "pos": [
+      -7.717,
+      null,
+      -88.956
+     ],
+     "h": 9.0,
+     "rotY": -0.1468,
+     "visible": true
+    },
+    {
+     "id": "village/homestead.3/hero_tree_b.1",
+     "t": "hero_tree_b",
+     "layer": 1,
+     "pos": [
+      -11.917,
+      null,
+      -87.756
+     ],
+     "h": 2.2,
+     "rotY": -0.0915,
+     "visible": true
+    },
+    {
+     "id": "village/homestead.3/grass_tuft_a.1",
+     "t": "grass_tuft_a",
+     "layer": 1,
+     "pos": [
+      -4.117,
+      null,
+      -86.756
+     ],
+     "h": 1.1,
+     "rotY": -0.1754,
+     "visible": true
+    },
+    {
+     "id": "village/square.1/hero_well.1",
+     "t": "hero_well",
+     "layer": 1,
+     "pos": [
+      5.028,
+      null,
+      -13.977
+     ],
+     "h": 4.4,
+     "rotY": 0.1086,
+     "visible": true
+    },
+    {
+     "id": "village/square.1/prop_lantern.1",
+     "t": "prop_lantern",
+     "layer": 1,
+     "pos": [
+      8.028,
+      null,
+      -14.977
+     ],
+     "h": 4.2,
+     "rotY": 0.1543,
+     "visible": true
+    },
+    {
+     "id": "village/square.1/prop_crates.1",
+     "t": "prop_crates",
+     "layer": 1,
+     "pos": [
+      4.428,
+      null,
+      -12.577
+     ],
+     "h": 1.8,
+     "rotY": 0.0923,
+     "visible": true
+    },
+    {
+     "id": "village/grove.1/hero_tree_a.1",
+     "t": "hero_tree_a",
+     "layer": 1,
+     "pos": [
+      12.201,
+      null,
+      -27.727
+     ],
+     "h": 8.4,
+     "rotY": 0.1135,
+     "visible": true,
+     "sway": true
+    },
+    {
+     "id": "village/grove.1/hero_tree_b.1",
+     "t": "hero_tree_b",
+     "layer": 1,
+     "pos": [
+      9.801,
+      null,
+      -26.127
+     ],
+     "h": 2.2,
+     "rotY": 0.1074,
+     "visible": true
+    },
+    {
+     "id": "village/grove.1/grass_tuft_b.1",
+     "t": "grass_tuft_b",
+     "layer": 1,
+     "pos": [
+      4.601,
+      null,
+      -25.927
+     ],
+     "h": 1.1,
+     "rotY": 0.1739,
+     "visible": true
+    },
+    {
+     "id": "village/homestead.4/hero_house_a.1",
+     "t": "hero_house_a",
+     "layer": 1,
+     "pos": [
+      6.825,
+      null,
+      -47.608
+     ],
+     "h": 9.0,
+     "rotY": 0.1567,
+     "visible": true
+    },
+    {
+     "id": "village/homestead.4/hero_tree_b.1",
+     "t": "hero_tree_b",
+     "layer": 1,
+     "pos": [
+      11.025,
+      null,
+      -46.408
+     ],
+     "h": 2.2,
+     "rotY": 0.1338,
+     "visible": true
+    },
+    {
+     "id": "village/homestead.4/grass_tuft_a.1",
+     "t": "grass_tuft_a",
+     "layer": 1,
+     "pos": [
+      3.225,
+      null,
+      -45.408
+     ],
+     "h": 1.1,
+     "rotY": 0.1508,
+     "visible": true
+    },
+    {
+     "id": "village/grove.2/hero_tree_a.1",
+     "t": "hero_tree_a",
+     "layer": 0.5,
+     "pos": [
+      16.935,
+      null,
+      -67.653
+     ],
+     "h": 8.4,
+     "rotY": 0.1974,
+     "visible": true,
+     "sway": true
+    },
+    {
+     "id": "village/grove.2/hero_tree_b.1",
+     "t": "hero_tree_b",
+     "layer": 0.5,
+     "pos": [
+      14.535,
+      null,
+      -66.053
+     ],
+     "h": 2.2,
+     "rotY": 0.1433,
+     "visible": true
+    },
+    {
+     "id": "village/grove.2/grass_tuft_b.1",
+     "t": "grass_tuft_b",
+     "layer": 0.5,
+     "pos": [
+      9.335,
+      null,
+      -65.853
+     ],
+     "h": 1.1,
+     "rotY": 0.1528,
+     "visible": true
+    },
+    {
+     "id": "village/farmyard.2/barn.1",
+     "t": "barn",
+     "layer": 1,
+     "pos": [
+      7.502,
+      null,
+      -89.463
+     ],
+     "h": 10.0,
+     "rotY": 0.1982,
+     "visible": true
+    },
+    {
+     "id": "village/farmyard.2/haystack.1",
+     "t": "haystack",
+     "layer": 1,
+     "pos": [
+      11.502,
+      null,
+      -87.463
+     ],
+     "h": 2.4,
+     "rotY": 0.1487,
+     "visible": true
+    },
+    {
+     "id": "village/farmyard.2/hero_cart.1",
+     "t": "hero_cart",
+     "layer": 1,
+     "pos": [
+      4.702,
+      null,
+      -86.463
+     ],
+     "h": 2.6,
+     "rotY": 0.148,
+     "visible": true
+    },
+    {
+     "id": "village/homestead.4/fence.1/hero_fence.1",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      5.2,
+      null,
+      -31.608
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "village/homestead.4/fence.1/hero_fence.2",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      5.2,
+      null,
+      -34.453
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "village/homestead.4/fence.1/hero_fence.3",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      5.2,
+      null,
+      -37.298
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "village/homestead.4/fence.1/hero_fence.4",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      5.2,
+      null,
+      -40.144
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "village/homestead.4/fence.1/hero_fence.5",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      5.2,
+      null,
+      -42.989
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "village/homestead.4/fence.1/end_post.start",
+     "t": "end_post",
+     "layer": 1,
+     "pos": [
+      5.2,
+      null,
+      -30.185
+     ],
+     "h": 2.1,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "village/homestead.2/fence.1/hero_fence.1",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      -5.2,
+      null,
+      -52.215
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "village/homestead.2/fence.1/hero_fence.2",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      -5.2,
+      null,
+      -55.06
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "village/homestead.2/fence.1/hero_fence.3",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      -5.2,
+      null,
+      -57.906
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "village/homestead.2/fence.1/hero_fence.4",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      -5.2,
+      null,
+      -60.751
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "village/homestead.2/fence.1/end_post.end",
+     "t": "end_post",
+     "layer": 1,
+     "pos": [
+      -5.2,
+      null,
+      -62.174
+     ],
+     "h": 2.1,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "village/homestead.4/fence.2/hero_fence.1",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      9.2,
+      null,
+      -54.608
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "village/homestead.4/fence.2/hero_fence.2",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      12.045,
+      null,
+      -54.608
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "village/homestead.4/fence.2/end_post.start",
+     "t": "end_post",
+     "layer": 1,
+     "pos": [
+      7.777,
+      null,
+      -54.608
+     ],
+     "h": 2.1,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "village/homestead.4/fence.2/end_post.end",
+     "t": "end_post",
+     "layer": 1,
+     "pos": [
+      13.468,
+      null,
+      -54.608
+     ],
+     "h": 2.1,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "village/backdrop.1/biome_pine_b.1",
+     "t": "biome_pine_b",
+     "layer": 0,
+     "pos": [
+      -26.0,
+      null,
+      -20
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.7
+    },
+    {
+     "id": "village/backdrop.1/biome_pine_b.2",
+     "t": "biome_pine_b",
+     "layer": 0,
+     "pos": [
+      -20.0,
+      null,
+      -23.0
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.62
+    },
+    {
+     "id": "village/backdrop.1/biome_pine_a.1",
+     "t": "biome_pine_a",
+     "layer": 0,
+     "pos": [
+      -31.4,
+      null,
+      -22.0
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.66
+    },
+    {
+     "id": "village/backdrop.2/biome_pine_b.1",
+     "t": "biome_pine_b",
+     "layer": 0,
+     "pos": [
+      26.0,
+      null,
+      -44
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.7
+    },
+    {
+     "id": "village/backdrop.2/biome_pine_b.2",
+     "t": "biome_pine_b",
+     "layer": 0,
+     "pos": [
+      32.0,
+      null,
+      -47.0
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.62
+    },
+    {
+     "id": "village/backdrop.2/biome_pine_a.1",
+     "t": "biome_pine_a",
+     "layer": 0,
+     "pos": [
+      20.6,
+      null,
+      -46.0
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.66
+    },
+    {
+     "id": "village/backdrop.3/biome_pine_b.1",
+     "t": "biome_pine_b",
+     "layer": 0,
+     "pos": [
+      -26.0,
+      null,
+      -68
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.7
+    },
+    {
+     "id": "village/backdrop.3/biome_pine_b.2",
+     "t": "biome_pine_b",
+     "layer": 0,
+     "pos": [
+      -20.0,
+      null,
+      -71.0
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.62
+    },
+    {
+     "id": "village/backdrop.3/biome_pine_a.1",
+     "t": "biome_pine_a",
+     "layer": 0,
+     "pos": [
+      -31.4,
+      null,
+      -70.0
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.66
+    },
+    {
+     "id": "village/backdrop.4/biome_pine_b.1",
+     "t": "biome_pine_b",
+     "layer": 0,
+     "pos": [
+      26.0,
+      null,
+      -92
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.7
+    },
+    {
+     "id": "village/backdrop.4/biome_pine_b.2",
+     "t": "biome_pine_b",
+     "layer": 0,
+     "pos": [
+      32.0,
+      null,
+      -95.0
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.62
+    },
+    {
+     "id": "village/backdrop.4/biome_pine_a.1",
+     "t": "biome_pine_a",
+     "layer": 0,
+     "pos": [
+      20.6,
+      null,
+      -94.0
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.66
+    },
+    {
+     "id": "village/sky/cloud.1",
+     "t": "cloud_a",
+     "layer": 0,
+     "pos": [
+      -12.586,
+      30.919,
+      -66.028
+     ],
+     "h": 8.0,
+     "rotY": 0.0,
+     "visible": true,
+     "drift": 0.241,
+     "span": 110
+    },
+    {
+     "id": "village/sky/cloud.2",
+     "t": "cloud_b",
+     "layer": 0,
+     "pos": [
+      -27.058,
+      29.067,
+      -62.723
+     ],
+     "h": 8.0,
+     "rotY": 0.0,
+     "visible": true,
+     "drift": 0.184,
+     "span": 110
+    },
+    {
+     "id": "village/sky/cloud.3",
+     "t": "cloud_c",
+     "layer": 0,
+     "pos": [
+      18.523,
+      26.363,
+      -74.039
+     ],
+     "h": 8.0,
+     "rotY": 0.0,
+     "visible": true,
+     "drift": 0.363,
+     "span": 110
+    },
+    {
+     "id": "village/sky/cloud.4",
+     "t": "cloud_a",
+     "layer": 0,
+     "pos": [
+      3.709,
+      34.02,
+      -86.171
+     ],
+     "h": 8.0,
+     "rotY": 0.0,
+     "visible": true,
+     "drift": 0.305,
+     "span": 110
+    },
+    {
+     "id": "village/scatter/c0",
+     "t": "grass_tuft_a",
+     "layer": 1,
+     "pos": [
+      4.627,
+      null,
+      -63.247
+     ],
+     "h": 1.1,
+     "rotY": 0.1695,
+     "visible": true
+    },
+    {
+     "id": "village/scatter/c1",
+     "t": "grass_tuft_b",
+     "layer": 1,
+     "pos": [
+      -6.85,
+      null,
+      -90.848
+     ],
+     "h": 1.1,
+     "rotY": -0.1765,
+     "visible": true
+    },
+    {
+     "id": "village/scatter/c3",
+     "t": "rock_s",
+     "layer": 1,
+     "pos": [
+      -6.674,
+      null,
+      -27.445
+     ],
+     "h": 1.2,
+     "rotY": -0.1834,
+     "visible": true
+    },
+    {
+     "id": "village/scatter/c5",
+     "t": "grass_tuft_a",
+     "layer": 1,
+     "pos": [
+      6.114,
+      null,
+      -44.587
+     ],
+     "h": 1.1,
+     "rotY": 0.0991,
+     "visible": true
+    },
+    {
+     "id": "village/scatter/c6",
+     "t": "grass_tuft_b",
+     "layer": 1,
+     "pos": [
+      6.87,
+      null,
+      -95.37
+     ],
+     "h": 1.1,
+     "rotY": 0.1636,
+     "visible": true
+    },
+    {
+     "id": "village/scatter/c7",
+     "t": "rock_s",
+     "layer": 1,
+     "pos": [
+      -5.048,
+      null,
+      -49.07
+     ],
+     "h": 1.2,
+     "rotY": -0.1861,
+     "visible": true
+    },
+    {
+     "id": "village/scatter/c11",
+     "t": "grass_tuft_a",
+     "layer": 1,
+     "pos": [
+      -7.571,
+      null,
+      -87.533
+     ],
+     "h": 1.1,
+     "rotY": -0.2009,
+     "visible": true
+    },
+    {
+     "id": "village/scatter/c13",
+     "t": "grass_tuft_b",
+     "layer": 1,
+     "pos": [
+      6.847,
+      null,
+      -72.734
+     ],
+     "h": 1.1,
+     "rotY": 0.1734,
+     "visible": true
+    },
+    {
+     "id": "village/scatter/c14",
+     "t": "rock_s",
+     "layer": 1,
+     "pos": [
+      7.288,
+      null,
+      -93.007
+     ],
+     "h": 1.2,
+     "rotY": 0.1212,
+     "visible": true
+    },
+    {
+     "id": "village/scatter/c19",
+     "t": "grass_tuft_a",
+     "layer": 1,
+     "pos": [
+      -4.325,
+      null,
+      -33.136
+     ],
+     "h": 1.1,
+     "rotY": -0.1288,
+     "visible": true
+    },
+    {
+     "id": "village/scatter/c20",
+     "t": "grass_tuft_b",
+     "layer": 1,
+     "pos": [
+      -7.181,
+      null,
+      -82.494
+     ],
+     "h": 1.1,
+     "rotY": -0.1039,
+     "visible": true
+    },
+    {
+     "id": "village/scatter/c23",
+     "t": "rock_s",
+     "layer": 1,
+     "pos": [
+      -4.561,
+      null,
+      -79.542
+     ],
+     "h": 1.2,
+     "rotY": -0.1739,
+     "visible": true
+    },
+    {
+     "id": "village/scatter/c27",
+     "t": "grass_tuft_a",
+     "layer": 1,
+     "pos": [
+      4.952,
+      null,
+      -84.812
+     ],
+     "h": 1.1,
+     "rotY": 0.1685,
+     "visible": true
+    },
+    {
+     "id": "village/scatter/c28",
+     "t": "grass_tuft_b",
+     "layer": 1,
+     "pos": [
+      4.353,
+      null,
+      -92.58
+     ],
+     "h": 1.1,
+     "rotY": 0.1808,
+     "visible": true
+    },
+    {
+     "id": "village/scatter/c30",
+     "t": "rock_s",
+     "layer": 1,
+     "pos": [
+      6.943,
+      null,
+      -64.052
+     ],
+     "h": 1.2,
+     "rotY": 0.1144,
+     "visible": true
+    },
+    {
+     "id": "village/scatter/c38",
+     "t": "grass_tuft_a",
+     "layer": 1,
+     "pos": [
+      -7.936,
+      null,
+      -73.584
+     ],
+     "h": 1.1,
+     "rotY": -0.1743,
+     "visible": true
+    },
+    {
+     "id": "village/scatter/c39",
+     "t": "grass_tuft_b",
+     "layer": 1,
+     "pos": [
+      -8.156,
+      null,
+      -16.432
+     ],
+     "h": 1.1,
+     "rotY": -0.0737,
+     "visible": true
+    }
+   ],
+   "boards": [
+    {
+     "id": "village/board/slogan",
+     "key": "slogan",
+     "kind": "wood",
+     "pos": [
+      9.022,
+      null,
+      -16
+     ],
+     "h": 8.0,
+     "rotY": 0.0977,
+     "visible": true
+    },
+    {
+     "id": "village/board/world_plays_itself",
+     "key": "world_plays_itself",
+     "kind": "wood",
+     "pos": [
+      -8.138,
+      null,
+      -42
+     ],
+     "h": 8.0,
+     "rotY": -0.1659,
+     "visible": true
+    }
+   ]
+  },
+  "forest": {
+   "sprites": [
+    {
+     "id": "forest/pine_stand.1/biome_pine_a.1",
+     "t": "biome_pine_a",
+     "layer": 1,
+     "pos": [
+      -7.795,
+      null,
+      -13.004
+     ],
+     "h": 13.0,
+     "rotY": -0.1551,
+     "visible": true,
+     "sway": true
+    },
+    {
+     "id": "forest/pine_stand.1/biome_pine_b.1",
+     "t": "biome_pine_b",
+     "layer": 1,
+     "pos": [
+      -12.195,
+      null,
+      -15.604
+     ],
+     "h": 13.0,
+     "rotY": -0.077,
+     "visible": true
+    },
+    {
+     "id": "forest/pine_stand.1/fern.1",
+     "t": "fern",
+     "layer": 1,
+     "pos": [
+      -5.795,
+      null,
+      -10.804
+     ],
+     "h": 1.4,
+     "rotY": -0.1973,
+     "visible": true
+    },
+    {
+     "id": "forest/pine_stand.1/mushrooms.1",
+     "t": "mushrooms",
+     "layer": 1,
+     "pos": [
+      -10.195,
+      null,
+      -10.004
+     ],
+     "h": 0.9,
+     "rotY": -0.1609,
+     "visible": true
+    },
+    {
+     "id": "forest/pine_stand.2/biome_pine_a.1",
+     "t": "biome_pine_a",
+     "layer": 1,
+     "pos": [
+      7.09,
+      null,
+      -13.837
+     ],
+     "h": 13.0,
+     "rotY": 0.1629,
+     "visible": true,
+     "sway": true
+    },
+    {
+     "id": "forest/pine_stand.2/biome_pine_b.1",
+     "t": "biome_pine_b",
+     "layer": 1,
+     "pos": [
+      11.49,
+      null,
+      -16.437
+     ],
+     "h": 13.0,
+     "rotY": 0.1009,
+     "visible": true
+    },
+    {
+     "id": "forest/pine_stand.2/fern.1",
+     "t": "fern",
+     "layer": 1,
+     "pos": [
+      5.09,
+      null,
+      -11.637
+     ],
+     "h": 1.4,
+     "rotY": 0.1122,
+     "visible": true
+    },
+    {
+     "id": "forest/pine_stand.2/mushrooms.1",
+     "t": "mushrooms",
+     "layer": 1,
+     "pos": [
+      9.49,
+      null,
+      -10.837
+     ],
+     "h": 0.9,
+     "rotY": 0.103,
+     "visible": true
+    },
+    {
+     "id": "forest/cutting.1/biome_stump.1",
+     "t": "biome_stump",
+     "layer": 1,
+     "pos": [
+      5.562,
+      null,
+      -33.41
+     ],
+     "h": 1.6,
+     "rotY": 0.152,
+     "visible": true
+    },
+    {
+     "id": "forest/cutting.1/res_wood.1",
+     "t": "res_wood",
+     "layer": 1,
+     "pos": [
+      7.762,
+      null,
+      -32.41
+     ],
+     "h": 1.8,
+     "rotY": 0.1319,
+     "visible": true
+    },
+    {
+     "id": "forest/cutting.1/fern.1",
+     "t": "fern",
+     "layer": 1,
+     "pos": [
+      4.962,
+      null,
+      -31.81
+     ],
+     "h": 1.4,
+     "rotY": 0.1368,
+     "visible": true
+    },
+    {
+     "id": "forest/pine_stand.3/biome_pine_a.1",
+     "t": "biome_pine_a",
+     "layer": 0.5,
+     "pos": [
+      -11.292,
+      null,
+      -31.584
+     ],
+     "h": 13.0,
+     "rotY": -0.1552,
+     "visible": true,
+     "sway": true
+    },
+    {
+     "id": "forest/pine_stand.3/biome_pine_b.1",
+     "t": "biome_pine_b",
+     "layer": 0.5,
+     "pos": [
+      -15.692,
+      null,
+      -34.184
+     ],
+     "h": 13.0,
+     "rotY": -0.0728,
+     "visible": true
+    },
+    {
+     "id": "forest/pine_stand.3/fern.1",
+     "t": "fern",
+     "layer": 0.5,
+     "pos": [
+      -9.292,
+      null,
+      -29.384
+     ],
+     "h": 1.4,
+     "rotY": -0.144,
+     "visible": true
+    },
+    {
+     "id": "forest/pine_stand.3/mushrooms.1",
+     "t": "mushrooms",
+     "layer": 0.5,
+     "pos": [
+      -13.692,
+      null,
+      -28.584
+     ],
+     "h": 0.9,
+     "rotY": -0.1523,
+     "visible": true
+    },
+    {
+     "id": "forest/biome_deadtree.1",
+     "t": "biome_deadtree",
+     "layer": 1,
+     "pos": [
+      -7.351,
+      null,
+      -53.759
+     ],
+     "h": 9.0,
+     "rotY": -0.154,
+     "visible": true
+    },
+    {
+     "id": "forest/pine_stand.4/biome_pine_a.1",
+     "t": "biome_pine_a",
+     "layer": 1,
+     "pos": [
+      7.421,
+      null,
+      -53.204
+     ],
+     "h": 13.0,
+     "rotY": 0.0699,
+     "visible": true,
+     "sway": true
+    },
+    {
+     "id": "forest/pine_stand.4/biome_pine_b.1",
+     "t": "biome_pine_b",
+     "layer": 1,
+     "pos": [
+      11.821,
+      null,
+      -55.804
+     ],
+     "h": 13.0,
+     "rotY": 0.1495,
+     "visible": true
+    },
+    {
+     "id": "forest/pine_stand.4/fern.1",
+     "t": "fern",
+     "layer": 1,
+     "pos": [
+      5.421,
+      null,
+      -51.004
+     ],
+     "h": 1.4,
+     "rotY": 0.166,
+     "visible": true
+    },
+    {
+     "id": "forest/pine_stand.4/mushrooms.1",
+     "t": "mushrooms",
+     "layer": 1,
+     "pos": [
+      9.821,
+      null,
+      -50.204
+     ],
+     "h": 0.9,
+     "rotY": 0.1015,
+     "visible": true
+    },
+    {
+     "id": "forest/cutting.2/biome_stump.1",
+     "t": "biome_stump",
+     "layer": 1,
+     "pos": [
+      -5.217,
+      null,
+      -77.823
+     ],
+     "h": 1.6,
+     "rotY": -0.16,
+     "visible": true
+    },
+    {
+     "id": "forest/cutting.2/res_wood.1",
+     "t": "res_wood",
+     "layer": 1,
+     "pos": [
+      -7.417,
+      null,
+      -76.823
+     ],
+     "h": 1.8,
+     "rotY": -0.1458,
+     "visible": true
+    },
+    {
+     "id": "forest/cutting.2/fern.1",
+     "t": "fern",
+     "layer": 1,
+     "pos": [
+      -4.617,
+      null,
+      -76.223
+     ],
+     "h": 1.4,
+     "rotY": -0.139,
+     "visible": true
+    },
+    {
+     "id": "forest/backdrop.1/biome_pine_b.1",
+     "t": "biome_pine_b",
+     "layer": 0,
+     "pos": [
+      -26.0,
+      null,
+      -14
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.7
+    },
+    {
+     "id": "forest/backdrop.1/biome_pine_b.2",
+     "t": "biome_pine_b",
+     "layer": 0,
+     "pos": [
+      -20.0,
+      null,
+      -17.0
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.62
+    },
+    {
+     "id": "forest/backdrop.1/biome_pine_a.1",
+     "t": "biome_pine_a",
+     "layer": 0,
+     "pos": [
+      -31.4,
+      null,
+      -16.0
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.66
+    },
+    {
+     "id": "forest/backdrop.2/biome_pine_b.1",
+     "t": "biome_pine_b",
+     "layer": 0,
+     "pos": [
+      26.0,
+      null,
+      -32
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.7
+    },
+    {
+     "id": "forest/backdrop.2/biome_pine_b.2",
+     "t": "biome_pine_b",
+     "layer": 0,
+     "pos": [
+      32.0,
+      null,
+      -35.0
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.62
+    },
+    {
+     "id": "forest/backdrop.2/biome_pine_a.1",
+     "t": "biome_pine_a",
+     "layer": 0,
+     "pos": [
+      20.6,
+      null,
+      -34.0
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.66
+    },
+    {
+     "id": "forest/backdrop.3/biome_pine_b.1",
+     "t": "biome_pine_b",
+     "layer": 0,
+     "pos": [
+      -26.0,
+      null,
+      -50
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.7
+    },
+    {
+     "id": "forest/backdrop.3/biome_pine_b.2",
+     "t": "biome_pine_b",
+     "layer": 0,
+     "pos": [
+      -20.0,
+      null,
+      -53.0
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.62
+    },
+    {
+     "id": "forest/backdrop.3/biome_pine_a.1",
+     "t": "biome_pine_a",
+     "layer": 0,
+     "pos": [
+      -31.4,
+      null,
+      -52.0
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.66
+    },
+    {
+     "id": "forest/backdrop.4/biome_pine_b.1",
+     "t": "biome_pine_b",
+     "layer": 0,
+     "pos": [
+      26.0,
+      null,
+      -68
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.7
+    },
+    {
+     "id": "forest/backdrop.4/biome_pine_b.2",
+     "t": "biome_pine_b",
+     "layer": 0,
+     "pos": [
+      32.0,
+      null,
+      -71.0
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.62
+    },
+    {
+     "id": "forest/backdrop.4/biome_pine_a.1",
+     "t": "biome_pine_a",
+     "layer": 0,
+     "pos": [
+      20.6,
+      null,
+      -70.0
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.66
+    },
+    {
+     "id": "forest/backdrop.5/biome_pine_b.1",
+     "t": "biome_pine_b",
+     "layer": 0,
+     "pos": [
+      -26.0,
+      null,
+      -86
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.7
+    },
+    {
+     "id": "forest/backdrop.5/biome_pine_b.2",
+     "t": "biome_pine_b",
+     "layer": 0,
+     "pos": [
+      -20.0,
+      null,
+      -89.0
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.62
+    },
+    {
+     "id": "forest/backdrop.5/biome_pine_a.1",
+     "t": "biome_pine_a",
+     "layer": 0,
+     "pos": [
+      -31.4,
+      null,
+      -88.0
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.66
+    },
+    {
+     "id": "forest/sky/cloud.1",
+     "t": "cloud_c",
+     "layer": 0,
+     "pos": [
+      -13.502,
+      32.405,
+      -75.69
+     ],
+     "h": 8.0,
+     "rotY": 0.0,
+     "visible": true,
+     "drift": 0.237,
+     "span": 110
+    },
+    {
+     "id": "forest/sky/cloud.2",
+     "t": "cloud_c",
+     "layer": 0,
+     "pos": [
+      -24.091,
+      32.868,
+      -81.445
+     ],
+     "h": 8.0,
+     "rotY": 0.0,
+     "visible": true,
+     "drift": 0.195,
+     "span": 110
+    },
+    {
+     "id": "forest/scatter/c0",
+     "t": "mushrooms",
+     "layer": 1,
+     "pos": [
+      -4.961,
+      null,
+      -48.66
+     ],
+     "h": 0.9,
+     "rotY": -0.1948,
+     "visible": true
+    },
+    {
+     "id": "forest/scatter/c1",
+     "t": "fern",
+     "layer": 1,
+     "pos": [
+      7.944,
+      null,
+      -71.783
+     ],
+     "h": 1.4,
+     "rotY": 0.1782,
+     "visible": true
+    },
+    {
+     "id": "forest/scatter/c2",
+     "t": "rock_s",
+     "layer": 1,
+     "pos": [
+      8.305,
+      null,
+      -58.962
+     ],
+     "h": 1.2,
+     "rotY": 0.0959,
+     "visible": true
+    },
+    {
+     "id": "forest/scatter/c3",
+     "t": "grass_tuft_a",
+     "layer": 1,
+     "pos": [
+      -7.042,
+      null,
+      -37.868
+     ],
+     "h": 1.1,
+     "rotY": -0.0907,
+     "visible": true
+    },
+    {
+     "id": "forest/scatter/c4",
+     "t": "mushrooms",
+     "layer": 1,
+     "pos": [
+      6.941,
+      null,
+      -27.227
+     ],
+     "h": 0.9,
+     "rotY": 0.1652,
+     "visible": true
+    },
+    {
+     "id": "forest/scatter/c5",
+     "t": "fern",
+     "layer": 1,
+     "pos": [
+      7.545,
+      null,
+      -63.88
+     ],
+     "h": 1.4,
+     "rotY": 0.1112,
+     "visible": true
+    },
+    {
+     "id": "forest/scatter/c6",
+     "t": "rock_s",
+     "layer": 1,
+     "pos": [
+      -7.703,
+      null,
+      -49.496
+     ],
+     "h": 1.2,
+     "rotY": -0.1584,
+     "visible": true
+    },
+    {
+     "id": "forest/scatter/c7",
+     "t": "grass_tuft_a",
+     "layer": 1,
+     "pos": [
+      -6.737,
+      null,
+      -44.006
+     ],
+     "h": 1.1,
+     "rotY": -0.1636,
+     "visible": true
+    },
+    {
+     "id": "forest/scatter/c8",
+     "t": "mushrooms",
+     "layer": 1,
+     "pos": [
+      7.804,
+      null,
+      -69.032
+     ],
+     "h": 0.9,
+     "rotY": 0.1521,
+     "visible": true
+    },
+    {
+     "id": "forest/scatter/c9",
+     "t": "fern",
+     "layer": 1,
+     "pos": [
+      -7.88,
+      null,
+      -23.107
+     ],
+     "h": 1.4,
+     "rotY": -0.1413,
+     "visible": true
+    },
+    {
+     "id": "forest/scatter/c10",
+     "t": "rock_s",
+     "layer": 1,
+     "pos": [
+      7.335,
+      null,
+      -38.416
+     ],
+     "h": 1.2,
+     "rotY": 0.0802,
+     "visible": true
+    },
+    {
+     "id": "forest/scatter/c14",
+     "t": "grass_tuft_a",
+     "layer": 1,
+     "pos": [
+      7.398,
+      null,
+      -76.148
+     ],
+     "h": 1.1,
+     "rotY": 0.1522,
+     "visible": true
+    },
+    {
+     "id": "forest/scatter/c15",
+     "t": "mushrooms",
+     "layer": 1,
+     "pos": [
+      8.024,
+      null,
+      -79.172
+     ],
+     "h": 0.9,
+     "rotY": 0.1687,
+     "visible": true
+    },
+    {
+     "id": "forest/scatter/c19",
+     "t": "fern",
+     "layer": 1,
+     "pos": [
+      4.478,
+      null,
+      -73.344
+     ],
+     "h": 1.4,
+     "rotY": 0.1008,
+     "visible": true
+    },
+    {
+     "id": "forest/scatter/c21",
+     "t": "rock_s",
+     "layer": 1,
+     "pos": [
+      -5.059,
+      null,
+      -40.11
+     ],
+     "h": 1.2,
+     "rotY": -0.0954,
+     "visible": true
+    },
+    {
+     "id": "forest/scatter/c22",
+     "t": "grass_tuft_a",
+     "layer": 1,
+     "pos": [
+      -5.083,
+      null,
+      -68.251
+     ],
+     "h": 1.1,
+     "rotY": -0.1927,
+     "visible": true
+    },
+    {
+     "id": "forest/scatter/c24",
+     "t": "mushrooms",
+     "layer": 1,
+     "pos": [
+      5.146,
+      null,
+      -21.265
+     ],
+     "h": 0.9,
+     "rotY": 0.0753,
+     "visible": true
+    },
+    {
+     "id": "forest/scatter/c25",
+     "t": "fern",
+     "layer": 1,
+     "pos": [
+      -7.343,
+      null,
+      -80.064
+     ],
+     "h": 1.4,
+     "rotY": -0.1362,
+     "visible": true
+    },
+    {
+     "id": "forest/scatter/c26",
+     "t": "rock_s",
+     "layer": 1,
+     "pos": [
+      -7.289,
+      null,
+      -27.949
+     ],
+     "h": 1.2,
+     "rotY": -0.1907,
+     "visible": true
+    },
+    {
+     "id": "forest/scatter/c28",
+     "t": "grass_tuft_a",
+     "layer": 1,
+     "pos": [
+      -6.133,
+      null,
+      -62.664
+     ],
+     "h": 1.1,
+     "rotY": -0.078,
+     "visible": true
+    }
+   ],
+   "boards": [
+    {
+     "id": "forest/board/skills_no_levels",
+     "key": "skills_no_levels",
+     "kind": "wood",
+     "pos": [
+      -8.692,
+      null,
+      -24
+     ],
+     "h": 8.0,
+     "rotY": -0.0952,
+     "visible": true
+    }
+   ]
+  },
+  "mine": {
+   "sprites": [
+    {
+     "id": "mine/mine_section.1/beam_frame.1",
+     "t": "beam_frame",
+     "layer": 1,
+     "pos": [
+      -0.227,
+      null,
+      -10.799
+     ],
+     "h": 7.823,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "mine/mine_section.1/ore_pile.1",
+     "t": "ore_pile",
+     "layer": 1,
+     "pos": [
+      4.973,
+      null,
+      -7.599
+     ],
+     "h": 1.788,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "mine/biome_brazier.1",
+     "t": "biome_brazier",
+     "layer": 1,
+     "pos": [
+      -8.797,
+      null,
+      -11.095
+     ],
+     "h": 2.906,
+     "rotY": -0.0932,
+     "visible": true
+    },
+    {
+     "id": "mine/lantern_chain.1",
+     "t": "lantern_chain",
+     "layer": 1,
+     "pos": [
+      9.033,
+      5.4,
+      -9.7
+     ],
+     "h": 3.577,
+     "rotY": 0.1512,
+     "visible": true,
+     "hanging": true
+    },
+    {
+     "id": "mine/vein_pocket.1/feat_mining.1",
+     "t": "feat_mining",
+     "layer": 1,
+     "pos": [
+      9.405,
+      null,
+      -23.287
+     ],
+     "h": 4.321,
+     "rotY": 0.1245,
+     "visible": true
+    },
+    {
+     "id": "mine/vein_pocket.1/biome_crystals.1",
+     "t": "biome_crystals",
+     "layer": 1,
+     "pos": [
+      12.805,
+      null,
+      -24.887
+     ],
+     "h": 4.969,
+     "rotY": 0.2013,
+     "visible": true
+    },
+    {
+     "id": "mine/vein_pocket.1/stalagmite_a.1",
+     "t": "stalagmite_a",
+     "layer": 1,
+     "pos": [
+      13.005,
+      null,
+      -19.887
+     ],
+     "h": 3.889,
+     "rotY": 0.1026,
+     "visible": true
+    },
+    {
+     "id": "mine/stalagmite_a.1",
+     "t": "stalagmite_a",
+     "layer": 0.5,
+     "pos": [
+      -13.648,
+      null,
+      -24.362
+     ],
+     "h": 3.886,
+     "rotY": -0.1416,
+     "visible": true
+    },
+    {
+     "id": "mine/mine_section.2/beam_frame.1",
+     "t": "beam_frame",
+     "layer": 1,
+     "pos": [
+      -0.454,
+      null,
+      -23.285
+     ],
+     "h": 7.561,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "mine/mine_section.2/ore_pile.1",
+     "t": "ore_pile",
+     "layer": 1,
+     "pos": [
+      4.746,
+      null,
+      -20.085
+     ],
+     "h": 1.728,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "mine/minecart.1",
+     "t": "minecart",
+     "layer": 1,
+     "pos": [
+      -8.97,
+      null,
+      -37.323
+     ],
+     "h": 2.904,
+     "rotY": -0.0923,
+     "visible": true
+    },
+    {
+     "id": "mine/lantern_chain.2",
+     "t": "lantern_chain",
+     "layer": 1,
+     "pos": [
+      -9.281,
+      5.8,
+      -54.215
+     ],
+     "h": 3.168,
+     "rotY": -0.1126,
+     "visible": true,
+     "hanging": true
+    },
+    {
+     "id": "mine/biome_crystals.1",
+     "t": "biome_crystals",
+     "layer": 1,
+     "pos": [
+      8.679,
+      null,
+      -38.481
+     ],
+     "h": 4.77,
+     "rotY": 0.1768,
+     "visible": true
+    },
+    {
+     "id": "mine/stalagmite_b.1",
+     "t": "stalagmite_b",
+     "layer": 0.5,
+     "pos": [
+      13.987,
+      null,
+      -54.075
+     ],
+     "h": 3.564,
+     "rotY": 0.199,
+     "visible": true
+    },
+    {
+     "id": "mine/mine_section.3/beam_frame.1",
+     "t": "beam_frame",
+     "layer": 1,
+     "pos": [
+      0.52,
+      null,
+      -37.837
+     ],
+     "h": 7.255,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "mine/mine_section.3/ore_pile.1",
+     "t": "ore_pile",
+     "layer": 1,
+     "pos": [
+      5.72,
+      null,
+      -34.637
+     ],
+     "h": 1.658,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "mine/vein_pocket.2/feat_mining.1",
+     "t": "feat_mining",
+     "layer": 1,
+     "pos": [
+      -9.203,
+      null,
+      -69.582
+     ],
+     "h": 3.765,
+     "rotY": -0.1447,
+     "visible": true
+    },
+    {
+     "id": "mine/vein_pocket.2/biome_crystals.1",
+     "t": "biome_crystals",
+     "layer": 1,
+     "pos": [
+      -12.603,
+      null,
+      -71.182
+     ],
+     "h": 4.33,
+     "rotY": -0.192,
+     "visible": true
+    },
+    {
+     "id": "mine/vein_pocket.2/stalagmite_a.1",
+     "t": "stalagmite_a",
+     "layer": 1,
+     "pos": [
+      -12.803,
+      null,
+      -66.182
+     ],
+     "h": 3.389,
+     "rotY": -0.0752,
+     "visible": true
+    },
+    {
+     "id": "mine/feat_craft.1",
+     "t": "feat_craft",
+     "layer": 1,
+     "pos": [
+      9.502,
+      null,
+      -71.847
+     ],
+     "h": 2.251,
+     "rotY": 0.1468,
+     "visible": true
+    },
+    {
+     "id": "mine/lantern_chain.3",
+     "t": "lantern_chain",
+     "layer": 1,
+     "pos": [
+      9.6,
+      5.2,
+      -90.233
+     ],
+     "h": 2.816,
+     "rotY": 0.1073,
+     "visible": true,
+     "hanging": true
+    },
+    {
+     "id": "mine/biome_crystals.2",
+     "t": "biome_crystals",
+     "layer": 1,
+     "pos": [
+      -8.881,
+      null,
+      -89.489
+     ],
+     "h": 4.048,
+     "rotY": -0.1858,
+     "visible": true
+    },
+    {
+     "id": "mine/mine_section.4/beam_frame.1",
+     "t": "beam_frame",
+     "layer": 1,
+     "pos": [
+      -0.057,
+      null,
+      -54.613
+     ],
+     "h": 6.903,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "mine/mine_section.4/ore_pile.1",
+     "t": "ore_pile",
+     "layer": 1,
+     "pos": [
+      5.143,
+      null,
+      -51.413
+     ],
+     "h": 1.578,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "mine/scatter/c0",
+     "t": "ore_pile",
+     "layer": 1,
+     "pos": [
+      5.366,
+      null,
+      -48.712
+     ],
+     "h": 1.6,
+     "rotY": 0.1149,
+     "visible": true
+    },
+    {
+     "id": "mine/scatter/c1",
+     "t": "stalagmite_b",
+     "layer": 1,
+     "pos": [
+      6.344,
+      null,
+      -46.025
+     ],
+     "h": 3.6,
+     "rotY": 0.1558,
+     "visible": true
+    },
+    {
+     "id": "mine/scatter/c5",
+     "t": "ore_pile",
+     "layer": 1,
+     "pos": [
+      -6.317,
+      null,
+      -79.546
+     ],
+     "h": 1.6,
+     "rotY": -0.076,
+     "visible": true
+    },
+    {
+     "id": "mine/scatter/c6",
+     "t": "stalagmite_b",
+     "layer": 1,
+     "pos": [
+      -6.468,
+      null,
+      -52.661
+     ],
+     "h": 3.6,
+     "rotY": -0.0949,
+     "visible": true
+    },
+    {
+     "id": "mine/scatter/c11",
+     "t": "ore_pile",
+     "layer": 1,
+     "pos": [
+      -6.785,
+      null,
+      -41.669
+     ],
+     "h": 1.6,
+     "rotY": -0.1727,
+     "visible": true
+    },
+    {
+     "id": "mine/scatter/c14",
+     "t": "stalagmite_b",
+     "layer": 1,
+     "pos": [
+      -6.178,
+      null,
+      -49.592
+     ],
+     "h": 3.6,
+     "rotY": -0.1204,
+     "visible": true
+    },
+    {
+     "id": "mine/scatter/c20",
+     "t": "ore_pile",
+     "layer": 1,
+     "pos": [
+      -6.726,
+      null,
+      -7.191
+     ],
+     "h": 1.6,
+     "rotY": -0.113,
+     "visible": true
+    },
+    {
+     "id": "mine/scatter/c21",
+     "t": "stalagmite_b",
+     "layer": 1,
+     "pos": [
+      -6.319,
+      null,
+      -62.636
+     ],
+     "h": 3.6,
+     "rotY": -0.1002,
+     "visible": true
+    },
+    {
+     "id": "mine/scatter/c27",
+     "t": "ore_pile",
+     "layer": 1,
+     "pos": [
+      -5.669,
+      null,
+      -67.826
+     ],
+     "h": 1.6,
+     "rotY": -0.0768,
+     "visible": true
+    },
+    {
+     "id": "mine/scatter/c30",
+     "t": "stalagmite_b",
+     "layer": 1,
+     "pos": [
+      5.265,
+      null,
+      -57.457
+     ],
+     "h": 3.6,
+     "rotY": 0.1345,
+     "visible": true
+    },
+    {
+     "id": "mine/scatter/c37",
+     "t": "ore_pile",
+     "layer": 1,
+     "pos": [
+      5.698,
+      null,
+      -89.558
+     ],
+     "h": 1.6,
+     "rotY": 0.1833,
+     "visible": true
+    },
+    {
+     "id": "mine/scatter/c42",
+     "t": "stalagmite_b",
+     "layer": 1,
+     "pos": [
+      -6.065,
+      null,
+      -44.53
+     ],
+     "h": 3.6,
+     "rotY": -0.1214,
+     "visible": true
+    }
+   ],
+   "boards": [
+    {
+     "id": "mine/board/mining",
+     "key": "mining",
+     "kind": "wood",
+     "pos": [
+      -8.29,
+      null,
+      -20
+     ],
+     "h": 8.0,
+     "rotY": -0.0922,
+     "visible": true
+    },
+    {
+     "id": "mine/board/fights_that_last",
+     "key": "fights_that_last",
+     "kind": "wood",
+     "pos": [
+      8.503,
+      null,
+      -52
+     ],
+     "h": 8.0,
+     "rotY": 0.086,
+     "visible": true
+    },
+    {
+     "id": "mine/board/crafting",
+     "key": "crafting",
+     "kind": "wood",
+     "pos": [
+      -8.356,
+      null,
+      -84
+     ],
+     "h": 8.0,
+     "rotY": -0.1083,
+     "visible": true
+    }
+   ]
+  },
+  "spirit": {
+   "sprites": [
+    {
+     "id": "spirit/feat_death_alt.1",
+     "t": "feat_death_alt",
+     "layer": 1,
+     "pos": [
+      -7.501,
+      null,
+      -13.751
+     ],
+     "h": 7.0,
+     "rotY": -0.2027,
+     "visible": true
+    },
+    {
+     "id": "spirit/graveplot.1/grave_a.1",
+     "t": "grave_a",
+     "layer": 1,
+     "pos": [
+      5.371,
+      null,
+      -15.108
+     ],
+     "h": 2.2,
+     "rotY": 0.1612,
+     "visible": true
+    },
+    {
+     "id": "spirit/graveplot.1/grave_b.1",
+     "t": "grave_b",
+     "layer": 1,
+     "pos": [
+      7.771,
+      null,
+      -13.708
+     ],
+     "h": 2.2,
+     "rotY": 0.1637,
+     "visible": true
+    },
+    {
+     "id": "spirit/graveplot.1/candles.1",
+     "t": "candles",
+     "layer": 1,
+     "pos": [
+      4.771,
+      null,
+      -13.308
+     ],
+     "h": 1.0,
+     "rotY": 0.1529,
+     "visible": true
+    },
+    {
+     "id": "spirit/biome_deadtree.1",
+     "t": "biome_deadtree",
+     "layer": 0.5,
+     "pos": [
+      -11.647,
+      null,
+      -33.798
+     ],
+     "h": 9.0,
+     "rotY": -0.1397,
+     "visible": true
+    },
+    {
+     "id": "spirit/feat_vendetta.1",
+     "t": "feat_vendetta",
+     "layer": 1,
+     "pos": [
+      7.408,
+      null,
+      -33.541
+     ],
+     "h": 5.2,
+     "rotY": 0.0848,
+     "visible": true
+    },
+    {
+     "id": "spirit/graveplot.2/grave_a.1",
+     "t": "grave_a",
+     "layer": 1,
+     "pos": [
+      -4.92,
+      null,
+      -53.583
+     ],
+     "h": 2.2,
+     "rotY": -0.1822,
+     "visible": true
+    },
+    {
+     "id": "spirit/graveplot.2/grave_b.1",
+     "t": "grave_b",
+     "layer": 1,
+     "pos": [
+      -7.32,
+      null,
+      -52.183
+     ],
+     "h": 2.2,
+     "rotY": -0.0714,
+     "visible": true
+    },
+    {
+     "id": "spirit/graveplot.2/candles.1",
+     "t": "candles",
+     "layer": 1,
+     "pos": [
+      -4.32,
+      null,
+      -51.783
+     ],
+     "h": 1.0,
+     "rotY": -0.0994,
+     "visible": true
+    },
+    {
+     "id": "spirit/biome_brazier.1",
+     "t": "biome_brazier",
+     "layer": 1,
+     "pos": [
+      7.039,
+      null,
+      -52.333
+     ],
+     "h": 2.6,
+     "rotY": 0.2027,
+     "visible": true
+    },
+    {
+     "id": "spirit/feat_death.1",
+     "t": "feat_death",
+     "layer": 1,
+     "pos": [
+      -0.004,
+      null,
+      -13.347
+     ],
+     "h": 6.0,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "spirit/backdrop.1/biome_deadtree.1",
+     "t": "biome_deadtree",
+     "layer": 0,
+     "pos": [
+      -25.995,
+      null,
+      -19.553
+     ],
+     "h": 9.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.5
+    },
+    {
+     "id": "spirit/backdrop.2/biome_deadtree.1",
+     "t": "biome_deadtree",
+     "layer": 0,
+     "pos": [
+      25.927,
+      null,
+      -42.756
+     ],
+     "h": 9.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.5
+    },
+    {
+     "id": "spirit/backdrop.3/biome_deadtree.1",
+     "t": "biome_deadtree",
+     "layer": 0,
+     "pos": [
+      -25.65,
+      null,
+      -64.42
+     ],
+     "h": 9.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.5
+    },
+    {
+     "id": "spirit/scatter/c0",
+     "t": "grave_c",
+     "layer": 1,
+     "pos": [
+      8.015,
+      null,
+      -63.975
+     ],
+     "h": 2.2,
+     "rotY": 0.1007,
+     "visible": true
+    },
+    {
+     "id": "spirit/scatter/c1",
+     "t": "candles",
+     "layer": 1,
+     "pos": [
+      -5.865,
+      null,
+      -68.538
+     ],
+     "h": 1.0,
+     "rotY": -0.1991,
+     "visible": true
+    },
+    {
+     "id": "spirit/scatter/c3",
+     "t": "rock_m",
+     "layer": 1,
+     "pos": [
+      -7.833,
+      null,
+      -5.038
+     ],
+     "h": 2.0,
+     "rotY": -0.1396,
+     "visible": true
+    },
+    {
+     "id": "spirit/scatter/c4",
+     "t": "grave_c",
+     "layer": 1,
+     "pos": [
+      -5.096,
+      null,
+      -44.304
+     ],
+     "h": 2.2,
+     "rotY": -0.1562,
+     "visible": true
+    },
+    {
+     "id": "spirit/scatter/c5",
+     "t": "candles",
+     "layer": 1,
+     "pos": [
+      6.671,
+      null,
+      -27.668
+     ],
+     "h": 1.0,
+     "rotY": 0.1653,
+     "visible": true
+    },
+    {
+     "id": "spirit/scatter/c6",
+     "t": "rock_m",
+     "layer": 1,
+     "pos": [
+      -7.575,
+      null,
+      -48.323
+     ],
+     "h": 2.0,
+     "rotY": -0.1529,
+     "visible": true
+    },
+    {
+     "id": "spirit/scatter/c7",
+     "t": "grave_c",
+     "layer": 1,
+     "pos": [
+      4.211,
+      null,
+      -27.747
+     ],
+     "h": 2.2,
+     "rotY": 0.0862,
+     "visible": true
+    },
+    {
+     "id": "spirit/scatter/c8",
+     "t": "candles",
+     "layer": 1,
+     "pos": [
+      6.326,
+      null,
+      -41.64
+     ],
+     "h": 1.0,
+     "rotY": 0.181,
+     "visible": true
+    },
+    {
+     "id": "spirit/scatter/c9",
+     "t": "rock_m",
+     "layer": 1,
+     "pos": [
+      8.327,
+      null,
+      -2.269
+     ],
+     "h": 2.0,
+     "rotY": 0.1388,
+     "visible": true
+    },
+    {
+     "id": "spirit/scatter/c10",
+     "t": "grave_c",
+     "layer": 1,
+     "pos": [
+      7.74,
+      null,
+      -6.681
+     ],
+     "h": 2.2,
+     "rotY": 0.1895,
+     "visible": true
+    },
+    {
+     "id": "spirit/scatter/c11",
+     "t": "candles",
+     "layer": 1,
+     "pos": [
+      -5.074,
+      null,
+      -3.28
+     ],
+     "h": 1.0,
+     "rotY": -0.1889,
+     "visible": true
+    },
+    {
+     "id": "spirit/scatter/c12",
+     "t": "rock_m",
+     "layer": 1,
+     "pos": [
+      -8.313,
+      null,
+      -26.015
+     ],
+     "h": 2.0,
+     "rotY": -0.1653,
+     "visible": true
+    },
+    {
+     "id": "spirit/scatter/c13",
+     "t": "grave_c",
+     "layer": 1,
+     "pos": [
+      5.949,
+      null,
+      -18.091
+     ],
+     "h": 2.2,
+     "rotY": 0.1456,
+     "visible": true
+    },
+    {
+     "id": "spirit/scatter/c14",
+     "t": "candles",
+     "layer": 1,
+     "pos": [
+      -7.018,
+      null,
+      -42.867
+     ],
+     "h": 1.0,
+     "rotY": -0.2031,
+     "visible": true
+    },
+    {
+     "id": "spirit/scatter/c16",
+     "t": "rock_m",
+     "layer": 1,
+     "pos": [
+      5.389,
+      null,
+      -11.025
+     ],
+     "h": 2.0,
+     "rotY": 0.0738,
+     "visible": true
+    },
+    {
+     "id": "spirit/scatter/c18",
+     "t": "grave_c",
+     "layer": 1,
+     "pos": [
+      -4.387,
+      null,
+      -59.023
+     ],
+     "h": 2.2,
+     "rotY": -0.1861,
+     "visible": true
+    }
+   ],
+   "boards": [
+    {
+     "id": "spirit/board/vendetta",
+     "key": "vendetta",
+     "kind": "stone",
+     "pos": [
+      7.994,
+      null,
+      -30
+     ],
+     "h": 8.0,
+     "rotY": 0.0795,
+     "visible": true
+    },
+    {
+     "id": "spirit/board/death_is_a_place",
+     "key": "death_is_a_place",
+     "kind": "stone",
+     "pos": [
+      -8.011,
+      null,
+      -48
+     ],
+     "h": 8.0,
+     "rotY": -0.1607,
+     "visible": true
+    }
+   ]
+  },
+  "home": {
+   "sprites": [
+    {
+     "id": "home/grove.1/hero_tree_a.1",
+     "t": "hero_tree_a",
+     "layer": 1,
+     "pos": [
+      -13.295,
+      null,
+      -13.798
+     ],
+     "h": 8.4,
+     "rotY": -0.1392,
+     "visible": true,
+     "sway": true
+    },
+    {
+     "id": "home/grove.1/hero_tree_b.1",
+     "t": "hero_tree_b",
+     "layer": 1,
+     "pos": [
+      -10.895,
+      null,
+      -12.198
+     ],
+     "h": 2.2,
+     "rotY": -0.099,
+     "visible": true
+    },
+    {
+     "id": "home/grove.1/grass_tuft_b.1",
+     "t": "grass_tuft_b",
+     "layer": 1,
+     "pos": [
+      -5.695,
+      null,
+      -11.998
+     ],
+     "h": 1.1,
+     "rotY": -0.1185,
+     "visible": true
+    },
+    {
+     "id": "home/chest.1",
+     "t": "chest",
+     "layer": 1,
+     "pos": [
+      -4.604,
+      null,
+      -38.893
+     ],
+     "h": 1.6,
+     "rotY": -0.1684,
+     "visible": true
+    },
+    {
+     "id": "home/grove.2/hero_tree_a.1",
+     "t": "hero_tree_a",
+     "layer": 0.5,
+     "pos": [
+      16.707,
+      null,
+      -39.953
+     ],
+     "h": 8.4,
+     "rotY": 0.1145,
+     "visible": true,
+     "sway": true
+    },
+    {
+     "id": "home/grove.2/hero_tree_b.1",
+     "t": "hero_tree_b",
+     "layer": 0.5,
+     "pos": [
+      14.307,
+      null,
+      -38.353
+     ],
+     "h": 2.2,
+     "rotY": 0.1766,
+     "visible": true
+    },
+    {
+     "id": "home/grove.2/grass_tuft_b.1",
+     "t": "grass_tuft_b",
+     "layer": 0.5,
+     "pos": [
+      9.107,
+      null,
+      -38.153
+     ],
+     "h": 1.1,
+     "rotY": 0.1588,
+     "visible": true
+    },
+    {
+     "id": "home/homestead.1/hero_house_b.1",
+     "t": "hero_house_b",
+     "layer": 1,
+     "pos": [
+      0.276,
+      null,
+      -14.473
+     ],
+     "h": 9.0,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "home/homestead.1/hero_tree_b.1",
+     "t": "hero_tree_b",
+     "layer": 1,
+     "pos": [
+      4.476,
+      null,
+      -13.273
+     ],
+     "h": 2.2,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "home/homestead.1/grass_tuft_a.1",
+     "t": "grass_tuft_a",
+     "layer": 1,
+     "pos": [
+      -3.324,
+      null,
+      -12.273
+     ],
+     "h": 1.1,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "home/grove.1/fence.1/hero_fence.1",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      -5.2,
+      null,
+      -18.798
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "home/grove.1/fence.1/hero_fence.2",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      -5.2,
+      null,
+      -21.644
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "home/grove.1/fence.1/hero_fence.3",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      -5.2,
+      null,
+      -24.489
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "home/grove.1/fence.1/hero_fence.4",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      -5.2,
+      null,
+      -27.335
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "home/grove.1/fence.1/hero_fence.5",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      -5.2,
+      null,
+      -30.18
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "home/grove.1/fence.1/end_post.end",
+     "t": "end_post",
+     "layer": 1,
+     "pos": [
+      -5.2,
+      null,
+      -31.603
+     ],
+     "h": 2.1,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "home/backdrop.1/biome_pine_b.1",
+     "t": "biome_pine_b",
+     "layer": 0,
+     "pos": [
+      -26.0,
+      null,
+      -30
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.7
+    },
+    {
+     "id": "home/backdrop.1/biome_pine_b.2",
+     "t": "biome_pine_b",
+     "layer": 0,
+     "pos": [
+      -20.0,
+      null,
+      -33.0
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.62
+    },
+    {
+     "id": "home/backdrop.2/biome_pine_b.1",
+     "t": "biome_pine_b",
+     "layer": 0,
+     "pos": [
+      26.0,
+      null,
+      -56
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.7
+    },
+    {
+     "id": "home/backdrop.2/biome_pine_b.2",
+     "t": "biome_pine_b",
+     "layer": 0,
+     "pos": [
+      32.0,
+      null,
+      -59.0
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.62
+    },
+    {
+     "id": "home/backdrop.3/biome_pine_b.1",
+     "t": "biome_pine_b",
+     "layer": 0,
+     "pos": [
+      -26.0,
+      null,
+      -82
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.7
+    },
+    {
+     "id": "home/backdrop.3/biome_pine_b.2",
+     "t": "biome_pine_b",
+     "layer": 0,
+     "pos": [
+      -20.0,
+      null,
+      -85.0
+     ],
+     "h": 13.0,
+     "rotY": 0.0,
+     "visible": true,
+     "dim": 0.62
+    },
+    {
+     "id": "home/sky/cloud.1",
+     "t": "cloud_a",
+     "layer": 0,
+     "pos": [
+      18.655,
+      30.651,
+      -85.319
+     ],
+     "h": 8.0,
+     "rotY": 0.0,
+     "visible": true,
+     "drift": 0.363,
+     "span": 110
+    },
+    {
+     "id": "home/sky/cloud.2",
+     "t": "cloud_b",
+     "layer": 0,
+     "pos": [
+      -14.461,
+      30.76,
+      -69.65
+     ],
+     "h": 8.0,
+     "rotY": 0.0,
+     "visible": true,
+     "drift": 0.233,
+     "span": 110
+    },
+    {
+     "id": "home/sky/cloud.3",
+     "t": "cloud_a",
+     "layer": 0,
+     "pos": [
+      2.163,
+      31.165,
+      -80.614
+     ],
+     "h": 8.0,
+     "rotY": 0.0,
+     "visible": true,
+     "drift": 0.298,
+     "span": 110
+    },
+    {
+     "id": "home/sky/moon.1",
+     "t": "moon",
+     "layer": 0,
+     "pos": [
+      14,
+      30,
+      -80
+     ],
+     "h": 6.0,
+     "rotY": 0.0,
+     "visible": true,
+     "nofog": true
+    },
+    {
+     "id": "home/scatter/c0",
+     "t": "grass_tuft_a",
+     "layer": 1,
+     "pos": [
+      -7.153,
+      null,
+      -42.094
+     ],
+     "h": 1.1,
+     "rotY": -0.1852,
+     "visible": true
+    },
+    {
+     "id": "home/scatter/c1",
+     "t": "grass_tuft_b",
+     "layer": 1,
+     "pos": [
+      4.637,
+      null,
+      -41.431
+     ],
+     "h": 1.1,
+     "rotY": 0.0981,
+     "visible": true
+    },
+    {
+     "id": "home/scatter/c2",
+     "t": "rock_s",
+     "layer": 1,
+     "pos": [
+      -8.273,
+      null,
+      -79.748
+     ],
+     "h": 1.2,
+     "rotY": -0.089,
+     "visible": true
+    },
+    {
+     "id": "home/scatter/c3",
+     "t": "grass_tuft_a",
+     "layer": 1,
+     "pos": [
+      -4.884,
+      null,
+      -83.3
+     ],
+     "h": 1.1,
+     "rotY": -0.1189,
+     "visible": true
+    },
+    {
+     "id": "home/scatter/c4",
+     "t": "grass_tuft_b",
+     "layer": 1,
+     "pos": [
+      6.008,
+      null,
+      -7.619
+     ],
+     "h": 1.1,
+     "rotY": 0.1843,
+     "visible": true
+    },
+    {
+     "id": "home/scatter/c5",
+     "t": "rock_s",
+     "layer": 1,
+     "pos": [
+      4.84,
+      null,
+      -33.608
+     ],
+     "h": 1.2,
+     "rotY": 0.1193,
+     "visible": true
+    },
+    {
+     "id": "home/scatter/c7",
+     "t": "grass_tuft_a",
+     "layer": 1,
+     "pos": [
+      5.957,
+      null,
+      -77.697
+     ],
+     "h": 1.1,
+     "rotY": 0.1769,
+     "visible": true
+    },
+    {
+     "id": "home/scatter/c8",
+     "t": "grass_tuft_b",
+     "layer": 1,
+     "pos": [
+      5.914,
+      null,
+      -54.867
+     ],
+     "h": 1.1,
+     "rotY": 0.1204,
+     "visible": true
+    },
+    {
+     "id": "home/scatter/c9",
+     "t": "rock_s",
+     "layer": 1,
+     "pos": [
+      -6.182,
+      null,
+      -72.583
+     ],
+     "h": 1.2,
+     "rotY": -0.1259,
+     "visible": true
+    },
+    {
+     "id": "home/scatter/c10",
+     "t": "grass_tuft_a",
+     "layer": 1,
+     "pos": [
+      -5.135,
+      null,
+      -76.157
+     ],
+     "h": 1.1,
+     "rotY": -0.1959,
+     "visible": true
+    },
+    {
+     "id": "home/scatter/c11",
+     "t": "grass_tuft_b",
+     "layer": 1,
+     "pos": [
+      -5.259,
+      null,
+      -6.059
+     ],
+     "h": 1.1,
+     "rotY": -0.1283,
+     "visible": true
+    },
+    {
+     "id": "home/scatter/c13",
+     "t": "rock_s",
+     "layer": 1,
+     "pos": [
+      -7.001,
+      null,
+      -47.296
+     ],
+     "h": 1.2,
+     "rotY": -0.1156,
+     "visible": true
+    },
+    {
+     "id": "home/scatter/c14",
+     "t": "grass_tuft_a",
+     "layer": 1,
+     "pos": [
+      -7.464,
+      null,
+      -83.035
+     ],
+     "h": 1.1,
+     "rotY": -0.1709,
+     "visible": true
+    },
+    {
+     "id": "home/scatter/c15",
+     "t": "grass_tuft_b",
+     "layer": 1,
+     "pos": [
+      -4.778,
+      null,
+      -44.427
+     ],
+     "h": 1.1,
+     "rotY": -0.1817,
+     "visible": true
+    }
+   ],
+   "boards": [
+    {
+     "id": "home/board/humans_and_monsters",
+     "key": "humans_and_monsters",
+     "kind": "wood",
+     "pos": [
+      9.048,
+      null,
+      -24
+     ],
+     "h": 8.0,
+     "rotY": 0.1237,
+     "visible": true
+    },
+    {
+     "id": "home/board/a_home_to_come_back_to",
+     "key": "a_home_to_come_back_to",
+     "kind": "wood",
+     "pos": [
+      -8.603,
+      null,
+      -30
+     ],
+     "h": 8.0,
+     "rotY": -0.17,
+     "visible": true
+    }
+   ],
+   "counter": {
+    "id": "home/counter.1",
+    "visible": true,
+    "stall": {
+     "t": "feat_world",
+     "x": 7.4,
+     "z": -14.4,
+     "h": 5.72,
+     "layer": 1
+    },
+    "items": [
+     "res_iron",
+     "res_gold",
+     "res_diamond",
+     "res_wood",
+     "res_herbs",
+     "res_fish",
+     "res_sword",
+     "res_staff"
+    ],
+    "x0": 5.1,
+    "step": 0.62,
+    "y": 2.974,
+    "z": -13.6,
+    "h": 0.72
+   }
+  }
+ }
+}

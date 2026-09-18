@@ -1,0 +1,524 @@
+{
+ "generated": "tools/sprite_contact.py по текстурам, которые грузит /proto/",
+ "rule": "stripped: нижняя строка, где вырезанный спрайт сохранил >= 0.5 непрозрачных пикселей исходной строки; run: нижняя строка со сплошным отрезком >= 0.03 ширины, устойчивым 0.01 высоты; ширина и центр — по полосе 0.03 высоты над строкой контакта; отремонтированные (index.json repaired) — по run",
+ "sprites": {
+  "barn": {
+   "src": "proto/sprites_stripped/barn.webp",
+   "rule": "stripped",
+   "contact_row": 0.9333,
+   "contact_width": 0.9396,
+   "contact_centre": -0.0052
+  },
+  "beam_frame": {
+   "src": "proto/sprites_stripped/beam_frame.webp",
+   "rule": "stripped",
+   "contact_row": 0.8141,
+   "contact_width": 0.9804,
+   "contact_centre": -0.0009
+  },
+  "biome_brazier": {
+   "src": "assets/biome_brazier.webp",
+   "rule": "run",
+   "contact_row": 0.9871,
+   "contact_width": 0.1071,
+   "contact_centre": -0.0982
+  },
+  "biome_crystals": {
+   "src": "assets/biome_crystals.webp",
+   "rule": "run",
+   "contact_row": 0.9919,
+   "contact_width": 0.4089,
+   "contact_centre": 0.0062
+  },
+  "biome_deadtree": {
+   "src": "assets/biome_deadtree.webp",
+   "rule": "run",
+   "contact_row": 0.9838,
+   "contact_width": 0.0625,
+   "contact_centre": 0.0473
+  },
+  "biome_orevein": {
+   "src": "assets/biome_orevein.webp",
+   "rule": "run",
+   "contact_row": 0.991,
+   "contact_width": 0.8411,
+   "contact_centre": -0.033
+  },
+  "biome_pine_a": {
+   "src": "assets/biome_pine_a.webp",
+   "rule": "run",
+   "contact_row": 0.9918,
+   "contact_width": 0.2161,
+   "contact_centre": -0.0062
+  },
+  "biome_pine_b": {
+   "src": "assets/biome_pine_b.webp",
+   "rule": "run",
+   "contact_row": 0.9907,
+   "contact_width": 0.1464,
+   "contact_centre": 0.1964
+  },
+  "biome_portal": {
+   "src": "assets/biome_portal.webp",
+   "rule": "run",
+   "contact_row": 0.9928,
+   "contact_width": 0.7321,
+   "contact_centre": 0.0232
+  },
+  "biome_stump": {
+   "src": "proto/sprites_stripped/biome_stump.webp",
+   "rule": "stripped",
+   "contact_row": 0.9157,
+   "contact_width": 0.6393,
+   "contact_centre": 0.0036
+  },
+  "branch_canopy": {
+   "src": "assets/branch_canopy.webp",
+   "rule": "run",
+   "contact_row": 0.9821,
+   "contact_width": 0.3804,
+   "contact_centre": 0.0295
+  },
+  "candles": {
+   "src": "assets/candles.webp",
+   "rule": "run",
+   "contact_row": 0.9899,
+   "contact_width": 0.1692,
+   "contact_centre": 0.0192
+  },
+  "chest": {
+   "src": "assets/chest.webp",
+   "rule": "run",
+   "contact_row": 0.9875,
+   "contact_width": 0.1471,
+   "contact_centre": -0.0853
+  },
+  "cloud_a": {
+   "src": "assets/cloud_a.webp",
+   "rule": "run",
+   "contact_row": 0.9861,
+   "contact_width": 0.1589,
+   "contact_centre": -0.1455
+  },
+  "cloud_b": {
+   "src": "assets/cloud_b.webp",
+   "rule": "run",
+   "contact_row": 0.9732,
+   "contact_width": 0.3845,
+   "contact_centre": -0.0347
+  },
+  "cloud_c": {
+   "src": "assets/cloud_c.webp",
+   "rule": "run",
+   "contact_row": 0.9867,
+   "contact_width": 0.3714,
+   "contact_centre": 0.0375
+  },
+  "end_post": {
+   "src": "assets/end_post.webp",
+   "rule": "run",
+   "contact_row": 1.0,
+   "contact_width": 0.5789,
+   "contact_centre": 0.0658
+  },
+  "feat_craft": {
+   "src": "assets/feat_craft.webp",
+   "rule": "run",
+   "contact_row": 0.9884,
+   "contact_width": 0.1632,
+   "contact_centre": 0.0365
+  },
+  "feat_death": {
+   "src": "assets/feat_death.webp",
+   "rule": "run",
+   "contact_row": 0.9882,
+   "contact_width": 0.4438,
+   "contact_centre": -0.0078
+  },
+  "feat_death_alt": {
+   "src": "assets/feat_death_alt.webp",
+   "rule": "run",
+   "contact_row": 0.9899,
+   "contact_width": 0.3393,
+   "contact_centre": 0.0821
+  },
+  "feat_home": {
+   "src": "assets/feat_home.webp",
+   "rule": "run",
+   "contact_row": 0.9919,
+   "contact_width": 0.5375,
+   "contact_centre": -0.1609
+  },
+  "feat_mining": {
+   "src": "assets/feat_mining.webp",
+   "rule": "run",
+   "contact_row": 0.9882,
+   "contact_width": 0.0953,
+   "contact_centre": -0.0336
+  },
+  "feat_pvp": {
+   "src": "assets/feat_pvp.webp",
+   "rule": "run",
+   "contact_row": 0.9923,
+   "contact_width": 0.1281,
+   "contact_centre": -0.3328
+  },
+  "feat_skills": {
+   "src": "assets/feat_skills.webp",
+   "rule": "run",
+   "contact_row": 0.9774,
+   "contact_width": 0.0641,
+   "contact_centre": -0.1508
+  },
+  "feat_tavern": {
+   "src": "proto/sprites_stripped/feat_tavern.webp",
+   "rule": "stripped",
+   "contact_row": 0.8233,
+   "contact_width": 0.9777,
+   "contact_centre": 0.0022
+  },
+  "feat_vendetta": {
+   "src": "assets/feat_vendetta.webp",
+   "rule": "run",
+   "contact_row": 0.9895,
+   "contact_width": 0.3527,
+   "contact_centre": -0.0062
+  },
+  "feat_world": {
+   "src": "assets/feat_world.webp",
+   "rule": "run",
+   "contact_row": 0.9809,
+   "contact_width": 0.075,
+   "contact_centre": 0.1531
+  },
+  "fence_seg": {
+   "src": "assets/fence_seg.webp",
+   "rule": "run",
+   "contact_row": 0.9777,
+   "contact_width": 0.8556,
+   "contact_centre": 0.0444
+  },
+  "fern": {
+   "src": "assets/fern.webp",
+   "rule": "run",
+   "contact_row": 0.9742,
+   "contact_width": 0.35,
+   "contact_centre": 0.0288
+  },
+  "grass_tuft_a": {
+   "src": "assets/grass_tuft_a.webp",
+   "rule": "run",
+   "contact_row": 0.9811,
+   "contact_width": 0.3308,
+   "contact_centre": -0.0192
+  },
+  "grass_tuft_b": {
+   "src": "assets/grass_tuft_b.webp",
+   "rule": "run",
+   "contact_row": 0.9753,
+   "contact_width": 0.3154,
+   "contact_centre": 0.0385
+  },
+  "grave_a": {
+   "src": "assets/grave_a.webp",
+   "rule": "run",
+   "contact_row": 0.9795,
+   "contact_width": 0.3467,
+   "contact_centre": 0.2267
+  },
+  "grave_b": {
+   "src": "assets/grave_b.webp",
+   "rule": "run",
+   "contact_row": 0.9842,
+   "contact_width": 0.67,
+   "contact_centre": -0.0617
+  },
+  "grave_c": {
+   "src": "assets/grave_c.webp",
+   "rule": "run",
+   "contact_row": 0.9912,
+   "contact_width": 0.78,
+   "contact_centre": -0.0133
+  },
+  "haystack": {
+   "src": "assets/haystack.webp",
+   "rule": "run",
+   "contact_row": 0.965,
+   "contact_width": 0.2233,
+   "contact_centre": -0.035
+  },
+  "hero_cart": {
+   "src": "proto/sprites_stripped/hero_cart.webp",
+   "rule": "stripped",
+   "contact_row": 0.961,
+   "contact_width": 0.1643,
+   "contact_centre": 0.0196
+  },
+  "hero_fence": {
+   "src": "assets/hero_fence.webp",
+   "rule": "run",
+   "contact_row": 0.9831,
+   "contact_width": 0.9054,
+   "contact_centre": 0.0045
+  },
+  "hero_house_a": {
+   "src": "proto/sprites_stripped/hero_house_a.webp",
+   "rule": "run",
+   "contact_row": 0.9227,
+   "contact_width": 0.4964,
+   "contact_centre": -0.0196
+  },
+  "hero_house_b": {
+   "src": "proto/sprites_stripped/hero_house_b.webp",
+   "rule": "run",
+   "contact_row": 0.8947,
+   "contact_width": 0.7554,
+   "contact_centre": -0.0312
+  },
+  "hero_tree_a": {
+   "src": "assets/hero_tree_a.webp",
+   "rule": "run",
+   "contact_row": 0.9858,
+   "contact_width": 0.4268,
+   "contact_centre": -0.0384
+  },
+  "hero_tree_b": {
+   "src": "assets/hero_tree_b.webp",
+   "rule": "run",
+   "contact_row": 0.9719,
+   "contact_width": 0.3857,
+   "contact_centre": 0.0071
+  },
+  "hero_well": {
+   "src": "proto/sprites_stripped/hero_well.webp",
+   "rule": "run",
+   "contact_row": 0.9017,
+   "contact_width": 0.1714,
+   "contact_centre": 0.0143
+  },
+  "hill_dark": {
+   "src": "assets/hill_dark.webp",
+   "rule": "run",
+   "contact_row": 0.9888,
+   "contact_width": 0.1181,
+   "contact_centre": -0.1257
+  },
+  "hill_green": {
+   "src": "assets/hill_green.webp",
+   "rule": "run",
+   "contact_row": 0.9684,
+   "contact_width": 0.4208,
+   "contact_centre": -0.0382
+  },
+  "lantern_chain": {
+   "src": "assets/lantern_chain.webp",
+   "rule": "run",
+   "contact_row": 0.9914,
+   "contact_width": 0.5667,
+   "contact_centre": 0.0333
+  },
+  "minecart": {
+   "src": "assets/minecart.webp",
+   "rule": "run",
+   "contact_row": 0.9889,
+   "contact_width": 0.1632,
+   "contact_centre": -0.0105
+  },
+  "moon": {
+   "src": "assets/moon.webp",
+   "rule": "run",
+   "contact_row": 0.9917,
+   "contact_width": 0.3306,
+   "contact_centre": 0.0014
+  },
+  "mushrooms": {
+   "src": "assets/mushrooms.webp",
+   "rule": "run",
+   "contact_row": 0.9822,
+   "contact_width": 0.4462,
+   "contact_centre": -0.0462
+  },
+  "ore_pile": {
+   "src": "assets/ore_pile.webp",
+   "rule": "run",
+   "contact_row": 0.9848,
+   "contact_width": 0.4233,
+   "contact_centre": -0.085
+  },
+  "prop_crates": {
+   "src": "assets/prop_crates.webp",
+   "rule": "run",
+   "contact_row": 0.9884,
+   "contact_width": 0.1611,
+   "contact_centre": -0.0194
+  },
+  "prop_lantern": {
+   "src": "assets/prop_lantern.webp",
+   "rule": "run",
+   "contact_row": 0.9913,
+   "contact_width": 0.5806,
+   "contact_centre": -0.0292
+  },
+  "prop_signpost": {
+   "src": "proto/sprites_stripped/prop_signpost.webp",
+   "rule": "stripped",
+   "contact_row": 0.8521,
+   "contact_width": 0.3694,
+   "contact_centre": 0.1069
+  },
+  "res_axe": {
+   "src": "assets/res_axe.webp",
+   "rule": "run",
+   "contact_row": 0.9893,
+   "contact_width": 0.2098,
+   "contact_centre": -0.0067
+  },
+  "res_bow": {
+   "src": "assets/res_bow.webp",
+   "rule": "run",
+   "contact_row": 0.9838,
+   "contact_width": 0.0938,
+   "contact_centre": 0.0156
+  },
+  "res_dagger": {
+   "src": "assets/res_dagger.webp",
+   "rule": "run",
+   "contact_row": 0.986,
+   "contact_width": 0.1875,
+   "contact_centre": 0.0045
+  },
+  "res_diamond": {
+   "src": "assets/res_diamond.webp",
+   "rule": "run",
+   "contact_row": 0.9912,
+   "contact_width": 0.25,
+   "contact_centre": 0.0938
+  },
+  "res_fish": {
+   "src": "assets/res_fish.webp",
+   "rule": "run",
+   "contact_row": 0.9923,
+   "contact_width": 0.375,
+   "contact_centre": -0.0134
+  },
+  "res_gold": {
+   "src": "assets/res_gold.webp",
+   "rule": "run",
+   "contact_row": 0.99,
+   "contact_width": 0.3482,
+   "contact_centre": -0.0402
+  },
+  "res_herbs": {
+   "src": "assets/res_herbs.webp",
+   "rule": "run",
+   "contact_row": 0.988,
+   "contact_width": 0.2009,
+   "contact_centre": -0.0781
+  },
+  "res_iron": {
+   "src": "assets/res_iron.webp",
+   "rule": "run",
+   "contact_row": 0.9914,
+   "contact_width": 0.2098,
+   "contact_centre": -0.1004
+  },
+  "res_pickaxe": {
+   "src": "assets/res_pickaxe.webp",
+   "rule": "run",
+   "contact_row": 0.992,
+   "contact_width": 0.1964,
+   "contact_centre": 0.0982
+  },
+  "res_potion": {
+   "src": "assets/res_potion.webp",
+   "rule": "run",
+   "contact_row": 0.989,
+   "contact_width": 0.4955,
+   "contact_centre": 0.0156
+  },
+  "res_runes": {
+   "src": "assets/res_runes.webp",
+   "rule": "run",
+   "contact_row": 0.9918,
+   "contact_width": 0.9375,
+   "contact_centre": -0.0134
+  },
+  "res_shield": {
+   "src": "assets/res_shield.webp",
+   "rule": "run",
+   "contact_row": 0.9911,
+   "contact_width": 0.3393,
+   "contact_centre": 0.0
+  },
+  "res_spellbook": {
+   "src": "assets/res_spellbook.webp",
+   "rule": "run",
+   "contact_row": 0.9897,
+   "contact_width": 0.2098,
+   "contact_centre": -0.0067
+  },
+  "res_staff": {
+   "src": "assets/res_staff.webp",
+   "rule": "run",
+   "contact_row": 0.9915,
+   "contact_width": 0.5,
+   "contact_centre": 0.0134
+  },
+  "res_sword": {
+   "src": "assets/res_sword.webp",
+   "rule": "run",
+   "contact_row": 0.9864,
+   "contact_width": 0.2768,
+   "contact_centre": 0.0
+  },
+  "res_wood": {
+   "src": "assets/res_wood.webp",
+   "rule": "run",
+   "contact_row": 0.9921,
+   "contact_width": 0.5357,
+   "contact_centre": -0.0268
+  },
+  "rock_l": {
+   "src": "proto/sprites_stripped/rock_l.webp",
+   "rule": "stripped",
+   "contact_row": 0.8512,
+   "contact_width": 0.9094,
+   "contact_centre": -0.0328
+  },
+  "rock_m": {
+   "src": "proto/sprites_stripped/rock_m.webp",
+   "rule": "stripped",
+   "contact_row": 0.8528,
+   "contact_width": 0.625,
+   "contact_centre": 0.0437
+  },
+  "rock_s": {
+   "src": "assets/rock_s.webp",
+   "rule": "run",
+   "contact_row": 0.9882,
+   "contact_width": 0.3438,
+   "contact_centre": 0.0312
+  },
+  "stalagmite_a": {
+   "src": "assets/stalagmite_a.webp",
+   "rule": "run",
+   "contact_row": 0.9914,
+   "contact_width": 0.7233,
+   "contact_centre": -0.0017
+  },
+  "stalagmite_b": {
+   "src": "assets/stalagmite_b.webp",
+   "rule": "run",
+   "contact_row": 0.9916,
+   "contact_width": 0.76,
+   "contact_centre": 0.0
+  },
+  "tile_path": {
+   "src": "assets/tile_path.webp",
+   "rule": "run",
+   "contact_row": 1.0,
+   "contact_width": 1.0,
+   "contact_centre": 0.0
+  }
+ }
+}

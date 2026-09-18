@@ -3002,7 +3002,7 @@
      "t": "minecart",
      "layer": 1,
      "pos": [
-      -6.257,
+      -6.657,
       null,
       -25.891
      ],
@@ -4116,19 +4116,6 @@
      "visible": true
     },
     {
-     "id": "mine/exit-narrows/c13",
-     "t": "rock_m",
-     "layer": 1,
-     "pos": [
-      7.42,
-      null,
-      -101.547
-     ],
-     "h": 2.511,
-     "rotY": 0.025,
-     "visible": true
-    },
-    {
      "id": "mine/exit-narrows/c15",
      "t": "rock_m",
      "layer": 1,
@@ -4155,16 +4142,29 @@
      "visible": true
     },
     {
-     "id": "mine/exit-narrows/c24",
+     "id": "mine/exit-narrows/c28",
      "t": "stalagmite_b",
      "layer": 1,
      "pos": [
-      -5.692,
+      -6.898,
       null,
-      -114.017
+      -101.421
      ],
-     "h": 5.686,
-     "rotY": 0.0287,
+     "h": 6.051,
+     "rotY": 0.0191,
+     "visible": true
+    },
+    {
+     "id": "mine/exit-narrows/c50",
+     "t": "rock_l",
+     "layer": 1,
+     "pos": [
+      17.994,
+      null,
+      -110.755
+     ],
+     "h": 4.608,
+     "rotY": 0.0636,
      "visible": true
     },
     {
@@ -4958,7 +4958,8 @@
      "h": 10.35,
      "rotY": 0.0,
      "visible": true,
-     "on_road": true
+     "on_road": true,
+     "road_terminal": true
     },
     {
      "id": "home/homestead/lamp-west",
@@ -5744,6 +5745,19 @@
      "visible": true
     },
     {
+     "id": "home/scatter/c2",
+     "t": "rock_s",
+     "layer": 1,
+     "pos": [
+      -6.673,
+      null,
+      -6.956
+     ],
+     "h": 1.2,
+     "rotY": 0.0682,
+     "visible": true
+    },
+    {
      "id": "home/scatter/c3",
      "t": "grass_tuft_b",
      "layer": 1,
@@ -5793,6 +5807,19 @@
      ],
      "h": 1.1,
      "rotY": -0.0084,
+     "visible": true
+    },
+    {
+     "id": "home/scatter/c7",
+     "t": "rock_s",
+     "layer": 1,
+     "pos": [
+      -6.179,
+      null,
+      -16.484
+     ],
+     "h": 1.2,
+     "rotY": 0.0383,
      "visible": true
     },
     {
@@ -5859,32 +5886,6 @@
      "h": 1.1,
      "rotY": -0.0204,
      "visible": true
-    },
-    {
-     "id": "home/scatter/c15",
-     "t": "grass_tuft_a",
-     "layer": 1,
-     "pos": [
-      -11.746,
-      null,
-      -41.21
-     ],
-     "h": 1.1,
-     "rotY": -0.0594,
-     "visible": true
-    },
-    {
-     "id": "home/scatter/c16",
-     "t": "grass_tuft_a",
-     "layer": 1,
-     "pos": [
-      -6.004,
-      null,
-      -34.982
-     ],
-     "h": 1.1,
-     "rotY": -0.0393,
-     "visible": true
     }
    ],
    "boards": [
@@ -5916,5 +5917,169 @@
     }
    ]
   }
+ },
+ "road_end_z": -652.8,
+ "presentation": {
+  "contact_shadow": {
+   "width_scale": 1.0,
+   "depth_per_width": 0.3,
+   "depth_per_height": 0.07,
+   "depth_min": 0.12,
+   "depth_max": 0.6,
+   "opacity": 0.38
+  },
+  "textures": {
+   "grass": "tile_grass.webp",
+   "moss": "tile_spirit.webp",
+   "stone": "tile_dirt.webp",
+   "dirt": "tile_path.webp",
+   "road": "tile_path.webp"
+  },
+  "biomes": [
+   {
+    "id": "village",
+    "ground": {
+     "grass": 1.0,
+     "moss": 0.0,
+     "stone": 0.0,
+     "dirt": 0.0
+    },
+    "tint": [
+     0.97,
+     0.98,
+     0.94
+    ],
+    "saturation": 0.92,
+    "brightness": 1.0,
+    "road_stone": 0.0,
+    "vegetation": 1.0
+   },
+   {
+    "id": "forest",
+    "ground": {
+     "grass": 1.0,
+     "moss": 0.55,
+     "stone": 0.0,
+     "dirt": 0.25
+    },
+    "tint": [
+     0.86,
+     0.94,
+     0.9
+    ],
+    "saturation": 0.82,
+    "brightness": 0.84,
+    "road_stone": 0.0,
+    "vegetation": 1.0
+   },
+   {
+    "id": "mine",
+    "ground": {
+     "grass": 0.1,
+     "moss": 0.0,
+     "stone": 0.9,
+     "dirt": 1.0
+    },
+    "tint": [
+     0.95,
+     0.94,
+     0.92
+    ],
+    "saturation": 0.7,
+    "brightness": 0.92,
+    "road_stone": 0.35,
+    "vegetation": 0.12
+   },
+   {
+    "id": "spirit",
+    "ground": {
+     "grass": 0.6,
+     "moss": 0.85,
+     "stone": 0.1,
+     "dirt": 0.15
+    },
+    "tint": [
+     0.86,
+     0.95,
+     1.04
+    ],
+    "saturation": 0.5,
+    "brightness": 1.08,
+    "road_stone": 0.1,
+    "vegetation": 0.15
+   },
+   {
+    "id": "home",
+    "ground": {
+     "grass": 1.0,
+     "moss": 0.0,
+     "stone": 0.0,
+     "dirt": 0.05
+    },
+    "tint": [
+     1.03,
+     0.99,
+     0.9
+    ],
+    "saturation": 0.9,
+    "brightness": 1.02,
+    "road_stone": 0.0,
+    "vegetation": 1.0
+   }
+  ],
+  "transitions": [
+   {
+    "from": "village",
+    "to": "forest",
+    "anchor_z": -154,
+    "blend_z": [
+     -114,
+     -166
+    ],
+    "dim": {
+     "max": 0.38,
+     "half_width": 12
+    }
+   },
+   {
+    "from": "forest",
+    "to": "mine",
+    "anchor_z": -301,
+    "blend_z": [
+     -267,
+     -313
+    ],
+    "dim": {
+     "max": 0.45,
+     "half_width": 12
+    }
+   },
+   {
+    "from": "mine",
+    "to": "spirit",
+    "anchor_z": -408,
+    "blend_z": [
+     -392,
+     -430
+    ],
+    "dim": {
+     "max": 0.5,
+     "half_width": 14
+    }
+   },
+   {
+    "from": "spirit",
+    "to": "home",
+    "anchor_z": -592,
+    "blend_z": [
+     -550,
+     -606
+    ],
+    "dim": {
+     "max": 0.38,
+     "half_width": 12
+    }
+   }
+  ]
  }
 }

@@ -172,6 +172,51 @@ assets/topdown/config.json       (road_half_width 4.2, road_clearance, biome_spa
   Биом без описания в composition.json собирается по ритму spec; такт с явным
   `key` сохраняет id при вставке такого же такта выше.
 
+## Вид биомов и переходы (/proto/)
+
+```
+assets/topdown/presentation.json   (грунт, палитра, растительность, якоря переходов)
+assets/topdown/config.json         (biome_spacing, road_end_z)
+        └─ generate_layout.py → layout.presentation + road_end_z в runtime
+              → proto/main.js: uniforms шейдера грунта, затемнение перехода,
+                доля травяных декалей, __PROTO.presentationAt(z)
+```
+
+* Грунт — одна плоскость и один шейдер. Слои: трава, мох (`tile_spirit`),
+  плиты (`tile_dirt`, пол шахты), земля (зерно дорожного тайла); веса из
+  presentation, пятнами по шуму. Палитра биома (tint, насыщенность, яркость)
+  ложится на весь грунт вместе с дорогой; спрайты не перекрашиваются.
+* Переход задан якорем там, где композиция сужает путь (локальный z биома, в
+  который ведёт переход): грунт меняется от `lead` метров до якоря до `tail`
+  после, граница сбита шумом, затемнение кадра — только около якоря и только
+  от положения камеры.
+* Дорога кончается у финального дома: `config.json road_end_z` = низ объекта
+  `road_terminal` в composition (проверяется). `make_road_spline.py` строит
+  сплайн до этой точки; шейдер, JS и Python-модель закругляют торец, дальше
+  полотна нет. После смены сплайна — `node tools/road_samples.mjs`.
+
+## Контакт объектов с землёй (/proto/)
+
+`python tools/sprite_contact.py` → `proto/sprite_contact.json`: для каждого
+спрайта — строка основания, ширина и центр основания, посчитанные по той
+текстуре, что грузит /proto/ (вырезанные — по месту выреза цоколя, остальные —
+по нижнему сплошному отрезку, чтобы ствол дерева считался, а травинка нет).
+Тень объекта центрируется на этой линии (с учётом поворота спрайта), без
+смещения по свету; ширина — ширина основания, глубина мала и ограничена
+(`presentation.json → contact_shadow`). `--check` — в CI.
+
+Ремонт низа (sprite bottom repair): `hero_house_b`, `hero_house_a`, `hero_well`
+в `proto/sprites_stripped/` — вариант B: основание восстановлено из исходника
+без земли + inpaint только полосы основания, выше неё — исходные пиксели.
+Список — `index.json → repaired`; `strip_pedestal.py` их не пересобирает,
+`sprite_contact.py` меряет их по правилу run (основание снова цельное), а
+`topdown_compose.py` держит прежнюю ширину следа (`layout_foot`), чтобы layout
+не сдвинулся. Лист «PR #4 | PR #6 | repaired»: `node tests/browser/sprite_repair_review.mjs`.
+
+Диагностика: `node tests/browser/grounding_diag.mjs` (варианты тени A–E на 7
+объектах, маркеры контакта) и `--review <git ref>` («было | стало»,
+`grounding-final-review.png`). Proto подменяется в памяти, файлы не трогаются.
+
 ## Проверки (они же в CI, `.github/workflows/ci.yml`)
 
 ```

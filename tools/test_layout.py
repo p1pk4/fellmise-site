@@ -389,5 +389,252 @@ class Consumers(unittest.TestCase):
         self.assertIsNone(re.search(r"ASSETS\s*\+\s*'layout\.json'", proto))
 
 
+class Presentation(unittest.TestCase):
+    """assets/topdown/presentation.json -> runtime -> proto: one source."""
+
+    def setUp(self):
+        import topdown_presentation as TP
+        self.TP = TP
+        self.pres = TP.load()
+        self.ids = list(SPEC["biomes"])
+
+    def test_schema_clean(self):
+        self.assertEqual(self.TP.check(self.pres, self.ids), [])
+
+    def test_every_biome_has_presentation(self):
+        self.assertEqual(list(self.pres["biomes"]), self.ids)
+
+    def test_schema_catches_problems(self):
+        for mutate in (
+            lambda p: p["biomes"].pop("mine"),
+            lambda p: p["biomes"]["forest"]["ground"].__setitem__("grass", 2),
+            lambda p: p["biomes"]["spirit"].__setitem__("tint", [3, 1, 1]),
+            lambda p: p["transitions"].pop(),
+            lambda p: p["transitions"][1].__setitem__("to", "home"),
+            lambda p: p["transitions"][0]["dim"].__setitem__("max", 1.0),
+            lambda p: p["textures"].__setitem__("stone", "nope.webp"),
+        ):
+            p = copy.deepcopy(self.pres)
+            mutate(p)
+            self.assertTrue(self.TP.check(p, self.ids))
+
+    def test_transitions_ordered_and_apart(self):
+        comp = self.TP.compute(self.pres, self.ids, CFG["biome_spacing"])
+        self.assertEqual(self.TP.check_computed(comp), [])
+        bad = copy.deepcopy(self.pres)
+        bad["transitions"][1]["anchor"] = {"biome": "forest", "z": -10}
+        self.assertTrue(self.TP.check_computed(self.TP.compute(bad, self.ids, CFG["biome_spacing"])))
+
+    def test_runtime_carries_the_computed_boundaries(self):
+        """What proto reads (runtime layout) is exactly compute(presentation.json)."""
+        runtime = json.loads(read("assets/topdown/layout.runtime.json"))
+        self.assertEqual(runtime["presentation"],
+                         self.TP.compute(self.pres, self.ids, CFG["biome_spacing"]))
+        self.assertEqual(runtime["road_end_z"], CFG["road_end_z"])
+
+    def test_anchors_sit_in_the_constrictions(self):
+        """Each anchor falls inside the z-span of the objects that narrow the
+        road there (the composition's gates), not at a midpoint."""
+        comp = self.TP.compute(self.pres, self.ids, CFG["biome_spacing"])
+        spans = {("village", "forest"): ("forest", ("gate-west", "gate-east")),
+                 ("forest", "mine"): ("mine", ("gate-west", "gate-east", "squeeze-west", "squeeze-east")),
+                 ("mine", "spirit"): ("mine", ("exit-narrows",)),
+                 ("spirit", "home"): ("home", ("gate-pines-west", "gate-pines-east", "returning-green-west"))}
+        objs = T.objects(TOPDOWN)
+        for t in comp["transitions"]:
+            bid, keys = spans[(t["from"], t["to"])]
+            bi = self.ids.index(bid)
+            zs = [-bi * CFG["biome_spacing"] + o["pos"][2] for i, o in objs.items()
+                  if any(i.startswith(f"{bid}/{k}/") for k in keys)]
+            self.assertTrue(zs, t)
+            self.assertLessEqual(min(zs) - 12, t["anchor_z"], t)
+            self.assertLessEqual(t["anchor_z"], max(zs) + 12, t)
+
+    def test_shader_and_js_read_runtime(self):
+        """proto builds uniforms and the overlay from layout.presentation — no
+        biome boundary or palette literal of its own."""
+        proto = read("proto/main.js")
+        for needle in ("PRES = layout.presentation", "uTrans: { value: PRES.transitions.map",
+                       "uGround: { value: PRES.biomes.map", "uRoadEnd: { value: ROAD_END }",
+                       "const ROAD_END = layout.road_end_z", "NB: PRES.biomes.length"):
+            self.assertIn(needle, proto)
+        for t in json.loads(read("assets/topdown/layout.runtime.json"))["presentation"]["transitions"]:
+            self.assertNotIn(str(t["anchor_z"]), proto)
+
+
+class RoadEnd(unittest.TestCase):
+    def test_spline_reproducible(self):
+        """road_spline.json is what tools/make_road_spline.py produces."""
+        import make_road_spline as MRS
+        _, text = MRS.build()
+        self.assertEqual(text, read("assets/road_spline.json"))
+        pts = json.loads(text)["points"]
+        self.assertEqual(pts[-1]["z"], CFG["road_end_z"])
+
+    def test_no_road_behind_the_house(self):
+        """Past the terminal the road is gone: zero half-width a road-width
+        after the end, and every point behind the house is clear."""
+        road = TC.Road(CFG["road_half_width"], end_z=CFG["road_end_z"])
+        end = CFG["road_end_z"]
+        self.assertGreater(road.at(end + 10)[1], 3.0)
+        self.assertEqual(road.at(end - 6)[1], 0.0)
+        house = T.objects(TOPDOWN)["home/homestead/house"]
+        top = -4 * CFG["biome_spacing"] + house["pos"][2] - house["h"] / 2
+        for z in (top, top - 10, top - 40, -760):
+            self.assertEqual(road.at(z)[1], 0.0, z)
+            self.assertTrue(road.clear(-2, 2, z, z - 1, CFG["road_clearance"]))
+
+    def test_terminal_object_matches_road_end(self):
+        self.assertEqual(TC.check_terminal(TOPDOWN, CFG["biome_spacing"], CFG["road_end_z"]), [])
+        moved = copy.deepcopy(TOPDOWN)
+        T.objects(moved)["home/homestead/house"]["pos"][2] -= 5
+        self.assertTrue(TC.check_terminal(moved, CFG["biome_spacing"], CFG["road_end_z"]))
+
+
+class ContactShadow(unittest.TestCase):
+    """proto/sprite_contact.json + presentation.contact_shadow -> /proto/ shadows."""
+
+    def setUp(self):
+        import math
+        import sprite_contact as SC
+        import topdown_presentation as TP
+        self.math, self.SC, self.TP = math, SC, TP
+        self.meta = json.loads(read("proto/sprite_contact.json"))["sprites"]
+        self.runtime = json.loads(read("assets/topdown/layout.runtime.json"))
+
+    def drawn(self):
+        """(biome index, object) for every sprite /proto/ draws with a shadow."""
+        for bi, b in enumerate(self.runtime["biomes"].values()):
+            for o in b["sprites"]:
+                t = o.get("t")
+                if not t or t in ("hero_fence", "end_post") or t.startswith("cloud_") or t == "moon":
+                    continue
+                if o.get("visible") is False:
+                    continue
+                yield bi, o
+
+    def test_metadata_deterministic_and_current(self):
+        self.assertEqual(json.dumps(self.SC.build(), ensure_ascii=False, indent=1) + "\n",
+                         read("proto/sprite_contact.json"))
+
+    def test_coverage_of_every_shadowed_sprite(self):
+        need = {o["t"] for _, o in self.drawn()} | {"prop_crates"}     # + the sort-test sprite
+        self.assertEqual(sorted(need - set(self.meta)), [])
+
+    def test_metadata_values_sane(self):
+        for t, m in self.meta.items():
+            for k in ("contact_row", "contact_width", "contact_centre"):
+                self.assertTrue(self.math.isfinite(m[k]), (t, k))
+            self.assertTrue(0.5 < m["contact_row"] <= 1.0, (t, m))
+            self.assertTrue(0.0 < m["contact_width"] <= 1.0, (t, m))
+            self.assertTrue(abs(m["contact_centre"]) < 0.5, (t, m))
+            self.assertIn(m["rule"], ("stripped", "run"), t)          # no fallback in the pack
+
+    def test_measured_on_the_texture_proto_loads(self):
+        stripped = set(json.loads(read("proto/sprites_stripped/index.json"))["stripped"])
+        for t, m in self.meta.items():
+            want = f"proto/sprites_stripped/{t}.webp" if t in stripped else f"assets/{t}.webp"
+            self.assertEqual(m["src"], want, t)
+
+    def test_shadow_sizes_capped_and_finite(self):
+        p = self.runtime["presentation"]
+        cs = p["contact_shadow"]
+        for _, o in self.drawn():
+            m = self.meta[o["t"]]
+            base_w = m["contact_width"] * o["h"] * self._aspect(o["t"])
+            w, d = self.TP.shadow_size(p, o["h"], base_w)
+            self.assertTrue(self.math.isfinite(w) and self.math.isfinite(d) and w > 0 and d > 0, o["id"])
+            self.assertLessEqual(d, cs["depth_max"] + 1e-9, o["id"])
+            self.assertLessEqual(d, max(cs["depth_min"], cs["depth_per_height"] * o["h"]) + 1e-9, o["id"])
+            self.assertLessEqual(d, self.TP.CONTACT_DEPTH_MAX, o["id"])
+
+    def test_schema_rejects_bad_contact_shadow(self):
+        pres = self.TP.load()
+        ids = list(SPEC["biomes"])
+        for key, bad in (("depth_max", 3.0), ("opacity", 0.0), ("depth_min", "x"), ("width_scale", 5)):
+            p = copy.deepcopy(pres)
+            p["contact_shadow"][key] = bad
+            self.assertTrue(self.TP.check(p, ids), key)
+        p = copy.deepcopy(pres)
+        p["contact_shadow"]["depth_min"] = 0.5
+        p["contact_shadow"]["depth_max"] = 0.2
+        self.assertTrue(self.TP.check(p, ids))
+
+    def test_proto_uses_contact_not_canvas_or_light(self):
+        proto = read("proto/main.js")
+        self.assertNotIn("LIGHT", proto)
+        self.assertNotIn("baseWidth", proto)
+        self.assertIn("fetch('./sprite_contact.json')", proto)
+        self.assertIn("PRES.contact_shadow", proto)
+        self.assertIn("q.position.set(p.x, 0.5, p.z)", proto)
+
+    _asp = {}
+
+    def _aspect(self, t):
+        if t not in self._asp:
+            from PIL import Image
+            with Image.open(ROOT / self.meta[t]["src"]) as im:
+                self._asp[t] = im.width / im.height
+        return self._asp[t]
+
+
+class SpriteRepair(unittest.TestCase):
+    """hero_house_b, hero_house_a, hero_well: base restored after the strip."""
+
+    REPAIRED = ["hero_house_a", "hero_house_b", "hero_well"]
+
+    def setUp(self):
+        self.index = json.loads(read("proto/sprites_stripped/index.json"))
+        self.meta = json.loads(read("proto/sprite_contact.json"))["sprites"]
+
+    def test_exactly_the_three_are_repaired_and_still_loaded_from_stripped(self):
+        self.assertEqual(sorted(self.index.get("repaired", {})), self.REPAIRED)
+        for t in self.REPAIRED:
+            self.assertIn(t, self.index["stripped"])
+            self.assertEqual(self.meta[t]["src"], f"proto/sprites_stripped/{t}.webp")
+
+    def test_canvas_and_upper_part_unchanged(self):
+        """Same canvas as the original; above the repaired band it IS the
+        original (webp noise only), so nothing moved inside the picture."""
+        import numpy as np
+        from PIL import Image
+        for t in self.REPAIRED:
+            with Image.open(ROOT / "proto" / "sprites_stripped" / f"{t}.webp") as im:
+                r = np.asarray(im.convert("RGBA")).astype(int)
+            with Image.open(ROOT / "assets" / f"{t}.webp") as im:
+                o = np.asarray(im.convert("RGBA")).astype(int)
+            self.assertEqual(r.shape, o.shape, t)
+            top = self.index["repaired"][t]["unchanged_rows_from_top"]
+            self.assertGreater(top / r.shape[0], 0.7, t)
+            d = np.abs(r[:top] - o[:top])
+            self.assertLessEqual(d[..., 3].max(), 24, t)
+            self.assertLess(d[..., :3][r[:top, :, 3] > 200].mean(), 3.0, t)
+
+    def test_base_is_whole_no_residue_below(self):
+        """Contact by the run rule, and nothing opaque below it: no drips, no
+        comb, no ground skirt left under the base."""
+        import numpy as np
+        from PIL import Image
+        for t in self.REPAIRED:
+            m = self.meta[t]
+            self.assertEqual(m["rule"], "run", t)
+            with Image.open(ROOT / m["src"]) as im:
+                a = np.asarray(im.convert("RGBA"))[..., 3] > 16
+            low = (np.nonzero(a.any(axis=1))[0].max() + 1) / a.shape[0]
+            self.assertLess(low - m["contact_row"], 0.01, t)
+
+    def test_layout_footprint_pinned(self):
+        """The repair does not move the layout: the footprint width the
+        composer uses is the pre-repair one recorded in index.json."""
+        TC._dims.clear(); TC._repaired = None
+        for t in self.REPAIRED:
+            self.assertEqual(TC.dims(t)[1], self.index["repaired"][t]["layout_foot"], t)
+
+    def test_strip_does_not_overwrite_repairs(self):
+        src = read("tools/strip_pedestal.py")
+        self.assertIn('prev.get("repaired", {})', src)
+        self.assertIn("if n in repaired:", src)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

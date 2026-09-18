@@ -45,6 +45,7 @@ class CompositionError(ValueError):
 
 # -------------------------------------------------------------------- sprites
 _stripped = None
+_repaired = None
 _dims = {}
 
 
@@ -54,6 +55,17 @@ def stripped_set():
         idx = STRIPPED_DIR / "index.json"
         _stripped = set(json.loads(idx.read_text(encoding="utf-8"))["stripped"]) if idx.exists() else set()
     return _stripped
+
+
+def repaired():
+    """proto/sprites_stripped/index.json "repaired": sprites whose base was
+    restored after the strip. Their footprint width stays as measured before
+    the repair (`layout_foot`), so replacing the art does not move the layout."""
+    global _repaired
+    if _repaired is None:
+        idx = STRIPPED_DIR / "index.json"
+        _repaired = json.loads(idx.read_text(encoding="utf-8")).get("repaired", {}) if idx.exists() else {}
+    return _repaired
 
 
 def dims(t):
@@ -74,7 +86,10 @@ def dims(t):
             xs = [x for x in range(W) if px[x, y] > 16]
             if xs:
                 best = max(best, xs[-1] - xs[0] + 1)
-        _dims[t] = (aspect, max(best / W, 0.15))
+        foot = max(best / W, 0.15)
+        if "layout_foot" in repaired().get(t, {}):
+            foot = repaired()[t]["layout_foot"]
+        _dims[t] = (aspect, foot)
     return _dims[t]
 
 
@@ -85,8 +100,12 @@ class Road:
 
     NPTS = 64
 
-    def __init__(self, half_width, spline=None):
+    def __init__(self, half_width, spline=None, end_z=None):
         spline = spline or json.loads(SPLINE.read_text(encoding="utf-8"))
+        # where the road stops (world z). Past it the half-width shrinks along a
+        # quarter circle of radius = half-width at the end: a rounded cap, then
+        # nothing. None = the old behaviour (clamped to the last sample).
+        self.end_z = end_z
         pts = [(p["x"], p["w"], p["z"]) for p in spline["points"]]
         self.half = half_width
         n = len(pts)
@@ -119,6 +138,9 @@ class Road:
         f = t - i
         cx = self.centre[i] + (self.centre[i + 1] - self.centre[i]) * f
         hw = self.half * (self.width[i] + (self.width[i + 1] - self.width[i]) * f)
+        if self.end_z is not None and z < self.end_z:
+            past = self.end_z - z
+            hw = hw * math.sqrt(1 - (past / hw) ** 2) if past < hw else 0.0
         return cx, hw
 
     def clear(self, x0, x1, z0, z1, margin):
@@ -127,6 +149,11 @@ class Road:
         z = z0
         while True:
             cx, hw = self.at(z)
+            if hw <= 0:                     # past the end of the road
+                if z <= z1:
+                    return True
+                z = max(z - 0.5, z1)
+                continue
             k = hw + margin
             if x1 > cx - k and x0 < cx + k:
                 return False
@@ -290,8 +317,9 @@ class Composer:
                     counts[t] = counts.get(t, 0) + 1
                     sid = f"{ck}/{t}.{counts[t]}"
                 extra = {"_grp": ck}
-                if it.get("on_road"):
-                    extra["on_road"] = True
+                for flag in ("on_road", "road_terminal"):
+                    if it.get(flag):
+                        extra[flag] = True
                 o = self.put(bid, t, ax + it.get("dx", 0), az + it.get("dz", 0),
                              self.height(it["h"], it.get("scale", 1.0)), sid, extra)
                 if o:
@@ -428,6 +456,21 @@ def validate(layout, spec, road, spacing, margin, road_props):
                     bad.append(f"{bid}: {a['id']} и {c['id']} стоят друг на друге "
                                f"(пересечение следов {ov:.2f} м²)")
     return bad
+
+
+def check_terminal(layout, spacing, end_z, tol=1.0):
+    """The road ends at the object the composition marks `road_terminal`: its
+    bottom edge (world z) is the configured road end, within `tol` metres."""
+    marked = [(bi, o) for bi, b in enumerate(layout["biomes"].values())
+              for o in b["sprites"] if o.get("road_terminal")]
+    if len(marked) != 1:
+        return [f"road_terminal: должен быть ровно один объект, а их {len(marked)}"]
+    bi, o = marked[0]
+    bottom = -bi * spacing + o["pos"][2] + o["h"] / 2
+    if abs(bottom - end_z) > tol:
+        return [f"road_terminal {o['id']}: низ на z {bottom:.2f}, а дорога кончается на "
+                f"{end_z} (config.json road_end_z) — разошлись больше чем на {tol} м"]
+    return []
 
 
 # ---------------------------------------------------------------- diagnostics

@@ -124,6 +124,105 @@ test.describe('/proto/', () => {
     expect(shot.length).toBeGreaterThan(200_000);
     clean(watch);
   });
+
+  test('repaired sprites are what /proto/ loads', async ({ page, watch }) => {
+    const got = new Map();
+    page.on('response', async (r) => {
+      const m = r.url().match(/\/proto\/sprites_stripped\/(hero_house_a|hero_house_b|hero_well)\.webp$/);
+      if (m) got.set(m[1], r.status());
+    });
+    await page.goto('/proto/');
+    await page.waitForFunction(PROTO_READY, null, { timeout: CONFIG.routes['/proto/'].readyTimeoutMs });
+    const index = await (await page.request.get('/proto/sprites_stripped/index.json')).json();
+    test.skip(!index.repaired, 'this checkout has no repaired sprites');
+    expect(Object.keys(index.repaired).sort()).toEqual(['hero_house_a', 'hero_house_b', 'hero_well']);
+    for (const t of Object.keys(index.repaired)) expect(got.get(t), t).toBe(200);
+    clean(watch);
+  });
+
+  test('every object shadow sits on its measured ground contact', async ({ page, watch }) => {
+    await page.goto('/proto/');
+    await page.waitForFunction(PROTO_READY, null, { timeout: CONFIG.routes['/proto/'].readyTimeoutMs });
+    const has = await page.evaluate(() => typeof window.__PROTO.shadows === 'function');
+    test.skip(!has, 'this checkout has no contact shadows yet');
+    const runtime = await (await page.request.get('/assets/topdown/layout.runtime.json')).json();
+    const meta = (await (await page.request.get('/proto/sprite_contact.json')).json()).sprites;
+    const CS = runtime.presentation.contact_shadow;
+    const shadows = await page.evaluate(() => window.__PROTO.shadows());
+    const byId = new Map(shadows.map((s) => [s.id, s]));
+    // aspect of each texture as the page loaded it
+    const aspects = await page.evaluate(async (m) => {
+      const out = {};
+      for (const [t, v] of Object.entries(m)) {
+        const img = new Image(); img.src = '/' + v.src; await img.decode();
+        out[t] = img.width / img.height;
+      }
+      return out;
+    }, meta);
+
+    let checked = 0;
+    const ids = Object.keys(runtime.biomes);
+    for (const [bi, bid] of ids.entries()) {
+      for (const o of runtime.biomes[bid].sprites) {
+        const t = o.t;
+        if (!t || t === 'hero_fence' || t === 'end_post' || t.startsWith('cloud_') || t === 'moon' || o.visible === false) continue;
+        const s = byId.get(o.id);
+        expect(s, `shadow for ${o.id}`).toBeTruthy();
+        const m = meta[t];
+        expect(m, `contact metadata for ${t}`).toBeTruthy();
+        // independent: contact point from metadata + the object's own rotation
+        const z0 = -bi * runtime.biome_spacing + o.pos[2], w = o.h * aspects[t], a = o.rotY || 0;
+        const px = m.contact_centre * w, py = (0.5 - m.contact_row) * o.h;
+        const ex = o.pos[0] + px * Math.cos(a) - py * Math.sin(a);
+        const ez = z0 - (px * Math.sin(a) + py * Math.cos(a));
+        expect(Math.abs(s.x - ex), `${o.id} x`).toBeLessThan(1e-6);
+        expect(Math.abs(s.z - ez), `${o.id} z`).toBeLessThan(1e-6);
+        for (const v of [s.x, s.z, s.w, s.d]) expect(Number.isFinite(v), o.id).toBe(true);
+        expect(s.w, o.id).toBeGreaterThan(0);
+        expect(s.d, o.id).toBeGreaterThan(0);
+        expect(s.d, o.id).toBeLessThanOrEqual(CS.depth_max + 1e-9);
+        expect(s.d, o.id).toBeLessThanOrEqual(Math.max(CS.depth_min, CS.depth_per_height * o.h) + 1e-9);
+        checked++;
+      }
+    }
+    expect(checked).toBe(shadows.length);
+    clean(watch);
+  });
+
+  test('biome presentation, transitions and the end of the road', async ({ page, watch }) => {
+    await page.goto('/proto/');
+    await page.waitForFunction(PROTO_READY, null, { timeout: CONFIG.routes['/proto/'].readyTimeoutMs });
+    const runtime = await (await page.request.get('/assets/topdown/layout.runtime.json')).json();
+    const P = runtime.presentation;
+    test.skip(!P, 'this checkout has no biome presentation yet');
+
+    // every biome is where presentation says, away from the transitions
+    const probe = await page.evaluate((zs) => zs.map((z) => window.__PROTO.presentationAt(z)),
+      [-20, -200, -350, -480, -660]);
+    expect(probe.map((p) => p.biome)).toEqual(P.biomes.map((b) => b.id));
+    expect(probe.every((p) => p.overlay === 0 && p.blend === 0)).toBe(true);
+
+    // at each anchor the overlay is at its peak, driven by camera z alone
+    const overlay = page.locator('#biome-transition-overlay');
+    await expect(overlay).toHaveAttribute('aria-hidden', 'true');
+    expect(await overlay.evaluate((e) => getComputedStyle(e).pointerEvents)).toBe('none');
+    expect(await overlay.textContent()).toBe('');
+    for (const t of P.transitions) {
+      await page.evaluate((z) => window.__PROTO.go(z, 'обзор'), t.anchor_z);
+      expect(Number(await overlay.evaluate((e) => e.style.opacity))).toBeCloseTo(t.dim.max, 3);
+    }
+    await page.evaluate(() => window.__PROTO.go(-20, 'обзор'));
+    expect(Number(await overlay.evaluate((e) => e.style.opacity))).toBe(0);
+
+    // the road stops at the final house: nothing a road-width past the end
+    const end = runtime.road_end_z;
+    const r = await page.evaluate((e) => [window.__PROTO.roadAt(e + 10), window.__PROTO.roadAt(e - 6),
+      window.__PROTO.roadAt(e - 40)], end);
+    expect(r[0].hw).toBeGreaterThan(3);
+    expect(r[1].hw).toBe(0);
+    expect(r[2].hw).toBe(0);
+    clean(watch);
+  });
 });
 
 /* ------------------------------------------------------------------- next */

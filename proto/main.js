@@ -57,9 +57,11 @@ const SEED = 'fellmise-proto-1';
 let ROAD_HALF = null;                       // задаётся в main() из runtime layout
 const RUT_HALF = 0.53;                      // та же доля дороги, что была при 5.5
 
-/* Единое направление света на всю сцену. Тень уезжает на 0.2 м — этого хватает,
-   чтобы объект отделился от земли, и мало, чтобы не читаться вторым предметом. */
-const LIGHT = { dx: 0.141, dz: 0.141 };    // |смещение| = 0.2 м
+/* Смещения тени по свету больше нет. Оно уводило пятно вниз по экрану, то
+   есть ПЕРЕД объектом, — для вида 3/4 это свет из-за предмета, против
+   нарисованной светотени, и вместе с привязкой к кромке холста давало
+   «парение» (grounding diagnostic 2). Отбрасываемая тень, если понадобится, —
+   отдельная система; здесь только контакт с землёй. */
 
 /* Диапазоны порядка отрисовки. Объекты сортируются по Z нижнего края (y-sort),
    всё остальное стоит фиксированными этажами заведомо ниже их. */
@@ -134,6 +136,15 @@ const GROUND_FS = `
   uniform float uWidth[NPTS];
   uniform float uZ0;
   uniform float uZStep;
+  uniform float uRoadEnd;
+  uniform sampler2D uMoss;
+  uniform sampler2D uStone;
+  // presentation биомов из runtime layout: веса слоёв (трава, мох, камень,
+  // грунт), тон (tint.rgb, насыщенность), тон2 (яркость, камень в дороге)
+  uniform vec4 uGround[NB];
+  uniform vec4 uTone[NB];
+  uniform vec4 uTone2[NB];
+  uniform vec2 uTrans[NTRANS];   // полосы переходов: (z начала, z конца)
   varying vec2 vWorld;
 
   float h21(vec2 p) {
@@ -155,77 +166,137 @@ const GROUND_FS = `
     return clamp(c * vec3(1.0 + k, 1.0, 1.0 - k), 0.0, 1.0);
   }
 
-  // ось и ширина дороги на данной Z, линейно между контрольными точками
+  // ось и ширина дороги на данной Z, линейно между контрольными точками.
+  // За концом дороги (uRoadEnd) полуширина сходит на нет по четверти круга
+  // радиусом в саму полуширину — скруглённый торец, дальше полотна нет.
   void road_at(float z, out float cx, out float hw) {
     float t = clamp((uZ0 - z) / uZStep, 0.0, float(NPTS - 1) - 0.001);
     int i = int(floor(t));
     float f = t - float(i);
     cx = mix(uCentre[i], uCentre[i + 1], f);
     hw = uHalf * mix(uWidth[i], uWidth[i + 1], f);
+    float past = uRoadEnd - z;
+    if (past > 0.0) hw = past < hw ? hw * sqrt(1.0 - (past / hw) * (past / hw)) : 0.0;
+  }
+
+  // Непрерывный номер биома 0..NB-1 на данной Z: сумма плавных ступеней по
+  // полосам переходов (presentation.transitions, мировые Z из runtime). Та же
+  // формула — в proto/main.js biomeAt() и tools/topdown_presentation.py.
+  float biome_at(float z) {
+    float b = 0.0;
+    for (int k = 0; k < NTRANS; k++) {
+      float u = clamp((uTrans[k].x - z) / (uTrans[k].x - uTrans[k].y), 0.0, 1.0);
+      b += u * u * (3.0 - 2.0 * u);
+    }
+    return b;
   }
 
   void main() {
-    // --- А: базовый тайл ---------------------------------------------------
-    vec3 a = texture2D(uGrass, vWorld / uTile).rgb;
+    // --- какой биом под этим пикселем ------------------------------------------
+    // Граница сбита шумом на ±7 м: ровная горизонтальная линия перехода читалась
+    // бы швом поперёк дороги.
+    float bz = vWorld.y + (fbm(vWorld * 0.04 + 3.3) - 0.5) * 14.0;
+    float b = biome_at(bz);
+    vec4 gw = vec4(0.0), tone = vec4(0.0), tone2 = vec4(0.0);
+    for (int k = 0; k < NB; k++) {
+      float w = max(0.0, 1.0 - abs(b - float(k)));
+      gw += w * uGround[k];
+      tone += w * uTone[k];
+      tone2 += w * uTone2[k];
+    }
 
-    // --- В: тот же тайл под 37° и в 1.61 раза крупнее ------------------------
-    // Смешение держится около половины и никогда не уходит в чистый слой: как
-    // только один из тайлов побеждает целиком, его решётка возвращается. При
-    // близких весах амплитуда каждой падает вдвое, а совпасть решётки не могут —
-    // угол не кратен 90°, масштаб иррационален, период в кадр не влезает.
-    vec2 uv2 = (rot(0.6458) * vWorld) / (uTile * 1.61);
-    vec3 c = texture2D(uGrass2, uv2).rgb;
-    float mixAC = 0.34 + 0.32 * fbm(vWorld * 0.045);
-    vec3 grass = mix(a, c, mixAC);
+    // --- А/В/Б: трава, как было (ground-3), только там, где она есть ---------
+    vec3 grass = vec3(0.0);
+    if (gw.x > 0.001) {
+      vec3 a = texture2D(uGrass, vWorld / uTile).rgb;
+      // тот же тайл под 37° и в 1.61 раза крупнее: смешение держится около
+      // половины, решётки не совпадают — период в кадр не влезает
+      vec2 uv2 = (rot(0.6458) * vWorld) / (uTile * 1.61);
+      vec3 c = texture2D(uGrass2, uv2).rgb;
+      float mixAC = 0.34 + 0.32 * fbm(vWorld * 0.045);
+      grass = mix(a, c, mixAC);
+      vec3 e = texture2D(uGrass, (rot(-1.13) * vWorld) / (uTile * 2.7)).rgb;
+      grass = mix(grass, e, 0.26);
+    }
 
-    // и третья выборка, ещё крупнее и под другим углом — она добивает остаток
-    vec3 e = texture2D(uGrass, (rot(-1.13) * vWorld) / (uTile * 2.7)).rgb;
-    grass = mix(grass, e, 0.26);
+    // --- мох (tile_spirit): те же приёмы — два угла, некратные масштабы ------
+    vec3 moss = vec3(0.0);
+    if (gw.y > 0.001) {
+      vec3 m1 = texture2D(uMoss, (rot(0.41) * vWorld) / (uTile * 1.13)).rgb;
+      vec3 m2 = texture2D(uMoss, (rot(-0.93) * vWorld) / (uTile * 2.31)).rgb;
+      moss = mix(m1, m2, 0.45 + 0.3 * (fbm(vWorld * 0.05 + 5.0) - 0.5));
+    }
 
-    // --- Б: низкочастотная перекраска, период ~50 м -------------------------
-    float low = fbm(vWorld * 0.021);                  // 1/0.021 ≈ 48 м
-    grass *= 1.0 + (low - 0.5) * 0.24;                // яркость ±12%
-    // и средняя частота: без неё крупные пятна плавают поверх нетронутой сетки
-    grass *= 1.0 + (fbm(vWorld * 0.085 + 7.1) - 0.5) * 0.16;
-    grass = hueShift(grass, (fbm(vWorld * 0.017 + 31.7) - 0.5) * 0.14);
+    // --- камень (tile_dirt — пол шахты из плит) ------------------------------
+    // Одна выборка под 13° с лёгким искажением координат: две решётки плит
+    // поверх друг друга дают кашу, а искажённая одна читается неровной
+    // мостовой, выложенной руками.
+    vec3 stone = vec3(0.0);
+    if (gw.z > 0.001 || tone2.y > 0.001) {
+      vec2 warp = vec2(fbm(vWorld * 0.15 + 9.0), fbm(vWorld * 0.15 + 21.0)) - 0.5;
+      stone = texture2D(uStone, (rot(0.227) * vWorld) / 8.5 + warp * 0.18).rgb;
+    }
+
+    // --- грунт (зерно дорожного тайла, сведённое к своему среднему) ----------
+    vec3 dirt = vec3(0.0);
+    if (gw.w > 0.001) {
+      dirt = mix(uRoadMean, texture2D(uRoad, (rot(0.7) * vWorld) / (uRoadTile * 1.3)).rgb, 0.35);
+      dirt *= (0.86 + fbm(vWorld * 0.6 + 2.0) * 0.18);
+      // земля темнее и серее полотна: иначе в шахте дорога тонет в грунте
+      dirt = mix(vec3(dot(dirt, vec3(0.299, 0.587, 0.114))), dirt, 0.45) * 0.66;
+    }
+
+    // --- слои пятнами, а не средним цветом ----------------------------------
+    // Вес слоя умножается на свой шум и возводится в куб: где слой один, он
+    // целиком; где их несколько, они проступают пятнами, а не мутной смесью.
+    vec4 n = vec4(fbm(vWorld * 0.05 + 1.3), fbm(vWorld * 0.06 + 17.0),
+                  fbm(vWorld * 0.08 + 41.0), fbm(vWorld * 0.055 + 63.0));
+    vec4 lw = gw * (0.35 + n * 1.3);
+    lw = lw * lw * lw;
+    lw /= max(dot(lw, vec4(1.0)), 1e-5);
+    vec3 ground = lw.x * grass + lw.y * moss + lw.z * stone + lw.w * dirt;
+
+    // Б: низкочастотная перекраска, период ~50 м, — поверх всего грунта
+    float low = fbm(vWorld * 0.021);
+    ground *= 1.0 + (low - 0.5) * 0.24;
+    ground *= 1.0 + (fbm(vWorld * 0.085 + 7.1) - 0.5) * 0.16;
+    ground = hueShift(ground, (fbm(vWorld * 0.017 + 31.7) - 0.5) * 0.14);
 
     // --- дорога ------------------------------------------------------------
     float cx, hw;
     road_at(vWorld.y, cx, hw);
     float d = abs(vWorld.x - cx);
+    // у торца дорога тает целиком — вместе с колеёй, шумом кромки и полосой
+    float alive = smoothstep(0.0, 0.8, hw);
 
     // Пятна исходного тайла сверху читаются артефактом текстуры, а не грязью:
-    // они повторяются вертикально с шагом тайла. Тайл сведён к своему среднему
-    // цвету и оставлен только как мелкое зерно.
+    // тайл сведён к своему среднему цвету и оставлен только как мелкое зерно.
     vec3 road = mix(uRoadMean, texture2D(uRoad, vWorld / uRoadTile).rgb, 0.22);
     road *= 0.94 + fbm(vWorld * 0.9) * 0.12;
+    // в шахте в полотно вкраплены плиты
+    road = mix(road, stone * 1.05, tone2.y * smoothstep(0.35, 0.7, n.z));
 
-    // Колея: две продольные полосы в 0.9 м друг от друга, прерывистые по шуму.
-    // Именно колея, а не пятна, читается сверху как «по дороге ездят».
-    // d уже отсчитан от оси сплайна, поэтому колея виляет вместе с дорогой.
-    // Разрывы сделаны заметными: сплошные полосы усиливают ощущение трубы.
+    // Колея: две продольные полосы, прерывистые по шуму
     float rutBreak = smoothstep(0.30, 0.52, fbm(vec2(vWorld.y * 0.09, 0.0)))
                    * smoothstep(0.28, 0.60, fbm(vec2(vWorld.y * 0.37, 11.3)));
-    float rutMask = (1.0 - smoothstep(0.0, 0.22, abs(d - uRutHalf))) * rutBreak;
+    float rutMask = (1.0 - smoothstep(0.0, 0.22, abs(d - uRutHalf))) * rutBreak * alive;
     road *= 1.0 - rutMask * 0.30;
 
-    // --- край: трава -> вытоптанная полоса -> земля -------------------------
-    // Один градиент читается мылом. Промежуточный слой даёт ДВА края, и каждый
-    // сбит шумом двух частот: медленная задаёт форму тропы, быстрая — языки
-    // травы, вгрызающиеся в грунт.
-    // Крупная волна раньше доминировала, и трава обрывалась круглыми фестонами —
-    // читалось вырезанным ножницами. Теперь она вдвое тише, а решают две мелкие
-    // частоты: одна даёт языки, вторая крошит их край.
+    // --- край: грунт -> вытоптанная полоса -> дорога -------------------------
     float jag = (fbm(vec2(vWorld.y * 0.035, 0.0)) - 0.5) * 1.1
               + (fbm(vec2(vWorld.y * 0.62, vWorld.x * 0.24)) - 0.5) * 1.5
               + (fbm(vec2(vWorld.y * 1.70, vWorld.x * 0.70)) - 0.5) * 0.55;
-    float eIn = hw + jag;
-    float eOut = eIn + 0.8;                            // полоса 0.8 м
-    vec3 trampled = mix(grass, road, 0.55) * 0.96;
+    float eIn = hw + jag * alive;
+    float eOut = eIn + 0.8 * alive;
+    vec3 trampled = mix(ground, road, 0.55) * 0.96;
 
-    vec3 col = grass;
-    col = mix(col, trampled, 1.0 - smoothstep(eOut - 0.28, eOut + 0.28, d));
-    col = mix(col, road, 1.0 - smoothstep(eIn - 0.20, eIn + 0.20, d));
+    vec3 col = ground;
+    col = mix(col, trampled, (1.0 - smoothstep(eOut - 0.28, eOut + 0.28, d)) * alive);
+    col = mix(col, road, (1.0 - smoothstep(eIn - 0.20, eIn + 0.20, d)) * alive);
+
+    // --- палитра биома: весь грунт вместе с дорогой; спрайты не трогаются ----
+    float lum = dot(col, vec3(0.299, 0.587, 0.114));
+    col = mix(vec3(lum), col, tone.w) * tone.rgb * tone2.x;
 
     gl_FragColor = vec4(col, 1.0);
   }
@@ -255,28 +326,14 @@ function meanColour(img) {
   return new THREE.Color(r / 255, g / 255, b / 255).convertSRGBToLinear();
 }
 
-/* Ширина силуэта у самого основания — для тени. Не габарит плоскости: у дерева
-   крона втрое шире ствола, и тень по габариту легла бы блином. */
-function baseWidth(img) {
-  const W = Math.min(img.width, 256);
-  const H = Math.round(img.height * (W / img.width));
-  const c = document.createElement('canvas');
-  c.width = W; c.height = H;
-  const cx = c.getContext('2d', { willReadFrequently: true });
-  cx.drawImage(img, 0, 0, W, H);
-  const d = cx.getImageData(0, 0, W, H).data;
-  let lo = W, hi = 0;
-  for (let y = Math.floor(H * 0.9); y < H; y++) {
-    for (let x = 0; x < W; x++) {
-      if (d[(y * W + x) * 4 + 3] > 16) { if (x < lo) lo = x; if (x > hi) hi = x; }
-    }
-  }
-  return hi > lo ? (hi - lo + 1) / W : 0.5;      // доля ширины картинки
-}
-
 // ---------------------------------------------------------------- спрайты --
 const cache = new Map();
 let strippedSet = new Set();
+/* Где спрайт касается земли: proto/sprite_contact.json (tools/sprite_contact.py),
+   посчитано заранее по той же текстуре, что грузится здесь. Доли высоты и
+   ширины текстуры, поэтому годятся при любом размере объекта в сцене. */
+let CONTACT = { sprites: {} };
+const SHADOWS = [];                          // для __PROTO.shadows(): проверки и отчёты
 
 function sprite(t) {
   if (!cache.has(t)) {
@@ -284,7 +341,7 @@ function sprite(t) {
     cache.set(t, tex(url).then((map) => ({
       map,
       aspect: map.image.width / map.image.height,
-      base: baseWidth(map.image),
+      contact: CONTACT.sprites[t] || null,
     })).catch(() => null));
   }
   return cache.get(t);
@@ -313,8 +370,17 @@ function flatQuad(art, o, z) {
   return q;
 }
 
-/* Тень вместо вырезанного цоколя. Эллипс по ширине силуэта у основания, мягкий
-   край, единое смещение по свету. */
+/* Контактная тень: объект вдавлен в землю, а не стоит над пятном.
+
+   Центр — НА линии контакта спрайта (строка основания из sprite_contact.json,
+   повёрнутая вместе со спрайтом), а не у кромки холста: у вырезанных
+   спрайтов основание на 0.4–1.2 м выше кромки, и тень оттуда лежала под
+   объектом отдельным пятном. Половина тени уходит под основание — это и
+   читается как контакт.
+
+   Размер: ширина — ширина основания; глубина мала и ограничена сверху и
+   долей ширины, и долей высоты объекта (у фасада в 12 м она не растёт до
+   метров). Все числа — presentation.contact_shadow из runtime layout. */
 let shadowTex = null;
 function shadowTexture() {
   if (shadowTex) return shadowTex;
@@ -323,9 +389,10 @@ function shadowTexture() {
   c.width = c.height = S;
   const cx = c.getContext('2d');
   const g = cx.createRadialGradient(S / 2, S / 2, 0, S / 2, S / 2, S / 2);
-  // мягкий край вдвое уже прежнего: тень должна читаться пятном, а не дымкой
+  // темнее всего в центре (на линии контакта) и быстро сходит на нет
   g.addColorStop(0, 'rgba(0,0,0,1)');
-  g.addColorStop(0.74, 'rgba(0,0,0,0.94)');
+  g.addColorStop(0.3, 'rgba(0,0,0,0.78)');
+  g.addColorStop(0.65, 'rgba(0,0,0,0.3)');
   g.addColorStop(1, 'rgba(0,0,0,0)');
   cx.fillStyle = g;
   cx.fillRect(0, 0, S, S);
@@ -333,17 +400,40 @@ function shadowTexture() {
   return shadowTex;
 }
 
+/* Точка контакта в мире: основание спрайта с учётом его поворота в плоскости
+   земли (flatQuad крутит квад вокруг центра на rotY). */
+function contactPoint(art, o, z) {
+  const w = o.h * art.aspect, c = art.contact, a = o.rotY || 0;
+  const px = c.contact_centre * w, py = (0.5 - c.contact_row) * o.h;   // локально, +y — верх картинки
+  return {
+    x: o.pos[0] + px * Math.cos(a) - py * Math.sin(a),
+    z: z - (px * Math.sin(a) + py * Math.cos(a)),
+    w: c.contact_width * w,
+  };
+}
+
+function shadowSize(o, baseW) {
+  const P = PRES.contact_shadow;
+  const w = baseW * P.width_scale;
+  const cap = Math.min(P.depth_max, P.depth_per_height * o.h);
+  const d = Math.max(P.depth_min, Math.min(P.depth_per_width * w, cap));
+  return { w, d };
+}
+
 function shadowFor(art, o, z) {
-  const w = o.h * art.aspect * art.base * 0.94;   // плотнее к основанию силуэта
+  if (!art.contact) return new THREE.Object3D();    // тест покрытия не пускает сюда
+  const p = contactPoint(art, o, z);
+  const { w, d } = shadowSize(o, p.w);
   const q = new THREE.Mesh(
-    new THREE.PlaneGeometry(w, w * 0.48),
+    new THREE.PlaneGeometry(w, d),
     new THREE.MeshBasicMaterial({
-      map: shadowTexture(), transparent: true, opacity: 0.5,
+      map: shadowTexture(), transparent: true, opacity: PRES.contact_shadow.opacity,
       depthTest: false, depthWrite: false, color: 0x1a1a14,
     }));
   q.rotation.x = -Math.PI / 2;
-  q.position.set(o.pos[0] + LIGHT.dx, 0.5, z + o.h / 2 + LIGHT.dz);
+  q.position.set(p.x, 0.5, p.z);
   q.renderOrder = ORDER.shadow;
+  if (o.id) SHADOWS.push({ id: o.id, t: o.t, x: p.x, z: p.z, w, d });
   return q;
 }
 
@@ -430,18 +520,18 @@ const DECALS = [
     share: 0.16, order: ORDER.decalFar, onRoad: true, plain: true },
   { key: 'patch2', tex: (img) => patchTexture('dark', img), size: [0.9, 1.9],
     share: 0.10, order: ORDER.decalFar, onRoad: true, plain: true },
-  { key: 'grass_tuft_a', size: [0.9, 1.7], share: 0.24, order: ORDER.decalNear },
-  { key: 'grass_tuft_b', size: [0.9, 1.7], share: 0.18, order: ORDER.decalNear },
+  { key: 'grass_tuft_a', size: [0.9, 1.7], share: 0.24, order: ORDER.decalNear, veg: true },
+  { key: 'grass_tuft_b', size: [0.9, 1.7], share: 0.18, order: ORDER.decalNear, veg: true },
   /* Кромка должна быть зубчатой ОБЪЕКТАМИ, а не только маской: маска сколь
      угодно рваная всё равно читается краем заливки. Эти кустики сидят поперёк
      границы и заходят на землю. */
   { key: 'grass_tuft_a', name: 'verge_a', size: [0.6, 1.2], share: 0.08,
-    order: ORDER.decalNear, verge: true },
+    order: ORDER.decalNear, verge: true, veg: true },
   { key: 'grass_tuft_b', name: 'verge_b', size: [0.6, 1.2], share: 0.06,
-    order: ORDER.decalNear, verge: true },
+    order: ORDER.decalNear, verge: true, veg: true },
   { key: 'rock_s', size: [0.6, 1.2], share: 0.12, order: ORDER.decalNear },
-  { key: 'mushrooms', size: [0.5, 0.9], share: 0.04, order: ORDER.decalNear },
-  { key: 'fern', size: [0.8, 1.5], share: 0.04, order: ORDER.decalNear },
+  { key: 'mushrooms', size: [0.5, 0.9], share: 0.04, order: ORDER.decalNear, veg: true },
+  { key: 'fern', size: [0.8, 1.5], share: 0.04, order: ORDER.decalNear, veg: true },
 ];
 
 /* Плотность пересмотрена после того, как у декалей появилась вариация: тот же
@@ -479,8 +569,12 @@ async function buildDecals(len, roadAt, roadImg) {
       const x = (h01('dx', dname, i) * 2 - 1) * FIELD_X;
       const z = 20 - h01('dz', dname, i) * (len + 40);
       const { cx, hw } = roadAt(z);
+      // трава редеет там, где её нет по presentation (шахта, мир духов); решает
+      // тот же хеш, поэтому земля воспроизводится от загрузки к загрузке
+      if (spec.veg && h01('veg', dname, i) > presentationAt(z).vegetation) continue;
       let px = x;
       if (spec.verge) {
+        if (hw < 0.5) continue;          // за концом дороги кромки нет
         // сажаем поперёк кромки: гладкая hw плюс разброс шире, чем ходит шум
         // края, поэтому часть кустов оказывается на земле, часть на траве
         px = cx + (x < 0 ? -1 : 1) * (hw + (h01('dv2', dname, i) - 0.5) * 1.9);
@@ -516,16 +610,62 @@ async function buildDecals(len, roadAt, roadImg) {
   }
 }
 
+// -------------------------------------------------------------- presentation --
+/* Как выглядит каждый биом и где один переходит в другой — не здесь, а в
+   assets/topdown/presentation.json; tools/generate_layout.py пересчитывает его
+   в мировые Z и кладёт в runtime layout (layout.presentation). Отсюда берутся
+   и uniforms шейдера, и затемнение перехода, и доля травы в декалях: одни и
+   те же числа, одна и та же формула ступени (см. biome_at в GROUND_FS). */
+let PRES = null;
+
+function biomeAt(z) {
+  let b = 0;
+  for (const t of PRES.transitions) {
+    const [z0, z1] = t.blend_z;
+    const u = Math.min(Math.max((z0 - z) / (z0 - z1), 0), 1);
+    b += u * u * (3 - 2 * u);
+  }
+  return b;
+}
+
+/* Затемнение кадра у якоря перехода: пик в якоре, к half_width метров от него
+   сходит на нет. Зависит только от положения камеры, не от времени. */
+function dimAt(z) {
+  let o = 0;
+  for (const t of PRES.transitions) {
+    const u = Math.min(Math.abs(z - t.anchor_z) / t.dim.half_width, 1);
+    o = Math.max(o, t.dim.max * (1 - u * u * (3 - 2 * u)));
+  }
+  return o;
+}
+
+function presentationAt(z) {
+  const b = biomeAt(z);
+  const i = Math.min(Math.floor(b), PRES.biomes.length - 1);
+  const f = b - i;
+  const A = PRES.biomes[i], B = PRES.biomes[Math.min(i + 1, PRES.biomes.length - 1)];
+  const layers = ['grass', 'moss', 'stone', 'dirt'];
+  const w = Object.fromEntries(layers.map((k) => [k, +(A.ground[k] * (1 - f) + B.ground[k] * f).toFixed(3)]));
+  return {
+    z, biome: A.id, neighbour: f > 0 ? B.id : null, blend: +f.toFixed(3),
+    overlay: +dimAt(z).toFixed(3),
+    ground: layers.reduce((m, k) => (w[k] > w[m] ? k : m), 'grass'), groundWeights: w,
+    vegetation: +(A.vegetation * (1 - f) + B.vegetation * f).toFixed(3),
+  };
+}
+
 // ------------------------------------------------------------------ сборка --
 let roadAt = () => ({ cx: 0, hw: 3.2 });
 
 async function main() {
-  const [layout, spline, index] = await Promise.all([
+  const [layout, spline, index, contact] = await Promise.all([
     fetch(LAYOUT).then((r) => r.json()),
     fetch(ASSETS + 'road_spline.json').then((r) => r.json()),
     fetch(STRIPPED + 'index.json').then((r) => r.json()).catch(() => ({ stripped: [] })),
+    fetch('./sprite_contact.json').then((r) => r.json()),
   ]);
   strippedSet = new Set(index.stripped);
+  CONTACT = contact;
   if (typeof layout.road_half_width !== 'number') {
     throw new Error('в ' + LAYOUT + ' нет road_half_width');
   }
@@ -552,16 +692,27 @@ async function main() {
     centre.push(v.x);
     width.push(v.y);
   }
+  // конец дороги — у финального дома (config.json road_end_z через runtime);
+  // за ним полуширина сходит по четверти круга, как в шейдере
+  if (typeof layout.road_end_z !== 'number') throw new Error('в ' + LAYOUT + ' нет road_end_z');
+  const ROAD_END = layout.road_end_z;
   roadAt = (z) => {
     const t = Math.min(Math.max((0 - z) / zStep, 0), NPTS - 1.001);
     const i = Math.floor(t), f = t - i;
-    return { cx: centre[i] + (centre[i + 1] - centre[i]) * f,
-             hw: ROAD_HALF * (width[i] + (width[i + 1] - width[i]) * f) };
+    let hw = ROAD_HALF * (width[i] + (width[i + 1] - width[i]) * f);
+    const past = ROAD_END - z;
+    if (past > 0) hw = past < hw ? hw * Math.sqrt(1 - (past / hw) ** 2) : 0;
+    return { cx: centre[i] + (centre[i + 1] - centre[i]) * f, hw };
   };
 
-  const [grass, grass2, road] = await Promise.all([
-    tex('./tile_grass.webp', true), tex('./tile_grass.webp', true),
-    tex('./tile_path.webp', true),
+  PRES = layout.presentation;
+  if (!PRES || PRES.biomes.length !== ids.length) throw new Error('в ' + LAYOUT + ' нет presentation');
+  const T = PRES.textures;
+  /* Все текстуры грунта грузятся ДО первого кадра: state.ready/done ставятся
+     только после них, и скриншот не может поймать землю без текстуры. */
+  const [grass, grass2, road, moss, stone] = await Promise.all([
+    tex('./' + T.grass, true), tex('./' + T.grass, true),
+    tex('./' + T.road, true), tex('./' + T.moss, true), tex('./' + T.stone, true),
   ]);
   /* Земля сейчас спорит с крышами — она фон, а не главный предмет кадра.
      Насыщенность снята на 28% и тон уведён в серо-коричневый. */
@@ -574,7 +725,14 @@ async function main() {
     new THREE.PlaneGeometry(320, state.len + 220),
     new THREE.ShaderMaterial({
       vertexShader: GROUND_VS, fragmentShader: GROUND_FS,
+      defines: { NB: PRES.biomes.length, NTRANS: PRES.transitions.length },
       uniforms: {
+        uMoss: { value: moss }, uStone: { value: stone },
+        uRoadEnd: { value: ROAD_END },
+        uGround: { value: PRES.biomes.map((b) => new THREE.Vector4(b.ground.grass, b.ground.moss, b.ground.stone, b.ground.dirt)) },
+        uTone: { value: PRES.biomes.map((b) => new THREE.Vector4(b.tint[0], b.tint[1], b.tint[2], b.saturation)) },
+        uTone2: { value: PRES.biomes.map((b) => new THREE.Vector4(b.brightness, b.road_stone, 0, 0)) },
+        uTrans: { value: PRES.transitions.map((t) => new THREE.Vector2(t.blend_z[0], t.blend_z[1])) },
         uGrass: { value: grass }, uGrass2: { value: grass2 },
         uRoad: { value: road }, uRoadMean: { value: new THREE.Vector3(mean.r, mean.g, mean.b) },
         uHalf: { value: ROAD_HALF },
@@ -720,7 +878,13 @@ function resize() {
   renderer.setSize(w, h);
 }
 
+/* Затемнение перехода — не контент: пустой слой поверх канваса и под панелью,
+   прозрачность которого задаёт положение камеры. Своих таймеров и анимаций
+   у него нет, поэтому кадр в заданной Z всегда один и тот же. */
+const OVERLAY = document.getElementById('biome-transition-overlay');
+
 function draw() {
+  if (OVERLAY && PRES) OVERLAY.style.opacity = dimAt(state.z).toFixed(3);
   camera.position.set(0, 120, state.z);
   camera.lookAt(0, 0, state.z);
   camera.up.set(0, 0, -1);
@@ -804,6 +968,10 @@ window.__PROTO = {
   sortTest,
   edgeStats,
   state,
+  // только чтение: для отчётов и тестов (что под камерой, где дорога)
+  presentationAt: (z) => presentationAt(z ?? state.z),
+  shadows: () => SHADOWS.map((s) => ({ ...s })),
+  roadAt: (z) => roadAt(z),
 };
 
 main().catch((e) => { HUD.textContent = 'ошибка: ' + e.message; throw e; });

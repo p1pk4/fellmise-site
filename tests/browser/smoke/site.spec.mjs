@@ -125,6 +125,21 @@ test.describe('/proto/', () => {
     clean(watch);
   });
 
+  test('repaired sprites are what /proto/ loads', async ({ page, watch }) => {
+    const got = new Map();
+    page.on('response', async (r) => {
+      const m = r.url().match(/\/proto\/sprites_stripped\/(hero_house_a|hero_house_b|hero_well)\.webp$/);
+      if (m) got.set(m[1], r.status());
+    });
+    await page.goto('/proto/');
+    await page.waitForFunction(PROTO_READY, null, { timeout: CONFIG.routes['/proto/'].readyTimeoutMs });
+    const index = await (await page.request.get('/proto/sprites_stripped/index.json')).json();
+    test.skip(!index.repaired, 'this checkout has no repaired sprites');
+    expect(Object.keys(index.repaired).sort()).toEqual(['hero_house_a', 'hero_house_b', 'hero_well']);
+    for (const t of Object.keys(index.repaired)) expect(got.get(t), t).toBe(200);
+    clean(watch);
+  });
+
   test('every object shadow sits on its measured ground contact', async ({ page, watch }) => {
     await page.goto('/proto/');
     await page.waitForFunction(PROTO_READY, null, { timeout: CONFIG.routes['/proto/'].readyTimeoutMs });

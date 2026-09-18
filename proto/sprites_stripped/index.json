@@ -11,5 +11,26 @@
   "prop_signpost",
   "rock_l",
   "rock_m"
- ]
+ ],
+ "repaired": {
+  "hero_house_a": {
+   "variant": "B",
+   "unchanged_rows_from_top": 334,
+   "note": "sprite bottom repair batch 1, variant B: base restored from assets/<t>.webp (ground removed) + Flux inpaint of the base band only; rows above unchanged; strip_pedestal.py does not overwrite it",
+   "layout_foot": 0.8633
+  },
+  "hero_house_b": {
+   "variant": "B",
+   "unchanged_rows_from_top": 331,
+   "note": "sprite bottom repair batch 1, variant B: base restored from assets/<t>.webp (ground removed) + Flux inpaint of the base band only; rows above unchanged; strip_pedestal.py does not overwrite it",
+   "layout_foot": 0.8789
+  },
+  "hero_well": {
+   "variant": "B",
+   "unchanged_rows_from_top": 415,
+   "note": "sprite bottom repair batch 1, variant B: base restored from assets/<t>.webp (ground removed) + Flux inpaint of the base band only; rows above unchanged; strip_pedestal.py does not overwrite it",
+   "layout_foot": 0.9805
+  }
+ },
+ "repaired_layout_note": "layout_foot: footprint width (share of texture width) measured on the pre-repair texture; tools/topdown_compose.py keeps it so the repair does not move the layout (re-measured it would swap one tree in village/west-woods). Re-measuring is a composition decision."
 }

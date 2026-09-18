@@ -1,6 +1,6 @@
 {
  "generated": "tools/sprite_contact.py по текстурам, которые грузит /proto/",
- "rule": "stripped: нижняя строка, где вырезанный спрайт сохранил >= 0.5 непрозрачных пикселей исходной строки; run: нижняя строка со сплошным отрезком >= 0.03 ширины, устойчивым 0.01 высоты; ширина и центр — по полосе 0.03 высоты над строкой контакта",
+ "rule": "stripped: нижняя строка, где вырезанный спрайт сохранил >= 0.5 непрозрачных пикселей исходной строки; run: нижняя строка со сплошным отрезком >= 0.03 ширины, устойчивым 0.01 высоты; ширина и центр — по полосе 0.03 высоты над строкой контакта; отремонтированные (index.json repaired) — по run",
  "sprites": {
   "barn": {
    "src": "proto/sprites_stripped/barn.webp",
@@ -263,17 +263,17 @@
   },
   "hero_house_a": {
    "src": "proto/sprites_stripped/hero_house_a.webp",
-   "rule": "stripped",
-   "contact_row": 0.8545,
-   "contact_width": 0.8839,
-   "contact_centre": 0.0509
+   "rule": "run",
+   "contact_row": 0.9227,
+   "contact_width": 0.4964,
+   "contact_centre": -0.0196
   },
   "hero_house_b": {
    "src": "proto/sprites_stripped/hero_house_b.webp",
-   "rule": "stripped",
-   "contact_row": 0.8421,
-   "contact_width": 0.8375,
-   "contact_centre": 0.0045
+   "rule": "run",
+   "contact_row": 0.8947,
+   "contact_width": 0.7554,
+   "contact_centre": -0.0312
   },
   "hero_tree_a": {
    "src": "assets/hero_tree_a.webp",
@@ -291,10 +291,10 @@
   },
   "hero_well": {
    "src": "proto/sprites_stripped/hero_well.webp",
-   "rule": "stripped",
-   "contact_row": 0.8207,
-   "contact_width": 0.9768,
-   "contact_centre": 0.0027
+   "rule": "run",
+   "contact_row": 0.9017,
+   "contact_width": 0.1714,
+   "contact_centre": 0.0143
   },
   "hill_dark": {
    "src": "assets/hill_dark.webp",

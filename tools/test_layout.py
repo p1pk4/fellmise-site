@@ -19,14 +19,23 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "tools"))
 
 import generate_layout as G   # noqa: E402
+import topdown_compose as TC  # noqa: E402
 import topdown_layout as T    # noqa: E402
 
 SPEC = json.loads(G.SPEC.read_text(encoding="utf-8"))
 CFG = G.load_topdown_config()
+COMP = TC.load_composition()
+
+# assets/layout.json as /next/ has read it since 2feb83f (LF-normalised). The
+# legacy target must not move while top-down is being recomposed; change this
+# only in a batch that deliberately changes /next/.
+LEGACY_SHA256 = "0898d0865c2d26d27ddab96dfe45827e62b554ff81d6cb2ebc57e7e3e4d2fb49"
 
 
-def build(target, spec=SPEC):
-    layout, bad, _ = G.generate(copy.deepcopy(spec), target, CFG if target == "topdown" else None)
+def build(target, spec=SPEC, comp=COMP):
+    layout, bad, _ = G.generate(copy.deepcopy(spec), target,
+                                CFG if target == "topdown" else None,
+                                copy.deepcopy(comp) if target == "topdown" else None)
     return layout, bad
 
 
@@ -36,6 +45,20 @@ def ids(layout):
 
 def read(rel):
     return (ROOT / rel).read_text(encoding="utf-8")
+
+
+def positions(layout):
+    return {i: (o.get("t"), o["pos"], o["h"], o["rotY"]) for i, o in T.objects(layout).items()}
+
+
+# Scatter is accepted or refused by geometry: a new object can take the spot of
+# a scatter candidate. Its ids are still stable (hash candidate), only the set
+# can shrink. Everything else is authored and must not move.
+DERIVED = ("/scatter/",)
+
+
+def authored(id_list):
+    return [i for i in id_list if not any(d in i for d in DERIVED)]
 
 
 LEGACY, _ = build("legacy")
@@ -57,93 +80,126 @@ class Generation(unittest.TestCase):
         runtime = T.merge(TOPDOWN, T.load_overrides())
         self.assertEqual(T.dump(runtime), read("assets/topdown/layout.runtime.json"))
 
-    def test_known_violations_match(self):
-        """The top-down validator's findings are exactly the known list."""
-        new, stale = G.known_split(TOPDOWN_BAD, CFG.get("validator_known_violations", []))
-        self.assertEqual(new, [], "новые нарушения top-down")
-        self.assertEqual(stale, [], "устаревшие записи в validator_known_violations")
+    def test_legacy_layout_unchanged(self):
+        """/next/'s layout is byte-identical to the one production serves."""
+        import hashlib
+        text = read("assets/layout.json").encode("utf-8")
+        self.assertEqual(hashlib.sha256(text).hexdigest(), LEGACY_SHA256)
 
-    def test_topdown_scene_equals_legacy_scene(self):
-        """Visual invariant: top-down placement is the legacy placement.
+    def test_topdown_has_no_violations(self):
+        """Zero road intrusions, zero collisions — and no known-list to hide any."""
+        self.assertEqual(TOPDOWN_BAD, [])
+        self.assertNotIn("validator_known_violations", CFG)
 
-        Before this batch /proto/ drew assets/layout.json. Same objects, same
-        order, same sprite, position, height, rotation, visibility and every
-        other field — only the id differs — so the picture cannot differ."""
-        self.assertEqual(list(LEGACY["biomes"]), list(TOPDOWN["biomes"]))
-        for bid in LEGACY["biomes"]:
-            a, b = LEGACY["biomes"][bid], TOPDOWN["biomes"][bid]
-            for kind in ("sprites", "boards"):
-                self.assertEqual(len(a[kind]), len(b[kind]), f"{bid}/{kind}")
-                for x, y in zip(a[kind], b[kind]):
-                    self.assertEqual({k: v for k, v in x.items() if k != "id"},
-                                     {k: v for k, v in y.items() if k != "id"})
-            ca, cb = a.get("counter"), b.get("counter")
-            self.assertEqual(ca and {k: v for k, v in ca.items() if k != "id"},
-                             cb and {k: v for k, v in cb.items() if k != "id"})
-        da, db = dict(LEGACY["debug"]), dict(TOPDOWN["debug"])
-        da.pop("road_half_width"), db.pop("road_half_width")
-        self.assertEqual(da, db)
+    def test_validator_still_catches_intrusions(self):
+        """Put a barn on the road: the validator must say so."""
+        comp = copy.deepcopy(COMP)
+        comp["biomes"]["village"]["clusters"].append(
+            {"key": "barn-on-road", "at": [1.0, -60], "items": [{"t": "barn", "h": "barn"}]})
+        _, bad = build("topdown", comp=comp)
+        self.assertTrue(any("barn-on-road" in b and "на дороге" in b for b in bad), bad)
+
+    def test_validator_catches_collisions(self):
+        """Two houses on one spot collide."""
+        comp = copy.deepcopy(COMP)
+        comp["biomes"]["village"]["clusters"].append(
+            {"key": "twin", "at": [-15.5, -14], "items": [{"t": "hero_house_a", "h": "house"}]})
+        _, bad = build("topdown", comp=comp)
+        self.assertTrue(any("twin" in b and "друг на друге" in b for b in bad), bad)
+
+    def test_composition_structure_checked(self):
+        """Duplicate keys, diagonal fences, unknown boards, '/' in keys fail."""
+        for mutate in (
+            lambda b: b["clusters"].append(dict(b["clusters"][0])),
+            lambda b: b["fences"].append({"key": "diag", "from": [10, -1], "to": [14, -5]}),
+            lambda b: b["boards"].__setitem__("no_such_board", {"at": [9, -9]}),
+            lambda b: b["clusters"].append({"key": "bad/key", "at": [0, 0], "items": []}),
+        ):
+            comp = copy.deepcopy(COMP)
+            mutate(comp["biomes"]["village"])
+            self.assertTrue(TC.check_composition(comp, SPEC))
+        self.assertEqual(TC.check_composition(COMP, SPEC), [])
 
 
 class StableIds(unittest.TestCase):
     def test_unique(self):
-        """Every sprite, board and counter id is unique."""
-        every = ids(TOPDOWN) + [b["counter"]["id"] for b in TOPDOWN["biomes"].values()
-                                if b.get("counter")]
+        """Every sprite and board id is unique and none is a legacy id."""
+        every = ids(TOPDOWN)
         self.assertEqual(len(every), len(set(every)))
         self.assertTrue(all("#" not in i for i in every), "легаси-id в top-down")
 
-    def test_insert_beat_keeps_other_ids(self):
-        """A beat of another kind inserted at the head of the village rhythm
-        renames nothing that existed. The legacy scheme does rename: the same
-        legacy id now points at a different object — shown here too, so the
-        test would notice if it stopped measuring anything."""
+    def test_same_kind_cluster_insert_keeps_ids_and_positions(self):
+        """A new place of the SAME kind (a well square) inserted first in the
+        village renames nothing and moves nothing that was authored: ids come
+        from keys, jitter hashes the id."""
+        comp = copy.deepcopy(COMP)
+        comp["biomes"]["village"]["clusters"].insert(0, {
+            "key": "north-well", "at": [-30, -96], "items": [
+                {"key": "well", "t": "hero_well", "h": "well"},
+                {"t": "prop_crates", "h": "crates", "dx": -3.4, "dz": 1.6}]})
+        new, _ = build("topdown", comp=comp)
+        before, after = positions(TOPDOWN), positions(new)
+        for i in authored(before):
+            self.assertIn(i, after)
+            self.assertEqual(before[i], after[i], i)
+        self.assertIn("village/north-well/well", after)
+
+    def test_member_insert_is_contained(self):
+        """A new item in one cluster changes nothing outside that cluster."""
+        comp = copy.deepcopy(COMP)
+        wh = next(c for c in comp["biomes"]["village"]["clusters"] if c["key"] == "west-homes")
+        wh["items"].insert(0, {"t": "hero_tree_b", "h": "bush", "dx": 4, "dz": -30})
+        new, _ = build("topdown", comp=comp)
+        before, after = positions(TOPDOWN), positions(new)
+        for i in authored(before):
+            if not i.startswith("village/west-homes/"):
+                self.assertEqual(before[i], after.get(i), i)
+
+    def test_mass_members_keep_their_place(self):
+        """A mass member is its hash candidate: a member present before and
+        after an unrelated insertion sits exactly where it sat."""
+        comp = copy.deepcopy(COMP)
+        comp["biomes"]["forest"]["clusters"].append(
+            {"key": "extra-stump", "at": [22, -40], "items": [{"t": "biome_stump", "h": "stump"}]})
+        new, _ = build("topdown", comp=comp)
+        before, after = positions(TOPDOWN), positions(new)
+        common = [i for i in before if i in after and "/east-deep/" in i]
+        self.assertTrue(common)
+        for i in common:
+            self.assertEqual(before[i], after[i], i)
+
+    def test_keyed_spec_tacts_survive_same_kind_insert(self):
+        """Fallback path (a biome composition.json does not describe): spec
+        beats with an explicit `key` keep their ids and jitter when a beat of
+        the SAME kind is inserted above them. Without keys the ordinal-based
+        id now names a different beat — shown too, so the test measures
+        something."""
+        comp = copy.deepcopy(COMP)
+        del comp["biomes"]["forest"]
         spec = copy.deepcopy(SPEC)
-        v = spec["biomes"]["village"]
-        v["rhythm"].insert(0, {"z": -5, "side": "R", "lane": "far",
-                               "single": "hero_well", "h": "well"})
-        for run in v.get("runs", []):
-            run["owner_tact"] += 1          # runs point at beats by index
-        new, _ = build("topdown", spec)
-        # Scatter and end posts are DERIVED from geometry: inserting a beat
-        # re-spaces the row, so a scatter candidate may now be refused or a
-        # fence end may now butt into a building and need no post. Those
-        # objects can legitimately vanish; everything authored must keep its id.
-        before = [i for i in ids(TOPDOWN)
-                  if "/scatter/" not in i and "/end_post." not in i]
-        after = set(ids(new))
-        self.assertEqual([i for i in before if i not in after], [])
-        self.assertIn("village/hero_well.1", after)
+        for n, beat in enumerate(spec["biomes"]["forest"]["rhythm"]):
+            beat["key"] = f"beat-{n}"
+        base, _ = build("topdown", spec=spec, comp=comp)
+        spec2 = copy.deepcopy(spec)
+        spec2["biomes"]["forest"]["rhythm"].insert(0, {
+            "z": -4, "side": "L", "lane": "near", "group": "pine_stand", "key": "new-stand"})
+        new, _ = build("topdown", spec=spec2, comp=comp)
+        keyed = [i for i in ids(base) if i.startswith("forest/beat-")]
+        self.assertTrue(keyed)
+        self.assertEqual([i for i in keyed if i not in set(ids(new))], [])
+        self.assertTrue(any(i.startswith("forest/new-stand/") for i in ids(new)))
 
-        legacy_new, _ = build("legacy", spec)
-
-        def legacy_to_topdown(leg, top):
-            return {x["id"]: y["id"]
-                    for bid in leg["biomes"] for kind in ("sprites", "boards")
-                    for x, y in zip(leg["biomes"][bid][kind], top["biomes"][bid][kind])}
-        old_map = legacy_to_topdown(LEGACY, TOPDOWN)
-        new_map = legacy_to_topdown(legacy_new, new)
-        self.assertNotEqual(old_map["hero_well#1"], new_map["hero_well#1"])
-
-    def test_group_member_insert_is_contained(self):
-        """A member added to one group changes ids only inside containers of
-        that group; biomes that do not use it keep every id."""
-        spec = copy.deepcopy(SPEC)
-        spec["groups"]["grove"]["members"].insert(
-            0, {"t": "rock_s", "dx": 3.5, "dz": 2.0, "h": "rock_s"})
-        new, _ = build("topdown", spec)
-        after = set(ids(new))
-        kept = [i for i in ids(TOPDOWN) if "/grove." not in i and "/scatter/" not in i
-                and "/end_post." not in i]
-        self.assertEqual([i for i in kept if i not in after], [])
-        for bid in ("forest", "mine", "spirit"):
-            self.assertEqual(ids({"biomes": {bid: TOPDOWN["biomes"][bid]}}),
-                             ids({"biomes": {bid: new["biomes"][bid]}}), bid)
+        plain_new = copy.deepcopy(SPEC)
+        plain_new["biomes"]["forest"]["rhythm"].insert(0, {
+            "z": -4, "side": "L", "lane": "near", "group": "pine_stand"})
+        a, _ = build("topdown", spec=SPEC, comp=comp)
+        b, _ = build("topdown", spec=plain_new, comp=comp)
+        pa, pb = positions(a), positions(b)
+        self.assertNotEqual(pa["forest/pine_stand.1/biome_pine_a.1"],
+                            pb["forest/pine_stand.1/biome_pine_a.1"])
 
     def test_ids_do_not_depend_on_array_position(self):
-        """Ids are not array positions: moving an unrelated object to the end of
-        its biome's list after generation changes no id, and no id carries the
-        legacy global occurrence counter."""
+        """Ids are not array positions, and none carries the legacy counter."""
         for i in ids(TOPDOWN):
             self.assertIsNone(re.search(r"#\d+$", i), i)
         shuffled = copy.deepcopy(TOPDOWN)
@@ -152,6 +208,32 @@ class StableIds(unittest.TestCase):
         self.assertEqual(sorted(ids(TOPDOWN)), sorted(ids(shuffled)))
         runtime = T.merge(shuffled, T.load_overrides())
         self.assertEqual(sorted(ids(runtime)), sorted(ids(TOPDOWN)))
+
+
+class Road(unittest.TestCase):
+    def test_road_model_is_protos(self):
+        """The Python road is proto's road: the same 64 samples three.js
+        produces (tests/fixtures/road_samples.json, node tools/road_samples.mjs),
+        for the spline that is committed now."""
+        import hashlib
+        fx = json.loads(read("tests/fixtures/road_samples.json"))
+        spline = read("assets/road_spline.json").encode("utf-8")
+        self.assertEqual(fx["spline_sha256"], hashlib.sha256(spline).hexdigest(),
+                         "road_spline.json изменился — node tools/road_samples.mjs")
+        road = TC.Road(CFG["road_half_width"])
+        for (x, w), cx, cw in zip(fx["samples"], road.centre, road.width):
+            self.assertAlmostEqual(x, cx, places=9)
+            self.assertAlmostEqual(w, cw, places=9)
+
+    def test_clearance_uses_canonical_width(self):
+        """Top-down placement and validation use config road_half_width;
+        legacy keeps the spec's."""
+        _, _, bld = G.generate(copy.deepcopy(SPEC), "topdown", CFG, copy.deepcopy(COMP))
+        self.assertEqual(bld.road, CFG["road_half_width"])
+        self.assertEqual(bld.placement_road, CFG["road_half_width"])
+        self.assertEqual(bld.composer.road.half, CFG["road_half_width"])
+        _, _, leg = G.generate(copy.deepcopy(SPEC), "legacy")
+        self.assertEqual(leg.placement_road, SPEC["global"]["road_half_width"])
 
 
 class Overrides(unittest.TestCase):
@@ -278,7 +360,8 @@ class Consumers(unittest.TestCase):
         self.assertIn("ROAD_HALF = layout.road_half_width", proto)
         self.assertIsNone(re.search(r"ROAD_HALF\s*=\s*[\d.]+", proto))
         literal = re.escape(repr(road))
-        for rel in ("proto/main.js", "tools/generate_layout.py", "tools/topdown_layout.py"):
+        for rel in ("proto/main.js", "tools/generate_layout.py", "tools/topdown_layout.py",
+                    "tools/topdown_compose.py"):
             self.assertIsNone(re.search(rf"(?<![\d.]){literal}(?![\d])", read(rel)), rel)
         # legacy keeps the spec's own value
         self.assertEqual(LEGACY["debug"]["road_half_width"],
@@ -299,6 +382,10 @@ class Consumers(unittest.TestCase):
     def test_proto_reads_topdown_runtime(self):
         proto = read("proto/main.js")
         self.assertIn("'topdown/layout.runtime.json'", proto)
+        self.assertIn("BIOME_SPACING = layout.biome_spacing", proto)
+        self.assertIsNone(re.search(r"BIOME_SPACING\s*=\s*\d", proto))
+        runtime = json.loads(read("assets/topdown/layout.runtime.json"))
+        self.assertEqual(runtime["biome_spacing"], CFG["biome_spacing"])
         self.assertIsNone(re.search(r"ASSETS\s*\+\s*'layout\.json'", proto))
 
 

@@ -1,0 +1,509 @@
+{
+ "version": 1,
+ "note": "Top-down расстановка /proto/. Только то, что отличает вид сверху: где стоят места, массы, участки. Спрайты, высоты, группы и тексты досок — из scene_spec.json. Координаты локальные для биома: x — метры от оси (минус — запад/лево), z — метры вглубь биома (0 — его начало, минус — дальше по дороге; плюс — подход к биому из промежутка перед ним). Ключи — стабильные id: не переименовывать без нужды, на них держатся overrides.",
+ "jitter": {"x": 0.5, "z": 0.7, "rot_deg": 4},
+ "biomes": {
+  "village": {
+   "whitelist_extra": {"feat_world": "рыночный прилавок: у деревни должна быть точка обмена"},
+   "clusters": [
+    {"key": "entrance", "at": [6.8, -2], "items": [{"key": "signpost", "t": "prop_signpost", "h": "signpost"}]},
+    {
+     "key": "west-homes",
+     "at": [-15.5, -14],
+     "items": [
+      {"key": "main-house", "t": "hero_house_b", "h": "house"},
+      {"t": "hero_tree_b", "h": "bush", "dx": 7.0, "dz": 3.4},
+      {"t": "grass_tuft_a", "h": "tuft", "dx": 2.6, "dz": 5.6},
+      {"key": "old-oak", "t": "hero_tree_a", "h": "tree_mid", "dx": -10.5, "dz": -2.5},
+      {"key": "second-house", "t": "hero_house_a", "h": "house", "scale": 0.9, "dx": -11.5, "dz": -17},
+      {"t": "hero_tree_b", "h": "bush", "dx": -3.4, "dz": -13.4},
+      {"key": "cottage", "t": "hero_house_a", "h": "house", "scale": 0.72, "dx": -20, "dz": 4.5},
+      {"t": "hero_tree_b", "h": "bush", "dx": -26, "dz": 7.5}
+     ]
+    },
+    {
+     "key": "work-yard",
+     "at": [20, -30],
+     "items": [
+      {"key": "barn", "t": "barn", "h": "barn"},
+      {"t": "haystack", "h": "haystack", "dx": 7.8, "dz": 2.4},
+      {"t": "haystack", "h": "haystack", "dx": 7.4, "dz": 6.2},
+      {"key": "cart", "t": "hero_cart", "h": "cart", "dx": -5.8, "dz": 6.2},
+      {"t": "prop_crates", "h": "crates", "dx": -2.2, "dz": 7.4}
+     ]
+    },
+    {
+     "key": "east-cottage",
+     "at": [30, -6],
+     "items": [
+      {"key": "house", "t": "hero_house_a", "h": "house", "scale": 0.78},
+      {"t": "hero_tree_b", "h": "bush", "dx": -6.2, "dz": 2.8},
+      {"t": "hero_tree_a", "h": "tree_mid", "scale": 0.9, "dx": 3, "dz": -9}
+     ]
+    },
+    {
+     "key": "well-square",
+     "at": [-9.5, -49],
+     "items": [
+      {"key": "well", "t": "hero_well", "h": "well"},
+      {"key": "lamp", "t": "prop_lantern", "h": "lantern", "dx": 3.6, "dz": -0.6},
+      {"t": "prop_crates", "h": "crates", "dx": -3.4, "dz": 1.6},
+      {"t": "grass_tuft_b", "h": "tuft", "dx": -1.4, "dz": 3.6}
+     ]
+    },
+    {
+     "key": "market",
+     "at": [12.5, -51],
+     "items": [
+      {"key": "stall", "t": "feat_world", "h": 4.4},
+      {"t": "prop_crates", "h": "crates", "dx": -3.8, "dz": 1.8},
+      {"t": "prop_crates", "h": "crates", "dx": -3.0, "dz": 3.4},
+      {"key": "cart", "t": "hero_cart", "h": "cart", "dx": 5.2, "dz": 1.4},
+      {"t": "hero_tree_b", "h": "bush", "dx": 9.5, "dz": -2.5}
+     ]
+    },
+    {
+     "key": "tavern",
+     "at": [-16, -73],
+     "items": [
+      {"key": "tavern", "t": "feat_tavern", "h": "tavern"},
+      {"key": "lamp", "t": "prop_lantern", "h": "lantern", "dx": 6.2, "dz": 2.6},
+      {"t": "prop_crates", "h": "crates", "dx": -6.4, "dz": 3.4},
+      {"t": "hero_tree_a", "h": "tree_mid", "dx": -11, "dz": -3}
+     ]
+    },
+    {
+     "key": "east-home",
+     "at": [22, -84],
+     "items": [
+      {"key": "house", "t": "hero_house_a", "h": "house", "scale": 0.92},
+      {"t": "hero_tree_a", "h": "tree_mid", "dx": 10.5, "dz": -5},
+      {"t": "hero_tree_b", "h": "bush", "dx": -6.6, "dz": 3.2}
+     ]
+    }
+   ],
+   "fences": [
+    {"key": "yard-front-a", "from": [11, -20.5], "to": [15.5, -20.5]},
+    {"key": "yard-front-b", "from": [20.5, -20.5], "to": [31, -20.5]},
+    {"key": "yard-side", "from": [31, -20.5], "to": [31, -38]},
+    {"key": "garden-front", "from": [-10.8, -22], "to": [-10.8, -35]},
+    {"key": "garden-back", "from": [-10.8, -35], "to": [-19, -35]},
+    {"key": "home-plot-front", "from": [13.4, -76], "to": [13.4, -91]}
+   ],
+   "boards": {"slogan": {"at": [11.5, -9]}, "world_plays_itself": {"at": [-11, -40]}},
+   "masses": [
+    {
+     "key": "west-woods",
+     "types": ["biome_pine_a", "biome_pine_b"],
+     "h": "pine",
+     "scale": [0.8, 1.0],
+     "area": {"x": [-30, -46], "z": [-26, -70]},
+     "count": 6,
+     "spacing": 7
+    },
+    {
+     "key": "east-orchard",
+     "types": ["hero_tree_a"],
+     "h": "tree_mid",
+     "scale": [0.85, 1.05],
+     "area": {"x": [27, 42], "z": [-40, -70]},
+     "count": 4,
+     "spacing": 8
+    },
+    {
+     "key": "forest-edge-west",
+     "types": ["biome_pine_a", "biome_pine_b"],
+     "h": "pine",
+     "scale": [0.8, 1.0],
+     "area": {"x": [-10, -40], "z": [-98, -132]},
+     "count": 7,
+     "spacing": 6
+    },
+    {
+     "key": "forest-edge-east",
+     "types": ["biome_pine_a", "biome_pine_b"],
+     "h": "pine",
+     "scale": [0.8, 1.0],
+     "area": {"x": [16, 44], "z": [-104, -132]},
+     "count": 4,
+     "spacing": 7
+    }
+   ],
+   "scatter": {"types": ["grass_tuft_a", "grass_tuft_b", "rock_s"], "count": 18, "x": [5.5, 30], "z": [2, -100], "spacing": 3}
+  },
+  "forest": {
+   "clusters": [
+    {
+     "key": "clearing",
+     "at": [-17, -38],
+     "items": [
+      {"key": "stump", "t": "biome_stump", "h": "stump"},
+      {"key": "woodpile", "t": "res_wood", "h": "crates", "dx": 3.2, "dz": 1.4},
+      {"t": "fern", "h": "fern", "dx": -2.2, "dz": 2.0},
+      {"t": "mushrooms", "h": "mushrooms", "dx": 1.6, "dz": 3.4},
+      {"t": "biome_stump", "h": "stump", "scale": 0.8, "dx": 6.5, "dz": -3.0}
+     ]
+    },
+    {
+     "key": "dead-oak",
+     "at": [-9.5, -50],
+     "items": [{"key": "tree", "t": "biome_deadtree", "h": "deadtree"}, {"t": "fern", "h": "fern", "dx": 2.4, "dz": 6.2}]
+    },
+    {
+     "key": "stones",
+     "at": [12, -84],
+     "items": [{"t": "rock_m", "h": "rock_m"}, {"t": "rock_s", "h": "rock_s", "dx": 2.6, "dz": 1.4}, {"t": "fern", "h": "fern", "dx": -2.0, "dz": 1.6}]
+    },
+    {"key": "exit-stones", "at": [-11, -112], "items": [{"t": "rock_m", "h": "rock_m"}, {"t": "rock_s", "h": "rock_s", "dx": 2.8, "dz": 1.2}]}
+   ],
+   "boards": {"skills_no_levels": {"at": [-11.2, -22]}},
+   "masses": [
+    {
+     "key": "gate-west",
+     "types": ["biome_pine_a", "biome_pine_b"],
+     "h": "pine",
+     "scale": [0.85, 1.0],
+     "area": {"x": [-7, -15], "z": [4, -12]},
+     "count": 3,
+     "spacing": 5
+    },
+    {
+     "key": "gate-east",
+     "types": ["biome_pine_a"],
+     "h": "pine",
+     "scale": [0.85, 1.0],
+     "area": {"x": [7, 13], "z": [-2, -16]},
+     "count": 2,
+     "spacing": 5
+    },
+    {
+     "key": "approach-east",
+     "types": ["biome_pine_a", "biome_pine_b"],
+     "h": "pine",
+     "scale": [0.8, 1.0],
+     "area": {"x": [12, 40], "z": [36, 8]},
+     "count": 6,
+     "spacing": 6
+    },
+    {
+     "key": "approach-west",
+     "types": ["biome_pine_a", "biome_pine_b"],
+     "h": "pine",
+     "scale": [0.8, 1.0],
+     "area": {"x": [-14, -44], "z": [22, 4]},
+     "count": 5,
+     "spacing": 6
+    },
+    {
+     "key": "east-deep",
+     "types": ["biome_pine_a", "biome_pine_a", "biome_pine_b"],
+     "h": "pine",
+     "scale": [0.8, 1.1],
+     "area": {"x": [8, 46], "z": [-16, -72]},
+     "count": 21,
+     "spacing": 5.2
+    },
+    {
+     "key": "west-far",
+     "types": ["biome_pine_a", "biome_pine_b"],
+     "h": "pine",
+     "scale": [0.85, 1.05],
+     "area": {"x": [-27, -44], "z": [-6, -52]},
+     "count": 6,
+     "spacing": 6
+    },
+    {
+     "key": "west-deep",
+     "types": ["biome_pine_a", "biome_pine_a", "biome_pine_b"],
+     "h": "pine",
+     "scale": [0.8, 1.1],
+     "area": {"x": [-8, -46], "z": [-58, -98]},
+     "count": 19,
+     "spacing": 5.2
+    },
+    {
+     "key": "east-thin",
+     "types": ["biome_pine_a", "biome_deadtree"],
+     "h": {"biome_pine_a": "pine", "biome_deadtree": "deadtree"},
+     "scale": [0.8, 1.0],
+     "area": {"x": [18, 42], "z": [-76, -104]},
+     "count": 4,
+     "spacing": 7
+    }
+   ],
+   "scatter": {"types": ["fern", "mushrooms", "grass_tuft_a", "rock_s"], "count": 26, "x": [5.5, 34], "z": [8, -100], "spacing": 2.6}
+  },
+  "mine": {
+   "whitelist_extra": {"rock_l": "каменная масса: сверху шахта читается камнем, сталагмитов для масс мало", "rock_m": "то же", "rock_s": "то же"},
+   "clusters": [
+    {
+     "key": "gate-west",
+     "at": [-9.8, -3],
+     "items": [
+      {"t": "rock_l", "h": "rock_l", "scale": 1.3},
+      {"t": "stalagmite_a", "h": "stalagmite", "dx": -3.2, "dz": -5.0},
+      {"t": "rock_m", "h": "rock_m", "dx": 1.8, "dz": 3.6}
+     ]
+    },
+    {
+     "key": "gate-east",
+     "at": [9.8, 1],
+     "items": [
+      {"t": "rock_l", "h": "rock_l", "scale": 1.2},
+      {"t": "stalagmite_b", "h": "stalagmite", "dx": 3.0, "dz": -4.6},
+      {"t": "rock_s", "h": "rock_s", "dx": -1.4, "dz": 3.0}
+     ]
+    },
+    {
+     "key": "adit",
+     "at": [-12, -30],
+     "items": [
+      {"key": "frame", "t": "beam_frame", "h": "beam"},
+      {"key": "cart", "t": "minecart", "h": "minecart", "dx": 5.4, "dz": 4.2},
+      {"t": "ore_pile", "h": "ore_pile", "dx": 2.2, "dz": 5.6},
+      {"key": "fire", "t": "biome_brazier", "h": "brazier", "dx": -5.8, "dz": 3.4}
+     ]
+    },
+    {
+     "key": "smithy",
+     "at": [12, -37],
+     "items": [
+      {"key": "anvil", "t": "feat_craft", "h": "anvil"},
+      {"key": "fire", "t": "biome_brazier", "h": "brazier", "dx": 3.4, "dz": -0.4},
+      {"t": "ore_pile", "h": "ore_pile", "dx": -3.4, "dz": 1.4},
+      {"t": "minecart", "h": "minecart", "dx": 7.6, "dz": 2.4}
+     ]
+    },
+    {
+     "key": "vein",
+     "at": [-19, -54],
+     "items": [
+      {"key": "pool", "t": "feat_mining", "h": "mining"},
+      {"key": "crystals", "t": "biome_crystals", "h": "crystals", "dx": 5.4, "dz": -2.0},
+      {"t": "stalagmite_a", "h": "stalagmite", "dx": -5.0, "dz": -1.0}
+     ]
+    },
+    {
+     "key": "deep-adit",
+     "at": [18, -70],
+     "items": [
+      {"key": "cave", "t": "biome_orevein", "h": "orevein"},
+      {"t": "ore_pile", "h": "ore_pile", "dx": -4.6, "dz": 2.8},
+      {"t": "rock_m", "h": "rock_m", "dx": 5.2, "dz": 2.2}
+     ]
+    },
+    {
+     "key": "crystal-spur",
+     "at": [-11.5, -90],
+     "items": [{"t": "biome_crystals", "h": "crystals", "scale": 0.8}, {"t": "rock_s", "h": "rock_s", "dx": 2.6, "dz": 2.0}]
+    }
+   ],
+   "boards": {"mining": {"at": [11.5, -19]}, "fights_that_last": {"at": [-11.5, -45]}, "crafting": {"at": [12, -57]}},
+   "masses": [
+    {
+     "key": "approach-west",
+     "types": ["rock_l", "rock_l", "rock_m", "stalagmite_a", "stalagmite_b"],
+     "h": {"rock_l": "rock_l", "rock_m": "rock_m", "stalagmite_a": "stalagmite", "stalagmite_b": "stalagmite"},
+     "scale": [1.2, 1.9],
+     "area": {"x": [-12, -38], "z": [46, 20]},
+     "count": 7,
+     "spacing": 4.2
+    },
+    {
+     "key": "approach-east",
+     "types": ["rock_l", "rock_l", "rock_m", "stalagmite_a", "stalagmite_b"],
+     "h": {"rock_l": "rock_l", "rock_m": "rock_m", "stalagmite_a": "stalagmite", "stalagmite_b": "stalagmite"},
+     "scale": [1.2, 1.9],
+     "area": {"x": [12, 38], "z": [42, 16]},
+     "count": 7,
+     "spacing": 4.2
+    },
+    {
+     "key": "squeeze-west",
+     "types": ["rock_l", "rock_l", "rock_m", "stalagmite_a", "stalagmite_b"],
+     "h": {"rock_l": "rock_l", "rock_m": "rock_m", "stalagmite_a": "stalagmite", "stalagmite_b": "stalagmite"},
+     "scale": [1.3, 2.0],
+     "area": {"x": [-7.5, -20], "z": [18, 3]},
+     "count": 6,
+     "spacing": 4.2
+    },
+    {
+     "key": "squeeze-east",
+     "types": ["rock_l", "rock_l", "rock_m", "stalagmite_a", "stalagmite_b"],
+     "h": {"rock_l": "rock_l", "rock_m": "rock_m", "stalagmite_a": "stalagmite", "stalagmite_b": "stalagmite"},
+     "scale": [1.3, 2.0],
+     "area": {"x": [7.5, 20], "z": [16, 2]},
+     "count": 6,
+     "spacing": 4.2
+    },
+    {
+     "key": "walls-west",
+     "types": ["rock_l", "rock_l", "rock_m", "stalagmite_a", "stalagmite_b"],
+     "h": {"rock_l": "rock_l", "rock_m": "rock_m", "stalagmite_a": "stalagmite", "stalagmite_b": "stalagmite"},
+     "scale": [1.2, 1.9],
+     "area": {"x": [-12, -36], "z": [-6, -100]},
+     "count": 22,
+     "spacing": 4.2
+    },
+    {
+     "key": "walls-east",
+     "types": ["rock_l", "rock_l", "rock_m", "stalagmite_a", "stalagmite_b"],
+     "h": {"rock_l": "rock_l", "rock_m": "rock_m", "stalagmite_a": "stalagmite", "stalagmite_b": "stalagmite"},
+     "scale": [1.2, 1.9],
+     "area": {"x": [13, 36], "z": [-6, -100]},
+     "count": 20,
+     "spacing": 4.2
+    },
+    {
+     "key": "exit-narrows",
+     "types": ["rock_l", "rock_l", "rock_m", "stalagmite_a", "stalagmite_b"],
+     "h": {"rock_l": "rock_l", "rock_m": "rock_m", "stalagmite_a": "stalagmite", "stalagmite_b": "stalagmite"},
+     "scale": [1.2, 1.7],
+     "area": {"x": [-9, 18], "z": [-98, -116]},
+     "count": 7,
+     "spacing": 4.2
+    }
+   ],
+   "scatter": {"types": ["rock_s", "ore_pile", "rock_m"], "count": 14, "x": [5.5, 26], "z": [-10, -96], "spacing": 3.2}
+  },
+  "spirit": {
+   "clusters": [
+    {"key": "sentinel", "at": [8.2, -9], "items": [{"key": "totem", "t": "feat_vendetta", "h": "totem"}]},
+    {
+     "key": "shipwreck",
+     "at": [-22, -30],
+     "items": [{"key": "ship", "t": "feat_death_alt", "h": "ship", "scale": 1.35}, {"t": "rock_m", "h": "rock_m", "dx": 5.4, "dz": 3.2}]
+    },
+    {"key": "lone-tree-west", "at": [-9.2, -52], "items": [{"key": "tree", "t": "biome_deadtree", "h": "deadtree"}]},
+    {"key": "lone-tree-east", "at": [27, -66], "items": [{"key": "tree", "t": "biome_deadtree", "h": "deadtree", "scale": 0.85}]},
+    {
+     "key": "crypt",
+     "at": [-12.5, -72],
+     "items": [
+      {"key": "crypt", "t": "feat_death", "h": "crypt"},
+      {"key": "fire-left", "t": "biome_brazier", "h": "brazier", "dx": -5.6, "dz": 2.4},
+      {"key": "fire-right", "t": "biome_brazier", "h": "brazier", "dx": 5.4, "dz": 2.4}
+     ]
+    },
+    {"key": "far-stones", "at": [-34, -10], "items": [{"t": "rock_l", "h": "rock_l"}]}
+   ],
+   "boards": {"vendetta": {"at": [-11, -12]}, "death_is_a_place": {"at": [11.5, -58]}},
+   "masses": [
+    {
+     "key": "grave-field",
+     "types": ["grave_a", "grave_b", "grave_c", "grave_c", "candles"],
+     "h": {"grave_a": "grave", "grave_b": "grave", "grave_c": "grave", "candles": "candles"},
+     "scale": [0.85, 1.1],
+     "area": {"x": [10, 26], "z": [-30, -50]},
+     "count": 10,
+     "spacing": 2.8
+    },
+    {
+     "key": "approach-trees",
+     "types": ["biome_deadtree"],
+     "h": "deadtree",
+     "scale": [0.7, 0.9],
+     "area": {"x": [-20, -44], "z": [44, 16]},
+     "count": 2,
+     "spacing": 14
+    },
+    {
+     "key": "far-stones-east",
+     "types": ["rock_l", "rock_m"],
+     "h": {"rock_l": "rock_l", "rock_m": "rock_m"},
+     "scale": [0.9, 1.2],
+     "area": {"x": [30, 46], "z": [0, -80]},
+     "count": 3,
+     "spacing": 14
+    },
+    {
+     "key": "threshold-west",
+     "types": ["biome_deadtree", "rock_l"],
+     "h": {"biome_deadtree": "deadtree", "rock_l": "rock_l"},
+     "scale": [0.8, 1.1],
+     "area": {"x": [-8, -24], "z": [-86, -112]},
+     "count": 3,
+     "spacing": 8
+    },
+    {
+     "key": "threshold-east",
+     "types": ["biome_deadtree", "rock_m"],
+     "h": {"biome_deadtree": "deadtree", "rock_m": "rock_m"},
+     "scale": [0.8, 1.1],
+     "area": {"x": [8, 26], "z": [-92, -118]},
+     "count": 3,
+     "spacing": 8
+    }
+   ],
+   "scatter": {"types": ["rock_m", "grave_c", "candles"], "count": 6, "x": [6, 30], "z": [-4, -74], "spacing": 6}
+  },
+  "home": {
+   "clusters": [
+    {"key": "gate-pines-west", "at": [-13.5, 10], "items": [{"t": "biome_pine_b", "h": "pine", "scale": 0.85}]},
+    {"key": "gate-pines-east", "at": [12, 4], "items": [{"t": "biome_pine_b", "h": "pine", "scale": 0.8}]},
+    {"key": "meadow-hay", "at": [18, -30], "items": [{"t": "haystack", "h": "haystack"}, {"t": "haystack", "h": "haystack", "dx": 3.6, "dz": 2.2}]},
+    {
+     "key": "homestead",
+     "at": [0, -58],
+     "items": [
+      {"key": "house", "t": "hero_house_b", "h": "house", "scale": 1.15, "on_road": true},
+      {"key": "lamp-west", "t": "prop_lantern", "h": "lantern", "dx": -6.8, "dz": 11.8},
+      {"key": "lamp-east", "t": "prop_lantern", "h": "lantern", "dx": 7.0, "dz": 11.8},
+      {"key": "chest", "t": "chest", "h": "chest", "dx": -9.4, "dz": 5.0},
+      {"t": "haystack", "h": "haystack", "dx": 10.4, "dz": 6.0},
+      {"t": "hero_tree_b", "h": "bush", "dx": -11.4, "dz": 2.4}
+     ]
+    },
+    {"key": "frame-oak-west", "at": [-22, -52], "items": [{"key": "tree", "t": "hero_tree_a", "h": "tree_big", "scale": 0.9}]},
+    {"key": "frame-oak-east", "at": [23, -63], "items": [{"key": "tree", "t": "hero_tree_a", "h": "tree_mid"}]}
+   ],
+   "fences": [
+    {"key": "yard-front-west", "from": [-15, -46], "to": [-5.2, -46]},
+    {"key": "yard-front-east", "from": [5.2, -46], "to": [15, -46]},
+    {"key": "yard-west", "from": [-15, -46], "to": [-15, -66]},
+    {"key": "yard-east", "from": [15, -46], "to": [15, -66]}
+   ],
+   "boards": {"humans_and_monsters": {"at": [-11, -16]}, "a_home_to_come_back_to": {"at": [11.5, -34]}},
+   "masses": [
+    {
+     "key": "meadow-trees",
+     "types": ["hero_tree_a"],
+     "h": "tree_mid",
+     "scale": [0.8, 1.0],
+     "area": {"x": [-26, -44], "z": [-6, -40]},
+     "count": 3,
+     "spacing": 10
+    },
+    {
+     "key": "closing-woods",
+     "types": ["biome_pine_b", "hero_tree_a"],
+     "h": {"biome_pine_b": "pine", "hero_tree_a": "tree_big"},
+     "scale": [0.85, 1.0],
+     "area": {"x": [-30, 30], "z": [-72, -94]},
+     "count": 10,
+     "spacing": 7,
+     "on_road": true
+    },
+    {
+     "key": "returning-green-west",
+     "types": ["hero_tree_b", "hero_tree_a"],
+     "h": {"hero_tree_b": "bush", "hero_tree_a": "tree_mid"},
+     "scale": [0.8, 1.0],
+     "area": {"x": [-8, -30], "z": [40, 18]},
+     "count": 4,
+     "spacing": 6
+    },
+    {
+     "key": "returning-green-east",
+     "types": ["hero_tree_b", "hero_tree_b", "hero_tree_a"],
+     "h": {"hero_tree_b": "bush", "hero_tree_a": "tree_mid"},
+     "scale": [0.8, 1.0],
+     "area": {"x": [8, 32], "z": [34, 14]},
+     "count": 4,
+     "spacing": 6
+    }
+   ],
+   "scatter": {"types": ["grass_tuft_a", "grass_tuft_b", "rock_s"], "count": 12, "x": [6, 32], "z": [8, -50], "spacing": 3.2}
+  }
+ }
+}

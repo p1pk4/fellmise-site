@@ -1,8 +1,9 @@
 {
  "version": 1,
  "target": "topdown",
- "generated": "tools/generate_layout.py --target topdown по assets/scene_spec.json + assets/topdown/config.json. Руками не править: правки — в layout.overrides.json",
+ "generated": "tools/generate_layout.py --target topdown по assets/scene_spec.json + assets/topdown/composition.json + assets/topdown/config.json. Руками не править: правки — в layout.overrides.json",
  "road_half_width": 4.2,
+ "biome_spacing": 150,
  "seed": 20260731,
  "debug": {
   "road_half_width": 4.2,
@@ -117,883 +118,1220 @@
   "village": {
    "sprites": [
     {
-     "id": "village/homestead.1/hero_house_b.1",
+     "id": "village/entrance/signpost",
+     "t": "prop_signpost",
+     "layer": 1,
+     "pos": [
+      6.681,
+      null,
+      -2.578
+     ],
+     "h": 3.0,
+     "rotY": 0.0339,
+     "visible": true
+    },
+    {
+     "id": "village/west-homes/main-house",
      "t": "hero_house_b",
      "layer": 1,
      "pos": [
-      -7.455,
+      -15.731,
       null,
-      -11.483
+      -13.799
      ],
      "h": 9.0,
-     "rotY": -0.1744,
+     "rotY": 0.0,
      "visible": true
     },
     {
-     "id": "village/homestead.1/hero_tree_b.1",
+     "id": "village/west-homes/hero_tree_b.1",
      "t": "hero_tree_b",
      "layer": 1,
      "pos": [
-      -11.655,
+      -8.731,
       null,
-      -10.283
+      -10.399
      ],
      "h": 2.2,
-     "rotY": -0.1335,
+     "rotY": -0.0473,
      "visible": true
     },
     {
-     "id": "village/homestead.1/grass_tuft_a.1",
+     "id": "village/west-homes/grass_tuft_a.1",
      "t": "grass_tuft_a",
      "layer": 1,
      "pos": [
-      -3.855,
+      -13.131,
       null,
-      -9.283
+      -8.199
      ],
      "h": 1.1,
-     "rotY": -0.1393,
+     "rotY": 0.0493,
      "visible": true
     },
     {
-     "id": "village/farmyard.1/barn.1",
-     "t": "barn",
+     "id": "village/west-homes/old-oak",
+     "t": "hero_tree_a",
      "layer": 1,
      "pos": [
-      -6.863,
+      -26.231,
       null,
-      -29.12
+      -16.299
      ],
-     "h": 10.0,
-     "rotY": -0.0734,
+     "h": 8.4,
+     "rotY": -0.0106,
      "visible": true
     },
     {
-     "id": "village/farmyard.1/haystack.1",
-     "t": "haystack",
-     "layer": 1,
-     "pos": [
-      -10.863,
-      null,
-      -27.12
-     ],
-     "h": 2.4,
-     "rotY": -0.1176,
-     "visible": true
-    },
-    {
-     "id": "village/farmyard.1/hero_cart.1",
-     "t": "hero_cart",
-     "layer": 1,
-     "pos": [
-      -4.063,
-      null,
-      -26.12
-     ],
-     "h": 2.6,
-     "rotY": -0.1986,
-     "visible": true
-    },
-    {
-     "id": "village/homestead.2/hero_house_a.1",
+     "id": "village/west-homes/second-house",
      "t": "hero_house_a",
      "layer": 1,
      "pos": [
-      -7.906,
+      -27.231,
       null,
-      -47.215
+      -30.799
      ],
-     "h": 9.0,
-     "rotY": -0.1171,
+     "h": 8.1,
+     "rotY": 0.0,
      "visible": true
     },
     {
-     "id": "village/homestead.2/hero_tree_b.1",
+     "id": "village/west-homes/hero_tree_b.2",
      "t": "hero_tree_b",
      "layer": 1,
      "pos": [
-      -12.106,
+      -19.131,
       null,
-      -46.015
+      -27.199
      ],
      "h": 2.2,
-     "rotY": -0.1377,
+     "rotY": 0.0147,
      "visible": true
     },
     {
-     "id": "village/homestead.2/grass_tuft_a.1",
-     "t": "grass_tuft_a",
+     "id": "village/west-homes/cottage",
+     "t": "hero_house_a",
      "layer": 1,
      "pos": [
-      -4.306,
+      -35.731,
       null,
-      -45.015
+      -9.299
      ],
-     "h": 1.1,
-     "rotY": -0.088,
+     "h": 6.48,
+     "rotY": 0.0,
      "visible": true
     },
     {
-     "id": "village/feat_tavern.1",
-     "t": "feat_tavern",
-     "layer": 1,
-     "pos": [
-      -7.072,
-      null,
-      -67.73
-     ],
-     "h": 9.5,
-     "rotY": -0.1154,
-     "visible": true
-    },
-    {
-     "id": "village/homestead.3/hero_house_b.1",
-     "t": "hero_house_b",
-     "layer": 1,
-     "pos": [
-      -7.717,
-      null,
-      -88.956
-     ],
-     "h": 9.0,
-     "rotY": -0.1468,
-     "visible": true
-    },
-    {
-     "id": "village/homestead.3/hero_tree_b.1",
+     "id": "village/west-homes/hero_tree_b.3",
      "t": "hero_tree_b",
      "layer": 1,
      "pos": [
-      -11.917,
+      -41.731,
       null,
-      -87.756
+      -6.299
      ],
      "h": 2.2,
-     "rotY": -0.0915,
+     "rotY": 0.0329,
      "visible": true
     },
     {
-     "id": "village/homestead.3/grass_tuft_a.1",
-     "t": "grass_tuft_a",
+     "id": "village/work-yard/barn",
+     "t": "barn",
      "layer": 1,
      "pos": [
-      -4.117,
+      20.035,
       null,
-      -86.756
+      -30.418
      ],
-     "h": 1.1,
-     "rotY": -0.1754,
+     "h": 10.0,
+     "rotY": 0.0,
      "visible": true
     },
     {
-     "id": "village/square.1/hero_well.1",
-     "t": "hero_well",
+     "id": "village/work-yard/haystack.1",
+     "t": "haystack",
      "layer": 1,
      "pos": [
-      5.028,
+      27.835,
       null,
-      -13.977
+      -28.018
      ],
-     "h": 4.4,
-     "rotY": 0.1086,
+     "h": 2.4,
+     "rotY": -0.0071,
      "visible": true
     },
     {
-     "id": "village/square.1/prop_lantern.1",
-     "t": "prop_lantern",
+     "id": "village/work-yard/haystack.2",
+     "t": "haystack",
      "layer": 1,
      "pos": [
-      8.028,
+      27.435,
       null,
-      -14.977
+      -24.218
      ],
-     "h": 4.2,
-     "rotY": 0.1543,
+     "h": 2.4,
+     "rotY": 0.0543,
      "visible": true
     },
     {
-     "id": "village/square.1/prop_crates.1",
+     "id": "village/work-yard/cart",
+     "t": "hero_cart",
+     "layer": 1,
+     "pos": [
+      14.235,
+      null,
+      -24.218
+     ],
+     "h": 2.6,
+     "rotY": -0.0105,
+     "visible": true
+    },
+    {
+     "id": "village/work-yard/prop_crates.1",
      "t": "prop_crates",
      "layer": 1,
      "pos": [
-      4.428,
+      17.835,
       null,
-      -12.577
+      -23.018
      ],
      "h": 1.8,
-     "rotY": 0.0923,
+     "rotY": 0.0395,
      "visible": true
     },
     {
-     "id": "village/grove.1/hero_tree_a.1",
-     "t": "hero_tree_a",
-     "layer": 1,
-     "pos": [
-      12.201,
-      null,
-      -27.727
-     ],
-     "h": 8.4,
-     "rotY": 0.1135,
-     "visible": true,
-     "sway": true
-    },
-    {
-     "id": "village/grove.1/hero_tree_b.1",
-     "t": "hero_tree_b",
-     "layer": 1,
-     "pos": [
-      9.801,
-      null,
-      -26.127
-     ],
-     "h": 2.2,
-     "rotY": 0.1074,
-     "visible": true
-    },
-    {
-     "id": "village/grove.1/grass_tuft_b.1",
-     "t": "grass_tuft_b",
-     "layer": 1,
-     "pos": [
-      4.601,
-      null,
-      -25.927
-     ],
-     "h": 1.1,
-     "rotY": 0.1739,
-     "visible": true
-    },
-    {
-     "id": "village/homestead.4/hero_house_a.1",
+     "id": "village/east-cottage/house",
      "t": "hero_house_a",
      "layer": 1,
      "pos": [
-      6.825,
+      29.858,
       null,
-      -47.608
+      -6.408
      ],
-     "h": 9.0,
-     "rotY": 0.1567,
+     "h": 7.02,
+     "rotY": 0.0,
      "visible": true
     },
     {
-     "id": "village/homestead.4/hero_tree_b.1",
+     "id": "village/east-cottage/hero_tree_b.1",
      "t": "hero_tree_b",
      "layer": 1,
      "pos": [
-      11.025,
+      23.658,
       null,
-      -46.408
+      -3.608
      ],
      "h": 2.2,
-     "rotY": 0.1338,
+     "rotY": 0.0178,
      "visible": true
     },
     {
-     "id": "village/homestead.4/grass_tuft_a.1",
-     "t": "grass_tuft_a",
-     "layer": 1,
-     "pos": [
-      3.225,
-      null,
-      -45.408
-     ],
-     "h": 1.1,
-     "rotY": 0.1508,
-     "visible": true
-    },
-    {
-     "id": "village/grove.2/hero_tree_a.1",
+     "id": "village/east-cottage/hero_tree_a.1",
      "t": "hero_tree_a",
-     "layer": 0.5,
+     "layer": 1,
      "pos": [
-      16.935,
+      32.858,
       null,
-      -67.653
+      -15.408
      ],
-     "h": 8.4,
-     "rotY": 0.1974,
-     "visible": true,
-     "sway": true
-    },
-    {
-     "id": "village/grove.2/hero_tree_b.1",
-     "t": "hero_tree_b",
-     "layer": 0.5,
-     "pos": [
-      14.535,
-      null,
-      -66.053
-     ],
-     "h": 2.2,
-     "rotY": 0.1433,
+     "h": 7.56,
+     "rotY": 0.0148,
      "visible": true
     },
     {
-     "id": "village/grove.2/grass_tuft_b.1",
-     "t": "grass_tuft_b",
-     "layer": 0.5,
+     "id": "village/well-square/well",
+     "t": "hero_well",
+     "layer": 1,
      "pos": [
-      9.335,
+      -9.489,
       null,
-      -65.853
+      -48.434
+     ],
+     "h": 4.4,
+     "rotY": 0.0032,
+     "visible": true
+    },
+    {
+     "id": "village/well-square/lamp",
+     "t": "prop_lantern",
+     "layer": 1,
+     "pos": [
+      -5.889,
+      null,
+      -49.034
+     ],
+     "h": 4.2,
+     "rotY": 0.031,
+     "visible": true
+    },
+    {
+     "id": "village/well-square/prop_crates.1",
+     "t": "prop_crates",
+     "layer": 1,
+     "pos": [
+      -12.889,
+      null,
+      -46.834
+     ],
+     "h": 1.8,
+     "rotY": -0.0273,
+     "visible": true
+    },
+    {
+     "id": "village/well-square/grass_tuft_b.1",
+     "t": "grass_tuft_b",
+     "layer": 1,
+     "pos": [
+      -10.889,
+      null,
+      -44.834
      ],
      "h": 1.1,
-     "rotY": 0.1528,
+     "rotY": -0.0169,
      "visible": true
     },
     {
-     "id": "village/farmyard.2/barn.1",
-     "t": "barn",
+     "id": "village/market/stall",
+     "t": "feat_world",
      "layer": 1,
      "pos": [
-      7.502,
+      12.011,
       null,
-      -89.463
+      -50.54
      ],
-     "h": 10.0,
-     "rotY": 0.1982,
+     "h": 4.4,
+     "rotY": 0.0,
      "visible": true
     },
     {
-     "id": "village/farmyard.2/haystack.1",
-     "t": "haystack",
+     "id": "village/market/prop_crates.1",
+     "t": "prop_crates",
      "layer": 1,
      "pos": [
-      11.502,
+      8.211,
       null,
-      -87.463
+      -48.74
      ],
-     "h": 2.4,
-     "rotY": 0.1487,
+     "h": 1.8,
+     "rotY": -0.0681,
      "visible": true
     },
     {
-     "id": "village/farmyard.2/hero_cart.1",
+     "id": "village/market/prop_crates.2",
+     "t": "prop_crates",
+     "layer": 1,
+     "pos": [
+      9.011,
+      null,
+      -47.14
+     ],
+     "h": 1.8,
+     "rotY": -0.0592,
+     "visible": true
+    },
+    {
+     "id": "village/market/cart",
      "t": "hero_cart",
      "layer": 1,
      "pos": [
-      4.702,
+      17.211,
       null,
-      -86.463
+      -49.14
      ],
      "h": 2.6,
-     "rotY": 0.148,
+     "rotY": 0.0629,
      "visible": true
     },
     {
-     "id": "village/homestead.4/fence.1/hero_fence.1",
+     "id": "village/market/hero_tree_b.1",
+     "t": "hero_tree_b",
+     "layer": 1,
+     "pos": [
+      21.511,
+      null,
+      -53.04
+     ],
+     "h": 2.2,
+     "rotY": -0.0141,
+     "visible": true
+    },
+    {
+     "id": "village/tavern/tavern",
+     "t": "feat_tavern",
+     "layer": 1,
+     "pos": [
+      -15.75,
+      null,
+      -72.419
+     ],
+     "h": 9.5,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "village/tavern/lamp",
+     "t": "prop_lantern",
+     "layer": 1,
+     "pos": [
+      -9.55,
+      null,
+      -69.819
+     ],
+     "h": 4.2,
+     "rotY": 0.0551,
+     "visible": true
+    },
+    {
+     "id": "village/tavern/prop_crates.1",
+     "t": "prop_crates",
+     "layer": 1,
+     "pos": [
+      -22.15,
+      null,
+      -69.019
+     ],
+     "h": 1.8,
+     "rotY": 0.0492,
+     "visible": true
+    },
+    {
+     "id": "village/tavern/hero_tree_a.1",
+     "t": "hero_tree_a",
+     "layer": 1,
+     "pos": [
+      -26.75,
+      null,
+      -75.419
+     ],
+     "h": 8.4,
+     "rotY": -0.028,
+     "visible": true
+    },
+    {
+     "id": "village/east-home/house",
+     "t": "hero_house_a",
+     "layer": 1,
+     "pos": [
+      21.879,
+      null,
+      -83.334
+     ],
+     "h": 8.28,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "village/east-home/hero_tree_a.1",
+     "t": "hero_tree_a",
+     "layer": 1,
+     "pos": [
+      32.379,
+      null,
+      -88.334
+     ],
+     "h": 8.4,
+     "rotY": -0.0202,
+     "visible": true
+    },
+    {
+     "id": "village/east-home/hero_tree_b.1",
+     "t": "hero_tree_b",
+     "layer": 1,
+     "pos": [
+      15.279,
+      null,
+      -80.134
+     ],
+     "h": 2.2,
+     "rotY": -0.0599,
+     "visible": true
+    },
+    {
+     "id": "village/yard-front-a/hero_fence.1",
      "t": "hero_fence",
      "layer": 1,
      "pos": [
-      5.2,
+      12.125,
       null,
-      -31.608
+      -20.5
      ],
      "h": 1.6,
-     "rotY": 0.0,
-     "visible": true
-    },
-    {
-     "id": "village/homestead.4/fence.1/hero_fence.2",
-     "t": "hero_fence",
-     "layer": 1,
-     "pos": [
-      5.2,
-      null,
-      -34.453
-     ],
-     "h": 1.6,
-     "rotY": 0.0,
-     "visible": true
-    },
-    {
-     "id": "village/homestead.4/fence.1/hero_fence.3",
-     "t": "hero_fence",
-     "layer": 1,
-     "pos": [
-      5.2,
-      null,
-      -37.298
-     ],
-     "h": 1.6,
-     "rotY": 0.0,
-     "visible": true
-    },
-    {
-     "id": "village/homestead.4/fence.1/hero_fence.4",
-     "t": "hero_fence",
-     "layer": 1,
-     "pos": [
-      5.2,
-      null,
-      -40.144
-     ],
-     "h": 1.6,
-     "rotY": 0.0,
-     "visible": true
-    },
-    {
-     "id": "village/homestead.4/fence.1/hero_fence.5",
-     "t": "hero_fence",
-     "layer": 1,
-     "pos": [
-      5.2,
-      null,
-      -42.989
-     ],
-     "h": 1.6,
-     "rotY": 0.0,
-     "visible": true
-    },
-    {
-     "id": "village/homestead.4/fence.1/end_post.start",
-     "t": "end_post",
-     "layer": 1,
-     "pos": [
-      5.2,
-      null,
-      -30.185
-     ],
-     "h": 2.1,
-     "rotY": 0.0,
-     "visible": true
-    },
-    {
-     "id": "village/homestead.2/fence.1/hero_fence.1",
-     "t": "hero_fence",
-     "layer": 1,
-     "pos": [
-      -5.2,
-      null,
-      -52.215
-     ],
-     "h": 1.6,
-     "rotY": 0.0,
-     "visible": true
-    },
-    {
-     "id": "village/homestead.2/fence.1/hero_fence.2",
-     "t": "hero_fence",
-     "layer": 1,
-     "pos": [
-      -5.2,
-      null,
-      -55.06
-     ],
-     "h": 1.6,
-     "rotY": 0.0,
-     "visible": true
-    },
-    {
-     "id": "village/homestead.2/fence.1/hero_fence.3",
-     "t": "hero_fence",
-     "layer": 1,
-     "pos": [
-      -5.2,
-      null,
-      -57.906
-     ],
-     "h": 1.6,
-     "rotY": 0.0,
-     "visible": true
-    },
-    {
-     "id": "village/homestead.2/fence.1/hero_fence.4",
-     "t": "hero_fence",
-     "layer": 1,
-     "pos": [
-      -5.2,
-      null,
-      -60.751
-     ],
-     "h": 1.6,
-     "rotY": 0.0,
-     "visible": true
-    },
-    {
-     "id": "village/homestead.2/fence.1/end_post.end",
-     "t": "end_post",
-     "layer": 1,
-     "pos": [
-      -5.2,
-      null,
-      -62.174
-     ],
-     "h": 2.1,
-     "rotY": 0.0,
-     "visible": true
-    },
-    {
-     "id": "village/homestead.4/fence.2/hero_fence.1",
-     "t": "hero_fence",
-     "layer": 1,
-     "pos": [
-      9.2,
-      null,
-      -54.608
-     ],
-     "h": 1.6,
-     "rotY": 0.0,
-     "visible": true
-    },
-    {
-     "id": "village/homestead.4/fence.2/hero_fence.2",
-     "t": "hero_fence",
-     "layer": 1,
-     "pos": [
-      12.045,
-      null,
-      -54.608
-     ],
-     "h": 1.6,
-     "rotY": 0.0,
-     "visible": true
-    },
-    {
-     "id": "village/homestead.4/fence.2/end_post.start",
-     "t": "end_post",
-     "layer": 1,
-     "pos": [
-      7.777,
-      null,
-      -54.608
-     ],
-     "h": 2.1,
-     "rotY": 0.0,
-     "visible": true
-    },
-    {
-     "id": "village/homestead.4/fence.2/end_post.end",
-     "t": "end_post",
-     "layer": 1,
-     "pos": [
-      13.468,
-      null,
-      -54.608
-     ],
-     "h": 2.1,
-     "rotY": 0.0,
-     "visible": true
-    },
-    {
-     "id": "village/backdrop.1/biome_pine_b.1",
-     "t": "biome_pine_b",
-     "layer": 0,
-     "pos": [
-      -26.0,
-      null,
-      -20
-     ],
-     "h": 13.0,
      "rotY": 0.0,
      "visible": true,
-     "dim": 0.7
+     "run": {
+      "key": "village/yard-front-a",
+      "axis": "x",
+      "step": 2.25
+     }
     },
     {
-     "id": "village/backdrop.1/biome_pine_b.2",
-     "t": "biome_pine_b",
-     "layer": 0,
+     "id": "village/yard-front-a/hero_fence.2",
+     "t": "hero_fence",
+     "layer": 1,
      "pos": [
-      -20.0,
+      14.375,
       null,
-      -23.0
+      -20.5
      ],
-     "h": 13.0,
+     "h": 1.6,
      "rotY": 0.0,
      "visible": true,
-     "dim": 0.62
+     "run": {
+      "key": "village/yard-front-a",
+      "axis": "x",
+      "step": 2.25
+     }
     },
     {
-     "id": "village/backdrop.1/biome_pine_a.1",
+     "id": "village/yard-front-b/hero_fence.1",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      21.812,
+      null,
+      -20.5
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true,
+     "run": {
+      "key": "village/yard-front-b",
+      "axis": "x",
+      "step": 2.625
+     }
+    },
+    {
+     "id": "village/yard-front-b/hero_fence.2",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      24.438,
+      null,
+      -20.5
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true,
+     "run": {
+      "key": "village/yard-front-b",
+      "axis": "x",
+      "step": 2.625
+     }
+    },
+    {
+     "id": "village/yard-front-b/hero_fence.3",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      27.062,
+      null,
+      -20.5
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true,
+     "run": {
+      "key": "village/yard-front-b",
+      "axis": "x",
+      "step": 2.625
+     }
+    },
+    {
+     "id": "village/yard-front-b/hero_fence.4",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      29.688,
+      null,
+      -20.5
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true,
+     "run": {
+      "key": "village/yard-front-b",
+      "axis": "x",
+      "step": 2.625
+     }
+    },
+    {
+     "id": "village/yard-side/hero_fence.1",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      31.0,
+      null,
+      -21.958
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true,
+     "run": {
+      "key": "village/yard-side",
+      "axis": "z",
+      "step": 2.917
+     }
+    },
+    {
+     "id": "village/yard-side/hero_fence.2",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      31.0,
+      null,
+      -24.875
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true,
+     "run": {
+      "key": "village/yard-side",
+      "axis": "z",
+      "step": 2.917
+     }
+    },
+    {
+     "id": "village/yard-side/hero_fence.3",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      31.0,
+      null,
+      -27.792
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true,
+     "run": {
+      "key": "village/yard-side",
+      "axis": "z",
+      "step": 2.917
+     }
+    },
+    {
+     "id": "village/yard-side/hero_fence.4",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      31.0,
+      null,
+      -30.708
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true,
+     "run": {
+      "key": "village/yard-side",
+      "axis": "z",
+      "step": 2.917
+     }
+    },
+    {
+     "id": "village/yard-side/hero_fence.5",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      31.0,
+      null,
+      -33.625
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true,
+     "run": {
+      "key": "village/yard-side",
+      "axis": "z",
+      "step": 2.917
+     }
+    },
+    {
+     "id": "village/yard-side/hero_fence.6",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      31.0,
+      null,
+      -36.542
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true,
+     "run": {
+      "key": "village/yard-side",
+      "axis": "z",
+      "step": 2.917
+     }
+    },
+    {
+     "id": "village/garden-front/hero_fence.1",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      -10.8,
+      null,
+      -23.3
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true,
+     "run": {
+      "key": "village/garden-front",
+      "axis": "z",
+      "step": 2.6
+     }
+    },
+    {
+     "id": "village/garden-front/hero_fence.2",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      -10.8,
+      null,
+      -25.9
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true,
+     "run": {
+      "key": "village/garden-front",
+      "axis": "z",
+      "step": 2.6
+     }
+    },
+    {
+     "id": "village/garden-front/hero_fence.3",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      -10.8,
+      null,
+      -28.5
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true,
+     "run": {
+      "key": "village/garden-front",
+      "axis": "z",
+      "step": 2.6
+     }
+    },
+    {
+     "id": "village/garden-front/hero_fence.4",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      -10.8,
+      null,
+      -31.1
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true,
+     "run": {
+      "key": "village/garden-front",
+      "axis": "z",
+      "step": 2.6
+     }
+    },
+    {
+     "id": "village/garden-front/hero_fence.5",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      -10.8,
+      null,
+      -33.7
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true,
+     "run": {
+      "key": "village/garden-front",
+      "axis": "z",
+      "step": 2.6
+     }
+    },
+    {
+     "id": "village/garden-back/hero_fence.1",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      -12.167,
+      null,
+      -35.0
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true,
+     "run": {
+      "key": "village/garden-back",
+      "axis": "x",
+      "step": 2.733
+     }
+    },
+    {
+     "id": "village/garden-back/hero_fence.2",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      -14.9,
+      null,
+      -35.0
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true,
+     "run": {
+      "key": "village/garden-back",
+      "axis": "x",
+      "step": 2.733
+     }
+    },
+    {
+     "id": "village/garden-back/hero_fence.3",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      -17.633,
+      null,
+      -35.0
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true,
+     "run": {
+      "key": "village/garden-back",
+      "axis": "x",
+      "step": 2.733
+     }
+    },
+    {
+     "id": "village/home-plot-front/hero_fence.1",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      13.4,
+      null,
+      -77.5
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true,
+     "run": {
+      "key": "village/home-plot-front",
+      "axis": "z",
+      "step": 3.0
+     }
+    },
+    {
+     "id": "village/home-plot-front/hero_fence.2",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      13.4,
+      null,
+      -80.5
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true,
+     "run": {
+      "key": "village/home-plot-front",
+      "axis": "z",
+      "step": 3.0
+     }
+    },
+    {
+     "id": "village/home-plot-front/hero_fence.3",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      13.4,
+      null,
+      -83.5
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true,
+     "run": {
+      "key": "village/home-plot-front",
+      "axis": "z",
+      "step": 3.0
+     }
+    },
+    {
+     "id": "village/home-plot-front/hero_fence.4",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      13.4,
+      null,
+      -86.5
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true,
+     "run": {
+      "key": "village/home-plot-front",
+      "axis": "z",
+      "step": 3.0
+     }
+    },
+    {
+     "id": "village/home-plot-front/hero_fence.5",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      13.4,
+      null,
+      -89.5
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true,
+     "run": {
+      "key": "village/home-plot-front",
+      "axis": "z",
+      "step": 3.0
+     }
+    },
+    {
+     "id": "village/west-woods/c0",
+     "t": "biome_pine_b",
+     "layer": 1,
+     "pos": [
+      -43.307,
+      null,
+      -45.171
+     ],
+     "h": 11.91,
+     "rotY": 0.0415,
+     "visible": true
+    },
+    {
+     "id": "village/west-woods/c2",
      "t": "biome_pine_a",
-     "layer": 0,
-     "pos": [
-      -31.4,
-      null,
-      -22.0
-     ],
-     "h": 13.0,
-     "rotY": 0.0,
-     "visible": true,
-     "dim": 0.66
-    },
-    {
-     "id": "village/backdrop.2/biome_pine_b.1",
-     "t": "biome_pine_b",
-     "layer": 0,
-     "pos": [
-      26.0,
-      null,
-      -44
-     ],
-     "h": 13.0,
-     "rotY": 0.0,
-     "visible": true,
-     "dim": 0.7
-    },
-    {
-     "id": "village/backdrop.2/biome_pine_b.2",
-     "t": "biome_pine_b",
-     "layer": 0,
-     "pos": [
-      32.0,
-      null,
-      -47.0
-     ],
-     "h": 13.0,
-     "rotY": 0.0,
-     "visible": true,
-     "dim": 0.62
-    },
-    {
-     "id": "village/backdrop.2/biome_pine_a.1",
-     "t": "biome_pine_a",
-     "layer": 0,
-     "pos": [
-      20.6,
-      null,
-      -46.0
-     ],
-     "h": 13.0,
-     "rotY": 0.0,
-     "visible": true,
-     "dim": 0.66
-    },
-    {
-     "id": "village/backdrop.3/biome_pine_b.1",
-     "t": "biome_pine_b",
-     "layer": 0,
-     "pos": [
-      -26.0,
-      null,
-      -68
-     ],
-     "h": 13.0,
-     "rotY": 0.0,
-     "visible": true,
-     "dim": 0.7
-    },
-    {
-     "id": "village/backdrop.3/biome_pine_b.2",
-     "t": "biome_pine_b",
-     "layer": 0,
-     "pos": [
-      -20.0,
-      null,
-      -71.0
-     ],
-     "h": 13.0,
-     "rotY": 0.0,
-     "visible": true,
-     "dim": 0.62
-    },
-    {
-     "id": "village/backdrop.3/biome_pine_a.1",
-     "t": "biome_pine_a",
-     "layer": 0,
-     "pos": [
-      -31.4,
-      null,
-      -70.0
-     ],
-     "h": 13.0,
-     "rotY": 0.0,
-     "visible": true,
-     "dim": 0.66
-    },
-    {
-     "id": "village/backdrop.4/biome_pine_b.1",
-     "t": "biome_pine_b",
-     "layer": 0,
-     "pos": [
-      26.0,
-      null,
-      -92
-     ],
-     "h": 13.0,
-     "rotY": 0.0,
-     "visible": true,
-     "dim": 0.7
-    },
-    {
-     "id": "village/backdrop.4/biome_pine_b.2",
-     "t": "biome_pine_b",
-     "layer": 0,
-     "pos": [
-      32.0,
-      null,
-      -95.0
-     ],
-     "h": 13.0,
-     "rotY": 0.0,
-     "visible": true,
-     "dim": 0.62
-    },
-    {
-     "id": "village/backdrop.4/biome_pine_a.1",
-     "t": "biome_pine_a",
-     "layer": 0,
-     "pos": [
-      20.6,
-      null,
-      -94.0
-     ],
-     "h": 13.0,
-     "rotY": 0.0,
-     "visible": true,
-     "dim": 0.66
-    },
-    {
-     "id": "village/sky/cloud.1",
-     "t": "cloud_a",
-     "layer": 0,
-     "pos": [
-      -12.586,
-      30.919,
-      -66.028
-     ],
-     "h": 8.0,
-     "rotY": 0.0,
-     "visible": true,
-     "drift": 0.241,
-     "span": 110
-    },
-    {
-     "id": "village/sky/cloud.2",
-     "t": "cloud_b",
-     "layer": 0,
-     "pos": [
-      -27.058,
-      29.067,
-      -62.723
-     ],
-     "h": 8.0,
-     "rotY": 0.0,
-     "visible": true,
-     "drift": 0.184,
-     "span": 110
-    },
-    {
-     "id": "village/sky/cloud.3",
-     "t": "cloud_c",
-     "layer": 0,
-     "pos": [
-      18.523,
-      26.363,
-      -74.039
-     ],
-     "h": 8.0,
-     "rotY": 0.0,
-     "visible": true,
-     "drift": 0.363,
-     "span": 110
-    },
-    {
-     "id": "village/sky/cloud.4",
-     "t": "cloud_a",
-     "layer": 0,
-     "pos": [
-      3.709,
-      34.02,
-      -86.171
-     ],
-     "h": 8.0,
-     "rotY": 0.0,
-     "visible": true,
-     "drift": 0.305,
-     "span": 110
-    },
-    {
-     "id": "village/scatter/c0",
-     "t": "grass_tuft_a",
      "layer": 1,
      "pos": [
-      4.627,
+      -33.003,
       null,
-      -63.247
+      -58.168
      ],
-     "h": 1.1,
-     "rotY": 0.1695,
+     "h": 12.369,
+     "rotY": -0.0688,
      "visible": true
     },
     {
-     "id": "village/scatter/c1",
+     "id": "village/west-woods/c4",
+     "t": "biome_pine_a",
+     "layer": 1,
+     "pos": [
+      -33.302,
+      null,
+      -38.741
+     ],
+     "h": 11.714,
+     "rotY": 0.0083,
+     "visible": true
+    },
+    {
+     "id": "village/west-woods/c5",
+     "t": "biome_pine_a",
+     "layer": 1,
+     "pos": [
+      -44.807,
+      null,
+      -37.91
+     ],
+     "h": 11.382,
+     "rotY": -0.0465,
+     "visible": true
+    },
+    {
+     "id": "village/west-woods/c6",
+     "t": "biome_pine_a",
+     "layer": 1,
+     "pos": [
+      -39.507,
+      null,
+      -69.448
+     ],
+     "h": 11.825,
+     "rotY": -0.0261,
+     "visible": true
+    },
+    {
+     "id": "village/west-woods/c8",
+     "t": "biome_pine_a",
+     "layer": 1,
+     "pos": [
+      -30.832,
+      null,
+      -47.79
+     ],
+     "h": 12.485,
+     "rotY": -0.0518,
+     "visible": true
+    },
+    {
+     "id": "village/east-orchard/c1",
+     "t": "hero_tree_a",
+     "layer": 1,
+     "pos": [
+      36.91,
+      null,
+      -69.415
+     ],
+     "h": 7.484,
+     "rotY": 0.0054,
+     "visible": true
+    },
+    {
+     "id": "village/east-orchard/c2",
+     "t": "hero_tree_a",
+     "layer": 1,
+     "pos": [
+      32.696,
+      null,
+      -55.348
+     ],
+     "h": 7.553,
+     "rotY": -0.0328,
+     "visible": true
+    },
+    {
+     "id": "village/east-orchard/c5",
+     "t": "hero_tree_a",
+     "layer": 1,
+     "pos": [
+      31.967,
+      null,
+      -44.476
+     ],
+     "h": 8.508,
+     "rotY": -0.0204,
+     "visible": true
+    },
+    {
+     "id": "village/east-orchard/c12",
+     "t": "hero_tree_a",
+     "layer": 1,
+     "pos": [
+      41.674,
+      null,
+      -57.245
+     ],
+     "h": 8.586,
+     "rotY": 0.0137,
+     "visible": true
+    },
+    {
+     "id": "village/forest-edge-west/c0",
+     "t": "biome_pine_a",
+     "layer": 1,
+     "pos": [
+      -24.365,
+      null,
+      -130.123
+     ],
+     "h": 11.748,
+     "rotY": -0.0549,
+     "visible": true
+    },
+    {
+     "id": "village/forest-edge-west/c1",
+     "t": "biome_pine_b",
+     "layer": 1,
+     "pos": [
+      -36.362,
+      null,
+      -129.656
+     ],
+     "h": 12.861,
+     "rotY": 0.0511,
+     "visible": true
+    },
+    {
+     "id": "village/forest-edge-west/c2",
+     "t": "biome_pine_a",
+     "layer": 1,
+     "pos": [
+      -21.992,
+      null,
+      -103.612
+     ],
+     "h": 10.649,
+     "rotY": 0.037,
+     "visible": true
+    },
+    {
+     "id": "village/forest-edge-west/c3",
+     "t": "biome_pine_b",
+     "layer": 1,
+     "pos": [
+      -33.563,
+      null,
+      -114.626
+     ],
+     "h": 11.368,
+     "rotY": -0.0216,
+     "visible": true
+    },
+    {
+     "id": "village/forest-edge-west/c5",
+     "t": "biome_pine_b",
+     "layer": 1,
+     "pos": [
+      -14.923,
+      null,
+      -99.935
+     ],
+     "h": 10.778,
+     "rotY": 0.0223,
+     "visible": true
+    },
+    {
+     "id": "village/forest-edge-west/c6",
+     "t": "biome_pine_b",
+     "layer": 1,
+     "pos": [
+      -18.163,
+      null,
+      -111.951
+     ],
+     "h": 11.977,
+     "rotY": -0.0617,
+     "visible": true
+    },
+    {
+     "id": "village/forest-edge-west/c7",
+     "t": "biome_pine_a",
+     "layer": 1,
+     "pos": [
+      -36.862,
+      null,
+      -121.004
+     ],
+     "h": 12.382,
+     "rotY": -0.0059,
+     "visible": true
+    },
+    {
+     "id": "village/forest-edge-east/c0",
+     "t": "biome_pine_a",
+     "layer": 1,
+     "pos": [
+      33.984,
+      null,
+      -116.364
+     ],
+     "h": 12.989,
+     "rotY": -0.0468,
+     "visible": true
+    },
+    {
+     "id": "village/forest-edge-east/c1",
+     "t": "biome_pine_b",
+     "layer": 1,
+     "pos": [
+      32.348,
+      null,
+      -124.954
+     ],
+     "h": 11.03,
+     "rotY": -0.0512,
+     "visible": true
+    },
+    {
+     "id": "village/forest-edge-east/c2",
+     "t": "biome_pine_a",
+     "layer": 1,
+     "pos": [
+      28.613,
+      null,
+      -109.627
+     ],
+     "h": 10.793,
+     "rotY": 0.0614,
+     "visible": true
+    },
+    {
+     "id": "village/forest-edge-east/c4",
+     "t": "biome_pine_b",
+     "layer": 1,
+     "pos": [
+      18.385,
+      null,
+      -124.486
+     ],
+     "h": 10.581,
+     "rotY": 0.0645,
+     "visible": true
+    },
+    {
+     "id": "village/scatter/c4",
      "t": "grass_tuft_b",
      "layer": 1,
      "pos": [
-      -6.85,
+      18.913,
       null,
-      -90.848
+      -94.323
      ],
      "h": 1.1,
-     "rotY": -0.1765,
-     "visible": true
-    },
-    {
-     "id": "village/scatter/c3",
-     "t": "rock_s",
-     "layer": 1,
-     "pos": [
-      -6.674,
-      null,
-      -27.445
-     ],
-     "h": 1.2,
-     "rotY": -0.1834,
-     "visible": true
-    },
-    {
-     "id": "village/scatter/c5",
-     "t": "grass_tuft_a",
-     "layer": 1,
-     "pos": [
-      6.114,
-      null,
-      -44.587
-     ],
-     "h": 1.1,
-     "rotY": 0.0991,
+     "rotY": 0.0281,
      "visible": true
     },
     {
      "id": "village/scatter/c6",
-     "t": "grass_tuft_b",
+     "t": "rock_s",
      "layer": 1,
      "pos": [
-      6.87,
+      -16.669,
       null,
-      -95.37
+      -62.555
      ],
-     "h": 1.1,
-     "rotY": 0.1636,
+     "h": 1.2,
+     "rotY": 0.0465,
      "visible": true
     },
     {
      "id": "village/scatter/c7",
-     "t": "rock_s",
+     "t": "grass_tuft_b",
      "layer": 1,
      "pos": [
-      -5.048,
+      18.439,
       null,
-      -49.07
+      -54.511
      ],
-     "h": 1.2,
-     "rotY": -0.1861,
+     "h": 1.1,
+     "rotY": -0.0102,
      "visible": true
     },
     {
-     "id": "village/scatter/c11",
-     "t": "grass_tuft_a",
+     "id": "village/scatter/c9",
+     "t": "grass_tuft_b",
      "layer": 1,
      "pos": [
-      -7.571,
+      -20.127,
       null,
-      -87.533
+      -4.937
      ],
      "h": 1.1,
-     "rotY": -0.2009,
+     "rotY": -0.0471,
+     "visible": true
+    },
+    {
+     "id": "village/scatter/c12",
+     "t": "rock_s",
+     "layer": 1,
+     "pos": [
+      -11.775,
+      null,
+      -42.589
+     ],
+     "h": 1.2,
+     "rotY": 0.0341,
      "visible": true
     },
     {
@@ -1001,25 +1339,64 @@
      "t": "grass_tuft_b",
      "layer": 1,
      "pos": [
-      6.847,
+      -27.678,
       null,
-      -72.734
+      -10.061
      ],
      "h": 1.1,
-     "rotY": 0.1734,
+     "rotY": 0.0044,
      "visible": true
     },
     {
-     "id": "village/scatter/c14",
+     "id": "village/scatter/c15",
+     "t": "grass_tuft_a",
+     "layer": 1,
+     "pos": [
+      10.812,
+      null,
+      1.913
+     ],
+     "h": 1.1,
+     "rotY": -0.0523,
+     "visible": true
+    },
+    {
+     "id": "village/scatter/c16",
+     "t": "grass_tuft_b",
+     "layer": 1,
+     "pos": [
+      -8.787,
+      null,
+      -54.438
+     ],
+     "h": 1.1,
+     "rotY": 0.055,
+     "visible": true
+    },
+    {
+     "id": "village/scatter/c17",
+     "t": "grass_tuft_a",
+     "layer": 1,
+     "pos": [
+      19.67,
+      null,
+      -43.63
+     ],
+     "h": 1.1,
+     "rotY": -0.0129,
+     "visible": true
+    },
+    {
+     "id": "village/scatter/c18",
      "t": "rock_s",
      "layer": 1,
      "pos": [
-      7.288,
+      19.768,
       null,
-      -93.007
+      -11.44
      ],
      "h": 1.2,
-     "rotY": 0.1212,
+     "rotY": 0.0666,
      "visible": true
     },
     {
@@ -1027,12 +1404,12 @@
      "t": "grass_tuft_a",
      "layer": 1,
      "pos": [
-      -4.325,
+      -25.318,
       null,
-      -33.136
+      -7.189
      ],
      "h": 1.1,
-     "rotY": -0.1288,
+     "rotY": -0.021,
      "visible": true
     },
     {
@@ -1040,12 +1417,12 @@
      "t": "grass_tuft_b",
      "layer": 1,
      "pos": [
-      -7.181,
+      -6.179,
       null,
-      -82.494
+      -36.784
      ],
      "h": 1.1,
-     "rotY": -0.1039,
+     "rotY": 0.0328,
      "visible": true
     },
     {
@@ -1053,77 +1430,77 @@
      "t": "rock_s",
      "layer": 1,
      "pos": [
-      -4.561,
+      -27.281,
       null,
-      -79.542
+      -2.495
      ],
      "h": 1.2,
-     "rotY": -0.1739,
+     "rotY": -0.0618,
      "visible": true
     },
     {
-     "id": "village/scatter/c27",
+     "id": "village/scatter/c24",
      "t": "grass_tuft_a",
      "layer": 1,
      "pos": [
-      4.952,
+      -27.387,
       null,
-      -84.812
+      -97.32
      ],
      "h": 1.1,
-     "rotY": 0.1685,
+     "rotY": 0.0406,
+     "visible": true
+    },
+    {
+     "id": "village/scatter/c25",
+     "t": "grass_tuft_a",
+     "layer": 1,
+     "pos": [
+      15.899,
+      null,
+      -6.698
+     ],
+     "h": 1.1,
+     "rotY": 0.0082,
+     "visible": true
+    },
+    {
+     "id": "village/scatter/c26",
+     "t": "grass_tuft_a",
+     "layer": 1,
+     "pos": [
+      15.636,
+      null,
+      -70.661
+     ],
+     "h": 1.1,
+     "rotY": -0.0527,
      "visible": true
     },
     {
      "id": "village/scatter/c28",
-     "t": "grass_tuft_b",
-     "layer": 1,
-     "pos": [
-      4.353,
-      null,
-      -92.58
-     ],
-     "h": 1.1,
-     "rotY": 0.1808,
-     "visible": true
-    },
-    {
-     "id": "village/scatter/c30",
-     "t": "rock_s",
-     "layer": 1,
-     "pos": [
-      6.943,
-      null,
-      -64.052
-     ],
-     "h": 1.2,
-     "rotY": 0.1144,
-     "visible": true
-    },
-    {
-     "id": "village/scatter/c38",
      "t": "grass_tuft_a",
      "layer": 1,
      "pos": [
-      -7.936,
+      -7.54,
       null,
-      -73.584
+      -26.443
      ],
      "h": 1.1,
-     "rotY": -0.1743,
+     "rotY": -0.013,
      "visible": true
     },
     {
-     "id": "village/scatter/c39",
-     "t": "grass_tuft_b",
+     "id": "village/scatter/c29",
+     "t": "rock_s",
      "layer": 1,
      "pos": [
-      -8.156,
+      6.516,
       null,
-      -16.432
+      -50.217
      ],
-     "h": 1.1,
-     "rotY": -0.0737,
+     "h": 1.2,
+     "rotY": 0.0323,
      "visible": true
     }
    ],
@@ -1133,12 +1510,12 @@
      "key": "slogan",
      "kind": "wood",
      "pos": [
-      9.022,
+      11.5,
       null,
-      -16
+      -9
      ],
      "h": 8.0,
-     "rotY": 0.0977,
+     "rotY": 0.0,
      "visible": true
     },
     {
@@ -1146,12 +1523,12 @@
      "key": "world_plays_itself",
      "kind": "wood",
      "pos": [
-      -8.138,
+      -11,
       null,
-      -42
+      -40
      ],
      "h": 8.0,
-     "rotY": -0.1659,
+     "rotY": 0.0,
      "visible": true
     }
    ]
@@ -1159,572 +1536,1017 @@
   "forest": {
    "sprites": [
     {
-     "id": "forest/pine_stand.1/biome_pine_a.1",
-     "t": "biome_pine_a",
-     "layer": 1,
-     "pos": [
-      -7.795,
-      null,
-      -13.004
-     ],
-     "h": 13.0,
-     "rotY": -0.1551,
-     "visible": true,
-     "sway": true
-    },
-    {
-     "id": "forest/pine_stand.1/biome_pine_b.1",
-     "t": "biome_pine_b",
-     "layer": 1,
-     "pos": [
-      -12.195,
-      null,
-      -15.604
-     ],
-     "h": 13.0,
-     "rotY": -0.077,
-     "visible": true
-    },
-    {
-     "id": "forest/pine_stand.1/fern.1",
-     "t": "fern",
-     "layer": 1,
-     "pos": [
-      -5.795,
-      null,
-      -10.804
-     ],
-     "h": 1.4,
-     "rotY": -0.1973,
-     "visible": true
-    },
-    {
-     "id": "forest/pine_stand.1/mushrooms.1",
-     "t": "mushrooms",
-     "layer": 1,
-     "pos": [
-      -10.195,
-      null,
-      -10.004
-     ],
-     "h": 0.9,
-     "rotY": -0.1609,
-     "visible": true
-    },
-    {
-     "id": "forest/pine_stand.2/biome_pine_a.1",
-     "t": "biome_pine_a",
-     "layer": 1,
-     "pos": [
-      7.09,
-      null,
-      -13.837
-     ],
-     "h": 13.0,
-     "rotY": 0.1629,
-     "visible": true,
-     "sway": true
-    },
-    {
-     "id": "forest/pine_stand.2/biome_pine_b.1",
-     "t": "biome_pine_b",
-     "layer": 1,
-     "pos": [
-      11.49,
-      null,
-      -16.437
-     ],
-     "h": 13.0,
-     "rotY": 0.1009,
-     "visible": true
-    },
-    {
-     "id": "forest/pine_stand.2/fern.1",
-     "t": "fern",
-     "layer": 1,
-     "pos": [
-      5.09,
-      null,
-      -11.637
-     ],
-     "h": 1.4,
-     "rotY": 0.1122,
-     "visible": true
-    },
-    {
-     "id": "forest/pine_stand.2/mushrooms.1",
-     "t": "mushrooms",
-     "layer": 1,
-     "pos": [
-      9.49,
-      null,
-      -10.837
-     ],
-     "h": 0.9,
-     "rotY": 0.103,
-     "visible": true
-    },
-    {
-     "id": "forest/cutting.1/biome_stump.1",
+     "id": "forest/clearing/stump",
      "t": "biome_stump",
      "layer": 1,
      "pos": [
-      5.562,
+      -17.395,
       null,
-      -33.41
+      -38.434
      ],
      "h": 1.6,
-     "rotY": 0.152,
+     "rotY": 0.0215,
      "visible": true
     },
     {
-     "id": "forest/cutting.1/res_wood.1",
+     "id": "forest/clearing/woodpile",
      "t": "res_wood",
      "layer": 1,
      "pos": [
-      7.762,
+      -14.195,
       null,
-      -32.41
+      -37.034
      ],
      "h": 1.8,
-     "rotY": 0.1319,
+     "rotY": -0.0441,
      "visible": true
     },
     {
-     "id": "forest/cutting.1/fern.1",
+     "id": "forest/clearing/fern.1",
      "t": "fern",
      "layer": 1,
      "pos": [
-      4.962,
+      -19.595,
       null,
-      -31.81
+      -36.434
      ],
      "h": 1.4,
-     "rotY": 0.1368,
+     "rotY": 0.0093,
      "visible": true
     },
     {
-     "id": "forest/pine_stand.3/biome_pine_a.1",
-     "t": "biome_pine_a",
-     "layer": 0.5,
-     "pos": [
-      -11.292,
-      null,
-      -31.584
-     ],
-     "h": 13.0,
-     "rotY": -0.1552,
-     "visible": true,
-     "sway": true
-    },
-    {
-     "id": "forest/pine_stand.3/biome_pine_b.1",
-     "t": "biome_pine_b",
-     "layer": 0.5,
-     "pos": [
-      -15.692,
-      null,
-      -34.184
-     ],
-     "h": 13.0,
-     "rotY": -0.0728,
-     "visible": true
-    },
-    {
-     "id": "forest/pine_stand.3/fern.1",
-     "t": "fern",
-     "layer": 0.5,
-     "pos": [
-      -9.292,
-      null,
-      -29.384
-     ],
-     "h": 1.4,
-     "rotY": -0.144,
-     "visible": true
-    },
-    {
-     "id": "forest/pine_stand.3/mushrooms.1",
+     "id": "forest/clearing/mushrooms.1",
      "t": "mushrooms",
-     "layer": 0.5,
+     "layer": 1,
      "pos": [
-      -13.692,
+      -15.795,
       null,
-      -28.584
+      -35.034
      ],
      "h": 0.9,
-     "rotY": -0.1523,
+     "rotY": 0.0226,
      "visible": true
     },
     {
-     "id": "forest/biome_deadtree.1",
+     "id": "forest/clearing/biome_stump.1",
+     "t": "biome_stump",
+     "layer": 1,
+     "pos": [
+      -10.895,
+      null,
+      -41.434
+     ],
+     "h": 1.28,
+     "rotY": -0.006,
+     "visible": true
+    },
+    {
+     "id": "forest/dead-oak/tree",
      "t": "biome_deadtree",
      "layer": 1,
      "pos": [
-      -7.351,
+      -9.496,
       null,
-      -53.759
+      -50.207
      ],
      "h": 9.0,
-     "rotY": -0.154,
+     "rotY": -0.0578,
      "visible": true
     },
     {
-     "id": "forest/pine_stand.4/biome_pine_a.1",
-     "t": "biome_pine_a",
-     "layer": 1,
-     "pos": [
-      7.421,
-      null,
-      -53.204
-     ],
-     "h": 13.0,
-     "rotY": 0.0699,
-     "visible": true,
-     "sway": true
-    },
-    {
-     "id": "forest/pine_stand.4/biome_pine_b.1",
-     "t": "biome_pine_b",
-     "layer": 1,
-     "pos": [
-      11.821,
-      null,
-      -55.804
-     ],
-     "h": 13.0,
-     "rotY": 0.1495,
-     "visible": true
-    },
-    {
-     "id": "forest/pine_stand.4/fern.1",
+     "id": "forest/dead-oak/fern.1",
      "t": "fern",
      "layer": 1,
      "pos": [
-      5.421,
+      -7.096,
       null,
-      -51.004
+      -44.007
      ],
      "h": 1.4,
-     "rotY": 0.166,
+     "rotY": 0.0644,
      "visible": true
     },
     {
-     "id": "forest/pine_stand.4/mushrooms.1",
-     "t": "mushrooms",
+     "id": "forest/stones/rock_m.1",
+     "t": "rock_m",
      "layer": 1,
      "pos": [
-      9.821,
+      12.445,
       null,
-      -50.204
+      -83.358
      ],
-     "h": 0.9,
-     "rotY": 0.1015,
+     "h": 2.0,
+     "rotY": -0.0197,
      "visible": true
     },
     {
-     "id": "forest/cutting.2/biome_stump.1",
-     "t": "biome_stump",
+     "id": "forest/stones/rock_s.1",
+     "t": "rock_s",
      "layer": 1,
      "pos": [
-      -5.217,
+      15.045,
       null,
-      -77.823
+      -81.958
      ],
-     "h": 1.6,
-     "rotY": -0.16,
+     "h": 1.2,
+     "rotY": 0.0143,
      "visible": true
     },
     {
-     "id": "forest/cutting.2/res_wood.1",
-     "t": "res_wood",
-     "layer": 1,
-     "pos": [
-      -7.417,
-      null,
-      -76.823
-     ],
-     "h": 1.8,
-     "rotY": -0.1458,
-     "visible": true
-    },
-    {
-     "id": "forest/cutting.2/fern.1",
+     "id": "forest/stones/fern.1",
      "t": "fern",
      "layer": 1,
      "pos": [
-      -4.617,
+      10.445,
       null,
-      -76.223
+      -81.758
      ],
      "h": 1.4,
-     "rotY": -0.139,
+     "rotY": -0.0638,
      "visible": true
     },
     {
-     "id": "forest/backdrop.1/biome_pine_b.1",
-     "t": "biome_pine_b",
-     "layer": 0,
-     "pos": [
-      -26.0,
-      null,
-      -14
-     ],
-     "h": 13.0,
-     "rotY": 0.0,
-     "visible": true,
-     "dim": 0.7
-    },
-    {
-     "id": "forest/backdrop.1/biome_pine_b.2",
-     "t": "biome_pine_b",
-     "layer": 0,
-     "pos": [
-      -20.0,
-      null,
-      -17.0
-     ],
-     "h": 13.0,
-     "rotY": 0.0,
-     "visible": true,
-     "dim": 0.62
-    },
-    {
-     "id": "forest/backdrop.1/biome_pine_a.1",
-     "t": "biome_pine_a",
-     "layer": 0,
-     "pos": [
-      -31.4,
-      null,
-      -16.0
-     ],
-     "h": 13.0,
-     "rotY": 0.0,
-     "visible": true,
-     "dim": 0.66
-    },
-    {
-     "id": "forest/backdrop.2/biome_pine_b.1",
-     "t": "biome_pine_b",
-     "layer": 0,
-     "pos": [
-      26.0,
-      null,
-      -32
-     ],
-     "h": 13.0,
-     "rotY": 0.0,
-     "visible": true,
-     "dim": 0.7
-    },
-    {
-     "id": "forest/backdrop.2/biome_pine_b.2",
-     "t": "biome_pine_b",
-     "layer": 0,
-     "pos": [
-      32.0,
-      null,
-      -35.0
-     ],
-     "h": 13.0,
-     "rotY": 0.0,
-     "visible": true,
-     "dim": 0.62
-    },
-    {
-     "id": "forest/backdrop.2/biome_pine_a.1",
-     "t": "biome_pine_a",
-     "layer": 0,
-     "pos": [
-      20.6,
-      null,
-      -34.0
-     ],
-     "h": 13.0,
-     "rotY": 0.0,
-     "visible": true,
-     "dim": 0.66
-    },
-    {
-     "id": "forest/backdrop.3/biome_pine_b.1",
-     "t": "biome_pine_b",
-     "layer": 0,
-     "pos": [
-      -26.0,
-      null,
-      -50
-     ],
-     "h": 13.0,
-     "rotY": 0.0,
-     "visible": true,
-     "dim": 0.7
-    },
-    {
-     "id": "forest/backdrop.3/biome_pine_b.2",
-     "t": "biome_pine_b",
-     "layer": 0,
-     "pos": [
-      -20.0,
-      null,
-      -53.0
-     ],
-     "h": 13.0,
-     "rotY": 0.0,
-     "visible": true,
-     "dim": 0.62
-    },
-    {
-     "id": "forest/backdrop.3/biome_pine_a.1",
-     "t": "biome_pine_a",
-     "layer": 0,
-     "pos": [
-      -31.4,
-      null,
-      -52.0
-     ],
-     "h": 13.0,
-     "rotY": 0.0,
-     "visible": true,
-     "dim": 0.66
-    },
-    {
-     "id": "forest/backdrop.4/biome_pine_b.1",
-     "t": "biome_pine_b",
-     "layer": 0,
-     "pos": [
-      26.0,
-      null,
-      -68
-     ],
-     "h": 13.0,
-     "rotY": 0.0,
-     "visible": true,
-     "dim": 0.7
-    },
-    {
-     "id": "forest/backdrop.4/biome_pine_b.2",
-     "t": "biome_pine_b",
-     "layer": 0,
-     "pos": [
-      32.0,
-      null,
-      -71.0
-     ],
-     "h": 13.0,
-     "rotY": 0.0,
-     "visible": true,
-     "dim": 0.62
-    },
-    {
-     "id": "forest/backdrop.4/biome_pine_a.1",
-     "t": "biome_pine_a",
-     "layer": 0,
-     "pos": [
-      20.6,
-      null,
-      -70.0
-     ],
-     "h": 13.0,
-     "rotY": 0.0,
-     "visible": true,
-     "dim": 0.66
-    },
-    {
-     "id": "forest/backdrop.5/biome_pine_b.1",
-     "t": "biome_pine_b",
-     "layer": 0,
-     "pos": [
-      -26.0,
-      null,
-      -86
-     ],
-     "h": 13.0,
-     "rotY": 0.0,
-     "visible": true,
-     "dim": 0.7
-    },
-    {
-     "id": "forest/backdrop.5/biome_pine_b.2",
-     "t": "biome_pine_b",
-     "layer": 0,
-     "pos": [
-      -20.0,
-      null,
-      -89.0
-     ],
-     "h": 13.0,
-     "rotY": 0.0,
-     "visible": true,
-     "dim": 0.62
-    },
-    {
-     "id": "forest/backdrop.5/biome_pine_a.1",
-     "t": "biome_pine_a",
-     "layer": 0,
-     "pos": [
-      -31.4,
-      null,
-      -88.0
-     ],
-     "h": 13.0,
-     "rotY": 0.0,
-     "visible": true,
-     "dim": 0.66
-    },
-    {
-     "id": "forest/sky/cloud.1",
-     "t": "cloud_c",
-     "layer": 0,
-     "pos": [
-      -13.502,
-      32.405,
-      -75.69
-     ],
-     "h": 8.0,
-     "rotY": 0.0,
-     "visible": true,
-     "drift": 0.237,
-     "span": 110
-    },
-    {
-     "id": "forest/sky/cloud.2",
-     "t": "cloud_c",
-     "layer": 0,
-     "pos": [
-      -24.091,
-      32.868,
-      -81.445
-     ],
-     "h": 8.0,
-     "rotY": 0.0,
-     "visible": true,
-     "drift": 0.195,
-     "span": 110
-    },
-    {
-     "id": "forest/scatter/c0",
-     "t": "mushrooms",
+     "id": "forest/exit-stones/rock_m.1",
+     "t": "rock_m",
      "layer": 1,
      "pos": [
-      -4.961,
+      -10.992,
       null,
-      -48.66
+      -112.328
      ],
-     "h": 0.9,
-     "rotY": -0.1948,
+     "h": 2.0,
+     "rotY": -0.0606,
      "visible": true
     },
     {
-     "id": "forest/scatter/c1",
-     "t": "fern",
+     "id": "forest/exit-stones/rock_s.1",
+     "t": "rock_s",
      "layer": 1,
      "pos": [
-      7.944,
+      -8.192,
       null,
-      -71.783
+      -111.128
      ],
-     "h": 1.4,
-     "rotY": 0.1782,
+     "h": 1.2,
+     "rotY": -0.0098,
+     "visible": true
+    },
+    {
+     "id": "forest/gate-west/c0",
+     "t": "biome_pine_b",
+     "layer": 1,
+     "pos": [
+      -13.07,
+      null,
+      2.164
+     ],
+     "h": 11.243,
+     "rotY": 0.0061,
+     "visible": true
+    },
+    {
+     "id": "forest/gate-west/c1",
+     "t": "biome_pine_a",
+     "layer": 1,
+     "pos": [
+      -14.046,
+      null,
+      -2.927
+     ],
+     "h": 12.504,
+     "rotY": -0.0244,
+     "visible": true
+    },
+    {
+     "id": "forest/gate-west/c6",
+     "t": "biome_pine_a",
+     "layer": 1,
+     "pos": [
+      -11.998,
+      null,
+      -10.459
+     ],
+     "h": 12.225,
+     "rotY": -0.0351,
+     "visible": true
+    },
+    {
+     "id": "forest/gate-east/c1",
+     "t": "biome_pine_a",
+     "layer": 1,
+     "pos": [
+      10.076,
+      null,
+      -5.012
+     ],
+     "h": 11.324,
+     "rotY": -0.0683,
+     "visible": true
+    },
+    {
+     "id": "forest/gate-east/c6",
+     "t": "biome_pine_a",
+     "layer": 1,
+     "pos": [
+      11.098,
+      null,
+      -10.16
+     ],
+     "h": 11.348,
+     "rotY": -0.0657,
+     "visible": true
+    },
+    {
+     "id": "forest/approach-east/c0",
+     "t": "biome_pine_a",
+     "layer": 1,
+     "pos": [
+      26.765,
+      null,
+      13.865
+     ],
+     "h": 11.068,
+     "rotY": -0.0532,
+     "visible": true
+    },
+    {
+     "id": "forest/approach-east/c1",
+     "t": "biome_pine_b",
+     "layer": 1,
+     "pos": [
+      35.067,
+      null,
+      10.459
+     ],
+     "h": 12.728,
+     "rotY": 0.0673,
+     "visible": true
+    },
+    {
+     "id": "forest/approach-east/c2",
+     "t": "biome_pine_b",
+     "layer": 1,
+     "pos": [
+      19.08,
+      null,
+      35.12
+     ],
+     "h": 10.872,
+     "rotY": 0.0534,
+     "visible": true
+    },
+    {
+     "id": "forest/approach-east/c5",
+     "t": "biome_pine_b",
+     "layer": 1,
+     "pos": [
+      36.794,
+      null,
+      30.242
+     ],
+     "h": 10.954,
+     "rotY": 0.0496,
+     "visible": true
+    },
+    {
+     "id": "forest/approach-east/c8",
+     "t": "biome_pine_b",
+     "layer": 1,
+     "pos": [
+      12.146,
+      null,
+      12.895
+     ],
+     "h": 10.944,
+     "rotY": -0.0243,
+     "visible": true
+    },
+    {
+     "id": "forest/approach-east/c11",
+     "t": "biome_pine_a",
+     "layer": 1,
+     "pos": [
+      34.412,
+      null,
+      24.3
+     ],
+     "h": 11.605,
+     "rotY": 0.0288,
+     "visible": true
+    },
+    {
+     "id": "forest/approach-west/c0",
+     "t": "biome_pine_b",
+     "layer": 1,
+     "pos": [
+      -20.644,
+      null,
+      4.645
+     ],
+     "h": 12.225,
+     "rotY": -0.064,
+     "visible": true
+    },
+    {
+     "id": "forest/approach-west/c1",
+     "t": "biome_pine_a",
+     "layer": 1,
+     "pos": [
+      -39.09,
+      null,
+      21.804
+     ],
+     "h": 12.961,
+     "rotY": -0.0564,
+     "visible": true
+    },
+    {
+     "id": "forest/approach-west/c2",
+     "t": "biome_pine_b",
+     "layer": 1,
+     "pos": [
+      -33.509,
+      null,
+      16.761
+     ],
+     "h": 11.527,
+     "rotY": 0.0317,
+     "visible": true
+    },
+    {
+     "id": "forest/approach-west/c4",
+     "t": "biome_pine_b",
+     "layer": 1,
+     "pos": [
+      -20.149,
+      null,
+      11.936
+     ],
+     "h": 11.482,
+     "rotY": -0.0315,
+     "visible": true
+    },
+    {
+     "id": "forest/approach-west/c5",
+     "t": "biome_pine_a",
+     "layer": 1,
+     "pos": [
+      -14.742,
+      null,
+      19.378
+     ],
+     "h": 10.662,
+     "rotY": -0.024,
+     "visible": true
+    },
+    {
+     "id": "forest/east-deep/c0",
+     "t": "biome_pine_a",
+     "layer": 1,
+     "pos": [
+      29.921,
+      null,
+      -63.381
+     ],
+     "h": 14.26,
+     "rotY": -0.055,
+     "visible": true
+    },
+    {
+     "id": "forest/east-deep/c1",
+     "t": "biome_pine_a",
+     "layer": 1,
+     "pos": [
+      22.959,
+      null,
+      -22.188
+     ],
+     "h": 11.415,
+     "rotY": -0.0153,
+     "visible": true
+    },
+    {
+     "id": "forest/east-deep/c2",
+     "t": "biome_pine_b",
+     "layer": 1,
+     "pos": [
+      17.069,
+      null,
+      -58.177
+     ],
+     "h": 10.963,
+     "rotY": -0.0373,
+     "visible": true
+    },
+    {
+     "id": "forest/east-deep/c3",
+     "t": "biome_pine_a",
+     "layer": 1,
+     "pos": [
+      44.201,
+      null,
+      -43.033
+     ],
+     "h": 13.611,
+     "rotY": 0.035,
+     "visible": true
+    },
+    {
+     "id": "forest/east-deep/c4",
+     "t": "biome_pine_a",
+     "layer": 1,
+     "pos": [
+      10.745,
+      null,
+      -53.466
+     ],
+     "h": 13.409,
+     "rotY": -0.0068,
+     "visible": true
+    },
+    {
+     "id": "forest/east-deep/c5",
+     "t": "biome_pine_a",
+     "layer": 1,
+     "pos": [
+      15.505,
+      null,
+      -32.373
+     ],
+     "h": 13.696,
+     "rotY": -0.0478,
+     "visible": true
+    },
+    {
+     "id": "forest/east-deep/c6",
+     "t": "biome_pine_b",
+     "layer": 1,
+     "pos": [
+      43.549,
+      null,
+      -22.98
+     ],
+     "h": 13.959,
+     "rotY": 0.0359,
+     "visible": true
+    },
+    {
+     "id": "forest/east-deep/c7",
+     "t": "biome_pine_a",
+     "layer": 1,
+     "pos": [
+      35.32,
+      null,
+      -51.533
+     ],
+     "h": 11.437,
+     "rotY": -0.0091,
+     "visible": true
+    },
+    {
+     "id": "forest/east-deep/c8",
+     "t": "biome_pine_a",
+     "layer": 1,
+     "pos": [
+      44.682,
+      null,
+      -64.472
+     ],
+     "h": 12.442,
+     "rotY": -0.0058,
+     "visible": true
+    },
+    {
+     "id": "forest/east-deep/c10",
+     "t": "biome_pine_a",
+     "layer": 1,
+     "pos": [
+      41.625,
+      null,
+      -71.47
+     ],
+     "h": 12.773,
+     "rotY": 0.0539,
+     "visible": true
+    },
+    {
+     "id": "forest/east-deep/c15",
+     "t": "biome_pine_a",
+     "layer": 1,
+     "pos": [
+      8.551,
+      null,
+      -36.977
+     ],
+     "h": 11.798,
+     "rotY": 0.0105,
+     "visible": true
+    },
+    {
+     "id": "forest/east-deep/c17",
+     "t": "biome_pine_b",
+     "layer": 1,
+     "pos": [
+      15.822,
+      null,
+      -63.532
+     ],
+     "h": 12.356,
+     "rotY": 0.0633,
+     "visible": true
+    },
+    {
+     "id": "forest/east-deep/c18",
+     "t": "biome_pine_a",
+     "layer": 1,
+     "pos": [
+      30.825,
+      null,
+      -23.84
+     ],
+     "h": 12.481,
+     "rotY": 0.0481,
+     "visible": true
+    },
+    {
+     "id": "forest/east-deep/c19",
+     "t": "biome_pine_a",
+     "layer": 1,
+     "pos": [
+      32.847,
+      null,
+      -38.544
+     ],
+     "h": 12.362,
+     "rotY": -0.011,
+     "visible": true
+    },
+    {
+     "id": "forest/east-deep/c21",
+     "t": "biome_pine_b",
+     "layer": 1,
+     "pos": [
+      12.69,
+      null,
+      -27.975
+     ],
+     "h": 11.85,
+     "rotY": -0.0177,
+     "visible": true
+    },
+    {
+     "id": "forest/east-deep/c22",
+     "t": "biome_pine_a",
+     "layer": 1,
+     "pos": [
+      22.646,
+      null,
+      -38.978
+     ],
+     "h": 13.187,
+     "rotY": 0.0431,
+     "visible": true
+    },
+    {
+     "id": "forest/east-deep/c24",
+     "t": "biome_pine_a",
+     "layer": 1,
+     "pos": [
+      37.313,
+      null,
+      -58.714
+     ],
+     "h": 10.774,
+     "rotY": -0.0084,
+     "visible": true
+    },
+    {
+     "id": "forest/east-deep/c28",
+     "t": "biome_pine_a",
+     "layer": 1,
+     "pos": [
+      23.326,
+      null,
+      -27.959
+     ],
+     "h": 10.757,
+     "rotY": -0.0545,
+     "visible": true
+    },
+    {
+     "id": "forest/east-deep/c29",
+     "t": "biome_pine_a",
+     "layer": 1,
+     "pos": [
+      37.146,
+      null,
+      -18.184
+     ],
+     "h": 11.912,
+     "rotY": 0.0392,
+     "visible": true
+    },
+    {
+     "id": "forest/east-deep/c33",
+     "t": "biome_pine_a",
+     "layer": 1,
+     "pos": [
+      15.062,
+      null,
+      -20.492
+     ],
+     "h": 12.968,
+     "rotY": 0.051,
+     "visible": true
+    },
+    {
+     "id": "forest/east-deep/c35",
+     "t": "biome_pine_a",
+     "layer": 1,
+     "pos": [
+      29.122,
+      null,
+      -32.462
+     ],
+     "h": 14.153,
+     "rotY": -0.021,
+     "visible": true
+    },
+    {
+     "id": "forest/west-far/c0",
+     "t": "biome_pine_a",
+     "layer": 1,
+     "pos": [
+      -36.097,
+      null,
+      -21.507
+     ],
+     "h": 12.988,
+     "rotY": 0.0612,
+     "visible": true
+    },
+    {
+     "id": "forest/west-far/c1",
+     "t": "biome_pine_b",
+     "layer": 1,
+     "pos": [
+      -32.215,
+      null,
+      -36.325
+     ],
+     "h": 12.427,
+     "rotY": 0.0536,
+     "visible": true
+    },
+    {
+     "id": "forest/west-far/c8",
+     "t": "biome_pine_b",
+     "layer": 1,
+     "pos": [
+      -41.588,
+      null,
+      -42.196
+     ],
+     "h": 11.866,
+     "rotY": 0.0351,
+     "visible": true
+    },
+    {
+     "id": "forest/west-far/c11",
+     "t": "biome_pine_a",
+     "layer": 1,
+     "pos": [
+      -42.189,
+      null,
+      -16.693
+     ],
+     "h": 12.265,
+     "rotY": 0.0057,
+     "visible": true
+    },
+    {
+     "id": "forest/west-far/c12",
+     "t": "biome_pine_a",
+     "layer": 1,
+     "pos": [
+      -29.554,
+      null,
+      -45.222
+     ],
+     "h": 11.68,
+     "rotY": 0.0491,
+     "visible": true
+    },
+    {
+     "id": "forest/west-far/c14",
+     "t": "biome_pine_a",
+     "layer": 1,
+     "pos": [
+      -36.245,
+      null,
+      -11.565
+     ],
+     "h": 11.114,
+     "rotY": -0.0125,
+     "visible": true
+    },
+    {
+     "id": "forest/west-deep/c0",
+     "t": "biome_pine_b",
+     "layer": 1,
+     "pos": [
+      -25.115,
+      null,
+      -58.833
+     ],
+     "h": 10.951,
+     "rotY": -0.0625,
+     "visible": true
+    },
+    {
+     "id": "forest/west-deep/c1",
+     "t": "biome_pine_a",
+     "layer": 1,
+     "pos": [
+      -32.307,
+      null,
+      -89.116
+     ],
+     "h": 12.409,
+     "rotY": 0.0043,
+     "visible": true
+    },
+    {
+     "id": "forest/west-deep/c2",
+     "t": "biome_pine_a",
+     "layer": 1,
+     "pos": [
+      -28.567,
+      null,
+      -78.722
+     ],
+     "h": 12.375,
+     "rotY": -0.0116,
+     "visible": true
+    },
+    {
+     "id": "forest/west-deep/c4",
+     "t": "biome_pine_a",
+     "layer": 1,
+     "pos": [
+      -31.455,
+      null,
+      -68.387
+     ],
+     "h": 12.06,
+     "rotY": -0.0123,
+     "visible": true
+    },
+    {
+     "id": "forest/west-deep/c5",
+     "t": "biome_pine_a",
+     "layer": 1,
+     "pos": [
+      -43.619,
+      null,
+      -80.95
+     ],
+     "h": 14.028,
+     "rotY": -0.0437,
+     "visible": true
+    },
+    {
+     "id": "forest/west-deep/c6",
+     "t": "biome_pine_a",
+     "layer": 1,
+     "pos": [
+      -19.93,
+      null,
+      -94.893
+     ],
+     "h": 13.752,
+     "rotY": 0.0467,
+     "visible": true
+    },
+    {
+     "id": "forest/west-deep/c8",
+     "t": "biome_pine_a",
+     "layer": 1,
+     "pos": [
+      -11.498,
+      null,
+      -75.831
+     ],
+     "h": 13.224,
+     "rotY": 0.064,
+     "visible": true
+    },
+    {
+     "id": "forest/west-deep/c9",
+     "t": "biome_pine_a",
+     "layer": 1,
+     "pos": [
+      -42.195,
+      null,
+      -91.606
+     ],
+     "h": 13.734,
+     "rotY": -0.0383,
+     "visible": true
+    },
+    {
+     "id": "forest/west-deep/c10",
+     "t": "biome_pine_b",
+     "layer": 1,
+     "pos": [
+      -23.249,
+      null,
+      -71.855
+     ],
+     "h": 11.385,
+     "rotY": 0.0623,
+     "visible": true
+    },
+    {
+     "id": "forest/west-deep/c11",
+     "t": "biome_pine_a",
+     "layer": 1,
+     "pos": [
+      -11.112,
+      null,
+      -64.174
+     ],
+     "h": 11.002,
+     "rotY": 0.0114,
+     "visible": true
+    },
+    {
+     "id": "forest/west-deep/c14",
+     "t": "biome_pine_a",
+     "layer": 1,
+     "pos": [
+      -13.803,
+      null,
+      -83.944
+     ],
+     "h": 10.696,
+     "rotY": -0.0493,
+     "visible": true
+    },
+    {
+     "id": "forest/west-deep/c17",
+     "t": "biome_pine_a",
+     "layer": 1,
+     "pos": [
+      -38.781,
+      null,
+      -65.607
+     ],
+     "h": 11.824,
+     "rotY": -0.0166,
+     "visible": true
+    },
+    {
+     "id": "forest/west-deep/c18",
+     "t": "biome_pine_b",
+     "layer": 1,
+     "pos": [
+      -18.685,
+      null,
+      -89.602
+     ],
+     "h": 13.455,
+     "rotY": -0.0095,
+     "visible": true
+    },
+    {
+     "id": "forest/west-deep/c19",
+     "t": "biome_pine_b",
+     "layer": 1,
+     "pos": [
+      -45.242,
+      null,
+      -71.873
+     ],
+     "h": 12.232,
+     "rotY": 0.0293,
+     "visible": true
+    },
+    {
+     "id": "forest/west-deep/c28",
+     "t": "biome_pine_a",
+     "layer": 1,
+     "pos": [
+      -37.1,
+      null,
+      -97.249
+     ],
+     "h": 12.164,
+     "rotY": 0.0152,
+     "visible": true
+    },
+    {
+     "id": "forest/west-deep/c33",
+     "t": "biome_pine_b",
+     "layer": 1,
+     "pos": [
+      -14.925,
+      null,
+      -97.248
+     ],
+     "h": 11.519,
+     "rotY": -0.0234,
+     "visible": true
+    },
+    {
+     "id": "forest/west-deep/c42",
+     "t": "biome_pine_a",
+     "layer": 1,
+     "pos": [
+      -21.567,
+      null,
+      -82.508
+     ],
+     "h": 10.834,
+     "rotY": 0.0675,
+     "visible": true
+    },
+    {
+     "id": "forest/west-deep/c51",
+     "t": "biome_pine_a",
+     "layer": 1,
+     "pos": [
+      -42.804,
+      null,
+      -58.653
+     ],
+     "h": 11.902,
+     "rotY": -0.0361,
+     "visible": true
+    },
+    {
+     "id": "forest/west-deep/c56",
+     "t": "biome_pine_a",
+     "layer": 1,
+     "pos": [
+      -17.514,
+      null,
+      -63.492
+     ],
+     "h": 12.059,
+     "rotY": 0.0234,
+     "visible": true
+    },
+    {
+     "id": "forest/east-thin/c0",
+     "t": "biome_deadtree",
+     "layer": 1,
+     "pos": [
+      34.796,
+      null,
+      -81.285
+     ],
+     "h": 7.569,
+     "rotY": -0.0537,
+     "visible": true
+    },
+    {
+     "id": "forest/east-thin/c1",
+     "t": "biome_deadtree",
+     "layer": 1,
+     "pos": [
+      23.293,
+      null,
+      -90.116
+     ],
+     "h": 8.105,
+     "rotY": 0.0125,
+     "visible": true
+    },
+    {
+     "id": "forest/east-thin/c2",
+     "t": "biome_pine_a",
+     "layer": 1,
+     "pos": [
+      25.958,
+      null,
+      -78.495
+     ],
+     "h": 11.383,
+     "rotY": 0.0061,
+     "visible": true
+    },
+    {
+     "id": "forest/east-thin/c3",
+     "t": "biome_deadtree",
+     "layer": 1,
+     "pos": [
+      32.389,
+      null,
+      -100.903
+     ],
+     "h": 7.355,
+     "rotY": 0.0636,
      "visible": true
     },
     {
@@ -1732,51 +2554,25 @@
      "t": "rock_s",
      "layer": 1,
      "pos": [
-      8.305,
+      -25.571,
       null,
-      -58.962
+      -22.389
      ],
      "h": 1.2,
-     "rotY": 0.0959,
-     "visible": true
-    },
-    {
-     "id": "forest/scatter/c3",
-     "t": "grass_tuft_a",
-     "layer": 1,
-     "pos": [
-      -7.042,
-      null,
-      -37.868
-     ],
-     "h": 1.1,
-     "rotY": -0.0907,
-     "visible": true
-    },
-    {
-     "id": "forest/scatter/c4",
-     "t": "mushrooms",
-     "layer": 1,
-     "pos": [
-      6.941,
-      null,
-      -27.227
-     ],
-     "h": 0.9,
-     "rotY": 0.1652,
+     "rotY": 0.0489,
      "visible": true
     },
     {
      "id": "forest/scatter/c5",
-     "t": "fern",
+     "t": "mushrooms",
      "layer": 1,
      "pos": [
-      7.545,
+      -31.324,
       null,
-      -63.88
+      1.782
      ],
-     "h": 1.4,
-     "rotY": 0.1112,
+     "h": 0.9,
+     "rotY": -0.0372,
      "visible": true
     },
     {
@@ -1784,64 +2580,25 @@
      "t": "rock_s",
      "layer": 1,
      "pos": [
-      -7.703,
+      -17.107,
       null,
-      -49.496
+      -18.912
      ],
      "h": 1.2,
-     "rotY": -0.1584,
+     "rotY": -0.0682,
      "visible": true
     },
     {
-     "id": "forest/scatter/c7",
-     "t": "grass_tuft_a",
-     "layer": 1,
-     "pos": [
-      -6.737,
-      null,
-      -44.006
-     ],
-     "h": 1.1,
-     "rotY": -0.1636,
-     "visible": true
-    },
-    {
-     "id": "forest/scatter/c8",
+     "id": "forest/scatter/c12",
      "t": "mushrooms",
      "layer": 1,
      "pos": [
-      7.804,
+      -15.443,
       null,
-      -69.032
+      -37.138
      ],
      "h": 0.9,
-     "rotY": 0.1521,
-     "visible": true
-    },
-    {
-     "id": "forest/scatter/c9",
-     "t": "fern",
-     "layer": 1,
-     "pos": [
-      -7.88,
-      null,
-      -23.107
-     ],
-     "h": 1.4,
-     "rotY": -0.1413,
-     "visible": true
-    },
-    {
-     "id": "forest/scatter/c10",
-     "t": "rock_s",
-     "layer": 1,
-     "pos": [
-      7.335,
-      null,
-      -38.416
-     ],
-     "h": 1.2,
-     "rotY": 0.0802,
+     "rotY": 0.0358,
      "visible": true
     },
     {
@@ -1849,116 +2606,285 @@
      "t": "grass_tuft_a",
      "layer": 1,
      "pos": [
-      7.398,
+      17.488,
       null,
-      -76.148
+      -0.699
      ],
      "h": 1.1,
-     "rotY": 0.1522,
+     "rotY": -0.0298,
      "visible": true
     },
     {
-     "id": "forest/scatter/c15",
-     "t": "mushrooms",
-     "layer": 1,
-     "pos": [
-      8.024,
-      null,
-      -79.172
-     ],
-     "h": 0.9,
-     "rotY": 0.1687,
-     "visible": true
-    },
-    {
-     "id": "forest/scatter/c19",
+     "id": "forest/scatter/c16",
      "t": "fern",
      "layer": 1,
      "pos": [
-      4.478,
+      -9.071,
       null,
-      -73.344
+      -36.512
      ],
      "h": 1.4,
-     "rotY": 0.1008,
-     "visible": true
-    },
-    {
-     "id": "forest/scatter/c21",
-     "t": "rock_s",
-     "layer": 1,
-     "pos": [
-      -5.059,
-      null,
-      -40.11
-     ],
-     "h": 1.2,
-     "rotY": -0.0954,
-     "visible": true
-    },
-    {
-     "id": "forest/scatter/c22",
-     "t": "grass_tuft_a",
-     "layer": 1,
-     "pos": [
-      -5.083,
-      null,
-      -68.251
-     ],
-     "h": 1.1,
-     "rotY": -0.1927,
-     "visible": true
-    },
-    {
-     "id": "forest/scatter/c24",
-     "t": "mushrooms",
-     "layer": 1,
-     "pos": [
-      5.146,
-      null,
-      -21.265
-     ],
-     "h": 0.9,
-     "rotY": 0.0753,
-     "visible": true
-    },
-    {
-     "id": "forest/scatter/c25",
-     "t": "fern",
-     "layer": 1,
-     "pos": [
-      -7.343,
-      null,
-      -80.064
-     ],
-     "h": 1.4,
-     "rotY": -0.1362,
+     "rotY": 0.0221,
      "visible": true
     },
     {
      "id": "forest/scatter/c26",
-     "t": "rock_s",
+     "t": "fern",
      "layer": 1,
      "pos": [
-      -7.289,
+      -29.223,
       null,
-      -27.949
+      -3.719
      ],
-     "h": 1.2,
-     "rotY": -0.1907,
+     "h": 1.4,
+     "rotY": -0.0445,
      "visible": true
     },
     {
-     "id": "forest/scatter/c28",
+     "id": "forest/scatter/c29",
+     "t": "mushrooms",
+     "layer": 1,
+     "pos": [
+      31.049,
+      null,
+      -91.573
+     ],
+     "h": 0.9,
+     "rotY": 0.0424,
+     "visible": true
+    },
+    {
+     "id": "forest/scatter/c35",
      "t": "grass_tuft_a",
      "layer": 1,
      "pos": [
-      -6.133,
+      -19.918,
       null,
-      -62.664
+      -39.921
      ],
      "h": 1.1,
-     "rotY": -0.078,
+     "rotY": 0.0272,
+     "visible": true
+    },
+    {
+     "id": "forest/scatter/c38",
+     "t": "fern",
+     "layer": 1,
+     "pos": [
+      15.034,
+      null,
+      -91.344
+     ],
+     "h": 1.4,
+     "rotY": -0.0157,
+     "visible": true
+    },
+    {
+     "id": "forest/scatter/c40",
+     "t": "fern",
+     "layer": 1,
+     "pos": [
+      -18.187,
+      null,
+      -51.662
+     ],
+     "h": 1.4,
+     "rotY": -0.0399,
+     "visible": true
+    },
+    {
+     "id": "forest/scatter/c44",
+     "t": "grass_tuft_a",
+     "layer": 1,
+     "pos": [
+      23.608,
+      null,
+      -3.457
+     ],
+     "h": 1.1,
+     "rotY": -0.0503,
+     "visible": true
+    },
+    {
+     "id": "forest/scatter/c48",
+     "t": "mushrooms",
+     "layer": 1,
+     "pos": [
+      29.622,
+      null,
+      -89.024
+     ],
+     "h": 0.9,
+     "rotY": 0.008,
+     "visible": true
+    },
+    {
+     "id": "forest/scatter/c49",
+     "t": "rock_s",
+     "layer": 1,
+     "pos": [
+      13.682,
+      null,
+      -78.944
+     ],
+     "h": 1.2,
+     "rotY": -0.0339,
+     "visible": true
+    },
+    {
+     "id": "forest/scatter/c50",
+     "t": "mushrooms",
+     "layer": 1,
+     "pos": [
+      33.017,
+      null,
+      -15.387
+     ],
+     "h": 0.9,
+     "rotY": -0.0249,
+     "visible": true
+    },
+    {
+     "id": "forest/scatter/c51",
+     "t": "grass_tuft_a",
+     "layer": 1,
+     "pos": [
+      7.894,
+      null,
+      -72.056
+     ],
+     "h": 1.1,
+     "rotY": -0.008,
+     "visible": true
+    },
+    {
+     "id": "forest/scatter/c55",
+     "t": "grass_tuft_a",
+     "layer": 1,
+     "pos": [
+      18.987,
+      null,
+      -82.81
+     ],
+     "h": 1.1,
+     "rotY": -0.0218,
+     "visible": true
+    },
+    {
+     "id": "forest/scatter/c66",
+     "t": "fern",
+     "layer": 1,
+     "pos": [
+      -6.851,
+      null,
+      -26.604
+     ],
+     "h": 1.4,
+     "rotY": 0.0097,
+     "visible": true
+    },
+    {
+     "id": "forest/scatter/c71",
+     "t": "grass_tuft_a",
+     "layer": 1,
+     "pos": [
+      -18.404,
+      null,
+      -46.005
+     ],
+     "h": 1.1,
+     "rotY": 0.0244,
+     "visible": true
+    },
+    {
+     "id": "forest/scatter/c72",
+     "t": "rock_s",
+     "layer": 1,
+     "pos": [
+      19.438,
+      null,
+      -8.164
+     ],
+     "h": 1.2,
+     "rotY": 0.0687,
+     "visible": true
+    },
+    {
+     "id": "forest/scatter/c75",
+     "t": "mushrooms",
+     "layer": 1,
+     "pos": [
+      -27.862,
+      null,
+      3.825
+     ],
+     "h": 0.9,
+     "rotY": 0.057,
+     "visible": true
+    },
+    {
+     "id": "forest/scatter/c78",
+     "t": "mushrooms",
+     "layer": 1,
+     "pos": [
+      27.729,
+      null,
+      -51.471
+     ],
+     "h": 0.9,
+     "rotY": 0.0638,
+     "visible": true
+    },
+    {
+     "id": "forest/scatter/c79",
+     "t": "rock_s",
+     "layer": 1,
+     "pos": [
+      -11.975,
+      null,
+      -31.407
+     ],
+     "h": 1.2,
+     "rotY": 0.0035,
+     "visible": true
+    },
+    {
+     "id": "forest/scatter/c80",
+     "t": "fern",
+     "layer": 1,
+     "pos": [
+      -11.765,
+      null,
+      -44.347
+     ],
+     "h": 1.4,
+     "rotY": -0.0578,
+     "visible": true
+    },
+    {
+     "id": "forest/scatter/c82",
+     "t": "mushrooms",
+     "layer": 1,
+     "pos": [
+      -21.76,
+      null,
+      -47.125
+     ],
+     "h": 0.9,
+     "rotY": 0.0166,
+     "visible": true
+    },
+    {
+     "id": "forest/scatter/c84",
+     "t": "grass_tuft_a",
+     "layer": 1,
+     "pos": [
+      -18.716,
+      null,
+      -55.546
+     ],
+     "h": 1.1,
+     "rotY": 0.0533,
      "visible": true
     }
    ],
@@ -1968,12 +2894,12 @@
      "key": "skills_no_levels",
      "kind": "wood",
      "pos": [
-      -8.692,
+      -11.2,
       null,
-      -24
+      -22
      ],
      "h": 8.0,
-     "rotY": -0.0952,
+     "rotY": 0.0,
      "visible": true
     }
    ]
@@ -1981,344 +2907,1303 @@
   "mine": {
    "sprites": [
     {
-     "id": "mine/mine_section.1/beam_frame.1",
-     "t": "beam_frame",
+     "id": "mine/gate-west/rock_l.1",
+     "t": "rock_l",
      "layer": 1,
      "pos": [
-      -0.227,
+      -9.563,
       null,
-      -10.799
+      -3.298
      ],
-     "h": 7.823,
-     "rotY": 0.0,
+     "h": 4.42,
+     "rotY": 0.0491,
      "visible": true
     },
     {
-     "id": "mine/mine_section.1/ore_pile.1",
-     "t": "ore_pile",
-     "layer": 1,
-     "pos": [
-      4.973,
-      null,
-      -7.599
-     ],
-     "h": 1.788,
-     "rotY": 0.0,
-     "visible": true
-    },
-    {
-     "id": "mine/biome_brazier.1",
-     "t": "biome_brazier",
-     "layer": 1,
-     "pos": [
-      -8.797,
-      null,
-      -11.095
-     ],
-     "h": 2.906,
-     "rotY": -0.0932,
-     "visible": true
-    },
-    {
-     "id": "mine/lantern_chain.1",
-     "t": "lantern_chain",
-     "layer": 1,
-     "pos": [
-      9.033,
-      5.4,
-      -9.7
-     ],
-     "h": 3.577,
-     "rotY": 0.1512,
-     "visible": true,
-     "hanging": true
-    },
-    {
-     "id": "mine/vein_pocket.1/feat_mining.1",
-     "t": "feat_mining",
-     "layer": 1,
-     "pos": [
-      9.405,
-      null,
-      -23.287
-     ],
-     "h": 4.321,
-     "rotY": 0.1245,
-     "visible": true
-    },
-    {
-     "id": "mine/vein_pocket.1/biome_crystals.1",
-     "t": "biome_crystals",
-     "layer": 1,
-     "pos": [
-      12.805,
-      null,
-      -24.887
-     ],
-     "h": 4.969,
-     "rotY": 0.2013,
-     "visible": true
-    },
-    {
-     "id": "mine/vein_pocket.1/stalagmite_a.1",
+     "id": "mine/gate-west/stalagmite_a.1",
      "t": "stalagmite_a",
      "layer": 1,
      "pos": [
-      13.005,
+      -12.763,
       null,
-      -19.887
+      -8.298
      ],
-     "h": 3.889,
-     "rotY": 0.1026,
+     "h": 3.6,
+     "rotY": -0.0408,
      "visible": true
     },
     {
-     "id": "mine/stalagmite_a.1",
-     "t": "stalagmite_a",
-     "layer": 0.5,
+     "id": "mine/gate-west/rock_m.1",
+     "t": "rock_m",
+     "layer": 1,
      "pos": [
-      -13.648,
+      -7.763,
       null,
-      -24.362
+      0.302
      ],
-     "h": 3.886,
-     "rotY": -0.1416,
+     "h": 2.0,
+     "rotY": -0.0302,
      "visible": true
     },
     {
-     "id": "mine/mine_section.2/beam_frame.1",
+     "id": "mine/gate-east/rock_l.1",
+     "t": "rock_l",
+     "layer": 1,
+     "pos": [
+      10.193,
+      null,
+      0.504
+     ],
+     "h": 4.08,
+     "rotY": -0.0614,
+     "visible": true
+    },
+    {
+     "id": "mine/gate-east/stalagmite_b.1",
+     "t": "stalagmite_b",
+     "layer": 1,
+     "pos": [
+      13.193,
+      null,
+      -4.096
+     ],
+     "h": 3.6,
+     "rotY": -0.0134,
+     "visible": true
+    },
+    {
+     "id": "mine/gate-east/rock_s.1",
+     "t": "rock_s",
+     "layer": 1,
+     "pos": [
+      8.793,
+      null,
+      3.504
+     ],
+     "h": 1.2,
+     "rotY": -0.0637,
+     "visible": true
+    },
+    {
+     "id": "mine/adit/frame",
      "t": "beam_frame",
      "layer": 1,
      "pos": [
-      -0.454,
+      -11.657,
       null,
-      -23.285
+      -30.091
      ],
-     "h": 7.561,
+     "h": 7.0,
      "rotY": 0.0,
      "visible": true
     },
     {
-     "id": "mine/mine_section.2/ore_pile.1",
-     "t": "ore_pile",
-     "layer": 1,
-     "pos": [
-      4.746,
-      null,
-      -20.085
-     ],
-     "h": 1.728,
-     "rotY": 0.0,
-     "visible": true
-    },
-    {
-     "id": "mine/minecart.1",
+     "id": "mine/adit/cart",
      "t": "minecart",
      "layer": 1,
      "pos": [
-      -8.97,
+      -6.257,
       null,
-      -37.323
+      -25.891
      ],
-     "h": 2.904,
-     "rotY": -0.0923,
+     "h": 2.8,
+     "rotY": -0.0044,
      "visible": true
     },
     {
-     "id": "mine/lantern_chain.2",
-     "t": "lantern_chain",
-     "layer": 1,
-     "pos": [
-      -9.281,
-      5.8,
-      -54.215
-     ],
-     "h": 3.168,
-     "rotY": -0.1126,
-     "visible": true,
-     "hanging": true
-    },
-    {
-     "id": "mine/biome_crystals.1",
-     "t": "biome_crystals",
-     "layer": 1,
-     "pos": [
-      8.679,
-      null,
-      -38.481
-     ],
-     "h": 4.77,
-     "rotY": 0.1768,
-     "visible": true
-    },
-    {
-     "id": "mine/stalagmite_b.1",
-     "t": "stalagmite_b",
-     "layer": 0.5,
-     "pos": [
-      13.987,
-      null,
-      -54.075
-     ],
-     "h": 3.564,
-     "rotY": 0.199,
-     "visible": true
-    },
-    {
-     "id": "mine/mine_section.3/beam_frame.1",
-     "t": "beam_frame",
-     "layer": 1,
-     "pos": [
-      0.52,
-      null,
-      -37.837
-     ],
-     "h": 7.255,
-     "rotY": 0.0,
-     "visible": true
-    },
-    {
-     "id": "mine/mine_section.3/ore_pile.1",
+     "id": "mine/adit/ore_pile.1",
      "t": "ore_pile",
      "layer": 1,
      "pos": [
-      5.72,
+      -9.457,
       null,
-      -34.637
+      -24.491
      ],
-     "h": 1.658,
-     "rotY": 0.0,
+     "h": 1.6,
+     "rotY": -0.0596,
      "visible": true
     },
     {
-     "id": "mine/vein_pocket.2/feat_mining.1",
-     "t": "feat_mining",
+     "id": "mine/adit/fire",
+     "t": "biome_brazier",
      "layer": 1,
      "pos": [
-      -9.203,
+      -17.457,
       null,
-      -69.582
+      -26.691
      ],
-     "h": 3.765,
-     "rotY": -0.1447,
+     "h": 2.6,
+     "rotY": 0.0276,
      "visible": true
     },
     {
-     "id": "mine/vein_pocket.2/biome_crystals.1",
-     "t": "biome_crystals",
-     "layer": 1,
-     "pos": [
-      -12.603,
-      null,
-      -71.182
-     ],
-     "h": 4.33,
-     "rotY": -0.192,
-     "visible": true
-    },
-    {
-     "id": "mine/vein_pocket.2/stalagmite_a.1",
-     "t": "stalagmite_a",
-     "layer": 1,
-     "pos": [
-      -12.803,
-      null,
-      -66.182
-     ],
-     "h": 3.389,
-     "rotY": -0.0752,
-     "visible": true
-    },
-    {
-     "id": "mine/feat_craft.1",
+     "id": "mine/smithy/anvil",
      "t": "feat_craft",
      "layer": 1,
      "pos": [
-      9.502,
+      11.529,
       null,
-      -71.847
+      -36.774
      ],
-     "h": 2.251,
-     "rotY": 0.1468,
-     "visible": true
-    },
-    {
-     "id": "mine/lantern_chain.3",
-     "t": "lantern_chain",
-     "layer": 1,
-     "pos": [
-      9.6,
-      5.2,
-      -90.233
-     ],
-     "h": 2.816,
-     "rotY": 0.1073,
-     "visible": true,
-     "hanging": true
-    },
-    {
-     "id": "mine/biome_crystals.2",
-     "t": "biome_crystals",
-     "layer": 1,
-     "pos": [
-      -8.881,
-      null,
-      -89.489
-     ],
-     "h": 4.048,
-     "rotY": -0.1858,
-     "visible": true
-    },
-    {
-     "id": "mine/mine_section.4/beam_frame.1",
-     "t": "beam_frame",
-     "layer": 1,
-     "pos": [
-      -0.057,
-      null,
-      -54.613
-     ],
-     "h": 6.903,
+     "h": 2.4,
      "rotY": 0.0,
      "visible": true
     },
     {
-     "id": "mine/mine_section.4/ore_pile.1",
+     "id": "mine/smithy/fire",
+     "t": "biome_brazier",
+     "layer": 1,
+     "pos": [
+      14.929,
+      null,
+      -37.174
+     ],
+     "h": 2.6,
+     "rotY": 0.0027,
+     "visible": true
+    },
+    {
+     "id": "mine/smithy/ore_pile.1",
      "t": "ore_pile",
      "layer": 1,
      "pos": [
-      5.143,
+      8.129,
       null,
-      -51.413
+      -35.374
      ],
-     "h": 1.578,
+     "h": 1.6,
+     "rotY": -0.0391,
+     "visible": true
+    },
+    {
+     "id": "mine/smithy/minecart.1",
+     "t": "minecart",
+     "layer": 1,
+     "pos": [
+      19.129,
+      null,
+      -34.374
+     ],
+     "h": 2.8,
+     "rotY": 0.0272,
+     "visible": true
+    },
+    {
+     "id": "mine/vein/pool",
+     "t": "feat_mining",
+     "layer": 1,
+     "pos": [
+      -18.574,
+      null,
+      -53.346
+     ],
+     "h": 4.0,
      "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "mine/vein/crystals",
+     "t": "biome_crystals",
+     "layer": 1,
+     "pos": [
+      -13.174,
+      null,
+      -55.346
+     ],
+     "h": 4.6,
+     "rotY": -0.0322,
+     "visible": true
+    },
+    {
+     "id": "mine/vein/stalagmite_a.1",
+     "t": "stalagmite_a",
+     "layer": 1,
+     "pos": [
+      -23.574,
+      null,
+      -54.346
+     ],
+     "h": 3.6,
+     "rotY": 0.0109,
+     "visible": true
+    },
+    {
+     "id": "mine/deep-adit/cave",
+     "t": "biome_orevein",
+     "layer": 1,
+     "pos": [
+      17.741,
+      null,
+      -70.55
+     ],
+     "h": 6.0,
+     "rotY": 0.0,
+     "visible": true
+    },
+    {
+     "id": "mine/deep-adit/ore_pile.1",
+     "t": "ore_pile",
+     "layer": 1,
+     "pos": [
+      13.141,
+      null,
+      -67.75
+     ],
+     "h": 1.6,
+     "rotY": -0.0501,
+     "visible": true
+    },
+    {
+     "id": "mine/deep-adit/rock_m.1",
+     "t": "rock_m",
+     "layer": 1,
+     "pos": [
+      22.941,
+      null,
+      -68.35
+     ],
+     "h": 2.0,
+     "rotY": 0.0357,
+     "visible": true
+    },
+    {
+     "id": "mine/crystal-spur/biome_crystals.1",
+     "t": "biome_crystals",
+     "layer": 1,
+     "pos": [
+      -11.298,
+      null,
+      -90.027
+     ],
+     "h": 3.68,
+     "rotY": 0.0323,
+     "visible": true
+    },
+    {
+     "id": "mine/crystal-spur/rock_s.1",
+     "t": "rock_s",
+     "layer": 1,
+     "pos": [
+      -8.698,
+      null,
+      -88.027
+     ],
+     "h": 1.2,
+     "rotY": 0.0356,
+     "visible": true
+    },
+    {
+     "id": "mine/approach-west/c0",
+     "t": "rock_l",
+     "layer": 1,
+     "pos": [
+      -17.576,
+      null,
+      33.557
+     ],
+     "h": 4.819,
+     "rotY": 0.0446,
+     "visible": true
+    },
+    {
+     "id": "mine/approach-west/c1",
+     "t": "stalagmite_a",
+     "layer": 1,
+     "pos": [
+      -24.982,
+      null,
+      31.081
+     ],
+     "h": 4.868,
+     "rotY": -0.0372,
+     "visible": true
+    },
+    {
+     "id": "mine/approach-west/c2",
+     "t": "rock_m",
+     "layer": 1,
+     "pos": [
+      -23.214,
+      null,
+      39.463
+     ],
+     "h": 3.546,
+     "rotY": 0.0503,
+     "visible": true
+    },
+    {
+     "id": "mine/approach-west/c4",
+     "t": "rock_l",
+     "layer": 1,
+     "pos": [
+      -16.481,
+      null,
+      39.819
+     ],
+     "h": 5.937,
+     "rotY": 0.0027,
+     "visible": true
+    },
+    {
+     "id": "mine/approach-west/c5",
+     "t": "rock_l",
+     "layer": 1,
+     "pos": [
+      -25.7,
+      null,
+      25.254
+     ],
+     "h": 4.737,
+     "rotY": -0.0003,
+     "visible": true
+    },
+    {
+     "id": "mine/approach-west/c6",
+     "t": "stalagmite_a",
+     "layer": 1,
+     "pos": [
+      -27.106,
+      null,
+      42.705
+     ],
+     "h": 4.575,
+     "rotY": 0.0597,
+     "visible": true
+    },
+    {
+     "id": "mine/approach-west/c9",
+     "t": "rock_m",
+     "layer": 1,
+     "pos": [
+      -33.957,
+      null,
+      41.937
+     ],
+     "h": 2.517,
+     "rotY": 0.058,
+     "visible": true
+    },
+    {
+     "id": "mine/approach-east/c0",
+     "t": "rock_m",
+     "layer": 1,
+     "pos": [
+      19.484,
+      null,
+      24.103
+     ],
+     "h": 3.35,
+     "rotY": 0.0592,
+     "visible": true
+    },
+    {
+     "id": "mine/approach-east/c1",
+     "t": "rock_l",
+     "layer": 1,
+     "pos": [
+      31.124,
+      null,
+      31.344
+     ],
+     "h": 5.77,
+     "rotY": -0.0609,
+     "visible": true
+    },
+    {
+     "id": "mine/approach-east/c2",
+     "t": "stalagmite_b",
+     "layer": 1,
+     "pos": [
+      16.958,
+      null,
+      20.667
+     ],
+     "h": 5.183,
+     "rotY": -0.0333,
+     "visible": true
+    },
+    {
+     "id": "mine/approach-east/c3",
+     "t": "rock_m",
+     "layer": 1,
+     "pos": [
+      32.783,
+      null,
+      36.58
+     ],
+     "h": 2.433,
+     "rotY": -0.0277,
+     "visible": true
+    },
+    {
+     "id": "mine/approach-east/c4",
+     "t": "stalagmite_b",
+     "layer": 1,
+     "pos": [
+      28.427,
+      null,
+      34.95
+     ],
+     "h": 5.536,
+     "rotY": 0.04,
+     "visible": true
+    },
+    {
+     "id": "mine/approach-east/c6",
+     "t": "rock_m",
+     "layer": 1,
+     "pos": [
+      32.899,
+      null,
+      19.104
+     ],
+     "h": 2.403,
+     "rotY": -0.0446,
+     "visible": true
+    },
+    {
+     "id": "mine/approach-east/c9",
+     "t": "rock_l",
+     "layer": 1,
+     "pos": [
+      24.022,
+      null,
+      16.742
+     ],
+     "h": 5.721,
+     "rotY": -0.0195,
+     "visible": true
+    },
+    {
+     "id": "mine/squeeze-west/c0",
+     "t": "rock_l",
+     "layer": 1,
+     "pos": [
+      -18.553,
+      null,
+      14.534
+     ],
+     "h": 5.953,
+     "rotY": -0.066,
+     "visible": true
+    },
+    {
+     "id": "mine/squeeze-west/c1",
+     "t": "rock_l",
+     "layer": 1,
+     "pos": [
+      -10.619,
+      null,
+      7.896
+     ],
+     "h": 6.423,
+     "rotY": -0.0451,
+     "visible": true
+    },
+    {
+     "id": "mine/squeeze-west/c2",
+     "t": "stalagmite_a",
+     "layer": 1,
+     "pos": [
+      -11.059,
+      null,
+      14.204
+     ],
+     "h": 4.769,
+     "rotY": -0.0157,
+     "visible": true
+    },
+    {
+     "id": "mine/squeeze-west/c5",
+     "t": "rock_l",
+     "layer": 1,
+     "pos": [
+      -18.684,
+      null,
+      8.534
+     ],
+     "h": 5.034,
+     "rotY": -0.0455,
+     "visible": true
+    },
+    {
+     "id": "mine/squeeze-west/c6",
+     "t": "stalagmite_a",
+     "layer": 1,
+     "pos": [
+      -18.131,
+      null,
+      3.092
+     ],
+     "h": 5.766,
+     "rotY": 0.0133,
+     "visible": true
+    },
+    {
+     "id": "mine/squeeze-west/c12",
+     "t": "rock_l",
+     "layer": 1,
+     "pos": [
+      -10.49,
+      null,
+      3.027
+     ],
+     "h": 5.743,
+     "rotY": 0.0035,
+     "visible": true
+    },
+    {
+     "id": "mine/squeeze-east/c0",
+     "t": "rock_m",
+     "layer": 1,
+     "pos": [
+      15.266,
+      null,
+      11.547
+     ],
+     "h": 3.127,
+     "rotY": -0.0406,
+     "visible": true
+    },
+    {
+     "id": "mine/squeeze-east/c4",
+     "t": "rock_l",
+     "layer": 1,
+     "pos": [
+      9.013,
+      null,
+      15.443
+     ],
+     "h": 5.094,
+     "rotY": -0.0095,
+     "visible": true
+    },
+    {
+     "id": "mine/squeeze-east/c7",
+     "t": "stalagmite_b",
+     "layer": 1,
+     "pos": [
+      12.728,
+      null,
+      4.674
+     ],
+     "h": 5.294,
+     "rotY": 0.0139,
+     "visible": true
+    },
+    {
+     "id": "mine/squeeze-east/c8",
+     "t": "rock_m",
+     "layer": 1,
+     "pos": [
+      17.393,
+      null,
+      2.159
+     ],
+     "h": 3.785,
+     "rotY": -0.0401,
+     "visible": true
+    },
+    {
+     "id": "mine/squeeze-east/c19",
+     "t": "stalagmite_a",
+     "layer": 1,
+     "pos": [
+      10.044,
+      null,
+      10.291
+     ],
+     "h": 5.577,
+     "rotY": 0.0316,
+     "visible": true
+    },
+    {
+     "id": "mine/squeeze-east/c21",
+     "t": "stalagmite_b",
+     "layer": 1,
+     "pos": [
+      16.907,
+      null,
+      7.067
+     ],
+     "h": 5.672,
+     "rotY": -0.0218,
+     "visible": true
+    },
+    {
+     "id": "mine/walls-west/c0",
+     "t": "rock_m",
+     "layer": 1,
+     "pos": [
+      -29.422,
+      null,
+      -46.7
+     ],
+     "h": 3.638,
+     "rotY": -0.0339,
+     "visible": true
+    },
+    {
+     "id": "mine/walls-west/c1",
+     "t": "stalagmite_b",
+     "layer": 1,
+     "pos": [
+      -17.959,
+      null,
+      -38.3
+     ],
+     "h": 4.635,
+     "rotY": -0.0644,
+     "visible": true
+    },
+    {
+     "id": "mine/walls-west/c2",
+     "t": "rock_l",
+     "layer": 1,
+     "pos": [
+      -19.697,
+      null,
+      -22.989
+     ],
+     "h": 5.016,
+     "rotY": 0.0413,
+     "visible": true
+    },
+    {
+     "id": "mine/walls-west/c3",
+     "t": "rock_l",
+     "layer": 1,
+     "pos": [
+      -22.304,
+      null,
+      -66.016
+     ],
+     "h": 6.136,
+     "rotY": -0.0068,
+     "visible": true
+    },
+    {
+     "id": "mine/walls-west/c4",
+     "t": "rock_m",
+     "layer": 1,
+     "pos": [
+      -21.418,
+      null,
+      -44.919
+     ],
+     "h": 2.419,
+     "rotY": 0.0054,
+     "visible": true
+    },
+    {
+     "id": "mine/walls-west/c5",
+     "t": "rock_l",
+     "layer": 1,
+     "pos": [
+      -30.74,
+      null,
+      -32.493
+     ],
+     "h": 6.264,
+     "rotY": -0.0305,
+     "visible": true
+    },
+    {
+     "id": "mine/walls-west/c6",
+     "t": "stalagmite_a",
+     "layer": 1,
+     "pos": [
+      -28.202,
+      null,
+      -20.479
+     ],
+     "h": 5.21,
+     "rotY": 0.0242,
+     "visible": true
+    },
+    {
+     "id": "mine/walls-west/c8",
+     "t": "stalagmite_b",
+     "layer": 1,
+     "pos": [
+      -35.765,
+      null,
+      -29.01
+     ],
+     "h": 6.111,
+     "rotY": 0.0623,
+     "visible": true
+    },
+    {
+     "id": "mine/walls-west/c9",
+     "t": "rock_l",
+     "layer": 1,
+     "pos": [
+      -13.41,
+      null,
+      -32.55
+     ],
+     "h": 4.81,
+     "rotY": 0.0589,
+     "visible": true
+    },
+    {
+     "id": "mine/walls-west/c10",
+     "t": "rock_l",
+     "layer": 1,
+     "pos": [
+      -12.157,
+      null,
+      -60.16
+     ],
+     "h": 4.956,
+     "rotY": 0.0394,
+     "visible": true
+    },
+    {
+     "id": "mine/walls-west/c13",
+     "t": "rock_l",
+     "layer": 1,
+     "pos": [
+      -24.337,
+      null,
+      -49.373
+     ],
+     "h": 6.376,
+     "rotY": 0.0316,
+     "visible": true
+    },
+    {
+     "id": "mine/walls-west/c14",
+     "t": "rock_l",
+     "layer": 1,
+     "pos": [
+      -24.965,
+      null,
+      -11.341
+     ],
+     "h": 4.358,
+     "rotY": -0.0096,
+     "visible": true
+    },
+    {
+     "id": "mine/walls-west/c15",
+     "t": "rock_l",
+     "layer": 1,
+     "pos": [
+      -24.393,
+      null,
+      -97.687
+     ],
+     "h": 5.154,
+     "rotY": 0.0386,
+     "visible": true
+    },
+    {
+     "id": "mine/walls-west/c16",
+     "t": "rock_l",
+     "layer": 1,
+     "pos": [
+      -19.112,
+      null,
+      -73.86
+     ],
+     "h": 6.148,
+     "rotY": -0.0133,
+     "visible": true
+    },
+    {
+     "id": "mine/walls-west/c18",
+     "t": "rock_l",
+     "layer": 1,
+     "pos": [
+      -30.391,
+      null,
+      -81.281
+     ],
+     "h": 6.45,
+     "rotY": -0.0438,
+     "visible": true
+    },
+    {
+     "id": "mine/walls-west/c19",
+     "t": "stalagmite_a",
+     "layer": 1,
+     "pos": [
+      -28.53,
+      null,
+      -37.126
+     ],
+     "h": 4.564,
+     "rotY": -0.008,
+     "visible": true
+    },
+    {
+     "id": "mine/walls-west/c20",
+     "t": "rock_l",
+     "layer": 1,
+     "pos": [
+      -31.646,
+      null,
+      -68.062
+     ],
+     "h": 5.335,
+     "rotY": -0.0318,
+     "visible": true
+    },
+    {
+     "id": "mine/walls-west/c21",
+     "t": "stalagmite_a",
+     "layer": 1,
+     "pos": [
+      -28.493,
+      null,
+      -56.68
+     ],
+     "h": 6.402,
+     "rotY": -0.0243,
+     "visible": true
+    },
+    {
+     "id": "mine/walls-west/c22",
+     "t": "stalagmite_b",
+     "layer": 1,
+     "pos": [
+      -33.854,
+      null,
+      -63.779
+     ],
+     "h": 6.004,
+     "rotY": 0.0555,
+     "visible": true
+    },
+    {
+     "id": "mine/walls-west/c24",
+     "t": "rock_m",
+     "layer": 1,
+     "pos": [
+      -33.989,
+      null,
+      -24.477
+     ],
+     "h": 2.785,
+     "rotY": 0.0033,
+     "visible": true
+    },
+    {
+     "id": "mine/walls-west/c25",
+     "t": "stalagmite_a",
+     "layer": 1,
+     "pos": [
+      -27.782,
+      null,
+      -42.716
+     ],
+     "h": 6.472,
+     "rotY": -0.0672,
+     "visible": true
+    },
+    {
+     "id": "mine/walls-west/c26",
+     "t": "rock_l",
+     "layer": 1,
+     "pos": [
+      -32.133,
+      null,
+      -91.56
+     ],
+     "h": 4.478,
+     "rotY": -0.0614,
+     "visible": true
+    },
+    {
+     "id": "mine/walls-east/c0",
+     "t": "rock_l",
+     "layer": 1,
+     "pos": [
+      26.652,
+      null,
+      -45.165
+     ],
+     "h": 4.602,
+     "rotY": 0.0256,
+     "visible": true
+    },
+    {
+     "id": "mine/walls-east/c1",
+     "t": "rock_l",
+     "layer": 1,
+     "pos": [
+      28.828,
+      null,
+      -90.088
+     ],
+     "h": 6.305,
+     "rotY": 0.0027,
+     "visible": true
+    },
+    {
+     "id": "mine/walls-east/c2",
+     "t": "stalagmite_b",
+     "layer": 1,
+     "pos": [
+      18.276,
+      null,
+      -54.851
+     ],
+     "h": 4.871,
+     "rotY": -0.0156,
+     "visible": true
+    },
+    {
+     "id": "mine/walls-east/c3",
+     "t": "rock_l",
+     "layer": 1,
+     "pos": [
+      32.364,
+      null,
+      -17.871
+     ],
+     "h": 4.105,
+     "rotY": 0.0114,
+     "visible": true
+    },
+    {
+     "id": "mine/walls-east/c5",
+     "t": "rock_l",
+     "layer": 1,
+     "pos": [
+      15.994,
+      null,
+      -24.863
+     ],
+     "h": 5.814,
+     "rotY": -0.0228,
+     "visible": true
+    },
+    {
+     "id": "mine/walls-east/c6",
+     "t": "rock_l",
+     "layer": 1,
+     "pos": [
+      18.319,
+      null,
+      -62.887
+     ],
+     "h": 4.41,
+     "rotY": 0.0676,
+     "visible": true
+    },
+    {
+     "id": "mine/walls-east/c8",
+     "t": "stalagmite_b",
+     "layer": 1,
+     "pos": [
+      33.049,
+      null,
+      -30.814
+     ],
+     "h": 5.083,
+     "rotY": 0.0497,
+     "visible": true
+    },
+    {
+     "id": "mine/walls-east/c10",
+     "t": "rock_m",
+     "layer": 1,
+     "pos": [
+      24.224,
+      null,
+      -93.438
+     ],
+     "h": 2.549,
+     "rotY": -0.0691,
+     "visible": true
+    },
+    {
+     "id": "mine/walls-east/c11",
+     "t": "stalagmite_a",
+     "layer": 1,
+     "pos": [
+      28.492,
+      null,
+      -25.358
+     ],
+     "h": 6.079,
+     "rotY": 0.0401,
+     "visible": true
+    },
+    {
+     "id": "mine/walls-east/c12",
+     "t": "stalagmite_b",
+     "layer": 1,
+     "pos": [
+      32.776,
+      null,
+      -39.944
+     ],
+     "h": 4.776,
+     "rotY": -0.0442,
+     "visible": true
+    },
+    {
+     "id": "mine/walls-east/c13",
+     "t": "stalagmite_a",
+     "layer": 1,
+     "pos": [
+      30.479,
+      null,
+      -69.216
+     ],
+     "h": 5.789,
+     "rotY": -0.0087,
+     "visible": true
+    },
+    {
+     "id": "mine/walls-east/c14",
+     "t": "rock_l",
+     "layer": 1,
+     "pos": [
+      35.917,
+      null,
+      -64.963
+     ],
+     "h": 5.821,
+     "rotY": 0.0336,
+     "visible": true
+    },
+    {
+     "id": "mine/walls-east/c15",
+     "t": "stalagmite_a",
+     "layer": 1,
+     "pos": [
+      21.609,
+      null,
+      -11.644
+     ],
+     "h": 5.057,
+     "rotY": 0.0686,
+     "visible": true
+    },
+    {
+     "id": "mine/walls-east/c17",
+     "t": "stalagmite_b",
+     "layer": 1,
+     "pos": [
+      31.932,
+      null,
+      -62.188
+     ],
+     "h": 6.646,
+     "rotY": -0.0694,
+     "visible": true
+    },
+    {
+     "id": "mine/walls-east/c18",
+     "t": "rock_m",
+     "layer": 1,
+     "pos": [
+      24.708,
+      null,
+      -39.499
+     ],
+     "h": 3.018,
+     "rotY": 0.0104,
+     "visible": true
+    },
+    {
+     "id": "mine/walls-east/c19",
+     "t": "stalagmite_a",
+     "layer": 1,
+     "pos": [
+      17.212,
+      null,
+      -82.742
+     ],
+     "h": 5.46,
+     "rotY": -0.0217,
+     "visible": true
+    },
+    {
+     "id": "mine/walls-east/c20",
+     "t": "stalagmite_b",
+     "layer": 1,
+     "pos": [
+      13.281,
+      null,
+      -41.058
+     ],
+     "h": 5.005,
+     "rotY": 0.0391,
+     "visible": true
+    },
+    {
+     "id": "mine/walls-east/c21",
+     "t": "rock_m",
+     "layer": 1,
+     "pos": [
+      18.621,
+      null,
+      -18.45
+     ],
+     "h": 2.518,
+     "rotY": 0.0515,
+     "visible": true
+    },
+    {
+     "id": "mine/walls-east/c24",
+     "t": "rock_m",
+     "layer": 1,
+     "pos": [
+      31.819,
+      null,
+      -75.997
+     ],
+     "h": 2.685,
+     "rotY": -0.0325,
+     "visible": true
+    },
+    {
+     "id": "mine/walls-east/c25",
+     "t": "stalagmite_b",
+     "layer": 1,
+     "pos": [
+      25.576,
+      null,
+      -53.61
+     ],
+     "h": 6.252,
+     "rotY": 0.0054,
+     "visible": true
+    },
+    {
+     "id": "mine/exit-narrows/c4",
+     "t": "stalagmite_b",
+     "layer": 1,
+     "pos": [
+      14.64,
+      null,
+      -101.007
+     ],
+     "h": 4.954,
+     "rotY": -0.0154,
+     "visible": true
+    },
+    {
+     "id": "mine/exit-narrows/c5",
+     "t": "rock_l",
+     "layer": 1,
+     "pos": [
+      13.756,
+      null,
+      -114.139
+     ],
+     "h": 4.76,
+     "rotY": -0.0375,
+     "visible": true
+    },
+    {
+     "id": "mine/exit-narrows/c6",
+     "t": "stalagmite_a",
+     "layer": 1,
+     "pos": [
+      12.517,
+      null,
+      -109.549
+     ],
+     "h": 4.494,
+     "rotY": -0.0477,
+     "visible": true
+    },
+    {
+     "id": "mine/exit-narrows/c13",
+     "t": "rock_m",
+     "layer": 1,
+     "pos": [
+      7.42,
+      null,
+      -101.547
+     ],
+     "h": 2.511,
+     "rotY": 0.025,
+     "visible": true
+    },
+    {
+     "id": "mine/exit-narrows/c15",
+     "t": "rock_m",
+     "layer": 1,
+     "pos": [
+      11.051,
+      null,
+      -104.013
+     ],
+     "h": 2.543,
+     "rotY": -0.0453,
+     "visible": true
+    },
+    {
+     "id": "mine/exit-narrows/c22",
+     "t": "stalagmite_a",
+     "layer": 1,
+     "pos": [
+      -8.756,
+      null,
+      -105.326
+     ],
+     "h": 6.028,
+     "rotY": 0.0129,
+     "visible": true
+    },
+    {
+     "id": "mine/exit-narrows/c24",
+     "t": "stalagmite_b",
+     "layer": 1,
+     "pos": [
+      -5.692,
+      null,
+      -114.017
+     ],
+     "h": 5.686,
+     "rotY": 0.0287,
      "visible": true
     },
     {
      "id": "mine/scatter/c0",
-     "t": "ore_pile",
+     "t": "rock_m",
      "layer": 1,
      "pos": [
-      5.366,
+      15.938,
       null,
-      -48.712
+      -13.717
      ],
-     "h": 1.6,
-     "rotY": 0.1149,
+     "h": 2.0,
+     "rotY": 0.0397,
      "visible": true
     },
     {
      "id": "mine/scatter/c1",
-     "t": "stalagmite_b",
+     "t": "rock_s",
      "layer": 1,
      "pos": [
-      6.344,
+      -9.538,
       null,
-      -46.025
+      -70.361
      ],
-     "h": 3.6,
-     "rotY": 0.1558,
+     "h": 1.2,
+     "rotY": -0.0537,
+     "visible": true
+    },
+    {
+     "id": "mine/scatter/c3",
+     "t": "rock_m",
+     "layer": 1,
+     "pos": [
+      19.79,
+      null,
+      -17.25
+     ],
+     "h": 2.0,
+     "rotY": -0.0203,
      "visible": true
     },
     {
@@ -2326,129 +4211,142 @@
      "t": "ore_pile",
      "layer": 1,
      "pos": [
-      -6.317,
+      -9.143,
       null,
-      -79.546
+      -93.387
      ],
      "h": 1.6,
-     "rotY": -0.076,
+     "rotY": -0.0525,
      "visible": true
     },
     {
      "id": "mine/scatter/c6",
-     "t": "stalagmite_b",
+     "t": "rock_s",
      "layer": 1,
      "pos": [
-      -6.468,
+      -10.949,
       null,
-      -52.661
+      -35.808
      ],
-     "h": 3.6,
-     "rotY": -0.0949,
+     "h": 1.2,
+     "rotY": 0.0163,
      "visible": true
     },
     {
-     "id": "mine/scatter/c11",
+     "id": "mine/scatter/c7",
+     "t": "rock_s",
+     "layer": 1,
+     "pos": [
+      -13.143,
+      null,
+      -65.481
+     ],
+     "h": 1.2,
+     "rotY": -0.0143,
+     "visible": true
+    },
+    {
+     "id": "mine/scatter/c8",
+     "t": "rock_m",
+     "layer": 1,
+     "pos": [
+      -6.563,
+      null,
+      -20.694
+     ],
+     "h": 2.0,
+     "rotY": -0.0576,
+     "visible": true
+    },
+    {
+     "id": "mine/scatter/c9",
      "t": "ore_pile",
      "layer": 1,
      "pos": [
-      -6.785,
+      -6.671,
       null,
-      -41.669
+      -59.699
      ],
      "h": 1.6,
-     "rotY": -0.1727,
+     "rotY": -0.0585,
+     "visible": true
+    },
+    {
+     "id": "mine/scatter/c12",
+     "t": "ore_pile",
+     "layer": 1,
+     "pos": [
+      -14.279,
+      null,
+      -89.077
+     ],
+     "h": 1.6,
+     "rotY": 0.0377,
+     "visible": true
+    },
+    {
+     "id": "mine/scatter/c13",
+     "t": "rock_s",
+     "layer": 1,
+     "pos": [
+      11.225,
+      null,
+      -34.397
+     ],
+     "h": 1.2,
+     "rotY": -0.0333,
      "visible": true
     },
     {
      "id": "mine/scatter/c14",
-     "t": "stalagmite_b",
+     "t": "rock_s",
      "layer": 1,
      "pos": [
-      -6.178,
+      18.843,
       null,
-      -49.592
+      -32.219
      ],
-     "h": 3.6,
-     "rotY": -0.1204,
+     "h": 1.2,
+     "rotY": -0.0264,
      "visible": true
     },
     {
-     "id": "mine/scatter/c20",
-     "t": "ore_pile",
+     "id": "mine/scatter/c15",
+     "t": "rock_m",
      "layer": 1,
      "pos": [
-      -6.726,
+      7.895,
       null,
-      -7.191
+      -86.843
      ],
-     "h": 1.6,
-     "rotY": -0.113,
+     "h": 2.0,
+     "rotY": -0.0434,
      "visible": true
     },
     {
-     "id": "mine/scatter/c21",
-     "t": "stalagmite_b",
+     "id": "mine/scatter/c16",
+     "t": "rock_m",
      "layer": 1,
      "pos": [
-      -6.319,
+      14.077,
       null,
-      -62.636
+      -18.678
      ],
-     "h": 3.6,
-     "rotY": -0.1002,
+     "h": 2.0,
+     "rotY": -0.0025,
      "visible": true
     },
     {
-     "id": "mine/scatter/c27",
-     "t": "ore_pile",
+     "id": "mine/scatter/c18",
+     "t": "rock_s",
      "layer": 1,
      "pos": [
-      -5.669,
+      10.331,
       null,
-      -67.826
+      -18.018
      ],
-     "h": 1.6,
-     "rotY": -0.0768,
-     "visible": true
-    },
-    {
-     "id": "mine/scatter/c30",
-     "t": "stalagmite_b",
-     "layer": 1,
-     "pos": [
-      5.265,
-      null,
-      -57.457
-     ],
-     "h": 3.6,
-     "rotY": 0.1345,
-     "visible": true
-    },
-    {
-     "id": "mine/scatter/c37",
-     "t": "ore_pile",
-     "layer": 1,
-     "pos": [
-      5.698,
-      null,
-      -89.558
-     ],
-     "h": 1.6,
-     "rotY": 0.1833,
-     "visible": true
-    },
-    {
-     "id": "mine/scatter/c42",
-     "t": "stalagmite_b",
-     "layer": 1,
-     "pos": [
-      -6.065,
-      null,
-      -44.53
-     ],
-     "h": 3.6,
-     "rotY": -0.1214,
+     "h": 1.2,
+     "rotY": -0.0549,
      "visible": true
     }
    ],
@@ -2458,12 +4356,12 @@
      "key": "mining",
      "kind": "wood",
      "pos": [
-      -8.29,
+      11.5,
       null,
-      -20
+      -19
      ],
      "h": 8.0,
-     "rotY": -0.0922,
+     "rotY": 0.0,
      "visible": true
     },
     {
@@ -2471,12 +4369,12 @@
      "key": "fights_that_last",
      "kind": "wood",
      "pos": [
-      8.503,
+      -11.5,
       null,
-      -52
+      -45
      ],
      "h": 8.0,
-     "rotY": 0.086,
+     "rotY": 0.0,
      "visible": true
     },
     {
@@ -2484,12 +4382,12 @@
      "key": "crafting",
      "kind": "wood",
      "pos": [
-      -8.356,
+      12,
       null,
-      -84
+      -57
      ],
      "h": 8.0,
-     "rotY": -0.1083,
+     "rotY": 0.0,
      "visible": true
     }
    ]
@@ -2497,214 +4395,419 @@
   "spirit": {
    "sprites": [
     {
-     "id": "spirit/feat_death_alt.1",
-     "t": "feat_death_alt",
-     "layer": 1,
-     "pos": [
-      -7.501,
-      null,
-      -13.751
-     ],
-     "h": 7.0,
-     "rotY": -0.2027,
-     "visible": true
-    },
-    {
-     "id": "spirit/graveplot.1/grave_a.1",
-     "t": "grave_a",
-     "layer": 1,
-     "pos": [
-      5.371,
-      null,
-      -15.108
-     ],
-     "h": 2.2,
-     "rotY": 0.1612,
-     "visible": true
-    },
-    {
-     "id": "spirit/graveplot.1/grave_b.1",
-     "t": "grave_b",
-     "layer": 1,
-     "pos": [
-      7.771,
-      null,
-      -13.708
-     ],
-     "h": 2.2,
-     "rotY": 0.1637,
-     "visible": true
-    },
-    {
-     "id": "spirit/graveplot.1/candles.1",
-     "t": "candles",
-     "layer": 1,
-     "pos": [
-      4.771,
-      null,
-      -13.308
-     ],
-     "h": 1.0,
-     "rotY": 0.1529,
-     "visible": true
-    },
-    {
-     "id": "spirit/biome_deadtree.1",
-     "t": "biome_deadtree",
-     "layer": 0.5,
-     "pos": [
-      -11.647,
-      null,
-      -33.798
-     ],
-     "h": 9.0,
-     "rotY": -0.1397,
-     "visible": true
-    },
-    {
-     "id": "spirit/feat_vendetta.1",
+     "id": "spirit/sentinel/totem",
      "t": "feat_vendetta",
      "layer": 1,
      "pos": [
-      7.408,
+      8.082,
       null,
-      -33.541
+      -9.176
      ],
      "h": 5.2,
-     "rotY": 0.0848,
+     "rotY": 0.0,
      "visible": true
     },
     {
-     "id": "spirit/graveplot.2/grave_a.1",
-     "t": "grave_a",
+     "id": "spirit/shipwreck/ship",
+     "t": "feat_death_alt",
      "layer": 1,
      "pos": [
-      -4.92,
+      -21.568,
       null,
-      -53.583
+      -30.592
      ],
-     "h": 2.2,
-     "rotY": -0.1822,
+     "h": 9.45,
+     "rotY": 0.0,
      "visible": true
     },
     {
-     "id": "spirit/graveplot.2/grave_b.1",
-     "t": "grave_b",
+     "id": "spirit/shipwreck/rock_m.1",
+     "t": "rock_m",
      "layer": 1,
      "pos": [
-      -7.32,
+      -16.168,
       null,
-      -52.183
+      -27.392
      ],
-     "h": 2.2,
-     "rotY": -0.0714,
+     "h": 2.0,
+     "rotY": 0.0286,
      "visible": true
     },
     {
-     "id": "spirit/graveplot.2/candles.1",
-     "t": "candles",
+     "id": "spirit/lone-tree-west/tree",
+     "t": "biome_deadtree",
      "layer": 1,
      "pos": [
-      -4.32,
+      -9.016,
       null,
-      -51.783
+      -51.492
      ],
-     "h": 1.0,
-     "rotY": -0.0994,
+     "h": 9.0,
+     "rotY": -0.0101,
      "visible": true
     },
     {
-     "id": "spirit/biome_brazier.1",
-     "t": "biome_brazier",
+     "id": "spirit/lone-tree-east/tree",
+     "t": "biome_deadtree",
      "layer": 1,
      "pos": [
-      7.039,
+      26.92,
       null,
-      -52.333
+      -66.339
      ],
-     "h": 2.6,
-     "rotY": 0.2027,
+     "h": 7.65,
+     "rotY": 0.0276,
      "visible": true
     },
     {
-     "id": "spirit/feat_death.1",
+     "id": "spirit/crypt/crypt",
      "t": "feat_death",
      "layer": 1,
      "pos": [
-      -0.004,
+      -12.793,
       null,
-      -13.347
+      -72.13
      ],
      "h": 6.0,
      "rotY": 0.0,
      "visible": true
     },
     {
-     "id": "spirit/backdrop.1/biome_deadtree.1",
-     "t": "biome_deadtree",
-     "layer": 0,
+     "id": "spirit/crypt/fire-left",
+     "t": "biome_brazier",
+     "layer": 1,
      "pos": [
-      -25.995,
+      -18.393,
       null,
-      -19.553
+      -69.73
      ],
-     "h": 9.0,
-     "rotY": 0.0,
-     "visible": true,
-     "dim": 0.5
+     "h": 2.6,
+     "rotY": 0.0141,
+     "visible": true
     },
     {
-     "id": "spirit/backdrop.2/biome_deadtree.1",
-     "t": "biome_deadtree",
-     "layer": 0,
+     "id": "spirit/crypt/fire-right",
+     "t": "biome_brazier",
+     "layer": 1,
      "pos": [
-      25.927,
+      -7.393,
       null,
-      -42.756
+      -69.73
      ],
-     "h": 9.0,
-     "rotY": 0.0,
-     "visible": true,
-     "dim": 0.5
+     "h": 2.6,
+     "rotY": -0.0612,
+     "visible": true
     },
     {
-     "id": "spirit/backdrop.3/biome_deadtree.1",
-     "t": "biome_deadtree",
-     "layer": 0,
+     "id": "spirit/far-stones/rock_l.1",
+     "t": "rock_l",
+     "layer": 1,
      "pos": [
-      -25.65,
+      -34.5,
       null,
-      -64.42
+      -9.535
      ],
-     "h": 9.0,
-     "rotY": 0.0,
-     "visible": true,
-     "dim": 0.5
+     "h": 3.4,
+     "rotY": 0.0339,
+     "visible": true
+    },
+    {
+     "id": "spirit/grave-field/c0",
+     "t": "grave_c",
+     "layer": 1,
+     "pos": [
+      14.57,
+      null,
+      -33.087
+     ],
+     "h": 1.902,
+     "rotY": 0.0455,
+     "visible": true
+    },
+    {
+     "id": "spirit/grave-field/c1",
+     "t": "grave_a",
+     "layer": 1,
+     "pos": [
+      23.425,
+      null,
+      -34.472
+     ],
+     "h": 2.099,
+     "rotY": 0.0409,
+     "visible": true
+    },
+    {
+     "id": "spirit/grave-field/c2",
+     "t": "grave_a",
+     "layer": 1,
+     "pos": [
+      23.407,
+      null,
+      -44.973
+     ],
+     "h": 2.228,
+     "rotY": 0.0207,
+     "visible": true
+    },
+    {
+     "id": "spirit/grave-field/c3",
+     "t": "grave_c",
+     "layer": 1,
+     "pos": [
+      16.203,
+      null,
+      -48.51
+     ],
+     "h": 2.274,
+     "rotY": -0.0215,
+     "visible": true
+    },
+    {
+     "id": "spirit/grave-field/c4",
+     "t": "grave_c",
+     "layer": 1,
+     "pos": [
+      19.842,
+      null,
+      -34.866
+     ],
+     "h": 2.376,
+     "rotY": 0.0641,
+     "visible": true
+    },
+    {
+     "id": "spirit/grave-field/c5",
+     "t": "grave_a",
+     "layer": 1,
+     "pos": [
+      14.766,
+      null,
+      -36.108
+     ],
+     "h": 2.224,
+     "rotY": 0.0396,
+     "visible": true
+    },
+    {
+     "id": "spirit/grave-field/c6",
+     "t": "grave_b",
+     "layer": 1,
+     "pos": [
+      20.969,
+      null,
+      -32.01
+     ],
+     "h": 2.102,
+     "rotY": 0.0163,
+     "visible": true
+    },
+    {
+     "id": "spirit/grave-field/c7",
+     "t": "grave_a",
+     "layer": 1,
+     "pos": [
+      11.131,
+      null,
+      -37.39
+     ],
+     "h": 1.948,
+     "rotY": -0.0689,
+     "visible": true
+    },
+    {
+     "id": "spirit/grave-field/c8",
+     "t": "grave_a",
+     "layer": 1,
+     "pos": [
+      19.669,
+      null,
+      -38.215
+     ],
+     "h": 2.066,
+     "rotY": 0.0456,
+     "visible": true
+    },
+    {
+     "id": "spirit/grave-field/c12",
+     "t": "candles",
+     "layer": 1,
+     "pos": [
+      24.089,
+      null,
+      -38.377
+     ],
+     "h": 1.043,
+     "rotY": -0.0367,
+     "visible": true
+    },
+    {
+     "id": "spirit/approach-trees/c0",
+     "t": "biome_deadtree",
+     "layer": 1,
+     "pos": [
+      -39.792,
+      null,
+      24.232
+     ],
+     "h": 6.84,
+     "rotY": 0.0035,
+     "visible": true
+    },
+    {
+     "id": "spirit/approach-trees/c1",
+     "t": "biome_deadtree",
+     "layer": 1,
+     "pos": [
+      -23.406,
+      null,
+      36.169
+     ],
+     "h": 7.703,
+     "rotY": -0.0126,
+     "visible": true
+    },
+    {
+     "id": "spirit/far-stones-east/c0",
+     "t": "rock_l",
+     "layer": 1,
+     "pos": [
+      44.781,
+      null,
+      -1.742
+     ],
+     "h": 3.219,
+     "rotY": -0.0265,
+     "visible": true
+    },
+    {
+     "id": "spirit/far-stones-east/c1",
+     "t": "rock_m",
+     "layer": 1,
+     "pos": [
+      40.47,
+      null,
+      -60.361
+     ],
+     "h": 1.973,
+     "rotY": 0.0493,
+     "visible": true
+    },
+    {
+     "id": "spirit/far-stones-east/c2",
+     "t": "rock_m",
+     "layer": 1,
+     "pos": [
+      31.142,
+      null,
+      -14.581
+     ],
+     "h": 1.88,
+     "rotY": -0.0229,
+     "visible": true
+    },
+    {
+     "id": "spirit/threshold-west/c0",
+     "t": "biome_deadtree",
+     "layer": 1,
+     "pos": [
+      -12.164,
+      null,
+      -89.21
+     ],
+     "h": 9.449,
+     "rotY": -0.0023,
+     "visible": true
+    },
+    {
+     "id": "spirit/threshold-west/c1",
+     "t": "biome_deadtree",
+     "layer": 1,
+     "pos": [
+      -21.151,
+      null,
+      -92.98
+     ],
+     "h": 7.818,
+     "rotY": -0.057,
+     "visible": true
+    },
+    {
+     "id": "spirit/threshold-west/c3",
+     "t": "biome_deadtree",
+     "layer": 1,
+     "pos": [
+      -23.073,
+      null,
+      -107.957
+     ],
+     "h": 9.797,
+     "rotY": -0.03,
+     "visible": true
+    },
+    {
+     "id": "spirit/threshold-east/c0",
+     "t": "rock_m",
+     "layer": 1,
+     "pos": [
+      25.194,
+      null,
+      -112.289
+     ],
+     "h": 2.041,
+     "rotY": -0.0551,
+     "visible": true
+    },
+    {
+     "id": "spirit/threshold-east/c1",
+     "t": "biome_deadtree",
+     "layer": 1,
+     "pos": [
+      24.181,
+      null,
+      -103.433
+     ],
+     "h": 8.476,
+     "rotY": -0.0318,
+     "visible": true
+    },
+    {
+     "id": "spirit/threshold-east/c2",
+     "t": "rock_m",
+     "layer": 1,
+     "pos": [
+      22.33,
+      null,
+      -93.11
+     ],
+     "h": 1.893,
+     "rotY": 0.0445,
+     "visible": true
     },
     {
      "id": "spirit/scatter/c0",
      "t": "grave_c",
      "layer": 1,
      "pos": [
-      8.015,
+      15.395,
       null,
-      -63.975
+      -4.116
      ],
      "h": 2.2,
-     "rotY": 0.1007,
+     "rotY": 0.0375,
      "visible": true
     },
     {
      "id": "spirit/scatter/c1",
-     "t": "candles",
+     "t": "rock_m",
      "layer": 1,
      "pos": [
-      -5.865,
+      23.128,
       null,
-      -68.538
+      -59.637
      ],
-     "h": 1.0,
-     "rotY": -0.1991,
+     "h": 2.0,
+     "rotY": -0.0578,
      "visible": true
     },
     {
@@ -2712,12 +4815,12 @@
      "t": "rock_m",
      "layer": 1,
      "pos": [
-      -7.833,
+      -12.233,
       null,
-      -5.038
+      -7.434
      ],
      "h": 2.0,
-     "rotY": -0.1396,
+     "rotY": -0.02,
      "visible": true
     },
     {
@@ -2725,168 +4828,38 @@
      "t": "grave_c",
      "layer": 1,
      "pos": [
-      -5.096,
+      19.414,
       null,
-      -44.304
+      -21.703
      ],
      "h": 2.2,
-     "rotY": -0.1562,
+     "rotY": 0.0137,
      "visible": true
     },
     {
      "id": "spirit/scatter/c5",
-     "t": "candles",
+     "t": "grave_c",
      "layer": 1,
      "pos": [
-      6.671,
+      -24.868,
       null,
-      -27.668
+      -69.872
      ],
-     "h": 1.0,
-     "rotY": 0.1653,
+     "h": 2.2,
+     "rotY": 0.0292,
      "visible": true
     },
     {
      "id": "spirit/scatter/c6",
-     "t": "rock_m",
-     "layer": 1,
-     "pos": [
-      -7.575,
-      null,
-      -48.323
-     ],
-     "h": 2.0,
-     "rotY": -0.1529,
-     "visible": true
-    },
-    {
-     "id": "spirit/scatter/c7",
-     "t": "grave_c",
-     "layer": 1,
-     "pos": [
-      4.211,
-      null,
-      -27.747
-     ],
-     "h": 2.2,
-     "rotY": 0.0862,
-     "visible": true
-    },
-    {
-     "id": "spirit/scatter/c8",
      "t": "candles",
      "layer": 1,
      "pos": [
-      6.326,
+      10.783,
       null,
-      -41.64
+      -32.623
      ],
      "h": 1.0,
-     "rotY": 0.181,
-     "visible": true
-    },
-    {
-     "id": "spirit/scatter/c9",
-     "t": "rock_m",
-     "layer": 1,
-     "pos": [
-      8.327,
-      null,
-      -2.269
-     ],
-     "h": 2.0,
-     "rotY": 0.1388,
-     "visible": true
-    },
-    {
-     "id": "spirit/scatter/c10",
-     "t": "grave_c",
-     "layer": 1,
-     "pos": [
-      7.74,
-      null,
-      -6.681
-     ],
-     "h": 2.2,
-     "rotY": 0.1895,
-     "visible": true
-    },
-    {
-     "id": "spirit/scatter/c11",
-     "t": "candles",
-     "layer": 1,
-     "pos": [
-      -5.074,
-      null,
-      -3.28
-     ],
-     "h": 1.0,
-     "rotY": -0.1889,
-     "visible": true
-    },
-    {
-     "id": "spirit/scatter/c12",
-     "t": "rock_m",
-     "layer": 1,
-     "pos": [
-      -8.313,
-      null,
-      -26.015
-     ],
-     "h": 2.0,
-     "rotY": -0.1653,
-     "visible": true
-    },
-    {
-     "id": "spirit/scatter/c13",
-     "t": "grave_c",
-     "layer": 1,
-     "pos": [
-      5.949,
-      null,
-      -18.091
-     ],
-     "h": 2.2,
-     "rotY": 0.1456,
-     "visible": true
-    },
-    {
-     "id": "spirit/scatter/c14",
-     "t": "candles",
-     "layer": 1,
-     "pos": [
-      -7.018,
-      null,
-      -42.867
-     ],
-     "h": 1.0,
-     "rotY": -0.2031,
-     "visible": true
-    },
-    {
-     "id": "spirit/scatter/c16",
-     "t": "rock_m",
-     "layer": 1,
-     "pos": [
-      5.389,
-      null,
-      -11.025
-     ],
-     "h": 2.0,
-     "rotY": 0.0738,
-     "visible": true
-    },
-    {
-     "id": "spirit/scatter/c18",
-     "t": "grave_c",
-     "layer": 1,
-     "pos": [
-      -4.387,
-      null,
-      -59.023
-     ],
-     "h": 2.2,
-     "rotY": -0.1861,
+     "rotY": 0.0103,
      "visible": true
     }
    ],
@@ -2896,12 +4869,12 @@
      "key": "vendetta",
      "kind": "stone",
      "pos": [
-      7.994,
+      -11,
       null,
-      -30
+      -12
      ],
      "h": 8.0,
-     "rotY": 0.0795,
+     "rotY": 0.0,
      "visible": true
     },
     {
@@ -2909,12 +4882,12 @@
      "key": "death_is_a_place",
      "kind": "stone",
      "pos": [
-      -8.011,
+      11.5,
       null,
-      -48
+      -58
      ],
      "h": 8.0,
-     "rotY": -0.1607,
+     "rotY": 0.0,
      "visible": true
     }
    ]
@@ -2922,408 +4895,865 @@
   "home": {
    "sprites": [
     {
-     "id": "home/grove.1/hero_tree_a.1",
-     "t": "hero_tree_a",
+     "id": "home/gate-pines-west/biome_pine_b.1",
+     "t": "biome_pine_b",
      "layer": 1,
      "pos": [
-      -13.295,
+      -13.703,
       null,
-      -13.798
+      9.9
      ],
-     "h": 8.4,
-     "rotY": -0.1392,
-     "visible": true,
-     "sway": true
+     "h": 11.05,
+     "rotY": -0.0163,
+     "visible": true
     },
     {
-     "id": "home/grove.1/hero_tree_b.1",
-     "t": "hero_tree_b",
+     "id": "home/gate-pines-east/biome_pine_b.1",
+     "t": "biome_pine_b",
      "layer": 1,
      "pos": [
-      -10.895,
+      12.5,
       null,
-      -12.198
+      4.269
      ],
-     "h": 2.2,
-     "rotY": -0.099,
+     "h": 10.4,
+     "rotY": -0.0438,
      "visible": true
     },
     {
-     "id": "home/grove.1/grass_tuft_b.1",
-     "t": "grass_tuft_b",
+     "id": "home/meadow-hay/haystack.1",
+     "t": "haystack",
      "layer": 1,
      "pos": [
-      -5.695,
+      18.441,
       null,
-      -11.998
+      -30.076
      ],
-     "h": 1.1,
-     "rotY": -0.1185,
+     "h": 2.4,
+     "rotY": -0.0136,
      "visible": true
     },
     {
-     "id": "home/chest.1",
-     "t": "chest",
+     "id": "home/meadow-hay/haystack.2",
+     "t": "haystack",
      "layer": 1,
      "pos": [
-      -4.604,
+      22.041,
       null,
-      -38.893
+      -27.876
      ],
-     "h": 1.6,
-     "rotY": -0.1684,
+     "h": 2.4,
+     "rotY": 0.041,
      "visible": true
     },
     {
-     "id": "home/grove.2/hero_tree_a.1",
-     "t": "hero_tree_a",
-     "layer": 0.5,
-     "pos": [
-      16.707,
-      null,
-      -39.953
-     ],
-     "h": 8.4,
-     "rotY": 0.1145,
-     "visible": true,
-     "sway": true
-    },
-    {
-     "id": "home/grove.2/hero_tree_b.1",
-     "t": "hero_tree_b",
-     "layer": 0.5,
-     "pos": [
-      14.307,
-      null,
-      -38.353
-     ],
-     "h": 2.2,
-     "rotY": 0.1766,
-     "visible": true
-    },
-    {
-     "id": "home/grove.2/grass_tuft_b.1",
-     "t": "grass_tuft_b",
-     "layer": 0.5,
-     "pos": [
-      9.107,
-      null,
-      -38.153
-     ],
-     "h": 1.1,
-     "rotY": 0.1588,
-     "visible": true
-    },
-    {
-     "id": "home/homestead.1/hero_house_b.1",
+     "id": "home/homestead/house",
      "t": "hero_house_b",
      "layer": 1,
      "pos": [
-      0.276,
+      -0.476,
       null,
-      -14.473
+      -57.974
      ],
-     "h": 9.0,
+     "h": 10.35,
      "rotY": 0.0,
+     "visible": true,
+     "on_road": true
+    },
+    {
+     "id": "home/homestead/lamp-west",
+     "t": "prop_lantern",
+     "layer": 1,
+     "pos": [
+      -7.276,
+      null,
+      -46.174
+     ],
+     "h": 4.2,
+     "rotY": -0.024,
      "visible": true
     },
     {
-     "id": "home/homestead.1/hero_tree_b.1",
+     "id": "home/homestead/lamp-east",
+     "t": "prop_lantern",
+     "layer": 1,
+     "pos": [
+      6.524,
+      null,
+      -46.174
+     ],
+     "h": 4.2,
+     "rotY": -0.0228,
+     "visible": true
+    },
+    {
+     "id": "home/homestead/chest",
+     "t": "chest",
+     "layer": 1,
+     "pos": [
+      -9.876,
+      null,
+      -52.974
+     ],
+     "h": 1.6,
+     "rotY": -0.0536,
+     "visible": true
+    },
+    {
+     "id": "home/homestead/haystack.1",
+     "t": "haystack",
+     "layer": 1,
+     "pos": [
+      9.924,
+      null,
+      -51.974
+     ],
+     "h": 2.4,
+     "rotY": 0.0454,
+     "visible": true
+    },
+    {
+     "id": "home/homestead/hero_tree_b.1",
      "t": "hero_tree_b",
      "layer": 1,
      "pos": [
-      4.476,
+      -11.876,
       null,
-      -13.273
+      -55.574
      ],
      "h": 2.2,
-     "rotY": 0.0,
+     "rotY": -0.0266,
      "visible": true
     },
     {
-     "id": "home/homestead.1/grass_tuft_a.1",
-     "t": "grass_tuft_a",
+     "id": "home/frame-oak-west/tree",
+     "t": "hero_tree_a",
      "layer": 1,
      "pos": [
-      -3.324,
+      -22.03,
       null,
-      -12.273
+      -52.021
      ],
-     "h": 1.1,
-     "rotY": 0.0,
+     "h": 10.8,
+     "rotY": 0.0327,
      "visible": true
     },
     {
-     "id": "home/grove.1/fence.1/hero_fence.1",
+     "id": "home/frame-oak-east/tree",
+     "t": "hero_tree_a",
+     "layer": 1,
+     "pos": [
+      22.946,
+      null,
+      -62.869
+     ],
+     "h": 8.4,
+     "rotY": 0.0334,
+     "visible": true
+    },
+    {
+     "id": "home/yard-front-west/hero_fence.1",
      "t": "hero_fence",
      "layer": 1,
      "pos": [
-      -5.2,
+      -13.775,
       null,
-      -18.798
+      -46.0
      ],
      "h": 1.6,
      "rotY": 0.0,
-     "visible": true
+     "visible": true,
+     "run": {
+      "key": "home/yard-front-west",
+      "axis": "x",
+      "step": 2.45
+     }
     },
     {
-     "id": "home/grove.1/fence.1/hero_fence.2",
+     "id": "home/yard-front-west/hero_fence.2",
      "t": "hero_fence",
      "layer": 1,
      "pos": [
-      -5.2,
+      -11.325,
       null,
-      -21.644
+      -46.0
      ],
      "h": 1.6,
      "rotY": 0.0,
-     "visible": true
+     "visible": true,
+     "run": {
+      "key": "home/yard-front-west",
+      "axis": "x",
+      "step": 2.45
+     }
     },
     {
-     "id": "home/grove.1/fence.1/hero_fence.3",
+     "id": "home/yard-front-west/hero_fence.3",
      "t": "hero_fence",
      "layer": 1,
      "pos": [
-      -5.2,
+      -8.875,
       null,
-      -24.489
+      -46.0
      ],
      "h": 1.6,
      "rotY": 0.0,
-     "visible": true
+     "visible": true,
+     "run": {
+      "key": "home/yard-front-west",
+      "axis": "x",
+      "step": 2.45
+     }
     },
     {
-     "id": "home/grove.1/fence.1/hero_fence.4",
+     "id": "home/yard-front-west/hero_fence.4",
      "t": "hero_fence",
      "layer": 1,
      "pos": [
-      -5.2,
+      -6.425,
       null,
-      -27.335
+      -46.0
      ],
      "h": 1.6,
      "rotY": 0.0,
-     "visible": true
+     "visible": true,
+     "run": {
+      "key": "home/yard-front-west",
+      "axis": "x",
+      "step": 2.45
+     }
     },
     {
-     "id": "home/grove.1/fence.1/hero_fence.5",
+     "id": "home/yard-front-east/hero_fence.1",
      "t": "hero_fence",
      "layer": 1,
      "pos": [
-      -5.2,
+      6.425,
       null,
-      -30.18
+      -46.0
      ],
      "h": 1.6,
      "rotY": 0.0,
+     "visible": true,
+     "run": {
+      "key": "home/yard-front-east",
+      "axis": "x",
+      "step": 2.45
+     }
+    },
+    {
+     "id": "home/yard-front-east/hero_fence.2",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      8.875,
+      null,
+      -46.0
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true,
+     "run": {
+      "key": "home/yard-front-east",
+      "axis": "x",
+      "step": 2.45
+     }
+    },
+    {
+     "id": "home/yard-front-east/hero_fence.3",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      11.325,
+      null,
+      -46.0
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true,
+     "run": {
+      "key": "home/yard-front-east",
+      "axis": "x",
+      "step": 2.45
+     }
+    },
+    {
+     "id": "home/yard-front-east/hero_fence.4",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      13.775,
+      null,
+      -46.0
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true,
+     "run": {
+      "key": "home/yard-front-east",
+      "axis": "x",
+      "step": 2.45
+     }
+    },
+    {
+     "id": "home/yard-west/hero_fence.1",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      -15.0,
+      null,
+      -47.429
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true,
+     "run": {
+      "key": "home/yard-west",
+      "axis": "z",
+      "step": 2.857
+     }
+    },
+    {
+     "id": "home/yard-west/hero_fence.2",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      -15.0,
+      null,
+      -50.286
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true,
+     "run": {
+      "key": "home/yard-west",
+      "axis": "z",
+      "step": 2.857
+     }
+    },
+    {
+     "id": "home/yard-west/hero_fence.3",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      -15.0,
+      null,
+      -53.143
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true,
+     "run": {
+      "key": "home/yard-west",
+      "axis": "z",
+      "step": 2.857
+     }
+    },
+    {
+     "id": "home/yard-west/hero_fence.4",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      -15.0,
+      null,
+      -56.0
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true,
+     "run": {
+      "key": "home/yard-west",
+      "axis": "z",
+      "step": 2.857
+     }
+    },
+    {
+     "id": "home/yard-west/hero_fence.5",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      -15.0,
+      null,
+      -58.857
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true,
+     "run": {
+      "key": "home/yard-west",
+      "axis": "z",
+      "step": 2.857
+     }
+    },
+    {
+     "id": "home/yard-west/hero_fence.6",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      -15.0,
+      null,
+      -61.714
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true,
+     "run": {
+      "key": "home/yard-west",
+      "axis": "z",
+      "step": 2.857
+     }
+    },
+    {
+     "id": "home/yard-west/hero_fence.7",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      -15.0,
+      null,
+      -64.571
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true,
+     "run": {
+      "key": "home/yard-west",
+      "axis": "z",
+      "step": 2.857
+     }
+    },
+    {
+     "id": "home/yard-east/hero_fence.1",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      15.0,
+      null,
+      -47.429
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true,
+     "run": {
+      "key": "home/yard-east",
+      "axis": "z",
+      "step": 2.857
+     }
+    },
+    {
+     "id": "home/yard-east/hero_fence.2",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      15.0,
+      null,
+      -50.286
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true,
+     "run": {
+      "key": "home/yard-east",
+      "axis": "z",
+      "step": 2.857
+     }
+    },
+    {
+     "id": "home/yard-east/hero_fence.3",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      15.0,
+      null,
+      -53.143
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true,
+     "run": {
+      "key": "home/yard-east",
+      "axis": "z",
+      "step": 2.857
+     }
+    },
+    {
+     "id": "home/yard-east/hero_fence.4",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      15.0,
+      null,
+      -56.0
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true,
+     "run": {
+      "key": "home/yard-east",
+      "axis": "z",
+      "step": 2.857
+     }
+    },
+    {
+     "id": "home/yard-east/hero_fence.5",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      15.0,
+      null,
+      -58.857
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true,
+     "run": {
+      "key": "home/yard-east",
+      "axis": "z",
+      "step": 2.857
+     }
+    },
+    {
+     "id": "home/yard-east/hero_fence.6",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      15.0,
+      null,
+      -61.714
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true,
+     "run": {
+      "key": "home/yard-east",
+      "axis": "z",
+      "step": 2.857
+     }
+    },
+    {
+     "id": "home/yard-east/hero_fence.7",
+     "t": "hero_fence",
+     "layer": 1,
+     "pos": [
+      15.0,
+      null,
+      -64.571
+     ],
+     "h": 1.6,
+     "rotY": 0.0,
+     "visible": true,
+     "run": {
+      "key": "home/yard-east",
+      "axis": "z",
+      "step": 2.857
+     }
+    },
+    {
+     "id": "home/meadow-trees/c0",
+     "t": "hero_tree_a",
+     "layer": 1,
+     "pos": [
+      -34.747,
+      null,
+      -38.328
+     ],
+     "h": 7.352,
+     "rotY": 0.0059,
      "visible": true
     },
     {
-     "id": "home/grove.1/fence.1/end_post.end",
-     "t": "end_post",
+     "id": "home/meadow-trees/c1",
+     "t": "hero_tree_a",
      "layer": 1,
      "pos": [
-      -5.2,
+      -41.375,
       null,
-      -31.603
+      -7.977
      ],
-     "h": 2.1,
-     "rotY": 0.0,
+     "h": 8.002,
+     "rotY": 0.0603,
      "visible": true
     },
     {
-     "id": "home/backdrop.1/biome_pine_b.1",
-     "t": "biome_pine_b",
-     "layer": 0,
-     "pos": [
-      -26.0,
-      null,
-      -30
-     ],
-     "h": 13.0,
-     "rotY": 0.0,
-     "visible": true,
-     "dim": 0.7
-    },
-    {
-     "id": "home/backdrop.1/biome_pine_b.2",
-     "t": "biome_pine_b",
-     "layer": 0,
-     "pos": [
-      -20.0,
-      null,
-      -33.0
-     ],
-     "h": 13.0,
-     "rotY": 0.0,
-     "visible": true,
-     "dim": 0.62
-    },
-    {
-     "id": "home/backdrop.2/biome_pine_b.1",
-     "t": "biome_pine_b",
-     "layer": 0,
-     "pos": [
-      26.0,
-      null,
-      -56
-     ],
-     "h": 13.0,
-     "rotY": 0.0,
-     "visible": true,
-     "dim": 0.7
-    },
-    {
-     "id": "home/backdrop.2/biome_pine_b.2",
-     "t": "biome_pine_b",
-     "layer": 0,
-     "pos": [
-      32.0,
-      null,
-      -59.0
-     ],
-     "h": 13.0,
-     "rotY": 0.0,
-     "visible": true,
-     "dim": 0.62
-    },
-    {
-     "id": "home/backdrop.3/biome_pine_b.1",
-     "t": "biome_pine_b",
-     "layer": 0,
-     "pos": [
-      -26.0,
-      null,
-      -82
-     ],
-     "h": 13.0,
-     "rotY": 0.0,
-     "visible": true,
-     "dim": 0.7
-    },
-    {
-     "id": "home/backdrop.3/biome_pine_b.2",
-     "t": "biome_pine_b",
-     "layer": 0,
-     "pos": [
-      -20.0,
-      null,
-      -85.0
-     ],
-     "h": 13.0,
-     "rotY": 0.0,
-     "visible": true,
-     "dim": 0.62
-    },
-    {
-     "id": "home/sky/cloud.1",
-     "t": "cloud_a",
-     "layer": 0,
-     "pos": [
-      18.655,
-      30.651,
-      -85.319
-     ],
-     "h": 8.0,
-     "rotY": 0.0,
-     "visible": true,
-     "drift": 0.363,
-     "span": 110
-    },
-    {
-     "id": "home/sky/cloud.2",
-     "t": "cloud_b",
-     "layer": 0,
-     "pos": [
-      -14.461,
-      30.76,
-      -69.65
-     ],
-     "h": 8.0,
-     "rotY": 0.0,
-     "visible": true,
-     "drift": 0.233,
-     "span": 110
-    },
-    {
-     "id": "home/sky/cloud.3",
-     "t": "cloud_a",
-     "layer": 0,
-     "pos": [
-      2.163,
-      31.165,
-      -80.614
-     ],
-     "h": 8.0,
-     "rotY": 0.0,
-     "visible": true,
-     "drift": 0.298,
-     "span": 110
-    },
-    {
-     "id": "home/sky/moon.1",
-     "t": "moon",
-     "layer": 0,
-     "pos": [
-      14,
-      30,
-      -80
-     ],
-     "h": 6.0,
-     "rotY": 0.0,
-     "visible": true,
-     "nofog": true
-    },
-    {
-     "id": "home/scatter/c0",
-     "t": "grass_tuft_a",
+     "id": "home/meadow-trees/c2",
+     "t": "hero_tree_a",
      "layer": 1,
      "pos": [
-      -7.153,
+      -36.065,
       null,
-      -42.094
+      -19.486
      ],
-     "h": 1.1,
-     "rotY": -0.1852,
+     "h": 6.721,
+     "rotY": 0.0491,
+     "visible": true
+    },
+    {
+     "id": "home/closing-woods/c0",
+     "t": "hero_tree_a",
+     "layer": 1,
+     "pos": [
+      -19.021,
+      null,
+      -76.95
+     ],
+     "h": 11.338,
+     "rotY": 0.0115,
+     "visible": true,
+     "on_road": true
+    },
+    {
+     "id": "home/closing-woods/c1",
+     "t": "biome_pine_b",
+     "layer": 1,
+     "pos": [
+      25.737,
+      null,
+      -85.322
+     ],
+     "h": 12.839,
+     "rotY": -0.001,
+     "visible": true,
+     "on_road": true
+    },
+    {
+     "id": "home/closing-woods/c3",
+     "t": "hero_tree_a",
+     "layer": 1,
+     "pos": [
+      -8.324,
+      null,
+      -82.1
+     ],
+     "h": 10.795,
+     "rotY": 0.0051,
+     "visible": true,
+     "on_road": true
+    },
+    {
+     "id": "home/closing-woods/c4",
+     "t": "biome_pine_b",
+     "layer": 1,
+     "pos": [
+      -25.26,
+      null,
+      -89.77
+     ],
+     "h": 11.107,
+     "rotY": 0.0109,
+     "visible": true,
+     "on_road": true
+    },
+    {
+     "id": "home/closing-woods/c5",
+     "t": "hero_tree_a",
+     "layer": 1,
+     "pos": [
+      5.814,
+      null,
+      -90.193
+     ],
+     "h": 10.804,
+     "rotY": -0.0034,
+     "visible": true,
+     "on_road": true
+    },
+    {
+     "id": "home/closing-woods/c9",
+     "t": "hero_tree_a",
+     "layer": 1,
+     "pos": [
+      -6.174,
+      null,
+      -72.11
+     ],
+     "h": 11.586,
+     "rotY": -0.062,
+     "visible": true,
+     "on_road": true
+    },
+    {
+     "id": "home/closing-woods/c12",
+     "t": "hero_tree_a",
+     "layer": 1,
+     "pos": [
+      -19.684,
+      null,
+      -84.911
+     ],
+     "h": 11.118,
+     "rotY": -0.0549,
+     "visible": true,
+     "on_road": true
+    },
+    {
+     "id": "home/closing-woods/c13",
+     "t": "hero_tree_a",
+     "layer": 1,
+     "pos": [
+      -5.09,
+      null,
+      -92.425
+     ],
+     "h": 10.364,
+     "rotY": -0.0368,
+     "visible": true,
+     "on_road": true
+    },
+    {
+     "id": "home/closing-woods/c15",
+     "t": "hero_tree_a",
+     "layer": 1,
+     "pos": [
+      15.148,
+      null,
+      -78.76
+     ],
+     "h": 11.599,
+     "rotY": 0.0162,
+     "visible": true,
+     "on_road": true
+    },
+    {
+     "id": "home/closing-woods/c16",
+     "t": "hero_tree_a",
+     "layer": 1,
+     "pos": [
+      9.253,
+      null,
+      -73.565
+     ],
+     "h": 11.119,
+     "rotY": 0.0656,
+     "visible": true,
+     "on_road": true
+    },
+    {
+     "id": "home/returning-green-west/c0",
+     "t": "hero_tree_a",
+     "layer": 1,
+     "pos": [
+      -24.639,
+      null,
+      39.587
+     ],
+     "h": 8.223,
+     "rotY": 0.0257,
+     "visible": true
+    },
+    {
+     "id": "home/returning-green-west/c1",
+     "t": "hero_tree_b",
+     "layer": 1,
+     "pos": [
+      -26.533,
+      null,
+      27.587
+     ],
+     "h": 2.082,
+     "rotY": -0.0413,
+     "visible": true
+    },
+    {
+     "id": "home/returning-green-west/c3",
+     "t": "hero_tree_a",
+     "layer": 1,
+     "pos": [
+      -18.402,
+      null,
+      33.204
+     ],
+     "h": 8.14,
+     "rotY": 0.0568,
+     "visible": true
+    },
+    {
+     "id": "home/returning-green-west/c4",
+     "t": "hero_tree_a",
+     "layer": 1,
+     "pos": [
+      -10.166,
+      null,
+      36.972
+     ],
+     "h": 8.073,
+     "rotY": -0.037,
+     "visible": true
+    },
+    {
+     "id": "home/returning-green-east/c0",
+     "t": "hero_tree_b",
+     "layer": 1,
+     "pos": [
+      28.064,
+      null,
+      27.377
+     ],
+     "h": 2.012,
+     "rotY": -0.0258,
+     "visible": true
+    },
+    {
+     "id": "home/returning-green-east/c1",
+     "t": "hero_tree_b",
+     "layer": 1,
+     "pos": [
+      23.772,
+      null,
+      14.959
+     ],
+     "h": 2.163,
+     "rotY": 0.0425,
+     "visible": true
+    },
+    {
+     "id": "home/returning-green-east/c2",
+     "t": "hero_tree_b",
+     "layer": 1,
+     "pos": [
+      8.827,
+      null,
+      20.876
+     ],
+     "h": 1.938,
+     "rotY": -0.0637,
+     "visible": true
+    },
+    {
+     "id": "home/returning-green-east/c7",
+     "t": "hero_tree_b",
+     "layer": 1,
+     "pos": [
+      14.972,
+      null,
+      30.108
+     ],
+     "h": 2.09,
+     "rotY": 0.045,
      "visible": true
     },
     {
      "id": "home/scatter/c1",
-     "t": "grass_tuft_b",
-     "layer": 1,
-     "pos": [
-      4.637,
-      null,
-      -41.431
-     ],
-     "h": 1.1,
-     "rotY": 0.0981,
-     "visible": true
-    },
-    {
-     "id": "home/scatter/c2",
      "t": "rock_s",
      "layer": 1,
      "pos": [
-      -8.273,
+      -30.877,
       null,
-      -79.748
+      -24.493
      ],
      "h": 1.2,
-     "rotY": -0.089,
+     "rotY": -0.0067,
      "visible": true
     },
     {
      "id": "home/scatter/c3",
-     "t": "grass_tuft_a",
+     "t": "grass_tuft_b",
      "layer": 1,
      "pos": [
-      -4.884,
+      -28.843,
       null,
-      -83.3
+      -7.938
      ],
      "h": 1.1,
-     "rotY": -0.1189,
+     "rotY": -0.0198,
      "visible": true
     },
     {
@@ -3331,12 +5761,12 @@
      "t": "grass_tuft_b",
      "layer": 1,
      "pos": [
-      6.008,
+      -15.556,
       null,
-      -7.619
+      3.131
      ],
      "h": 1.1,
-     "rotY": 0.1843,
+     "rotY": -0.0255,
      "visible": true
     },
     {
@@ -3344,116 +5774,116 @@
      "t": "rock_s",
      "layer": 1,
      "pos": [
-      4.84,
+      6.216,
       null,
-      -33.608
+      -43.334
      ],
      "h": 1.2,
-     "rotY": 0.1193,
+     "rotY": -0.0597,
      "visible": true
     },
     {
-     "id": "home/scatter/c7",
-     "t": "grass_tuft_a",
+     "id": "home/scatter/c6",
+     "t": "grass_tuft_b",
      "layer": 1,
      "pos": [
-      5.957,
+      7.261,
       null,
-      -77.697
+      -11.841
      ],
      "h": 1.1,
-     "rotY": 0.1769,
+     "rotY": -0.0084,
      "visible": true
     },
     {
      "id": "home/scatter/c8",
-     "t": "grass_tuft_b",
+     "t": "rock_s",
      "layer": 1,
      "pos": [
-      5.914,
+      -25.842,
       null,
-      -54.867
+      -25.054
      ],
-     "h": 1.1,
-     "rotY": 0.1204,
+     "h": 1.2,
+     "rotY": 0.0438,
      "visible": true
     },
     {
      "id": "home/scatter/c9",
-     "t": "rock_s",
-     "layer": 1,
-     "pos": [
-      -6.182,
-      null,
-      -72.583
-     ],
-     "h": 1.2,
-     "rotY": -0.1259,
-     "visible": true
-    },
-    {
-     "id": "home/scatter/c10",
      "t": "grass_tuft_a",
      "layer": 1,
      "pos": [
-      -5.135,
+      23.355,
       null,
-      -76.157
+      -30.778
      ],
      "h": 1.1,
-     "rotY": -0.1959,
+     "rotY": -0.0555,
      "visible": true
     },
     {
      "id": "home/scatter/c11",
-     "t": "grass_tuft_b",
+     "t": "rock_s",
      "layer": 1,
      "pos": [
-      -5.259,
+      31.637,
       null,
-      -6.059
+      -14.938
      ],
-     "h": 1.1,
-     "rotY": -0.1283,
+     "h": 1.2,
+     "rotY": 0.034,
+     "visible": true
+    },
+    {
+     "id": "home/scatter/c12",
+     "t": "rock_s",
+     "layer": 1,
+     "pos": [
+      23.59,
+      null,
+      3.4
+     ],
+     "h": 1.2,
+     "rotY": 0.0411,
      "visible": true
     },
     {
      "id": "home/scatter/c13",
-     "t": "rock_s",
+     "t": "grass_tuft_b",
      "layer": 1,
      "pos": [
-      -7.001,
+      13.906,
       null,
-      -47.296
-     ],
-     "h": 1.2,
-     "rotY": -0.1156,
-     "visible": true
-    },
-    {
-     "id": "home/scatter/c14",
-     "t": "grass_tuft_a",
-     "layer": 1,
-     "pos": [
-      -7.464,
-      null,
-      -83.035
+      -11.958
      ],
      "h": 1.1,
-     "rotY": -0.1709,
+     "rotY": -0.0204,
      "visible": true
     },
     {
      "id": "home/scatter/c15",
-     "t": "grass_tuft_b",
+     "t": "grass_tuft_a",
      "layer": 1,
      "pos": [
-      -4.778,
+      -11.746,
       null,
-      -44.427
+      -41.21
      ],
      "h": 1.1,
-     "rotY": -0.1817,
+     "rotY": -0.0594,
+     "visible": true
+    },
+    {
+     "id": "home/scatter/c16",
+     "t": "grass_tuft_a",
+     "layer": 1,
+     "pos": [
+      -6.004,
+      null,
+      -34.982
+     ],
+     "h": 1.1,
+     "rotY": -0.0393,
      "visible": true
     }
    ],
@@ -3463,12 +5893,12 @@
      "key": "humans_and_monsters",
      "kind": "wood",
      "pos": [
-      9.048,
+      -11,
       null,
-      -24
+      -16
      ],
      "h": 8.0,
-     "rotY": 0.1237,
+     "rotY": 0.0,
      "visible": true
     },
     {
@@ -3476,41 +5906,15 @@
      "key": "a_home_to_come_back_to",
      "kind": "wood",
      "pos": [
-      -8.603,
+      11.5,
       null,
-      -30
+      -34
      ],
      "h": 8.0,
-     "rotY": -0.17,
+     "rotY": 0.0,
      "visible": true
     }
-   ],
-   "counter": {
-    "id": "home/counter.1",
-    "visible": true,
-    "stall": {
-     "t": "feat_world",
-     "x": 7.4,
-     "z": -14.4,
-     "h": 5.72,
-     "layer": 1
-    },
-    "items": [
-     "res_iron",
-     "res_gold",
-     "res_diamond",
-     "res_wood",
-     "res_herbs",
-     "res_fish",
-     "res_sword",
-     "res_staff"
-    ],
-    "x0": 5.1,
-    "step": 0.62,
-    "y": 2.974,
-    "z": -13.6,
-    "h": 0.72
-   }
+   ]
   }
  }
 }

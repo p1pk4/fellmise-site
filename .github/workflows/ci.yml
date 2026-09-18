@@ -99,6 +99,8 @@ jobs:
       BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
       HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
       CONTEXT: ${{ github.event_name == 'pull_request' && format('pr{0}', github.event.pull_request.number) || 'main' }}
+      # named in the Job Summary, so the table says where the pictures are
+      VISUAL_ARTIFACT: visual-${{ github.event_name == 'pull_request' && format('pr{0}', github.event.pull_request.number) || 'main' }}-run${{ github.run_id }}
     defaults:
       run:
         working-directory: tests/browser

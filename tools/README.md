@@ -125,36 +125,52 @@ Node — `.nvmrc` (24.15.0), Python — `.python-version` (3.11), пакеты P
 
 ## Расстановка: legacy (/next/) и top-down (/proto/)
 
-Один spec, один генератор, два target:
+Один генератор, два target:
 
 ```
 assets/scene_spec.json ─┬─ generate_layout.py --target legacy ─→ assets/layout.json ─→ /next/
-                        │     (id <sprite>#<n>, дорога 3.2 из spec)       ↑ Export редактора /next/ (POST /__layout)
+                        │     (id <sprite>#<n>, дорога 3.2, коридор полос)  ↑ Export редактора /next/ (POST /__layout)
                         │
-assets/topdown/config.json (road_half_width 4.2 — единственный источник)
+assets/topdown/composition.json  (где стоят места, массы, участки — только вид сверху)
+assets/topdown/config.json       (road_half_width 4.2, road_clearance, biome_spacing)
                         └─ generate_layout.py --target topdown ─→ assets/topdown/layout.generated.json
-                              (стабильные id)                              + assets/topdown/layout.overrides.json
-                                                                           ─ topdown_layout.py ─→ layout.runtime.json ─→ /proto/
+                              (tools/topdown_compose.py)              + assets/topdown/layout.overrides.json
+                                                                      ─ topdown_layout.py ─→ layout.runtime.json ─→ /proto/
 ```
 
 * `python tools/generate_layout.py` — оба target, плюс пересборка runtime.
   `--dry` ничего не пишет, `--check` падает, если committed-файл устарел.
+  Для top-down печатается диагностика: число объектов, размах по X, заполнение
+  полос |x|, длинные пустоты, объекты целиком за крупными. Это числа, не оценка.
+* Legacy composition.json не читает; `assets/layout.json` для /next/ не меняется
+  (тест держит его sha256).
+* composition.json по биомам: `clusters` (место с ключом: `at` + `items` с dx/dz,
+  или `group` из spec), `fences` (отрезок строго вдоль X или Z — границы
+  участков), `masses` (много однотипного в области, Poisson по хешу),
+  `scatter`, `boards` (куда встать доскам spec), `whitelist_extra` (с причиной).
+  Спрайты, высоты, группы, whitelist и тексты досок — из scene_spec.json.
+* Геометрия — рендерера: спрайт лежит плашмя, низ на z + h/2; след — нижняя
+  полоса спрайта. Дорога — та же, что в шейдере: сплайн `road_spline.json`
+  через Catmull-Rom three.js (64 выборки), полуширина × множитель ширины.
+  Python-копия сверяется с three.js (`node tools/road_samples.mjs` →
+  `tests/fixtures/road_samples.json`; перезапустить при смене сплайна).
+* Валидатор top-down: след объекта не заходит на дорогу + `road_clearance`
+  (кроме road_props и объектов с `on_road: true`), следы не пересекаются
+  (кроме стыков заборов), висящих без `hanging` нет. Списка «известных
+  нарушений» нет: их ноль.
 * `layout.generated.json` и `layout.runtime.json` руками не правятся. Ручные
   правки — только в `layout.overrides.json`: `{id: {pos|h|rotY|visible}}`, только
   отличия. Id, которого нет в генерации, — ошибка, а не тихий пропуск.
 * Top-down export: `POST /__topdown/layout` в `editor_serve.py` принимает весь
   отредактированный runtime-layout, сам вычисляет overrides относительно
   generated, пишет overrides и пересобирает runtime. Generated не пишется никогда.
-* Стабильный id: `<биом>/<контейнер>.<n>/<спрайт>.<n>`, где контейнер —
-  группа или одиночный спрайт такта и его номер среди таких же в биоме, забор —
-  `<такт-владелец>/fence.<n>/hero_fence.<n>`, столбы `end_post.start|end`,
-  scatter — `<биом>/scatter/c<номер кандидата хеша>`, доски
-  `<биом>/board/<key>`. Scatter и столбы производны от геометрии: при
-  перестановке тактов они могут появиться или исчезнуть.
-* Scatter в обоих target пока раскладывается с отступом от spec-дороги 3.2 —
-  иначе сцена бы сдвинулась. Валидатор top-down меряет по 4.2, и его текущие
-  находки перечислены в `config.json → validator_known_violations`: новая
-  находка или исчезнувшая запись валят сборку.
+* Стабильный id: `<биом>/<ключ места>/<ключ элемента>` или
+  `<биом>/<ключ места>/<спрайт>.<n>` (n — среди таких же в этом месте), заборы
+  `<биом>/<ключ отрезка>/hero_fence.<n>`, массы `<биом>/<ключ массы>/c<кандидат>`,
+  scatter `<биом>/scatter/c<кандидат>`, доски `<биом>/board/<key>`. Jitter и
+  поворот хешируются от id, поэтому вставка нового места ничего не сдвигает.
+  Биом без описания в composition.json собирается по ритму spec; такт с явным
+  `key` сохраняет id при вставке такого же такта выше.
 
 ## Проверки (они же в CI, `.github/workflows/ci.yml`)
 

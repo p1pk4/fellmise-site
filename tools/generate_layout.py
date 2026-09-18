@@ -103,18 +103,15 @@ def aspect(t):
 
 class Builder:
     """`target` is "legacy" or "topdown". `road` is the half-width the target's
-    renderer draws and its validator holds objects to; by default the spec's
-    own value, which is what legacy uses.
+    renderer draws; by default the spec's own value, which is what legacy uses.
+    Placement keeps clear of that same road in both targets.
 
-    Placement (the scatter's keep-out from the road) uses the spec's value in
-    BOTH targets: moving it to the top-down road would re-lay the scatter, and
-    the scene is not supposed to change until a composition batch says so. The
-    gap is kept visible rather than hidden — the top-down validator measures
-    against the wider road, and what it finds today is listed by name in
-    assets/topdown/config.json.
+    `composer` (top-down only) lays out every biome that
+    assets/topdown/composition.json describes; a biome it does not describe
+    falls back to the spec's rhythm, with top-down ids and jitter.
     """
 
-    def __init__(self, spec, target="legacy", road=None):
+    def __init__(self, spec, target="legacy", road=None, composer=None):
         assert target in ("legacy", "topdown"), target
         self.spec = spec
         self.target = target
@@ -122,8 +119,9 @@ class Builder:
         self.seed = self.g["seed"]
         self.lanes = self.g["lanes"]
         self.heights = self.g["heights"]
-        self.placement_road = self.g["road_half_width"]
-        self.road = self.placement_road if road is None else road
+        self.road = self.g["road_half_width"] if road is None else road
+        self.placement_road = self.road
+        self.composer = composer
         self.counts = {}
         self.ordinals = {}
         self.skipped = []
@@ -196,20 +194,24 @@ class Builder:
             return None
 
         oid = self.uid(t)
-        if jit:
-            x += jitter(self.seed, f"{oid}:x", self.g["lane_jitter"]["x"])
-            z += jitter(self.seed, f"{oid}:z", self.g["lane_jitter"]["z"])
         if self.target == "topdown":
             if sid is None:
                 raise SystemExit(f"[{biome}] {t}: нет семантического id — в "
                                  f"top-down каждый place() обязан его передать")
             # taken lazily, so an ordinal is spent only on an object that exists
             sid = sid() if callable(sid) else sid
+        # Legacy hashes its jitter on the occurrence counter (and must keep
+        # doing so: /next/ is byte-identical). Top-down hashes on the stable id,
+        # so inserting an unrelated object moves nothing else.
+        key = sid if self.target == "topdown" else oid
+        if jit:
+            x += jitter(self.seed, f"{key}:x", self.g["lane_jitter"]["x"])
+            z += jitter(self.seed, f"{key}:z", self.g["lane_jitter"]["z"])
         o = {
-            "id": sid if self.target == "topdown" else oid, "t": t, "layer": layer,
+            "id": key, "t": t, "layer": layer,
             "pos": [round(x, 3), None if y is None else round(y, 3), round(z, 3)],
             "h": round(h, 3),
-            "rotY": self.rot_for(side, oid) if rot is None else round(rot, 4),
+            "rotY": self.rot_for(side, key) if rot is None else round(rot, 4),
             "visible": True,
         }
         if extra:
@@ -390,6 +392,8 @@ class Builder:
 
     # -- one biome --------------------------------------------------------
     def biome(self, bid):
+        if self.composer and bid in self.composer.comp["biomes"]:
+            return self.composer.biome(bid, list(self.spec["biomes"]).index(bid))
         b = self.spec["biomes"][bid]
         out = {"sprites": [], "boards": []}
 
@@ -400,23 +404,28 @@ class Builder:
         # position rather than the number the spec wrote down — the spacing
         # formula relays every beat and keeps only their order.
         anchors = {}
-        # The semantic container of each beat: what it is (its group, or its
-        # single sprite) and which one of those it is in this biome — not its
-        # index in the rhythm, so inserting a beat of another kind renames
-        # nothing here.
+        # The semantic container of each beat. An explicit `key` on the beat
+        # wins; without one it is what the beat is (its group, or its single
+        # sprite) and which one of those it is in this biome — never its index
+        # in the rhythm. Only the explicit key survives inserting a beat of the
+        # SAME kind above it.
         owners = {}
         for i, beat in enumerate(beats):
             z, side, lane = beat["z"], beat["side"], beat["lane"]
             x0 = self.lane_x(bid, lane, side)
             layer = self.layer_of(lane)
             kind = beat.get("group") or beat["single"]
-            owners[i] = f"{bid}/{kind}.{self.ordinal(bid, 'beat:' + kind)}"
+            owners[i] = (f"{bid}/{beat['key']}" if beat.get("key") else
+                         f"{bid}/{kind}.{self.ordinal(bid, 'beat:' + kind)}")
 
             if "group" in beat:
                 grp = self.spec["groups"][beat["group"]]
-                # the anchor takes the jitter; members hang off it rigidly
-                ax = x0 + jitter(self.seed, f"{bid}:{i}:x", self.g["lane_jitter"]["x"])
-                az = z + jitter(self.seed, f"{bid}:{i}:z", self.g["lane_jitter"]["z"])
+                # the anchor takes the jitter; members hang off it rigidly.
+                # Legacy keys it on the beat index (byte-identical /next/),
+                # top-down on the beat's semantic container.
+                jkey = owners[i] if self.target == "topdown" else f"{bid}:{i}"
+                ax = x0 + jitter(self.seed, f"{jkey}:x", self.g["lane_jitter"]["x"])
+                az = z + jitter(self.seed, f"{jkey}:z", self.g["lane_jitter"]["z"])
                 made = []
                 gname = beat["group"]
                 scale = self.depth_scale(b, az)
@@ -622,9 +631,11 @@ class Builder:
         if self.target == "topdown":
             head = {"version": 1, "target": "topdown",
                     "generated": "tools/generate_layout.py --target topdown по "
-                                 "assets/scene_spec.json + assets/topdown/config.json. "
+                                 "assets/scene_spec.json + assets/topdown/composition.json + "
+                                 "assets/topdown/config.json. "
                                  "Руками не править: правки — в layout.overrides.json",
-                    "road_half_width": self.road}
+                    "road_half_width": self.road,
+                    "biome_spacing": self.composer.spacing if self.composer else None}
         return {
             **head,
             "seed": self.seed,
@@ -791,23 +802,45 @@ def dump(layout):
 
 def load_topdown_config():
     cfg = json.loads(TOPDOWN_CONFIG.read_text(encoding="utf-8"))
-    road = cfg.get("road_half_width")
-    if isinstance(road, bool) or not isinstance(road, (int, float)) or road <= 0:
-        raise SystemExit(f"{TOPDOWN_CONFIG.relative_to(ROOT)}: road_half_width "
-                         f"должен быть положительным числом, а не {road!r}")
+    for key in ("road_half_width", "road_clearance", "biome_spacing"):
+        v = cfg.get(key)
+        if isinstance(v, bool) or not isinstance(v, (int, float)) or v <= 0:
+            raise SystemExit(f"{TOPDOWN_CONFIG.relative_to(ROOT)}: {key} "
+                             f"должен быть положительным числом, а не {v!r}")
     return cfg
 
 
-def generate(spec, target, cfg=None):
+def generate(spec, target, cfg=None, comp=None):
     """One target's layout, validated and stripped of the builder's tags.
 
     Returns (layout, violations, builder). The validator runs before the tags
     are stripped: it needs them to tell a designed group from an accident.
+
+    Top-down reads assets/topdown/composition.json (or `comp`) and is checked
+    by topdown_compose.validate against proto's real road — the spline, not a
+    straight axis. Legacy is checked exactly as before.
     """
-    road = cfg["road_half_width"] if target == "topdown" else None
-    bld = Builder(spec, target=target, road=road)
-    layout = bld.build()
-    bad = validate(layout, spec, road=road)
+    if target == "legacy":
+        bld = Builder(spec, target="legacy")
+        layout = bld.build()
+        bad = validate(layout, spec)
+    else:
+        import topdown_compose as TC     # tools/, next to this file
+        comp = TC.load_composition() if comp is None else comp
+        problems = TC.check_composition(comp, spec)
+        if problems:
+            raise SystemExit("composition.json:\n  " + "\n  ".join(problems))
+        road = TC.Road(cfg["road_half_width"])
+        composer = TC.Composer(None, comp, road, cfg["biome_spacing"], cfg["road_clearance"])
+        bld = Builder(spec, target="topdown", road=cfg["road_half_width"], composer=composer)
+        composer.bld = bld
+        layout = bld.build()
+        bad = TC.validate(layout, spec, road, cfg["biome_spacing"], cfg["road_clearance"],
+                          set(spec["road_props"]))
+        bad += [f"{bid}: '{t}' не входит в whitelist биома (scene_spec + whitelist_extra)"
+                for bid, t in sorted(bld.conflicts)]
+        bld.diagnostics = TC.diagnostics(layout, road, cfg["biome_spacing"],
+                                         spec["global"]["validator"]["max_gap_z"])
     for b in layout["biomes"].values():
         for o in b["sprites"]:
             for k in TAGS:
@@ -841,6 +874,10 @@ def report(layout, bld):
         print(f"\n  пропущен '{t}': {RETIRED[t]}")
     for note in bld.notes:
         print(f"  {note}")
+    if getattr(bld, "diagnostics", None):
+        import topdown_compose as TC
+        print("\nдиагностика top-down (числа, не оценка):")
+        print(TC.diagnostics_text(bld.diagnostics))
 
 
 def emit(path, text, args):

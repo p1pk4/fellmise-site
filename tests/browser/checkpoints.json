@@ -23,7 +23,7 @@
   { "id": "proto-mine-close", "route": "/proto/", "z": -330, "zoom": "близко" },
   { "id": "proto-spirit", "route": "/proto/", "z": -480, "zoom": "обзор" },
   { "id": "proto-home", "route": "/proto/", "z": -640, "zoom": "обзор" },
-  { "id": "proto-home-close", "route": "/proto/", "z": -614.5, "zoom": "близко", "note": "финальный дом по центру пути (home/homestead.1/hero_house_b.1)" },
+  { "id": "proto-home-close", "route": "/proto/", "z": -657, "zoom": "близко", "note": "финальный дом (home/homestead/house); до world-composition-1 стоял на -614.5, где теперь по замыслу пустой луг" },
   { "id": "proto-far-end", "route": "/proto/", "z": -680, "zoom": "обзор", "note": "дальний контрольный кадр, последние объекты (до -683)" }
  ]
 }

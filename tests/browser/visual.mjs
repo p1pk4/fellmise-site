@@ -184,8 +184,11 @@ export function compare({ base, head, out, mode = 'report', title = 'visual', sm
   let fail = missingHead.length > 0;
   if (mode === 'strict' && (changed.length || missingBase.length)) fail = true;
 
+  const sheet = contactSheet(head, path.join(out, 'contact-sheet.png'));
   const report = {
     title, mode, visual, result: fail ? 'FAIL' : 'PASS', smoke,
+    contactSheet: sheet ? `${sheet} (head, по маршруту: ${CONFIG.checkpoints.map((c) => c.id).join(' → ')})` : null,
+    artifact: process.env.VISUAL_ARTIFACT || null,
     base: { dir: path.resolve(base), sha: bm.sha, browser: bm.browser, errors: bm.errors || [] },
     head: { dir: path.resolve(head), sha: hm.sha, browser: hm.browser, errors: hm.errors || [] },
     viewport: CONFIG.viewport, deviceScaleFactor: CONFIG.deviceScaleFactor, tolerance: tol,
@@ -197,6 +200,36 @@ export function compare({ base, head, out, mode = 'report', title = 'visual', sm
   if (process.env.GITHUB_STEP_SUMMARY) fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, md + '\n');
   console.log(md);
   return report;
+}
+
+/* One PNG with every head checkpoint at half size, two per row, in manifest
+   (= route) order — for a human look without opening ten files. */
+function contactSheet(dir, file) {
+  const shots = CONFIG.checkpoints.map((c) => path.join(dir, `${c.id}.png`)).filter((f) => fs.existsSync(f));
+  if (!shots.length) return null;
+  const imgs = shots.map(readPng);
+  const tw = Math.floor(imgs[0].width / 2), th = Math.floor(imgs[0].height / 2), gap = 4;
+  const cols = 2, rows = Math.ceil(imgs.length / cols);
+  const sheet = new PNG({ width: cols * tw + (cols - 1) * gap, height: rows * th + (rows - 1) * gap });
+  sheet.data.fill(24);
+  imgs.forEach((im, k) => {
+    const ox = (k % cols) * (tw + gap), oy = Math.floor(k / cols) * (th + gap);
+    for (let y = 0; y < th; y++) {
+      for (let x = 0; x < tw; x++) {
+        const o = ((oy + y) * sheet.width + ox + x) * 4;
+        for (let ch = 0; ch < 3; ch++) {
+          let s = 0;
+          for (const [dx, dy] of [[0, 0], [1, 0], [0, 1], [1, 1]]) {
+            s += im.data[((y * 2 + dy) * im.width + x * 2 + dx) * 4 + ch];
+          }
+          sheet.data[o + ch] = s >> 2;
+        }
+        sheet.data[o + 3] = 255;
+      }
+    }
+  });
+  fs.writeFileSync(file, PNG.sync.write(sheet));
+  return path.basename(file);
 }
 
 function readMeta(dir) {
@@ -217,6 +250,10 @@ function markdown(r) {
     `BASE:   ${short(r.base.sha)} (${r.base.browser || 'n/a'})`,
     `HEAD:   ${short(r.head.sha)} (${r.head.browser || 'n/a'})`,
     '```');
+  if (r.contactSheet || r.artifact) {
+    L.push('', `Скрины, diff и contact sheet: artifact **${r.artifact || 'out/visual'}**`
+      + (r.contactSheet ? ` → \`${r.contactSheet.split(' ')[0]}\`` : ''));
+  }
   for (const [side, m] of [['base', r.base], ['head', r.head]]) {
     for (const e of m.errors) L.push(`- ${side}: ${e}`);
   }

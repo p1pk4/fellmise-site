@@ -2,6 +2,11 @@
  * across shadow models on the SAME objects, camera, zoom, viewport and layout.
  *
  *   node grounding_diag.mjs [--out <dir>] [--grounded-ref <git ref>]
+ *   node grounding_diag.mjs --review <git ref> [--out <dir>]
+ *
+ * --review <ref>: grounding-final-review.png — BEFORE (proto/main.js of <ref>)
+ * | AFTER (this working tree), same objects, camera, zoom, layout; plus
+ * review.json/md with where each shadow sits relative to the contact line.
  *
  * Diagnostic only. Nothing here is runtime: /proto/main.js is patched IN
  * MEMORY (Playwright route) with the variants below; the repository files are
@@ -98,11 +103,14 @@ function DIAG_place(art, o, z) {
   const alphaLowZ = z - o.h / 2 + (m.low + 1) / m.H * o.h;
   const contactZ = z - o.h / 2 + (m.contact + 1) / m.H * o.h;
   const cxw = o.pos[0] + m.cc * w, cw = m.cw * w;
-  // what the branch draws (A): exactly shadowFor()
-  const sw = o.h * art.aspect * art.base * 0.94, sd = sw * 0.48;
-  let shadow = null, info = { kind: 'ellipse', cx: o.pos[0] + LIGHT.dx, cz: quadBottom + LIGHT.dz, w: sw, d: sd };
+  // A: exactly what this main.js draws; its numbers are read off the mesh
+  let shadow = null, info = { kind: 'none' };
   const v = test ? DIAG.variant : 'A';
-  if (v === 'A') shadow = shadowFor(art, o, z);
+  if (v === 'A') {
+    shadow = shadowFor(art, o, z);
+    const g = shadow && shadow.geometry && shadow.geometry.parameters;
+    if (g) info = { kind: 'mesh', cx: shadow.position.x, cz: shadow.position.z, w: g.width, d: g.height };
+  }
   else if (v === 'B') { shadow = null; info = { kind: 'none' }; }
   else if (v === 'C' || v === 'E') {
     const d = Math.min(0.37 * cw, 0.6);
@@ -113,8 +121,11 @@ function DIAG_place(art, o, z) {
   }
   if (shadow) scene.add(shadow);
   const quad = flatQuad(art, o, z); scene.add(quad);
+  const light = typeof LIGHT !== 'undefined' ? LIGHT : { dx: 0, dz: 0 };
+  // where THIS main.js thinks the contact is, if it has contact metadata
+  const meta = art.contact ? { contactZ: z - (0.5 - art.contact.contact_row) * o.h } : null;
   DIAG.reg[o.id] = { id: o.id, t: o.t, x: o.pos[0], z, h: o.h, w, texH: m.H, alphaLowRow: m.low, contactRow: m.contact,
-    quadBottom, alphaLowZ, contactZ, contactX: cxw, contactW: cw, shadow: info, light: LIGHT, variant: v };
+    quadBottom, alphaLowZ, contactZ, contactX: cxw, contactW: cw, shadow: info, light, variant: v, meta };
 }
 window.__DIAG_API = { info: (id) => DIAG.reg[id] || null };
 // ===== end diagnostic =====
@@ -128,7 +139,7 @@ function patch(src, groundedTypes) {
       `    const G = ${JSON.stringify(groundedTypes)};
     const url = (DIAG.variant === 'E' && G.includes(t) ? './sprites_grounded/'
                  : strippedSet.has(t) ? STRIPPED : ASSETS) + t + '.webp';`);
-  rep('      base: baseWidth(map.image),', '      base: baseWidth(map.image),\n      m: DIAG_alpha(map.image),');
+  rep('      aspect: map.image.width / map.image.height,', '      aspect: map.image.width / map.image.height,\n      m: DIAG_alpha(map.image),');
   rep('      scene.add(shadowFor(art, o, z));\n      scene.add(flatQuad(art, o, z));', '      DIAG_place(art, o, z);');
   rep('  camera.position.set(0, 120, state.z);\n  camera.lookAt(0, 0, state.z);',
       '  const DX = window.__DIAG_X || 0;\n  camera.position.set(DX, 120, state.z);\n  camera.lookAt(DX, 0, state.z);');
@@ -139,9 +150,12 @@ function patch(src, groundedTypes) {
 const git = (...a) => execFileSync('git', a, { cwd: REPO, maxBuffer: 64 << 20 });
 const rafs = (p) => p.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
 
+const REVIEW = arg('--review', null);
+
 async function main() {
   fs.rmSync(OUT, { recursive: true, force: true });
   fs.mkdirSync(path.join(OUT, 'cells'), { recursive: true });
+  if (REVIEW) return review();
   // the working copy may be CRLF on Windows; anchors are written with LF
   const CR = String.fromCharCode(13);
   const src = fs.readFileSync(path.join(REPO, 'proto', 'main.js'), 'utf8').split(CR).join('');
@@ -270,6 +284,78 @@ async function main() {
   await browser.close();
   await srv.close();
   console.log(`\n-> ${OUT}`);
+}
+
+/* ------------------------------------------------------------- review */
+async function review() {
+  const CR = String.fromCharCode(13);
+  const before = git('show', `${REVIEW}:proto/main.js`).toString().split(CR).join('');
+  const after = fs.readFileSync(path.join(REPO, 'proto', 'main.js'), 'utf8').split(CR).join('');
+  const srcs = { BEFORE: patch(before, []), AFTER: patch(after, []) };
+  const srv = await startServer({ root: REPO });
+  const browser = await chromium.launch(LAUNCH);
+  const ids = OBJECTS.map(([, id]) => id);
+  const PXM = VIEW.height / 16;
+  const out = {};
+  for (const [col, body] of Object.entries(srcs)) {
+    const ctx = await browser.newContext({ viewport: VIEW, deviceScaleFactor: 1 });
+    const page = await ctx.newPage();
+    await page.addInitScript((list) => { window.__DIAG = { variant: 'A', ids: list }; }, ids);
+    await page.route(/\/proto\/main\.js(\?.*)?$/, (r) => r.fulfill({ contentType: 'text/javascript', body }));
+    await page.goto(srv.url + '/proto/');
+    await page.addStyleTag({ content: '#hud{display:none!important}' });
+    await page.waitForFunction(() => window.__PROTO && window.__PROTO.state.done, null, { timeout: 120000 });
+    for (const [label, id] of OBJECTS) {
+      const I = await page.evaluate((i) => window.__DIAG_API.info(i), id);
+      if (!I) throw new Error('no such object in the scene: ' + id);
+      // one camera for both columns: centred on the object's measured base
+      const camZ = I.contactZ - 1.5;
+      await page.evaluate(([x, z]) => { window.__DIAG_X = x; window.__PROTO.go(z, 'близко'); }, [I.x, camZ]);
+      await rafs(page);
+      const sy = (wz) => VIEW.height / 2 + (wz - camZ) * PXM;
+      const sx = (wx) => VIEW.width / 2 + (wx - I.x) * PXM;
+      const half = Math.max(I.w / 2, 2) + 1.2;
+      const top = Math.max(I.contactZ - Math.min(I.h, 6), I.z - I.h / 2 - 0.3);
+      const clip = { x: Math.max(0, sx(I.x - half)), y: Math.max(0, sy(top)) };
+      clip.width = Math.min(VIEW.width - clip.x, 2 * half * PXM);
+      clip.height = Math.min(VIEW.height - clip.y, sy(I.contactZ + 2.8) - clip.y);
+      await page.screenshot({ path: path.join(OUT, 'cells', `${col}-${label.replace(/\W+/g, '_')}.png`), clip });
+      const base = I.meta ? I.meta.contactZ : I.contactZ;
+      (out[label] ||= { id, t: I.t })[col] = I.shadow.kind === 'mesh' ? {
+        shadow_centre_below_base_cm: +((I.shadow.cz - base) * 100).toFixed(1),
+        shadow_w_m: +I.shadow.w.toFixed(2), shadow_d_m: +I.shadow.d.toFixed(2),
+        visible_below_base_cm: +((I.shadow.cz + I.shadow.d / 2 - base) * 100).toFixed(1),
+      } : { shadow: 'none' };
+    }
+    await ctx.close();
+  }
+  const esc = (t) => String(t).replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+  const rows = OBJECTS.map(([label, id]) => `<tr><th>${esc(label)}<br><small>${esc(id)}</small></th>`
+    + ['BEFORE', 'AFTER'].map((c) => `<td><img src="${pathToFileURL(path.join(OUT, 'cells', `${c}-${label.replace(/\W+/g, '_')}.png`)).href}"></td>`).join('')
+    + '</tr>').join('');
+  const html = `<!doctype html><meta charset="utf-8"><style>
+    body{margin:0;background:#18191a;color:#e8e6dc;font:13px ui-monospace,monospace}
+    table{border-collapse:separate;border-spacing:8px} th{text-align:left;color:#ffc857;max-width:170px}
+    img{display:block;max-width:420px;max-height:320px} small{color:#9a9e8c} h1{font-size:15px;margin:10px 8px 0;color:#ffc857}</style>
+    <h1>grounding final review — BEFORE ${esc(REVIEW)} | AFTER working tree · close zoom 50 px/m, same camera per row</h1>
+    <table><tr><th></th><th>BEFORE</th><th>AFTER</th></tr>${rows}</table>`;
+  const hf = path.join(OUT, 'grounding-final-review.html');
+  fs.writeFileSync(hf, html);
+  const ctx = await browser.newContext({ viewport: { width: 1100, height: 800 } });
+  const p = await ctx.newPage();
+  await p.goto(pathToFileURL(hf).href);
+  await p.evaluate(() => Promise.all([...document.images].map((i) => i.decode())));
+  await p.screenshot({ path: path.join(OUT, 'grounding-final-review.png'), fullPage: true });
+  await ctx.close();
+  fs.writeFileSync(path.join(OUT, 'review.json'), JSON.stringify(out, null, 1) + '\n');
+  const md = ['| object | t | BEFORE: centre ↓ base | BEFORE w×d | BEFORE visible ↓ base | AFTER: centre ↓ base | AFTER w×d | AFTER visible ↓ base |',
+    '|---|---|---:|---|---:|---:|---|---:|',
+    ...Object.entries(out).map(([l, r]) => `| ${l} | ${r.t} | ${r.BEFORE.shadow_centre_below_base_cm} cm | ${r.BEFORE.shadow_w_m}×${r.BEFORE.shadow_d_m} m | ${r.BEFORE.visible_below_base_cm} cm | ${r.AFTER.shadow_centre_below_base_cm} cm | ${r.AFTER.shadow_w_m}×${r.AFTER.shadow_d_m} m | ${r.AFTER.visible_below_base_cm} cm |`)];
+  fs.writeFileSync(path.join(OUT, 'review.md'), md.join('\n') + '\n');
+  console.log(md.join('\n'));
+  await browser.close();
+  await srv.close();
+  console.log(`\n-> ${path.join(OUT, 'grounding-final-review.png')}`);
 }
 
 main().catch((e) => { console.error(e); process.exit(1); });

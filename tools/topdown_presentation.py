@@ -27,6 +27,7 @@ PRESENTATION = ROOT / "assets" / "topdown" / "presentation.json"
 GROUND_LAYERS = ("grass", "moss", "stone", "dirt")
 DIM_MAX = 0.6            # a transition dims the frame, it never blacks it out
 DIM_HALF_MAX = 20.0      # metres: an accent of a passage, not a loading screen
+CONTACT_DEPTH_MAX = 0.8  # metres: a contact shadow, never a pool in front of a facade
 
 
 def load(path=PRESENTATION):
@@ -42,6 +43,14 @@ def check(pres, biome_ids):
     bad = []
     if pres.get("version") != 1:
         return ["presentation.json: ожидается \"version\": 1"]
+    cs = pres.get("contact_shadow", {})
+    for key, lo, hi in (("width_scale", 0.5, 1.5), ("depth_per_width", 0.05, 0.6),
+                        ("depth_per_height", 0.01, 0.2), ("depth_min", 0.02, 0.5),
+                        ("depth_max", 0.1, CONTACT_DEPTH_MAX), ("opacity", 0.05, 0.8)):
+        if not _num(cs.get(key), lo, hi):
+            bad.append(f"contact_shadow.{key}: число {lo}..{hi}")
+    if _num(cs.get("depth_min"), 0, 1) and _num(cs.get("depth_max"), 0, 1) and cs["depth_min"] > cs["depth_max"]:
+        bad.append("contact_shadow: depth_min больше depth_max")
     tex = pres.get("textures", {})
     for layer in GROUND_LAYERS + ("road",):
         f = tex.get(layer)
@@ -95,6 +104,7 @@ def compute(pres, biome_ids, spacing):
             "dim": {"max": t["dim"]["max"], "half_width": t["dim"]["half_width"]},
         })
     return {
+        "contact_shadow": {k: v for k, v in pres["contact_shadow"].items() if k != "note"},
         "textures": dict(pres["textures"]),
         "biomes": [{"id": bid, **pres["biomes"][bid]} for bid in ids],
         "transitions": out_tr,
@@ -117,6 +127,15 @@ def check_computed(p):
         if not (t["blend_z"][0] > t["anchor_z"] > t["blend_z"][1]):
             bad.append(f"{t['from']}→{t['to']}: якорь вне своей полосы")
     return bad
+
+
+def shadow_size(p, h, base_w):
+    """(width, depth) of a contact shadow — the formula proto/main.js
+    shadowSize() uses, for tests and reports."""
+    c = p["contact_shadow"]
+    w = base_w * c["width_scale"]
+    cap = min(c["depth_max"], c["depth_per_height"] * h)
+    return w, max(c["depth_min"], min(c["depth_per_width"] * w, cap))
 
 
 def blend_at(p, z):

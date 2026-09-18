@@ -5920,6 +5920,14 @@
  },
  "road_end_z": -652.8,
  "presentation": {
+  "contact_shadow": {
+   "width_scale": 1.0,
+   "depth_per_width": 0.3,
+   "depth_per_height": 0.07,
+   "depth_min": 0.12,
+   "depth_max": 0.6,
+   "opacity": 0.38
+  },
   "textures": {
    "grass": "tile_grass.webp",
    "moss": "tile_spirit.webp",

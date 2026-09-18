@@ -491,5 +491,92 @@ class RoadEnd(unittest.TestCase):
         self.assertTrue(TC.check_terminal(moved, CFG["biome_spacing"], CFG["road_end_z"]))
 
 
+class ContactShadow(unittest.TestCase):
+    """proto/sprite_contact.json + presentation.contact_shadow -> /proto/ shadows."""
+
+    def setUp(self):
+        import math
+        import sprite_contact as SC
+        import topdown_presentation as TP
+        self.math, self.SC, self.TP = math, SC, TP
+        self.meta = json.loads(read("proto/sprite_contact.json"))["sprites"]
+        self.runtime = json.loads(read("assets/topdown/layout.runtime.json"))
+
+    def drawn(self):
+        """(biome index, object) for every sprite /proto/ draws with a shadow."""
+        for bi, b in enumerate(self.runtime["biomes"].values()):
+            for o in b["sprites"]:
+                t = o.get("t")
+                if not t or t in ("hero_fence", "end_post") or t.startswith("cloud_") or t == "moon":
+                    continue
+                if o.get("visible") is False:
+                    continue
+                yield bi, o
+
+    def test_metadata_deterministic_and_current(self):
+        self.assertEqual(json.dumps(self.SC.build(), ensure_ascii=False, indent=1) + "\n",
+                         read("proto/sprite_contact.json"))
+
+    def test_coverage_of_every_shadowed_sprite(self):
+        need = {o["t"] for _, o in self.drawn()} | {"prop_crates"}     # + the sort-test sprite
+        self.assertEqual(sorted(need - set(self.meta)), [])
+
+    def test_metadata_values_sane(self):
+        for t, m in self.meta.items():
+            for k in ("contact_row", "contact_width", "contact_centre"):
+                self.assertTrue(self.math.isfinite(m[k]), (t, k))
+            self.assertTrue(0.5 < m["contact_row"] <= 1.0, (t, m))
+            self.assertTrue(0.0 < m["contact_width"] <= 1.0, (t, m))
+            self.assertTrue(abs(m["contact_centre"]) < 0.5, (t, m))
+            self.assertIn(m["rule"], ("stripped", "run"), t)          # no fallback in the pack
+
+    def test_measured_on_the_texture_proto_loads(self):
+        stripped = set(json.loads(read("proto/sprites_stripped/index.json"))["stripped"])
+        for t, m in self.meta.items():
+            want = f"proto/sprites_stripped/{t}.webp" if t in stripped else f"assets/{t}.webp"
+            self.assertEqual(m["src"], want, t)
+
+    def test_shadow_sizes_capped_and_finite(self):
+        p = self.runtime["presentation"]
+        cs = p["contact_shadow"]
+        for _, o in self.drawn():
+            m = self.meta[o["t"]]
+            base_w = m["contact_width"] * o["h"] * self._aspect(o["t"])
+            w, d = self.TP.shadow_size(p, o["h"], base_w)
+            self.assertTrue(self.math.isfinite(w) and self.math.isfinite(d) and w > 0 and d > 0, o["id"])
+            self.assertLessEqual(d, cs["depth_max"] + 1e-9, o["id"])
+            self.assertLessEqual(d, max(cs["depth_min"], cs["depth_per_height"] * o["h"]) + 1e-9, o["id"])
+            self.assertLessEqual(d, self.TP.CONTACT_DEPTH_MAX, o["id"])
+
+    def test_schema_rejects_bad_contact_shadow(self):
+        pres = self.TP.load()
+        ids = list(SPEC["biomes"])
+        for key, bad in (("depth_max", 3.0), ("opacity", 0.0), ("depth_min", "x"), ("width_scale", 5)):
+            p = copy.deepcopy(pres)
+            p["contact_shadow"][key] = bad
+            self.assertTrue(self.TP.check(p, ids), key)
+        p = copy.deepcopy(pres)
+        p["contact_shadow"]["depth_min"] = 0.5
+        p["contact_shadow"]["depth_max"] = 0.2
+        self.assertTrue(self.TP.check(p, ids))
+
+    def test_proto_uses_contact_not_canvas_or_light(self):
+        proto = read("proto/main.js")
+        self.assertNotIn("LIGHT", proto)
+        self.assertNotIn("baseWidth", proto)
+        self.assertIn("fetch('./sprite_contact.json')", proto)
+        self.assertIn("PRES.contact_shadow", proto)
+        self.assertIn("q.position.set(p.x, 0.5, p.z)", proto)
+
+    _asp = {}
+
+    def _aspect(self, t):
+        if t not in self._asp:
+            from PIL import Image
+            with Image.open(ROOT / self.meta[t]["src"]) as im:
+                self._asp[t] = im.width / im.height
+        return self._asp[t]
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

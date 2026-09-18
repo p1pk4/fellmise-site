@@ -50,6 +50,8 @@ jobs:
         run: python tools/generate_layout.py --check
       - name: top-down overrides merge
         run: python tools/topdown_layout.py --check
+      - name: sprite contact metadata is current
+        run: python tools/sprite_contact.py --check
       - name: layout tests
         run: python tools/test_layout.py
       - name: run rules are enforced

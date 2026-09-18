@@ -20,7 +20,7 @@
   foundation-1: 10/10 SAME, strict PASS · контрольная мутация (кромка 0.96 →
   0.80, не коммитилась) поймана 10/10, 26–84 тыс. px, strict FAIL · runtime
   сайта не тронут
-- **Commit:** —
+- **Commit:** 0d11b85
 
 **Найден дефект `/next/`, в продакшене уже сейчас:** в static-fallback (узкий
 экран, reduced-motion, без WebGL) сплэш `#boot` не снимается никогда —

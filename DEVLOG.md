@@ -17,7 +17,7 @@
 - **Проверка:** test_layout 49/49 · smoke 15/15 · selftest 14/14 · `--check` ✓ ·
   next/ в синхроне · layout байт-в-байт · visual vs PR #6: изменены только кадры
   деревни и дома (5/14), остальные SAME
-- **Commit:** <hash>
+- **Commit:** 3bc0c4a
 
 ## 2026-09-18 20:59 — grounding-fix-2: тень объекта на линии контакта
 

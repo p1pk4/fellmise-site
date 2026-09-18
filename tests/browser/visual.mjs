@@ -22,7 +22,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { chromium } from '@playwright/test';
 import { PNG } from 'pngjs';
 import { startServer } from './lib/server.mjs';
@@ -105,7 +105,11 @@ export async function capture({ root, out, mutate = false, quiet = false }) {
         await rafs(page);        // the frame go() drew has to reach the compositor
         const file = path.join(out, `${c.id}.png`);
         await page.screenshot({ path: file, animations: 'disabled', caret: 'hide' });
-        meta.shots[c.id] = { file: `${c.id}.png`, route, z: c.z, zoom: c.zoom };
+        // what the page says is under the camera (biome, blend, dim) — debug
+        // metadata for the report; pages without the hook just leave it out
+        const presentation = await page.evaluate(
+          (z) => (window.__PROTO && window.__PROTO.presentationAt ? window.__PROTO.presentationAt(z) : null), c.z);
+        meta.shots[c.id] = { file: `${c.id}.png`, route, z: c.z, zoom: c.zoom, presentation };
         if (!quiet) console.log(`  ${c.id}`);
       }
       if (pageErrors.length) meta.errors.push(`${route}: pageerror: ${pageErrors.join('; ')}`);
@@ -149,14 +153,15 @@ function diffPair(a, b, channelTol) {
   return { changed, ratio: changed / n, maxDelta, meanDelta: sum / n, png: out };
 }
 
-export function compare({ base, head, out, mode = 'report', title = 'visual', smoke = null }) {
+export async function compare({ base, head, out, mode = 'report', title = 'visual', smoke = null }) {
   const tol = CONFIG.tolerance;
   fs.mkdirSync(path.join(out, 'diff'), { recursive: true });
   const bm = readMeta(base), hm = readMeta(head);
   const rows = [];
   for (const c of CONFIG.checkpoints) {
     const fb = path.join(base, `${c.id}.png`), fh = path.join(head, `${c.id}.png`);
-    const row = { id: c.id, route: c.route, z: c.z, zoom: c.zoom };
+    const row = { id: c.id, route: c.route, z: c.z, zoom: c.zoom,
+                  presentation: hm.shots?.[c.id]?.presentation ?? null };
     if (!fs.existsSync(fh)) {
       Object.assign(row, { result: 'MISSING-HEAD' });
     } else if (!fs.existsSync(fb)) {
@@ -184,10 +189,10 @@ export function compare({ base, head, out, mode = 'report', title = 'visual', sm
   let fail = missingHead.length > 0;
   if (mode === 'strict' && (changed.length || missingBase.length)) fail = true;
 
-  const sheet = contactSheet(head, path.join(out, 'contact-sheet.png'));
+  const sheet = await contactSheet(head, hm, path.join(out, 'contact-sheet.png'));
   const report = {
     title, mode, visual, result: fail ? 'FAIL' : 'PASS', smoke,
-    contactSheet: sheet ? `${sheet} (head, по маршруту: ${CONFIG.checkpoints.map((c) => c.id).join(' → ')})` : null,
+    contactSheet: sheet ? `${sheet} (head, по маршруту)` : null,
     artifact: process.env.VISUAL_ARTIFACT || null,
     base: { dir: path.resolve(base), sha: bm.sha, browser: bm.browser, errors: bm.errors || [] },
     head: { dir: path.resolve(head), sha: hm.sha, browser: hm.browser, errors: hm.errors || [] },
@@ -202,33 +207,44 @@ export function compare({ base, head, out, mode = 'report', title = 'visual', sm
   return report;
 }
 
-/* One PNG with every head checkpoint at half size, two per row, in manifest
-   (= route) order — for a human look without opening ten files. */
-function contactSheet(dir, file) {
-  const shots = CONFIG.checkpoints.map((c) => path.join(dir, `${c.id}.png`)).filter((f) => fs.existsSync(f));
-  if (!shots.length) return null;
-  const imgs = shots.map(readPng);
-  const tw = Math.floor(imgs[0].width / 2), th = Math.floor(imgs[0].height / 2), gap = 4;
-  const cols = 2, rows = Math.ceil(imgs.length / cols);
-  const sheet = new PNG({ width: cols * tw + (cols - 1) * gap, height: rows * th + (rows - 1) * gap });
-  sheet.data.fill(24);
-  imgs.forEach((im, k) => {
-    const ox = (k % cols) * (tw + gap), oy = Math.floor(k / cols) * (th + gap);
-    for (let y = 0; y < th; y++) {
-      for (let x = 0; x < tw; x++) {
-        const o = ((oy + y) * sheet.width + ox + x) * 4;
-        for (let ch = 0; ch < 3; ch++) {
-          let s = 0;
-          for (const [dx, dy] of [[0, 0], [1, 0], [0, 1], [1, 1]]) {
-            s += im.data[((y * 2 + dy) * im.width + x * 2 + dx) * 4 + ch];
-          }
-          sheet.data[o + ch] = s >> 2;
-        }
-        sheet.data[o + 3] = 255;
-      }
-    }
-  });
-  fs.writeFileSync(file, PNG.sync.write(sheet));
+/* One PNG with every head checkpoint in ROUTE order (by camera z), two per
+   row, each frame at half size with its caption UNDER it — checkpoint, z,
+   zoom, and what presentation says is there (biome, ground, blend, dim).
+   Rendered by the same Chromium from a throwaway HTML page, so captions need
+   no image library; the frames themselves are untouched. */
+async function contactSheet(dir, meta, file) {
+  const cps = CONFIG.checkpoints.filter((c) => fs.existsSync(path.join(dir, `${c.id}.png`)))
+    .sort((x, y) => y.z - x.z);
+  if (!cps.length) return null;
+  const esc = (t) => String(t).replace(/[&<>]/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[ch]));
+  const cell = (c, k) => {
+    const p = meta.shots?.[c.id]?.presentation;
+    const where = p ? `${p.biome}${p.neighbour ? ' → ' + p.neighbour : ''} · грунт ${p.ground}`
+      + ` · blend ${p.blend.toFixed(2)} · затемнение ${p.overlay.toFixed(2)}` : '';
+    const src = pathToFileURL(path.join(dir, `${c.id}.png`)).href;
+    return `<figure><img src="${src}"><figcaption><b>${k + 1}. ${esc(c.id)}</b> · z ${c.z} · ${esc(c.zoom)}`
+      + `<br>${esc(where)}</figcaption></figure>`;
+  };
+  const w = CONFIG.viewport.width / 2, h = CONFIG.viewport.height / 2;
+  const html = `<!doctype html><meta charset="utf-8"><style>
+    body{margin:0;background:#18191a;color:#e8e6dc;font:13px/1.35 ui-monospace,monospace}
+    main{display:grid;grid-template-columns:repeat(2,${w}px);gap:10px;padding:10px}
+    figure{margin:0} img{display:block;width:${w}px;height:${h}px}
+    figcaption{padding:4px 2px 0} b{color:#ffc857}
+    header{padding:10px 10px 0;color:#9a9e8c}</style>
+    <header>${esc(meta.sha || '')} · ${esc(meta.browser || '')} · ${CONFIG.viewport.width}×${CONFIG.viewport.height} DPR ${CONFIG.deviceScaleFactor}</header>
+    <main>${cps.map(cell).join('')}</main>`;
+  const htmlFile = file.replace(/\.png$/, '.html');
+  fs.writeFileSync(htmlFile, html);
+  const browser = await chromium.launch(LAUNCH);
+  try {
+    const page = await (await browser.newContext({ viewport: { width: w * 2 + 30, height: 600 } })).newPage();
+    await page.goto(pathToFileURL(htmlFile).href);
+    await page.evaluate(() => Promise.all([...document.images].map((i) => i.decode())));
+    await page.screenshot({ path: file, fullPage: true });
+  } finally {
+    await browser.close();
+  }
   return path.basename(file);
 }
 
@@ -239,9 +255,12 @@ function readMeta(dir) {
 function markdown(r) {
   const short = (s) => (s ? s.slice(0, 10) + (s.endsWith('+dirty') ? '+dirty' : '') : 'n/a');
   const L = [`### ${r.title}`, '',
-    '| Checkpoint | Changed pixels | Ratio | Max Δ | Result |', '|---|---:|---:|---:|---|'];
+    '| Checkpoint | Changed pixels | Ratio | Max Δ | Result | z · biome · ground · blend · dim |',
+    '|---|---:|---:|---:|---|---|'];
   for (const c of r.checkpoints) {
-    L.push(`| ${c.id} | ${c.changed ?? '—'} | ${c.ratio !== undefined ? (c.ratio * 100).toFixed(4) + '%' : '—'} | ${c.maxDelta ?? '—'} | ${c.result} |`);
+    const p = c.presentation;
+    const where = p ? `${c.z} · ${p.biome}${p.neighbour ? '→' + p.neighbour : ''} · ${p.ground} · ${p.blend} · ${p.overlay}` : `${c.z}`;
+    L.push(`| ${c.id} | ${c.changed ?? '—'} | ${c.ratio !== undefined ? (c.ratio * 100).toFixed(4) + '%' : '—'} | ${c.maxDelta ?? '—'} | ${c.result} | ${where} |`);
   }
   L.push('', '```',
     `SMOKE:  ${r.smoke || 'n/a'}`,
@@ -294,7 +313,7 @@ async function run(o) {
     await capture({ root: b.dir, out: path.join(out, 'base') });
     console.log(`head ${o.head || '.'} -> ${headDir}`);
     await capture({ root: headDir, out: path.join(out, 'head') });
-    const r = compare({ base: path.join(out, 'base'), head: path.join(out, 'head'), out, mode,
+    const r = await compare({ base: path.join(out, 'base'), head: path.join(out, 'head'), out, mode,
                         title: o.title || `visual: ${o.base} -> ${o.head || 'working tree'}`,
                         smoke: smokeStatus(o.smoke) });
     return r.result === 'PASS' ? 0 : 1;
@@ -313,10 +332,10 @@ async function selftest(o) {
   await capture({ root, out: path.join(out, 'a'), quiet: true });
   await capture({ root, out: path.join(out, 'b'), quiet: true });
   await capture({ root, out: path.join(out, 'mutated'), mutate: true, quiet: true });
-  const same = compare({ base: path.join(out, 'a'), head: path.join(out, 'b'),
+  const same = await compare({ base: path.join(out, 'a'), head: path.join(out, 'b'),
                          out: path.join(out, 'repeat'), mode: 'strict',
                          title: 'self-test 1: same tree twice (strict)' });
-  const mut = compare({ base: path.join(out, 'a'), head: path.join(out, 'mutated'),
+  const mut = await compare({ base: path.join(out, 'a'), head: path.join(out, 'mutated'),
                         out: path.join(out, 'mutation'), mode: 'report',
                         title: 'self-test 2: road_half_width x1.6 must be detected' });
   const caught = mut.checkpoints.filter((c) => c.result === 'CHANGED').length;
@@ -337,7 +356,7 @@ try {
     const m = await capture({ root: o.root || REPO, out: path.resolve(o.out || path.join(REPO, 'out', 'visual', 'head')), mutate: !!o.mutate });
     if (m.errors.length) { console.error(m.errors.join('\n')); code = 1; }
   } else if (cmd === 'compare') {
-    const r = compare({ base: o.base, head: o.head, out: path.resolve(o.out || path.join(REPO, 'out', 'visual')),
+    const r = await compare({ base: o.base, head: o.head, out: path.resolve(o.out || path.join(REPO, 'out', 'visual')),
                         mode: o.mode || 'report', title: o.title, smoke: smokeStatus(o.smoke) });
     code = r.result === 'PASS' ? 0 : 1;
   } else if (cmd === 'run') {

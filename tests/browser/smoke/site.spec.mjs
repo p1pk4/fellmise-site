@@ -124,6 +124,41 @@ test.describe('/proto/', () => {
     expect(shot.length).toBeGreaterThan(200_000);
     clean(watch);
   });
+
+  test('biome presentation, transitions and the end of the road', async ({ page, watch }) => {
+    await page.goto('/proto/');
+    await page.waitForFunction(PROTO_READY, null, { timeout: CONFIG.routes['/proto/'].readyTimeoutMs });
+    const runtime = await (await page.request.get('/assets/topdown/layout.runtime.json')).json();
+    const P = runtime.presentation;
+    test.skip(!P, 'this checkout has no biome presentation yet');
+
+    // every biome is where presentation says, away from the transitions
+    const probe = await page.evaluate((zs) => zs.map((z) => window.__PROTO.presentationAt(z)),
+      [-20, -200, -350, -480, -660]);
+    expect(probe.map((p) => p.biome)).toEqual(P.biomes.map((b) => b.id));
+    expect(probe.every((p) => p.overlay === 0 && p.blend === 0)).toBe(true);
+
+    // at each anchor the overlay is at its peak, driven by camera z alone
+    const overlay = page.locator('#biome-transition-overlay');
+    await expect(overlay).toHaveAttribute('aria-hidden', 'true');
+    expect(await overlay.evaluate((e) => getComputedStyle(e).pointerEvents)).toBe('none');
+    expect(await overlay.textContent()).toBe('');
+    for (const t of P.transitions) {
+      await page.evaluate((z) => window.__PROTO.go(z, 'обзор'), t.anchor_z);
+      expect(Number(await overlay.evaluate((e) => e.style.opacity))).toBeCloseTo(t.dim.max, 3);
+    }
+    await page.evaluate(() => window.__PROTO.go(-20, 'обзор'));
+    expect(Number(await overlay.evaluate((e) => e.style.opacity))).toBe(0);
+
+    // the road stops at the final house: nothing a road-width past the end
+    const end = runtime.road_end_z;
+    const r = await page.evaluate((e) => [window.__PROTO.roadAt(e + 10), window.__PROTO.roadAt(e - 6),
+      window.__PROTO.roadAt(e - 40)], end);
+    expect(r[0].hw).toBeGreaterThan(3);
+    expect(r[1].hw).toBe(0);
+    expect(r[2].hw).toBe(0);
+    clean(watch);
+  });
 });
 
 /* ------------------------------------------------------------------- next */

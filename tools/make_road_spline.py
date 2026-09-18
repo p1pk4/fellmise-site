@@ -24,7 +24,10 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 OUT = ROOT / "assets" / "road_spline.json"
 
 SEED = "fellmise-road-1"
-LENGTH = 760.0       # метров вдоль оси: пять биомов по 150 плюс запас
+CONFIG = ROOT / "assets" / "topdown" / "config.json"
+# Дорога кончается у финального дома: road_end_z в config.json. Раньше
+# LENGTH был 760 «с запасом», и полотно шло за дом между деревьями.
+LENGTH = abs(json.loads(CONFIG.read_text(encoding="utf-8"))["road_end_z"])
 STEP = 40.0          # шаг контрольных точек
 AMP_X = 1.5          # виляние оси, ±метры на шаге
 AMP_W = 0.20         # ширина, ±доля от базовой
@@ -36,7 +39,9 @@ def h01(*parts):
     return int.from_bytes(d, "big") / 2 ** 64
 
 
-def main():
+def build():
+    """(points, file text) — deterministic; tools/test_layout.py compares the
+    text with the committed road_spline.json."""
     pts = []
     n = int(LENGTH / STEP) + 1
     for i in range(n):
@@ -46,15 +51,23 @@ def main():
         x = 0.0 if i == 0 else round((h01("x", i) * 2 - 1) * AMP_X, 3)
         w = round(1.0 + (h01("w", i) * 2 - 1) * AMP_W, 3)
         pts.append({"z": z, "x": x, "w": w})
+    # последняя точка — ровно конец дороги, на оси: дорога приходит к двери
+    if pts[-1]["z"] > -LENGTH:
+        pts.append({"z": -LENGTH, "x": 0.0, "w": 1.0})
 
-    OUT.write_text(json.dumps({
+    return pts, json.dumps({
         "seed": SEED,
         "generated": "tools/make_road_spline.py",
         "note": ("x — смещение оси дороги от нуля в метрах, w — множитель "
                  "базовой полуширины. Между точками проба ведёт Catmull-Rom."),
         "step_z": STEP,
         "points": pts,
-    }, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+    }, ensure_ascii=False, indent=1) + "\n"
+
+
+def main():
+    pts, text = build()
+    OUT.write_text(text, encoding="utf-8")
 
     dx = max(abs(p["x"]) for p in pts)
     lo = min(p["w"] for p in pts)

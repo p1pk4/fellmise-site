@@ -15,15 +15,19 @@
   }
  },
  "checkpoints": [
-  { "id": "proto-village-overview", "route": "/proto/", "z": -20, "zoom": "обзор", "note": "начало, вид при открытии" },
-  { "id": "proto-village-close", "route": "/proto/", "z": -47.6, "zoom": "близко", "note": "два дома по берегам, y-sort и тени" },
-  { "id": "proto-village-forest", "route": "/proto/", "z": -112, "zoom": "обзор", "note": "стык village -> forest: хвост деревни (объекты до -95) и пустой перегон" },
-  { "id": "proto-forest", "route": "/proto/", "z": -190, "zoom": "обзор" },
-  { "id": "proto-mine", "route": "/proto/", "z": -340, "zoom": "обзор" },
-  { "id": "proto-mine-close", "route": "/proto/", "z": -330, "zoom": "близко" },
-  { "id": "proto-spirit", "route": "/proto/", "z": -480, "zoom": "обзор" },
-  { "id": "proto-home", "route": "/proto/", "z": -640, "zoom": "обзор" },
-  { "id": "proto-home-close", "route": "/proto/", "z": -657, "zoom": "близко", "note": "финальный дом (home/homestead/house); до world-composition-1 стоял на -614.5, где теперь по замыслу пустой луг" },
-  { "id": "proto-far-end", "route": "/proto/", "z": -680, "zoom": "обзор", "note": "дальний контрольный кадр, последние объекты (до -683)" }
+  {"id": "proto-village-overview", "route": "/proto/", "z": -20, "zoom": "обзор", "note": "начало, вид при открытии"},
+  {"id": "proto-village-close", "route": "/proto/", "z": -47.6, "zoom": "близко", "note": "два дома по берегам, y-sort и тени"},
+  {"id": "proto-village-forest", "route": "/proto/", "z": -112, "zoom": "обзор", "note": "стык village -> forest: хвост деревни (объекты до -95) и пустой перегон"},
+  {"id": "transition-village-forest", "route": "/proto/", "z": -154, "zoom": "обзор", "note": "якорь перехода (presentation.json → runtime anchor_z): пик затемнения, середина смены грунта"},
+  {"id": "proto-forest", "route": "/proto/", "z": -190, "zoom": "обзор"},
+  {"id": "transition-forest-mine", "route": "/proto/", "z": -301, "zoom": "обзор", "note": "якорь перехода (presentation.json → runtime anchor_z): пик затемнения, середина смены грунта"},
+  {"id": "proto-mine", "route": "/proto/", "z": -340, "zoom": "обзор"},
+  {"id": "proto-mine-close", "route": "/proto/", "z": -330, "zoom": "близко"},
+  {"id": "transition-mine-spirit", "route": "/proto/", "z": -408, "zoom": "обзор", "note": "якорь перехода (presentation.json → runtime anchor_z): пик затемнения, середина смены грунта"},
+  {"id": "proto-spirit", "route": "/proto/", "z": -480, "zoom": "обзор"},
+  {"id": "transition-spirit-home", "route": "/proto/", "z": -592, "zoom": "обзор", "note": "якорь перехода (presentation.json → runtime anchor_z): пик затемнения, середина смены грунта"},
+  {"id": "proto-home", "route": "/proto/", "z": -640, "zoom": "обзор"},
+  {"id": "proto-home-close", "route": "/proto/", "z": -657, "zoom": "близко", "note": "финальный дом (home/homestead/house); до world-composition-1 стоял на -614.5, где теперь по замыслу пустой луг"},
+  {"id": "proto-far-end", "route": "/proto/", "z": -680, "zoom": "обзор", "note": "дальний контрольный кадр, последние объекты (до -683)"}
  ]
 }

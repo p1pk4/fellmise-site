@@ -1,0 +1,48 @@
+{
+ "version": 1,
+ "note": "Как выглядит каждый биом /proto/ сверху и где один переходит в другой. Где стоят объекты — composition.json, здесь только вид. Текстуры — существующие тайлы пака сайта (копии в proto/), новых нет. ground: веса слоёв грунта 0..1 (шум решает, где какой слой проступает). tint/saturation/brightness — палитра всего грунта вместе с дорогой; спрайты не перекрашиваются. road_stone — сколько камня в полотне дороги. vegetation — доля травяных декалей (кусты, папоротники, грибы) на земле биома. Переходы: якорь — локальный z биома, В который ведёт переход (там, где композиция сужает путь); lead/tail — метры до и после якоря, за которые меняется грунт; dim — короткое затемнение кадра у якоря.",
+ "textures": {
+  "grass": "tile_grass.webp",
+  "moss": "tile_spirit.webp",
+  "stone": "tile_dirt.webp",
+  "dirt": "tile_path.webp",
+  "road": "tile_path.webp"
+ },
+ "biomes": {
+  "village": {
+   "ground": { "grass": 1.0, "moss": 0.0, "stone": 0.0, "dirt": 0.0 },
+   "tint": [0.97, 0.98, 0.94], "saturation": 0.92, "brightness": 1.0,
+   "road_stone": 0.0, "vegetation": 1.0
+  },
+  "forest": {
+   "ground": { "grass": 1.0, "moss": 0.55, "stone": 0.0, "dirt": 0.25 },
+   "tint": [0.86, 0.94, 0.9], "saturation": 0.82, "brightness": 0.84,
+   "road_stone": 0.0, "vegetation": 1.0
+  },
+  "mine": {
+   "ground": { "grass": 0.1, "moss": 0.0, "stone": 0.9, "dirt": 1.0 },
+   "tint": [0.95, 0.94, 0.92], "saturation": 0.7, "brightness": 0.92,
+   "road_stone": 0.35, "vegetation": 0.12
+  },
+  "spirit": {
+   "ground": { "grass": 0.6, "moss": 0.85, "stone": 0.1, "dirt": 0.15 },
+   "tint": [0.86, 0.95, 1.04], "saturation": 0.5, "brightness": 1.08,
+   "road_stone": 0.1, "vegetation": 0.15
+  },
+  "home": {
+   "ground": { "grass": 1.0, "moss": 0.0, "stone": 0.0, "dirt": 0.05 },
+   "tint": [1.03, 0.99, 0.9], "saturation": 0.9, "brightness": 1.02,
+   "road_stone": 0.0, "vegetation": 1.0
+  }
+ },
+ "transitions": [
+  { "from": "village", "to": "forest", "anchor": { "biome": "forest", "z": -4 },
+    "lead": 40, "tail": 12, "dim": { "max": 0.38, "half_width": 12 } },
+  { "from": "forest", "to": "mine", "anchor": { "biome": "mine", "z": -1 },
+    "lead": 34, "tail": 12, "dim": { "max": 0.45, "half_width": 12 } },
+  { "from": "mine", "to": "spirit", "anchor": { "biome": "spirit", "z": 42 },
+    "lead": 16, "tail": 22, "dim": { "max": 0.5, "half_width": 14 } },
+  { "from": "spirit", "to": "home", "anchor": { "biome": "home", "z": 8 },
+    "lead": 42, "tail": 14, "dim": { "max": 0.38, "half_width": 12 } }
+ ]
+}

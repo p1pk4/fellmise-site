@@ -6,5 +6,7 @@
  "road_clearance": 0.8,
  "road_clearance_note": "Сколько метров свободной земли держат следы объектов от кромки дороги (ось и ширина — из road_spline.json, как в шейдере). Кроме road_props из spec и объектов, объявленных on_road в composition.json.",
  "biome_spacing": 150,
- "biome_spacing_note": "Шаг биомов по Z: биом i начинается с z = -i * biome_spacing. Попадает в runtime layout, proto берёт его оттуда."
+ "biome_spacing_note": "Шаг биомов по Z: биом i начинается с z = -i * biome_spacing. Попадает в runtime layout, proto берёт его оттуда.",
+ "road_end_z": -652.8,
+ "road_end_note": "Мировой Z, где дорога кончается: низ финального дома (composition home/homestead/house, помечен road_terminal). По нему tools/make_road_spline.py строит сплайн, шейдер, JS и Python-модель закругляют конец; дальше полотна нет."
 }

@@ -807,6 +807,10 @@ def load_topdown_config():
         if isinstance(v, bool) or not isinstance(v, (int, float)) or v <= 0:
             raise SystemExit(f"{TOPDOWN_CONFIG.relative_to(ROOT)}: {key} "
                              f"должен быть положительным числом, а не {v!r}")
+    v = cfg.get("road_end_z")
+    if isinstance(v, bool) or not isinstance(v, (int, float)) or v >= 0:
+        raise SystemExit(f"{TOPDOWN_CONFIG.relative_to(ROOT)}: road_end_z — мировой z "
+                         f"конца дороги, отрицательное число, а не {v!r}")
     return cfg
 
 
@@ -830,13 +834,24 @@ def generate(spec, target, cfg=None, comp=None):
         problems = TC.check_composition(comp, spec)
         if problems:
             raise SystemExit("composition.json:\n  " + "\n  ".join(problems))
-        road = TC.Road(cfg["road_half_width"])
+        import topdown_presentation as TP
+        pres = TP.load()
+        problems = TP.check(pres, list(spec["biomes"]))
+        if problems:
+            raise SystemExit("presentation.json:\n  " + "\n  ".join(problems))
+        road = TC.Road(cfg["road_half_width"], end_z=cfg["road_end_z"])
         composer = TC.Composer(None, comp, road, cfg["biome_spacing"], cfg["road_clearance"])
         bld = Builder(spec, target="topdown", road=cfg["road_half_width"], composer=composer)
         composer.bld = bld
         layout = bld.build()
-        bad = TC.validate(layout, spec, road, cfg["biome_spacing"], cfg["road_clearance"],
-                          set(spec["road_props"]))
+        # what proto draws the ground and the transitions from — computed here,
+        # once, so shader, JS and tests read the same numbers
+        layout["road_end_z"] = cfg["road_end_z"]
+        layout["presentation"] = TP.compute(pres, list(spec["biomes"]), cfg["biome_spacing"])
+        bad = TP.check_computed(layout["presentation"])
+        bad += TC.validate(layout, spec, road, cfg["biome_spacing"], cfg["road_clearance"],
+                           set(spec["road_props"]))
+        bad += TC.check_terminal(layout, cfg["biome_spacing"], cfg["road_end_z"])
         bad += [f"{bid}: '{t}' не входит в whitelist биома (scene_spec + whitelist_extra)"
                 for bid, t in sorted(bld.conflicts)]
         bld.diagnostics = TC.diagnostics(layout, road, cfg["biome_spacing"],

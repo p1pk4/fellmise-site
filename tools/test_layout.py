@@ -389,5 +389,107 @@ class Consumers(unittest.TestCase):
         self.assertIsNone(re.search(r"ASSETS\s*\+\s*'layout\.json'", proto))
 
 
+class Presentation(unittest.TestCase):
+    """assets/topdown/presentation.json -> runtime -> proto: one source."""
+
+    def setUp(self):
+        import topdown_presentation as TP
+        self.TP = TP
+        self.pres = TP.load()
+        self.ids = list(SPEC["biomes"])
+
+    def test_schema_clean(self):
+        self.assertEqual(self.TP.check(self.pres, self.ids), [])
+
+    def test_every_biome_has_presentation(self):
+        self.assertEqual(list(self.pres["biomes"]), self.ids)
+
+    def test_schema_catches_problems(self):
+        for mutate in (
+            lambda p: p["biomes"].pop("mine"),
+            lambda p: p["biomes"]["forest"]["ground"].__setitem__("grass", 2),
+            lambda p: p["biomes"]["spirit"].__setitem__("tint", [3, 1, 1]),
+            lambda p: p["transitions"].pop(),
+            lambda p: p["transitions"][1].__setitem__("to", "home"),
+            lambda p: p["transitions"][0]["dim"].__setitem__("max", 1.0),
+            lambda p: p["textures"].__setitem__("stone", "nope.webp"),
+        ):
+            p = copy.deepcopy(self.pres)
+            mutate(p)
+            self.assertTrue(self.TP.check(p, self.ids))
+
+    def test_transitions_ordered_and_apart(self):
+        comp = self.TP.compute(self.pres, self.ids, CFG["biome_spacing"])
+        self.assertEqual(self.TP.check_computed(comp), [])
+        bad = copy.deepcopy(self.pres)
+        bad["transitions"][1]["anchor"] = {"biome": "forest", "z": -10}
+        self.assertTrue(self.TP.check_computed(self.TP.compute(bad, self.ids, CFG["biome_spacing"])))
+
+    def test_runtime_carries_the_computed_boundaries(self):
+        """What proto reads (runtime layout) is exactly compute(presentation.json)."""
+        runtime = json.loads(read("assets/topdown/layout.runtime.json"))
+        self.assertEqual(runtime["presentation"],
+                         self.TP.compute(self.pres, self.ids, CFG["biome_spacing"]))
+        self.assertEqual(runtime["road_end_z"], CFG["road_end_z"])
+
+    def test_anchors_sit_in_the_constrictions(self):
+        """Each anchor falls inside the z-span of the objects that narrow the
+        road there (the composition's gates), not at a midpoint."""
+        comp = self.TP.compute(self.pres, self.ids, CFG["biome_spacing"])
+        spans = {("village", "forest"): ("forest", ("gate-west", "gate-east")),
+                 ("forest", "mine"): ("mine", ("gate-west", "gate-east", "squeeze-west", "squeeze-east")),
+                 ("mine", "spirit"): ("mine", ("exit-narrows",)),
+                 ("spirit", "home"): ("home", ("gate-pines-west", "gate-pines-east", "returning-green-west"))}
+        objs = T.objects(TOPDOWN)
+        for t in comp["transitions"]:
+            bid, keys = spans[(t["from"], t["to"])]
+            bi = self.ids.index(bid)
+            zs = [-bi * CFG["biome_spacing"] + o["pos"][2] for i, o in objs.items()
+                  if any(i.startswith(f"{bid}/{k}/") for k in keys)]
+            self.assertTrue(zs, t)
+            self.assertLessEqual(min(zs) - 12, t["anchor_z"], t)
+            self.assertLessEqual(t["anchor_z"], max(zs) + 12, t)
+
+    def test_shader_and_js_read_runtime(self):
+        """proto builds uniforms and the overlay from layout.presentation — no
+        biome boundary or palette literal of its own."""
+        proto = read("proto/main.js")
+        for needle in ("PRES = layout.presentation", "uTrans: { value: PRES.transitions.map",
+                       "uGround: { value: PRES.biomes.map", "uRoadEnd: { value: ROAD_END }",
+                       "const ROAD_END = layout.road_end_z", "NB: PRES.biomes.length"):
+            self.assertIn(needle, proto)
+        for t in json.loads(read("assets/topdown/layout.runtime.json"))["presentation"]["transitions"]:
+            self.assertNotIn(str(t["anchor_z"]), proto)
+
+
+class RoadEnd(unittest.TestCase):
+    def test_spline_reproducible(self):
+        """road_spline.json is what tools/make_road_spline.py produces."""
+        import make_road_spline as MRS
+        _, text = MRS.build()
+        self.assertEqual(text, read("assets/road_spline.json"))
+        pts = json.loads(text)["points"]
+        self.assertEqual(pts[-1]["z"], CFG["road_end_z"])
+
+    def test_no_road_behind_the_house(self):
+        """Past the terminal the road is gone: zero half-width a road-width
+        after the end, and every point behind the house is clear."""
+        road = TC.Road(CFG["road_half_width"], end_z=CFG["road_end_z"])
+        end = CFG["road_end_z"]
+        self.assertGreater(road.at(end + 10)[1], 3.0)
+        self.assertEqual(road.at(end - 6)[1], 0.0)
+        house = T.objects(TOPDOWN)["home/homestead/house"]
+        top = -4 * CFG["biome_spacing"] + house["pos"][2] - house["h"] / 2
+        for z in (top, top - 10, top - 40, -760):
+            self.assertEqual(road.at(z)[1], 0.0, z)
+            self.assertTrue(road.clear(-2, 2, z, z - 1, CFG["road_clearance"]))
+
+    def test_terminal_object_matches_road_end(self):
+        self.assertEqual(TC.check_terminal(TOPDOWN, CFG["biome_spacing"], CFG["road_end_z"]), [])
+        moved = copy.deepcopy(TOPDOWN)
+        T.objects(moved)["home/homestead/house"]["pos"][2] -= 5
+        self.assertTrue(TC.check_terminal(moved, CFG["biome_spacing"], CFG["road_end_z"]))
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

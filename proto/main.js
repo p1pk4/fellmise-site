@@ -46,7 +46,7 @@ const GAME_FRAME_M = GAME_ORTHO_SIZE * 2 * TILE_M;   // 11.67 м по высот
  * Зумы заданы тем, что реально читается на экране: 16 м — дом с окружением,
  * 40 м — усадьба с соседями и куском дороги. */
 const ZOOM = { обзор: 40 / 2, близко: 16 / 2 };
-const BIOME_SPACING = 150;                  // как в боевой сцене
+let BIOME_SPACING = null;                    // из runtime layout (assets/topdown/config.json)
 const SEED = 'fellmise-proto-1';
 
 /* Полуширина дороги — НЕ из scene_spec.json (там 3.2 для /next/) и не
@@ -530,6 +530,10 @@ async function main() {
     throw new Error('в ' + LAYOUT + ' нет road_half_width');
   }
   ROAD_HALF = layout.road_half_width;
+  if (typeof layout.biome_spacing !== 'number') {
+    throw new Error('в ' + LAYOUT + ' нет biome_spacing');
+  }
+  BIOME_SPACING = layout.biome_spacing;
   const dbg = layout.debug;
   const ids = Object.keys(layout.biomes);
   state.biomes = ids.length;
@@ -615,7 +619,34 @@ async function biome(layout, ids, i) {
          const CLOUDS = ['cloud_a', 'cloud_b', 'cloud_c', 'moon'];  */
     const isSky = (o) => o.t && (o.t.startsWith('cloud_') || o.t === 'moon');
 
-    for (const run of groupRuns(all.filter(isFence))) {
+    /* Заборы top-down композиции приходят с явным отрезком (o.run: ключ, ось
+       и шаг) и могут идти поперёк дороги — участок, а не рельс. Каждый отрезок
+       рисуется одной полосой вдоль своей оси, ровно по следу, который меряет
+       валидатор (tools/topdown_compose.py footprint). Заборы без o.run — как
+       раньше: группировка по X. */
+    const fences = all.filter(isFence);
+    const byRun = new Map();
+    for (const o of fences) {
+      if (!o.run || o.visible === false) continue;
+      if (!byRun.has(o.run.key)) byRun.set(o.run.key, []);
+      byRun.get(o.run.key).push(o);
+    }
+    for (const segs of byRun.values()) {
+      const { axis, step } = segs[0].run;
+      const along = segs.map((o) => (axis === 'z' ? o.pos[2] : o.pos[0]));
+      const a0 = Math.min(...along) - step / 2, a1 = Math.max(...along) + step / 2;
+      const across = segs[0].pos[axis === 'z' ? 0 : 2];
+      const q = new THREE.Mesh(
+        axis === 'z' ? new THREE.PlaneGeometry(0.7, a1 - a0) : new THREE.PlaneGeometry(a1 - a0, 0.7),
+        new THREE.MeshBasicMaterial({ color: 0x7a4f2a, depthTest: false }));
+      q.rotation.x = -Math.PI / 2;
+      if (axis === 'z') q.position.set(across, 1, z0 + (a0 + a1) / 2);
+      else q.position.set((a0 + a1) / 2, 1, z0 + across);
+      q.renderOrder = orderOf(z0 + (axis === 'z' ? a1 : across + 0.35));
+      scene.add(q);
+      state.objects++;
+    }
+    for (const run of groupRuns(fences.filter((o) => !o.run))) {
       const zc = z0 + (run.z0 + run.z1) / 2;
       const q = new THREE.Mesh(
         new THREE.PlaneGeometry(0.7, Math.max(run.z1 - run.z0, 0.7)),

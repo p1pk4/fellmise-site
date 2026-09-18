@@ -1,24 +1,10 @@
 {
  "version": 1,
- "note": "Единственный источник параметров top-down сцены (/proto/). road_half_width читают generate_layout.py --target topdown (валидатор) и, через layout.runtime.json, proto/main.js. Legacy /next/ живёт на assets/scene_spec.json global.road_half_width (3.2) и этот файл не читает.",
+ "note": "Единственный источник параметров top-down сцены (/proto/). Читают generate_layout.py --target topdown (расстановка, clearance, валидатор) и, через layout.runtime.json, proto/main.js. Legacy /next/ живёт на assets/scene_spec.json и этот файл не читает.",
  "road_half_width": 4.2,
  "road_half_width_history": "3.2 — тропинка между усадьбами; 5.5 — съедала треть кадра; 4.2 — улица, которая не спорит с постройками (topdown-ground-3).",
- "placement_note": "Scatter пока раскладывается с отступом от spec-дороги 3.2: перевод на 4.2 переложит ~60 объектов, это композиционный батч. Пока он не сделан, валидатор на 4.2 находит объекты на видимой дороге — они перечислены ниже поимённо, новые валят сборку, исчезнувшие тоже.",
- "validator_known_violations": [
-  "village/village/farmyard.1/hero_cart.1: на дороге, x=-4.063 (порог 5.0)",
-  "village/village/square.1/prop_crates.1: на дороге, x=4.428 (порог 5.0)",
-  "village/village/farmyard.2/hero_cart.1: на дороге, x=4.702 (порог 5.0)",
-  "village/village/scatter/c23: на дороге, x=-4.561 (порог 5.0)",
-  "forest/forest/cutting.1/fern.1: на дороге, x=4.962 (порог 5.0)",
-  "forest/forest/cutting.2/fern.1: на дороге, x=-4.617 (порог 5.0)",
-  "forest/forest/scatter/c0: на дороге, x=-4.961 (порог 5.0)",
-  "forest/forest/scatter/c19: на дороге, x=4.478 (порог 5.0)",
-  "spirit/spirit/graveplot.1/candles.1: на дороге, x=4.771 (порог 5.0)",
-  "spirit/spirit/graveplot.2/grave_a.1: на дороге, x=-4.92 (порог 5.0)",
-  "spirit/spirit/graveplot.2/candles.1: на дороге, x=-4.32 (порог 5.0)",
-  "spirit/spirit/scatter/c7: на дороге, x=4.211 (порог 5.0)",
-  "spirit/spirit/scatter/c18: на дороге, x=-4.387 (порог 5.0)",
-  "home/home/chest.1: на дороге, x=-4.604 (порог 5.0)",
-  "home/home/scatter/c5: на дороге, x=4.84 (порог 5.0)"
- ]
+ "road_clearance": 0.8,
+ "road_clearance_note": "Сколько метров свободной земли держат следы объектов от кромки дороги (ось и ширина — из road_spline.json, как в шейдере). Кроме road_props из spec и объектов, объявленных on_road в composition.json.",
+ "biome_spacing": 150,
+ "biome_spacing_note": "Шаг биомов по Z: биом i начинается с z = -i * biome_spacing. Попадает в runtime layout, proto берёт его оттуда."
 }

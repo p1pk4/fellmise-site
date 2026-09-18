@@ -5,6 +5,19 @@
 
 ---
 
+## 2026-09-18 22:09 — patch-integration-review-1: заплатки земли под 3 постройками (review)
+
+- **Что:** review-слой заплаток земли в /proto/ (`proto/ground_patches.json`,
+  6 PNG из ground patch batch 1 без изменений): hero_house_b дома, hero_house_a,
+  колодец, варианты A/B, под контактной тенью и спрайтом. По умолчанию выключен,
+  включается `?patches=`. Лист «PR #4 | PR #6 | patch A | patch B» —
+  `tests/browser/patch_review.mjs`.
+- **Тип:** feat
+- **Проверка:** test_layout 48/48 · smoke 15/15 (+ заплатки: выкл. по умолчанию,
+  квад на спрайте до 1e-6 м) · selftest 14/14 · `--check` ✓ · visual vs PR #6:
+  14/14 SAME
+- **Commit:** <hash>
+
 ## 2026-09-18 20:59 — grounding-fix-2: тень объекта на линии контакта
 
 - **Что:** тень каждого объекта /proto/ теперь центрируется на реальной

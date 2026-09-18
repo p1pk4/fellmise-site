@@ -578,5 +578,57 @@ class ContactShadow(unittest.TestCase):
         return self._asp[t]
 
 
+class GroundPatches(unittest.TestCase):
+    """proto/ground_patches.json: review layer of painted ground under 3 buildings."""
+
+    def setUp(self):
+        self.gp = json.loads(read("proto/ground_patches.json"))
+        self.objs = {o["id"]: o for b in json.loads(read("assets/topdown/layout.runtime.json"))["biomes"].values()
+                     for o in b["sprites"]}
+        self.meta = json.loads(read("proto/sprite_contact.json"))["sprites"]
+
+    def test_only_the_three_key_buildings(self):
+        self.assertEqual(sorted(p["id"] for p in self.gp["patches"]),
+                         ["home/homestead/house", "village/well-square/well", "village/west-homes/second-house"])
+
+    def test_off_by_default(self):
+        """Nothing changes in /proto/ until a variant is chosen: no selection committed yet."""
+        self.assertEqual([p["selected"] for p in self.gp["patches"]], [None] * len(self.gp["patches"]))
+        self.assertEqual(self.gp["order"], "under_shadow")
+
+    def test_files_match_the_sprite_and_the_pads(self):
+        from PIL import Image
+        for p in self.gp["patches"]:
+            o = self.objs[p["id"]]
+            self.assertEqual(o["t"], p["t"], p["id"])
+            with Image.open(ROOT / self.meta[p["t"]]["src"]) as im:
+                self.assertEqual(list(im.size), p["sprite_px"], p["id"])
+            pad = p["pad_px"]
+            self.assertEqual(pad["left"], pad["right"], p["id"])
+            self.assertEqual(sorted(p["variants"]), ["A", "B"])
+            for v, f in p["variants"].items():
+                with Image.open(ROOT / "proto" / f) as im:
+                    self.assertEqual(im.mode, "RGBA", f)
+                    self.assertEqual(im.size, (p["sprite_px"][0] + pad["left"] + pad["right"],
+                                               p["sprite_px"][1] + pad["bottom"]), f)
+                    a = im.getchannel("A")
+                    W, H = im.size
+                    # soft edges inside the canvas: nothing is cut by its border
+                    for box in ((0, 0, 2, H), (W - 2, 0, W, H), (0, H - 2, W, H)):
+                        self.assertEqual(a.crop(box).getextrema()[1], 0, (f, box))
+                    # no reach more than PAD below the canvas of the sprite
+                    self.assertLess(a.getbbox()[3], H, f)
+
+    def test_proto_draws_patch_under_shadow_and_sprite(self):
+        proto = read("proto/main.js")
+        self.assertIn("fetch('./ground_patches.json')", proto)
+        order = re.search(r"const ORDER = \{([^}]*)\}", proto).group(1)
+        vals = dict((k.strip(), int(v)) for k, v in re.findall(r"(\w+):\s*(-?\d+)", order))
+        self.assertLess(vals["decalNear"], vals["patch"])
+        self.assertLess(vals["patch"], vals["shadow"])
+        i = proto.index("if (gp) scene.add(await groundPatch(gp, art, o, z));")
+        self.assertLess(i, proto.index("scene.add(shadowFor(art, o, z));", i))
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

@@ -65,7 +65,8 @@ const RUT_HALF = 0.53;                      // та же доля дороги, 
 
 /* Диапазоны порядка отрисовки. Объекты сортируются по Z нижнего края (y-sort),
    всё остальное стоит фиксированными этажами заведомо ниже их. */
-const ORDER = { ground: -1000, decalFar: -900, decalNear: -880, shadow: -500 };
+const ORDER = { ground: -1000, decalFar: -900, decalNear: -880, patch: -520, shadow: -500,
+                patchOverShadow: -480 };
 const OBJECT_BASE = 1000;                   // + (z нижнего края + 800) * 10
 
 const state = { zoom: 'обзор', z: -20, len: 400, objects: 0, decals: 0,
@@ -437,6 +438,55 @@ function shadowFor(art, o, z) {
   return q;
 }
 
+/* Заплатки земли (proto/ground_patches.json): нарисованная трава и утоптанная
+   земля под основанием спрайта. Слой review: по умолчанию не рисуется ничего;
+   вариант выбирает `selected` в JSON или ?patches= в адресе (?patches=A,
+   ?patches=hero_well:B,hero_house_a:A, ?patches=none). ?patch_order=over_shadow —
+   поверх контактной тени, для сравнения; иначе под ней.
+   Квад заплатки — квад спрайта, расширенный на pad_px (пиксели текстуры
+   спрайта) влево, вправо и вниз, верх тот же, поворот тот же. Своей тени и
+   своей цветокоррекции у неё нет. */
+let GP = { order: 'under_shadow', patches: [] };
+const GP_BY_ID = new Map();
+const PATCHES = [];                          // для __PROTO.patches(): проверки и отчёты
+
+function choosePatches() {
+  const q = new URLSearchParams(location.search);
+  const want = q.get('patches');
+  if (q.get('patch_order')) GP.order = q.get('patch_order');
+  for (const p of GP.patches) {
+    let v = p.selected || null;
+    if (want !== null) {
+      v = null;
+      for (const part of want.split(',')) {
+        const [k, x] = part.includes(':') ? part.split(':') : ['*', part];
+        if ((k === '*' || k === p.key || k === p.id) && p.variants[x]) v = x;
+      }
+    }
+    if (v) GP_BY_ID.set(p.id, { ...p, variant: v });
+  }
+}
+
+async function groundPatch(p, art, o, z) {
+  const [sw, sh] = p.sprite_px, pad = p.pad_px;
+  const m = o.h / sh;                         // метров на пиксель текстуры спрайта
+  const map = await tex('./' + p.variants[p.variant]);
+  const w = (sw + pad.left + pad.right) * m, h = (sh + pad.bottom) * m, a = o.rotY || 0;
+  const px = (pad.right - pad.left) / 2 * m, py = -pad.bottom / 2 * m;   // центр, +y — верх
+  const q = new THREE.Mesh(
+    new THREE.PlaneGeometry(w, h),
+    new THREE.MeshBasicMaterial({ map, transparent: true, depthTest: false, depthWrite: false }));
+  q.rotation.x = -Math.PI / 2;
+  q.rotation.z = a;
+  q.position.set(o.pos[0] + px * Math.cos(a) - py * Math.sin(a), 0.4,
+                 z - (px * Math.sin(a) + py * Math.cos(a)));
+  q.renderOrder = GP.order === 'over_shadow' ? ORDER.patchOverShadow : ORDER.patch;
+  PATCHES.push({ id: o.id, key: p.key, variant: p.variant, file: p.variants[p.variant],
+                 x: q.position.x, z: q.position.z, w, h, rotY: a, order: GP.order,
+                 spriteW: o.h * art.aspect, spriteH: o.h });
+  return q;
+}
+
 /* Сегменты одного отрезка: та же X и разрыв по Z не больше шага. Забор в пробе
    рисуется одним прямоугольником — смотрим, как читается линейный объект. */
 function groupRuns(segs) {
@@ -658,14 +708,17 @@ function presentationAt(z) {
 let roadAt = () => ({ cx: 0, hw: 3.2 });
 
 async function main() {
-  const [layout, spline, index, contact] = await Promise.all([
+  const [layout, spline, index, contact, patches] = await Promise.all([
     fetch(LAYOUT).then((r) => r.json()),
     fetch(ASSETS + 'road_spline.json').then((r) => r.json()),
     fetch(STRIPPED + 'index.json').then((r) => r.json()).catch(() => ({ stripped: [] })),
     fetch('./sprite_contact.json').then((r) => r.json()),
+    fetch('./ground_patches.json').then((r) => r.json()),
   ]);
   strippedSet = new Set(index.stripped);
   CONTACT = contact;
+  GP = patches;
+  choosePatches();
   if (typeof layout.road_half_width !== 'number') {
     throw new Error('в ' + LAYOUT + ' нет road_half_width');
   }
@@ -834,6 +887,8 @@ async function biome(layout, ids, i) {
       }
       const art = await sprite(o.t);
       if (!art) continue;
+      const gp = GP_BY_ID.get(o.id);
+      if (gp) scene.add(await groundPatch(gp, art, o, z));
       scene.add(shadowFor(art, o, z));
       scene.add(flatQuad(art, o, z));
       state.objects++;
@@ -971,6 +1026,7 @@ window.__PROTO = {
   // только чтение: для отчётов и тестов (что под камерой, где дорога)
   presentationAt: (z) => presentationAt(z ?? state.z),
   shadows: () => SHADOWS.map((s) => ({ ...s })),
+  patches: () => PATCHES.map((p) => ({ ...p })),
   roadAt: (z) => roadAt(z),
 };
 

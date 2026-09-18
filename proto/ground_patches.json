@@ -1,0 +1,70 @@
+{
+ "_doc": [
+  "Grounding patches: painted ground under a sprite's base (grass, trodden earth).",
+  "Review layer: nothing is drawn unless `selected` is A/B here or /proto/?patches=... asks for it",
+  "(e.g. ?patches=A, ?patches=hero_well:B,hero_house_a:A, ?patches=none).",
+  "Quad = the sprite quad grown by pad_px (sprite texture px) left/right/bottom, same top edge,",
+  "same rotation; drawn under the contact shadow and the sprite.",
+  "Source: out/ground_patches/final/placement.json (ground patch batch 1); PNGs copied unchanged."
+ ],
+ "order": "under_shadow",
+ "patches": [
+  {
+   "key": "hero_house_b",
+   "id": "home/homestead/house",
+   "t": "hero_house_b",
+   "sprite_px": [
+    560,
+    437
+   ],
+   "pad_px": {
+    "left": 34,
+    "right": 34,
+    "bottom": 34
+   },
+   "variants": {
+    "A": "ground_patches/ground_patch_hero_house_b_home_a.png",
+    "B": "ground_patches/ground_patch_hero_house_b_home_b.png"
+   },
+   "selected": null
+  },
+  {
+   "key": "hero_house_a",
+   "id": "village/west-homes/second-house",
+   "t": "hero_house_a",
+   "sprite_px": [
+    560,
+    440
+   ],
+   "pad_px": {
+    "left": 44,
+    "right": 44,
+    "bottom": 44
+   },
+   "variants": {
+    "A": "ground_patches/ground_patch_hero_house_a_village_a.png",
+    "B": "ground_patches/ground_patch_hero_house_a_village_b.png"
+   },
+   "selected": null
+  },
+  {
+   "key": "hero_well",
+   "id": "village/well-square/well",
+   "t": "hero_well",
+   "sprite_px": [
+    560,
+    580
+   ],
+   "pad_px": {
+    "left": 106,
+    "right": 106,
+    "bottom": 106
+   },
+   "variants": {
+    "A": "ground_patches/ground_patch_hero_well_village_a.png",
+    "B": "ground_patches/ground_patch_hero_well_village_b.png"
+   },
+   "selected": null
+  }
+ ]
+}

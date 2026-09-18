@@ -174,6 +174,40 @@ test.describe('/proto/', () => {
     clean(watch);
   });
 
+  test('ground patches: off by default, on request each sits on its sprite', async ({ page, watch }) => {
+    await page.goto('/proto/');
+    await page.waitForFunction(PROTO_READY, null, { timeout: CONFIG.routes['/proto/'].readyTimeoutMs });
+    const has = await page.evaluate(() => typeof window.__PROTO.patches === 'function');
+    test.skip(!has, 'this checkout has no ground patch layer');
+    expect(await page.evaluate(() => window.__PROTO.patches())).toEqual([]);
+
+    const gp = await (await page.request.get('/proto/ground_patches.json')).json();
+    const runtime = await (await page.request.get('/assets/topdown/layout.runtime.json')).json();
+    for (const v of ['A', 'B']) {
+      await page.goto(`/proto/?patches=${v}`);
+      await page.waitForFunction(PROTO_READY, null, { timeout: CONFIG.routes['/proto/'].readyTimeoutMs });
+      const drawn = await page.evaluate(() => window.__PROTO.patches());
+      expect(drawn.map((p) => p.id).sort()).toEqual(gp.patches.map((p) => p.id).sort());
+      const bio = Object.keys(runtime.biomes);
+      for (const p of gp.patches) {
+        const d = drawn.find((x) => x.id === p.id);
+        expect(d.variant).toBe(v);
+        expect(d.order).toBe('under_shadow');
+        const bi = bio.findIndex((b) => runtime.biomes[b].sprites.some((o) => o.id === p.id));
+        const o = runtime.biomes[bio[bi]].sprites.find((x) => x.id === p.id);
+        // independent: quad = sprite quad + pads, same top edge, same rotation
+        const m = o.h / p.sprite_px[1], a = o.rotY || 0;
+        const py = -p.pad_px.bottom / 2 * m;
+        expect(Math.abs(d.x - (o.pos[0] - py * Math.sin(a))), p.id).toBeLessThan(1e-6);
+        expect(Math.abs(d.z - (-bi * runtime.biome_spacing + o.pos[2] - py * Math.cos(a))), p.id).toBeLessThan(1e-6);
+        expect(Math.abs(d.w - (p.sprite_px[0] + 2 * p.pad_px.left) * m), p.id).toBeLessThan(1e-6);
+        expect(Math.abs(d.h - (p.sprite_px[1] + p.pad_px.bottom) * m), p.id).toBeLessThan(1e-6);
+        expect(Math.abs(d.spriteW - p.sprite_px[0] * m), `${p.id} aspect`).toBeLessThan(1e-3);
+      }
+    }
+    clean(watch);
+  });
+
   test('biome presentation, transitions and the end of the road', async ({ page, watch }) => {
     await page.goto('/proto/');
     await page.waitForFunction(PROTO_READY, null, { timeout: CONFIG.routes['/proto/'].readyTimeoutMs });

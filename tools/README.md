@@ -209,6 +209,15 @@ assets/topdown/config.json         (biome_spacing, road_end_z)
 объектах, маркеры контакта) и `--review <git ref>` («было | стало»,
 `grounding-final-review.png`). Proto подменяется в памяти, файлы не трогаются.
 
+Заплатки земли (review-слой): `proto/ground_patches.json` + PNG в
+`proto/ground_patches/` — нарисованная трава/земля под основанием трёх
+построек (hero_house_b дома, hero_house_a, колодец), варианты A/B. По умолчанию
+не рисуется (`selected: null`); включить: `/proto/?patches=A`,
+`?patches=hero_well:B,hero_house_a:A`; `?patch_order=over_shadow` — сравнить
+порядок. Квад = квад спрайта + pad_px влево/вправо/вниз, под контактной тенью.
+Лист «baseline | shadow-fix | patch A | patch B»:
+`node tests/browser/patch_review.mjs` → `out/patch-review/`.
+
 ## Проверки (они же в CI, `.github/workflows/ci.yml`)
 
 ```

@@ -6,14 +6,16 @@
  * друг друга перекрывают.
  *
  * Ничего из journey3/ не импортируется: проба должна удаляться одним `rm -rf
- * proto/`, а импорт сделал бы её частью боевой сцены. Общее у них одно —
- * assets/layout.json, и он читается как есть, без единой правки.
+ * proto/`, а импорт сделал бы её частью боевой сцены. Расстановка у неё своя —
+ * assets/topdown/layout.runtime.json (генерация top-down target + ручные
+ * overrides, см. tools/topdown_layout.py). assets/layout.json остаётся за /next/.
  */
 
 import * as THREE from './vendor/three.module.min.js';
 
 const HUD = document.getElementById('hud');
 const ASSETS = '../assets/';
+const LAYOUT = ASSETS + 'topdown/layout.runtime.json';
 const STRIPPED = './sprites_stripped/';
 
 /* Масштаб игры, выведенный из фактов, а не подобранный.
@@ -47,13 +49,12 @@ const ZOOM = { обзор: 40 / 2, близко: 16 / 2 };
 const BIOME_SPACING = 150;                  // как в боевой сцене
 const SEED = 'fellmise-proto-1';
 
-/* Полуширина дороги — НЕ из scene_spec.json (там 3.2 и трогать его не в этом
-   батче), а константой пробы.
-     3.2  читалась тропинкой между усадьбами;
-     5.5  съедала треть кадра при двух домах (wide_2.png прошлого батча);
-     4.2  улица, которая не спорит с постройками.
+/* Полуширина дороги — НЕ из scene_spec.json (там 3.2 для /next/) и не
+   константой здесь: единственный источник — assets/topdown/config.json. Его же
+   читает валидатор top-down генерации, а сюда число приходит через
+   layout.runtime.json (поле road_half_width). История значений — там же.
    Колея держит ту же долю ширины, что и при 5.5. */
-const ROAD_HALF = 4.2;
+let ROAD_HALF = null;                       // задаётся в main() из runtime layout
 const RUT_HALF = 0.53;                      // та же доля дороги, что была при 5.5
 
 /* Единое направление света на всю сцену. Тень уезжает на 0.2 м — этого хватает,
@@ -520,11 +521,15 @@ let roadAt = () => ({ cx: 0, hw: 3.2 });
 
 async function main() {
   const [layout, spline, index] = await Promise.all([
-    fetch(ASSETS + 'layout.json').then((r) => r.json()),
+    fetch(LAYOUT).then((r) => r.json()),
     fetch(ASSETS + 'road_spline.json').then((r) => r.json()),
     fetch(STRIPPED + 'index.json').then((r) => r.json()).catch(() => ({ stripped: [] })),
   ]);
   strippedSet = new Set(index.stripped);
+  if (typeof layout.road_half_width !== 'number') {
+    throw new Error('в ' + LAYOUT + ' нет road_half_width');
+  }
+  ROAD_HALF = layout.road_half_width;
   const dbg = layout.debug;
   const ids = Object.keys(layout.biomes);
   state.biomes = ids.length;
@@ -722,9 +727,9 @@ addEventListener('keydown', (e) => {
 addEventListener('resize', () => { resize(); draw(); });
 
 /* Где НА САМОМ ДЕЛЕ проходит кромка дороги.
-   Полуширина 4.2 — это гладкая ось; видимый край гуляет от неё на шум. Забор
-   стоит на полосе verge = 5.2, и вопрос «снаружи ли он» решается не вычитанием
-   4.2 из 5.2, а замером. Формулы те же, что в шейдере; точность двойная вместо
+   Полуширина ROAD_HALF — это гладкая ось; видимый край гуляет от неё на шум.
+   Забор стоит на полосе verge = 5.2, и вопрос «снаружи ли он» решается не
+   вычитанием ROAD_HALF из 5.2, а замером. Формулы те же, что в шейдере; точность двойная вместо
    одинарной, поэтому число представительное, а не побитовое. */
 function edgeStats(z0, z1) {
   const h21 = (x, y) => {

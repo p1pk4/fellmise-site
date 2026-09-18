@@ -1,7 +1,21 @@
-"""Build assets/layout.json out of assets/scene_spec.json.
+"""Build the runtime layouts out of assets/scene_spec.json.
 
-    python tools/generate_layout.py            # generate, validate, write
+    python tools/generate_layout.py            # both targets: generate, validate, write
     python tools/generate_layout.py --dry      # generate and validate, write nothing
+    python tools/generate_layout.py --check    # fail if a committed file is stale
+    python tools/generate_layout.py --target legacy|topdown|all
+
+One spec, one generator, two targets. What differs between them is declared in
+the Builder and in main(), and nowhere else:
+
+  legacy    assets/layout.json — the perspective journey at /next/. Ids are
+            `<sprite>#<n>`; it is the file the /next/ editor writes back.
+            Byte-identical to what this script produced before targets existed.
+  topdown   assets/topdown/layout.generated.json — the top-down scene at
+            /proto/. Stable semantic ids (Builder.sid), road width from
+            assets/topdown/config.json. Never edited by hand: manual changes
+            live in layout.overrides.json, and tools/topdown_layout.py merges
+            the two into layout.runtime.json, which is what /proto/ reads.
 
 The spec is the source of truth for WHERE THINGS GO; this only executes it. The
 placement it produces is deterministic: the same spec and the same seed give a
@@ -44,6 +58,9 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 ASSETS = ROOT / "assets"
 SPEC = ASSETS / "scene_spec.json"
 OUT = ASSETS / "layout.json"
+TOPDOWN = ASSETS / "topdown"
+TOPDOWN_CONFIG = TOPDOWN / "config.json"
+TOPDOWN_OUT = TOPDOWN / "layout.generated.json"
 
 # Retired from the pack this batch: the audit found no front-on version worth
 # making. The spec still names them, so they are skipped loudly rather than
@@ -85,14 +102,30 @@ def aspect(t):
 
 
 class Builder:
-    def __init__(self, spec):
+    """`target` is "legacy" or "topdown". `road` is the half-width the target's
+    renderer draws and its validator holds objects to; by default the spec's
+    own value, which is what legacy uses.
+
+    Placement (the scatter's keep-out from the road) uses the spec's value in
+    BOTH targets: moving it to the top-down road would re-lay the scatter, and
+    the scene is not supposed to change until a composition batch says so. The
+    gap is kept visible rather than hidden — the top-down validator measures
+    against the wider road, and what it finds today is listed by name in
+    assets/topdown/config.json.
+    """
+
+    def __init__(self, spec, target="legacy", road=None):
+        assert target in ("legacy", "topdown"), target
         self.spec = spec
+        self.target = target
         self.g = spec["global"]
         self.seed = self.g["seed"]
         self.lanes = self.g["lanes"]
         self.heights = self.g["heights"]
-        self.road = self.g["road_half_width"]
+        self.placement_road = self.g["road_half_width"]
+        self.road = self.placement_road if road is None else road
         self.counts = {}
+        self.ordinals = {}
         self.skipped = []
         self.notes = []
         self.conflicts = set()
@@ -122,8 +155,24 @@ class Builder:
         return round(math.radians(deg), 4)
 
     def uid(self, t):
+        """Legacy id: the sprite's occurrence number across the WHOLE run. It
+        shifts whenever anything of the same sprite is added upstream, which is
+        why the top-down target does not use it as an id. It stays the key of
+        the jitter hash in both targets, so both lay exactly the same scene."""
         self.counts[t] = self.counts.get(t, 0) + 1
         return f"{t}#{self.counts[t]}"
+
+    def ordinal(self, container, name):
+        """1, 2, 3... for `name` inside one semantic container. Counted per
+        container and per name, so an object added to one container — or one of
+        another kind added to the same container — renumbers nothing else."""
+        key = (container, name)
+        self.ordinals[key] = self.ordinals.get(key, 0) + 1
+        return self.ordinals[key]
+
+    def sid(self, container, t):
+        """Stable top-down id: `<container>/<sprite>.<n>`."""
+        return f"{container}/{t}.{self.ordinal(container, t)}"
 
     def height(self, key):
         if isinstance(key, (int, float)):
@@ -131,7 +180,7 @@ class Builder:
         return float(self.heights[key])
 
     def place(self, biome, t, x, z, h, *, side="C", y=None, layer=1,
-              rot=None, extra=None, jit=True):
+              rot=None, extra=None, jit=True, sid=None):
         if t in RETIRED:
             self.skipped.append((biome, t))
             return None
@@ -150,8 +199,14 @@ class Builder:
         if jit:
             x += jitter(self.seed, f"{oid}:x", self.g["lane_jitter"]["x"])
             z += jitter(self.seed, f"{oid}:z", self.g["lane_jitter"]["z"])
+        if self.target == "topdown":
+            if sid is None:
+                raise SystemExit(f"[{biome}] {t}: нет семантического id — в "
+                                 f"top-down каждый place() обязан его передать")
+            # taken lazily, so an ordinal is spent only on an object that exists
+            sid = sid() if callable(sid) else sid
         o = {
-            "id": oid, "t": t, "layer": layer,
+            "id": sid if self.target == "topdown" else oid, "t": t, "layer": layer,
             "pos": [round(x, 3), None if y is None else round(y, 3), round(z, 3)],
             "h": round(h, 3),
             "rotY": self.rot_for(side, oid) if rot is None else round(rot, 4),
@@ -216,7 +271,7 @@ class Builder:
         return [{**o, "z": round(o["z"] * k, 2)} for o in out]
 
     # -- one run of fence -------------------------------------------------
-    def run(self, bid, b, ri, run, anchors, placed):
+    def run(self, bid, b, ri, run, anchors, placed, owners):
         """A run laid relative to the beat that owns it.
 
         Absolute metres do not survive: the spacing formula relays every beat
@@ -240,6 +295,8 @@ class Builder:
                              f"{i}, которого в ритме нет (тактов "
                              f"{len(b['rhythm'])})")
         ax, az, aside = anchors[i]
+        # a run is named after the beat that owns it, not after its index
+        rkey = f"{owners[i]}/{run['run']}.{self.ordinal(owners[i], 'run:' + run['run'])}"
         # A run may sit on the other bank from its owner, but never on both: the
         # side is declared once, here, and the validator holds it to that.
         side = run.get("side", aside)
@@ -273,7 +330,8 @@ class Builder:
 
         for x, z in spots:
             made.append(self.place(bid, t, x, z, h, side=side, layer=layer,
-                                   jit=False, rot=0.0))
+                                   jit=False, rot=0.0,
+                                   sid=lambda: self.sid(rkey, t)))
         made = [o for o in made if o is not None]
         for o in made:
             o["_line"] = True
@@ -284,11 +342,11 @@ class Builder:
                               f"{len(made)} сегмент — это уже не линия")
 
         made += self.end_posts(bid, run, ri, kind, axis, side, spots, step,
-                               placed, made)
+                               placed, made, rkey)
         return self.tag(made, f"{bid}:run{ri}", False)
 
     def end_posts(self, bid, run, ri, kind, axis, side, spots, step,
-                  placed, segs):
+                  placed, segs, rkey):
         """A run must not stop in mid-air.
 
         Either the end butts into something solid — a house, a barn, the thing
@@ -304,7 +362,7 @@ class Builder:
         solids = [o for o in placed
                   if o["layer"] >= 0.5 and o["h"] >= 4.0 and o not in segs]
         out = []
-        for end, out_dir in ((spots[0], +1), (spots[-1], -1)):
+        for end, out_dir, which in ((spots[0], +1, "start"), (spots[-1], -1, "end")):
             ex, ez = end
             if axis == "z":
                 px, pz = ex, ez + out_dir * step * 0.5
@@ -321,7 +379,8 @@ class Builder:
             if near:
                 continue
             o = self.place(bid, post_t, px, pz, post_h, side=side,
-                           layer=self.layer_of(run["lane"]), jit=False, rot=0.0)
+                           layer=self.layer_of(run["lane"]), jit=False, rot=0.0,
+                           sid=f"{rkey}/{post_t}.{which}")
             if o is not None:
                 o["_line"] = True
                 o["_run"] = {"i": ri, "name": run["run"], "axis": axis,
@@ -341,10 +400,17 @@ class Builder:
         # position rather than the number the spec wrote down — the spacing
         # formula relays every beat and keeps only their order.
         anchors = {}
+        # The semantic container of each beat: what it is (its group, or its
+        # single sprite) and which one of those it is in this biome — not its
+        # index in the rhythm, so inserting a beat of another kind renames
+        # nothing here.
+        owners = {}
         for i, beat in enumerate(beats):
             z, side, lane = beat["z"], beat["side"], beat["lane"]
             x0 = self.lane_x(bid, lane, side)
             layer = self.layer_of(lane)
+            kind = beat.get("group") or beat["single"]
+            owners[i] = f"{bid}/{kind}.{self.ordinal(bid, 'beat:' + kind)}"
 
             if "group" in beat:
                 grp = self.spec["groups"][beat["group"]]
@@ -368,7 +434,8 @@ class Builder:
                                **({"over_road": True} if m.get("over_road") else {}),
                                "_from": f"группа {gname}, член {m['t']} dx={m['dx']}, "
                                         f"полоса {lane}={self.lane_x(bid, lane, 'R'):.1f}",
-                               "_jit": round(abs(ax - x0), 3)}))
+                               "_jit": round(abs(ax - x0), 3)},
+                    sid=lambda t=t, c=owners[i]: self.sid(c, t)))
                 out["sprites"] += self.tag(made, f"{bid}:{i}", side == "C")
                 anchors[i] = (ax, az, side)
                 continue
@@ -376,19 +443,23 @@ class Builder:
             single = beat["single"]
             if single == "counter":
                 out["counter"] = self.counter(bid, x0, z)
+                if self.target == "topdown":
+                    out["counter"]["id"] = owners[i]
                 anchors[i] = (x0, z, side)
                 continue
             h = self.height(beat["h"]) * self.depth_scale(b, z)
             o = self.place(bid, single, x0, z, h, side=side, layer=layer,
                            y=beat["hanging"] if beat.get("hanging") else None,
-                           extra={"hanging": True} if beat.get("hanging") else None)
+                           extra={"hanging": True} if beat.get("hanging") else None,
+                           sid=owners[i])
             out["sprites"] += self.tag([o], f"{bid}:{i}", side == "C")
             anchors[i] = ((o["pos"][0], o["pos"][2], side) if o
                           else (x0, z, side))
 
         # --- runs: a fence is a line, and the line belongs to a house -----
         for ri, run in enumerate(b.get("runs", [])):
-            out["sprites"] += self.run(bid, b, ri, run, anchors, out["sprites"])
+            out["sprites"] += self.run(bid, b, ri, run, anchors, out["sprites"],
+                                       owners)
 
         # --- boards ------------------------------------------------------
         for bd in b["boards"]:
@@ -398,7 +469,9 @@ class Builder:
             x += jitter(self.seed, f"board:{bd['key']}:x", self.g["lane_jitter"]["x"])
             deg = 4.0 + h01(self.seed, "board", bd["key"]) * 6.0
             out["boards"].append({
-                "id": f"board:{bd['key']}", "key": bd["key"],
+                "id": (f"{bid}/board/{bd['key']}" if self.target == "topdown"
+                       else f"board:{bd['key']}"),
+                "key": bd["key"],
                 "kind": "stone" if bid == "spirit" else "wood",
                 "pos": [round(x, 3), None, round(bd["z"], 3)],
                 "h": self.height("board"),
@@ -419,13 +492,16 @@ class Builder:
                     made = [self.place(bid, m["t"], x0 + m["dx"], z + m["dz"],
                                        self.height(m["h"]), side="C", layer=0,
                                        rot=0.0, jit=False,
-                                       extra={"dim": m.get("dim", bd.get("dim", 0.7))})
+                                       extra={"dim": m.get("dim", bd.get("dim", 0.7))},
+                                       sid=lambda t=m["t"], c=f"{bid}/backdrop.{n + 1}":
+                                           self.sid(c, t))
                             for m in grp["members"]]
                     out["sprites"] += self.tag(made, f"{bid}:bd{n}", True)
                 else:
                     o = self.place(bid, bd["single"], x0, z, self.height("deadtree"),
                                    side="C", layer=0, rot=0.0,
-                                   extra={"dim": bd.get("dim", 0.6)})
+                                   extra={"dim": bd.get("dim", 0.6)},
+                                   sid=f"{bid}/backdrop.{n + 1}/{bd['single']}.1")
                     if o:
                         out["sprites"].append(o)
                 z -= bd["every_z"]
@@ -451,14 +527,15 @@ class Builder:
                                self.height("cloud"), side="C", rot=0.0, layer=0,
                                y=y0 + (y1 - y0) * h01(self.seed, bid, "cloudy", k),
                                jit=False,
-                               extra={"drift": round(0.18 + fx * 0.22, 3), "span": 110})
+                               extra={"drift": round(0.18 + fx * 0.22, 3), "span": 110},
+                               sid=f"{bid}/sky/cloud.{k + 1}")
                 if o:
                     out["sprites"].append(o)
             mo = sky.get("moon")
             if mo:
                 o = self.place(bid, "moon", mo["x"], mo["z"], self.height("moon"),
                                side="C", rot=0.0, layer=0, y=mo["y"], jit=False,
-                               extra={"nofog": True})
+                               extra={"nofog": True}, sid=f"{bid}/sky/moon.1")
                 if o:
                     out["sprites"].append(o)
 
@@ -468,9 +545,12 @@ class Builder:
             placed = [(o["pos"][0], o["pos"][2],
                        (aspect(o["t"]) or 1) * o["h"] / 2)
                       for o in out["sprites"] if o["layer"] >= 0.5]
-            for j, (t, x, z, _half) in enumerate(self.poisson(bid, sc, b["length_z"], placed)):
+            # a scattered object is named by the hash candidate it came from,
+            # not by how many were accepted before it
+            for t, x, z, _half, k in self.poisson(bid, sc, b["length_z"], placed):
                 o = self.place(bid, t, x, z, self.height(self.h_key(t)),
-                               side="L" if x < 0 else "R", layer=1, jit=False)
+                               side="L" if x < 0 else "R", layer=1, jit=False,
+                               sid=f"{bid}/scatter/c{k}")
                 if o:
                     out["sprites"].append(o)
 
@@ -513,14 +593,14 @@ class Builder:
             side = -1 if h01(self.seed, bid, "sside", k) < 0.5 else 1
             x = side * (lo + h01(self.seed, bid, "sx", k) * (hi - lo))
             z = -2 - h01(self.seed, bid, "sz", k) * (length - 6)
-            if sc.get("avoid_road") and abs(x) < self.road + 0.8:
+            if sc.get("avoid_road") and abs(x) < self.placement_road + 0.8:
                 continue
             t = sc["types"][len(out) % len(sc["types"])]
             half = (aspect(t) or 1) * self.height(self.h_key(t)) / 2
             if any(abs(z - pz) < 1.2 and abs(x - px) < half + ph + 0.8
-                   for _t, px, pz, ph in out):
+                   for _t, px, pz, ph, _k in out):
                 continue
-            if any((x - px) ** 2 + (z - pz) ** 2 < rmin ** 2 for _t, px, pz, _h in out):
+            if any((x - px) ** 2 + (z - pz) ** 2 < rmin ** 2 for _t, px, pz, _h, _k in out):
                 continue
             # and clear of everything the rhythm already put down: scattered
             # dressing that lands inside a house is worse than one tuft fewer
@@ -528,7 +608,7 @@ class Builder:
             if any(abs(z - pz) < 1.2 and abs(x - px) < half + pw + gap
                    for px, pz, pw in placed):
                 continue
-            out.append((t, x, z, half))
+            out.append((t, x, z, half, k))
         if len(out) < sc["count"]:
             self.notes.append(
                 f"{bid}: scatter разложил {len(out)} из {sc['count']} — "
@@ -537,9 +617,16 @@ class Builder:
 
     def build(self):
         biomes = {bid: self.biome(bid) for bid in self.spec["biomes"]}
+        head = {"version": 1,
+                "generated": "tools/generate_layout.py по assets/scene_spec.json"}
+        if self.target == "topdown":
+            head = {"version": 1, "target": "topdown",
+                    "generated": "tools/generate_layout.py --target topdown по "
+                                 "assets/scene_spec.json + assets/topdown/config.json. "
+                                 "Руками не править: правки — в layout.overrides.json",
+                    "road_half_width": self.road}
         return {
-            "version": 1,
-            "generated": "tools/generate_layout.py по assets/scene_spec.json",
+            **head,
             "seed": self.seed,
             # What ?debug=lanes and ?debug=rows draw. Written here because the
             # scene never reads the spec — it would have to guess the numbers,
@@ -566,9 +653,11 @@ def jitter_of(o):
     return o.get("_jit", 0.0)
 
 
-def validate(layout, spec):
+def validate(layout, spec, road=None):
+    """`road` is the half-width objects are held to; the spec's own by default."""
     v = spec["global"]["validator"]
-    road = spec["global"]["road_half_width"]
+    if road is None:
+        road = spec["global"]["road_half_width"]
     bad = []
 
     for bid, b in layout["biomes"].items():
@@ -691,17 +780,54 @@ def validate(layout, spec):
     return bad
 
 
-def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--dry", action="store_true")
-    ap.add_argument("--force", action="store_true",
-                    help="записать файл несмотря на нарушения (они всё равно печатаются)")
-    args = ap.parse_args()
+# ------------------------------------------------------------------- targets
+TAGS = ("_grp", "_axis", "_from", "_jit", "_line", "_run")
 
-    spec = json.loads(SPEC.read_text(encoding="utf-8"))
-    bld = Builder(spec)
+
+def dump(layout):
+    """The one serialisation every layout file uses, so a diff is a diff."""
+    return json.dumps(layout, ensure_ascii=False, indent=1) + "\n"
+
+
+def load_topdown_config():
+    cfg = json.loads(TOPDOWN_CONFIG.read_text(encoding="utf-8"))
+    road = cfg.get("road_half_width")
+    if isinstance(road, bool) or not isinstance(road, (int, float)) or road <= 0:
+        raise SystemExit(f"{TOPDOWN_CONFIG.relative_to(ROOT)}: road_half_width "
+                         f"должен быть положительным числом, а не {road!r}")
+    return cfg
+
+
+def generate(spec, target, cfg=None):
+    """One target's layout, validated and stripped of the builder's tags.
+
+    Returns (layout, violations, builder). The validator runs before the tags
+    are stripped: it needs them to tell a designed group from an accident.
+    """
+    road = cfg["road_half_width"] if target == "topdown" else None
+    bld = Builder(spec, target=target, road=road)
     layout = bld.build()
+    bad = validate(layout, spec, road=road)
+    for b in layout["biomes"].values():
+        for o in b["sprites"]:
+            for k in TAGS:
+                o.pop(k, None)
+    return layout, bad, bld
 
+
+def known_split(bad, known):
+    """Violations against the list of known ones, matched by their first line.
+
+    Returns (new, stale): findings not on the list, and list entries that no
+    longer occur. Both fail — a known list that is allowed to go stale stops
+    saying what is actually wrong with the scene."""
+    heads = [line.split("\n")[0] for line in bad]
+    new = [line for line, h in zip(bad, heads) if h not in known]
+    stale = [k for k in known if k not in heads]
+    return new, stale
+
+
+def report(layout, bld):
     n = {bid: len(b["sprites"]) + len(b["boards"]) + (1 if b.get("counter") else 0)
          for bid, b in layout["biomes"].items()}
     print(f"{'биом':<10}{'объектов':>10}{'спрайтов':>10}{'досок':>8}")
@@ -716,31 +842,92 @@ def main():
     for note in bld.notes:
         print(f"  {note}")
 
-    bad = validate(layout, spec)   # runs before the tags are stripped
-    if bad:
-        print(f"\nВАЛИДАТОР: нарушений {len(bad)}")
-        for line in bad:
-            print(f"  - {line}")
-        if spec["global"]["validator"].get("fail_on_violation") and not args.force:
-            sys.exit(1)
-        if args.force:
-            print("  --force: файл всё равно записан, нарушения выше не исправлены")
-    else:
-        print("\nвалидатор: чисто")
 
-    for b in layout["biomes"].values():
-        for o in b["sprites"]:
-            for k in ("_grp", "_axis", "_from", "_jit", "_line", "_run"):
-                o.pop(k, None)
-
+def emit(path, text, args):
+    """Write, or with --check compare. Returns False if the file is stale."""
+    rel = path.relative_to(ROOT)
+    if args.check:
+        have = path.read_text(encoding="utf-8") if path.exists() else None
+        if have != text:
+            print(f"  УСТАРЕЛ: {rel} не совпадает с генерацией — "
+                  f"запустите python tools/generate_layout.py")
+            return False
+        print(f"  актуален: {rel}")
+        return True
     if args.dry:
-        print("\n--dry: файл не записан")
-        return
-    if OUT.exists() and not (ASSETS / "layout_manual.json").exists():
-        (ASSETS / "layout_manual.json").write_bytes(OUT.read_bytes())
-        print("прежняя ручная расстановка сохранена как assets/layout_manual.json")
-    OUT.write_text(json.dumps(layout, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
-    print(f"-> {OUT.relative_to(ROOT)}")
+        print(f"  --dry: {rel} не записан")
+        return True
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text, encoding="utf-8")
+    print(f"  -> {rel}")
+    return True
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--target", choices=("legacy", "topdown", "all"), default="all")
+    ap.add_argument("--dry", action="store_true", help="ничего не записывать")
+    ap.add_argument("--check", action="store_true",
+                    help="ничего не записывать; упасть, если committed-файл устарел")
+    ap.add_argument("--force", action="store_true",
+                    help="записать файл несмотря на нарушения (они всё равно печатаются)")
+    args = ap.parse_args()
+
+    spec = json.loads(SPEC.read_text(encoding="utf-8"))
+    targets = ("legacy", "topdown") if args.target == "all" else (args.target,)
+    ok = True
+
+    for target in targets:
+        print(f"\n=== target: {target}")
+        cfg = load_topdown_config() if target == "topdown" else None
+        layout, bad, bld = generate(spec, target, cfg)
+        report(layout, bld)
+
+        known = (cfg or {}).get("validator_known_violations", [])
+        new, stale = known_split(bad, known)
+        if bad or stale:
+            if new:
+                print(f"\nВАЛИДАТОР: нарушений {len(new)}")
+                for line in new:
+                    print(f"  - {line}")
+            if len(bad) > len(new):
+                print(f"\nвалидатор: известных нарушений {len(bad) - len(new)} "
+                      f"(assets/topdown/config.json, validator_known_violations)")
+                for line in bad:
+                    if line not in new:
+                        print(f"  ~ {line.split(chr(10))[0]}")
+            if stale:
+                print(f"\nВАЛИДАТОР: в списке известных {len(stale)} записей, "
+                      f"которых больше нет — уберите их из config.json:")
+                for k in stale:
+                    print(f"  - {k}")
+            failed = bool(new or stale) and spec["global"]["validator"].get("fail_on_violation")
+            if failed and not args.force:
+                ok = False
+                continue
+            if failed:
+                print("  --force: файл всё равно записан, нарушения выше не исправлены")
+        else:
+            print("\nвалидатор: чисто")
+
+        if target == "legacy":
+            if (not args.dry and not args.check and OUT.exists()
+                    and not (ASSETS / "layout_manual.json").exists()):
+                (ASSETS / "layout_manual.json").write_bytes(OUT.read_bytes())
+                print("прежняя ручная расстановка сохранена как assets/layout_manual.json")
+            ok &= emit(OUT, dump(layout), args)
+        else:
+            import topdown_layout            # tools/, next to this file
+            ok &= emit(TOPDOWN_OUT, dump(layout), args)
+            try:
+                runtime = topdown_layout.merge(layout, topdown_layout.load_overrides())
+            except topdown_layout.OverrideError as exc:
+                print(f"\nOVERRIDES: {exc}")
+                ok = False
+                continue
+            ok &= emit(topdown_layout.RUNTIME, topdown_layout.dump(runtime), args)
+
+    sys.exit(0 if ok else 1)
 
 
 if __name__ == "__main__":

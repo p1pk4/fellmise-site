@@ -1,0 +1,6 @@
+# Python tools of the site (tools/*.py). Pinned to the versions the committed
+# outputs were produced and checked with; CI installs exactly these.
+# Python 3.11 (.python-version). The art generators (gen_*.py) additionally need
+# the local ComfyUI pipeline in D:\Dev\ART_Fellmise — not installable from here.
+Pillow==12.1.1
+numpy==2.4.3

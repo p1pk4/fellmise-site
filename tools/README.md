@@ -116,6 +116,63 @@ python tools/build_journey3.py deploy
 это и нужно: сборка обязана быть воспроизводимой, а `npm install` может тихо
 подтянуть другие патч-версии.
 
+## Окружение
+
+Node — `.nvmrc` (24.15.0), Python — `.python-version` (3.11), пакеты Python —
+`requirements.txt` (`pip install -r requirements.txt`). Генераторы артов
+(`gen_*.py`) дополнительно требуют локальный ComfyUI-пайплайн
+(`tools/pipeline.py`), в CI его нет.
+
+## Расстановка: legacy (/next/) и top-down (/proto/)
+
+Один spec, один генератор, два target:
+
+```
+assets/scene_spec.json ─┬─ generate_layout.py --target legacy ─→ assets/layout.json ─→ /next/
+                        │     (id <sprite>#<n>, дорога 3.2 из spec)       ↑ Export редактора /next/ (POST /__layout)
+                        │
+assets/topdown/config.json (road_half_width 4.2 — единственный источник)
+                        └─ generate_layout.py --target topdown ─→ assets/topdown/layout.generated.json
+                              (стабильные id)                              + assets/topdown/layout.overrides.json
+                                                                           ─ topdown_layout.py ─→ layout.runtime.json ─→ /proto/
+```
+
+* `python tools/generate_layout.py` — оба target, плюс пересборка runtime.
+  `--dry` ничего не пишет, `--check` падает, если committed-файл устарел.
+* `layout.generated.json` и `layout.runtime.json` руками не правятся. Ручные
+  правки — только в `layout.overrides.json`: `{id: {pos|h|rotY|visible}}`, только
+  отличия. Id, которого нет в генерации, — ошибка, а не тихий пропуск.
+* Top-down export: `POST /__topdown/layout` в `editor_serve.py` принимает весь
+  отредактированный runtime-layout, сам вычисляет overrides относительно
+  generated, пишет overrides и пересобирает runtime. Generated не пишется никогда.
+* Стабильный id: `<биом>/<контейнер>.<n>/<спрайт>.<n>`, где контейнер —
+  группа или одиночный спрайт такта и его номер среди таких же в биоме, забор —
+  `<такт-владелец>/fence.<n>/hero_fence.<n>`, столбы `end_post.start|end`,
+  scatter — `<биом>/scatter/c<номер кандидата хеша>`, доски
+  `<биом>/board/<key>`. Scatter и столбы производны от геометрии: при
+  перестановке тактов они могут появиться или исчезнуть.
+* Scatter в обоих target пока раскладывается с отступом от spec-дороги 3.2 —
+  иначе сцена бы сдвинулась. Валидатор top-down меряет по 4.2, и его текущие
+  находки перечислены в `config.json → validator_known_violations`: новая
+  находка или исчезнувшая запись валят сборку.
+
+## Проверки (они же в CI, `.github/workflows/ci.yml`)
+
+```
+python tools/check_site_static.py        # страницы, CNAME, noindex, robots, sitemap
+python tools/generate_layout.py --check  # committed layouts актуальны
+python tools/topdown_layout.py --check   # overrides валидны, runtime актуален
+python tools/test_layout.py              # стабильные id, overrides, потребители
+python tools/check_run_rules.py
+python tools/measure_foreshortening.py
+cd journey3 && npm ci && npm run build && cd .. && python tools/build_journey3.py deploy
+git diff --exit-code -- next/            # next/ совпадает со сборкой
+npm run smoke --prefix tests/browser     # браузерный smoke (см. tests/browser/README.md)
+node tests/browser/visual.mjs run --base main   # visual regression против main
+```
+
+CI ничего не деплоит: публикация остаётся за GitHub Pages (main:/).
+
 ## Порядок обработки
 
 1. `gen_*.py` — кадры в `out/site_assets/_raw/<id>/`

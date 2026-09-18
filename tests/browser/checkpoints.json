@@ -1,0 +1,29 @@
+{
+ "version": 1,
+ "note": "Контрольные кадры visual regression. Координаты — мировые Z /proto/ (биом i начинается с z = -150*i: village 0, forest -150, mine -300, spirit -450, home -600; конец дороги около -690). Камера ставится хуком window.__PROTO.go(z, zoom), без колеса мыши.",
+ "viewport": { "width": 1280, "height": 800 },
+ "deviceScaleFactor": 1,
+ "tolerance": {
+  "note": "channel — на сколько (0..255) может отличаться любой канал пикселя, прежде чем пиксель считается изменённым. strict_max_changed_pixels — сколько изменённых пикселей на кадр допускает strict. Рендер в одном окружении детерминирован (повторный снимок = 0 отличий), поэтому оба нуля.",
+  "channel": 0,
+  "strict_max_changed_pixels": 0
+ },
+ "routes": {
+  "/proto/": {
+   "ready": "window.__PROTO && window.__PROTO.state.done === true",
+   "readyTimeoutMs": 120000
+  }
+ },
+ "checkpoints": [
+  { "id": "proto-village-overview", "route": "/proto/", "z": -20, "zoom": "обзор", "note": "начало, вид при открытии" },
+  { "id": "proto-village-close", "route": "/proto/", "z": -47.6, "zoom": "близко", "note": "два дома по берегам, y-sort и тени" },
+  { "id": "proto-village-forest", "route": "/proto/", "z": -112, "zoom": "обзор", "note": "стык village -> forest: хвост деревни (объекты до -95) и пустой перегон" },
+  { "id": "proto-forest", "route": "/proto/", "z": -190, "zoom": "обзор" },
+  { "id": "proto-mine", "route": "/proto/", "z": -340, "zoom": "обзор" },
+  { "id": "proto-mine-close", "route": "/proto/", "z": -330, "zoom": "близко" },
+  { "id": "proto-spirit", "route": "/proto/", "z": -480, "zoom": "обзор" },
+  { "id": "proto-home", "route": "/proto/", "z": -640, "zoom": "обзор" },
+  { "id": "proto-home-close", "route": "/proto/", "z": -614.5, "zoom": "близко", "note": "финальный дом по центру пути (home/homestead.1/hero_house_b.1)" },
+  { "id": "proto-far-end", "route": "/proto/", "z": -680, "zoom": "обзор", "note": "дальний контрольный кадр, последние объекты (до -683)" }
+ ]
+}

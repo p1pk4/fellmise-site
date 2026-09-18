@@ -1,0 +1,16 @@
+{
+  "name": "fellmise-site-browser-tests",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Browser smoke + visual regression for fellmise.com. Tooling only — never shipped to the site.",
+  "scripts": {
+    "install-browser": "playwright install chromium",
+    "smoke": "playwright test",
+    "visual": "node visual.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "pngjs": "7.0.0"
+  }
+}

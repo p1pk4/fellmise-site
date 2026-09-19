@@ -1,0 +1,222 @@
+{
+ "_doc": [
+  "Audio of /proto/ (live mode only; the static journey is silent). Read by proto/audio.js, checked by tools/audio_config.py.",
+  "Data only; the rules live in proto/audio.js. Ambient levels follow the camera's z through the SAME biome map as the ground",
+  "(layout presentation: biome order, each transition's blend_z); a transition SFX plays when the camera crosses its anchor_z",
+  "going down the route. status planned = no file yet, never requested; live = requested only after the visitor turns sound on",
+  "(the ambient under the camera, the next one and the nearest transition SFX). This file itself is fetched only then.",
+  "sources = the same sound in preference order; the manager picks ONE type per session (canPlayType), fetches only that one,",
+  "and falls back to the next type only if decoding the chosen one fails. Ambients loop seamlessly (tools/audio_loop_encode.py;",
+  "the AAC fallback holds the 60 s loop twice: a 1024-sample AAC frame does not divide 60 s).",
+  "fade_ms = [in, out]: an ambient voice fading in when it starts / out when it is released; an SFX attack / release.",
+  "master.fade_ms: the whole mix on the toggle. gain = base gain, 0..1, before master.gain."
+ ],
+ "master": {
+  "default_muted": true,
+  "gain": 0.8,
+  "fade_ms": 600,
+  "smoothing_s": 0.08,
+  "preload_ahead_m": 60
+ },
+ "biomes": [
+  {
+   "id": "village",
+   "sources": [
+    {
+     "src": "assets/audio/ambient/village.webm",
+     "type": "audio/webm; codecs=opus"
+    },
+    {
+     "src": "assets/audio/ambient/village.m4a",
+     "type": "audio/mp4; codecs=mp4a.40.2"
+    }
+   ],
+   "status": "live",
+   "loop": true,
+   "gain": 0.55,
+   "fade_ms": [
+    1200,
+    1500
+   ],
+   "notes": "quiet lived-in village: wind, distant activity, no music"
+  },
+  {
+   "id": "forest",
+   "sources": [
+    {
+     "src": "assets/audio/ambient/forest.webm",
+     "type": "audio/webm; codecs=opus"
+    },
+    {
+     "src": "assets/audio/ambient/forest.m4a",
+     "type": "audio/mp4; codecs=mp4a.40.2"
+    }
+   ],
+   "status": "live",
+   "loop": true,
+   "gain": 0.55,
+   "fade_ms": [
+    1200,
+    1500
+   ],
+   "notes": "forest air: wind in leaves, rare birds"
+  },
+  {
+   "id": "mine",
+   "sources": [
+    {
+     "src": "assets/audio/ambient/mine.webm",
+     "type": "audio/webm; codecs=opus"
+    },
+    {
+     "src": "assets/audio/ambient/mine.m4a",
+     "type": "audio/mp4; codecs=mp4a.40.2"
+    }
+   ],
+   "status": "live",
+   "loop": true,
+   "gain": 0.5,
+   "fade_ms": [
+    1200,
+    1500
+   ],
+   "notes": "enclosed stone space: distant drips, timber creaks, rare stone"
+  },
+  {
+   "id": "spirit",
+   "sources": [
+    {
+     "src": "assets/audio/ambient/spirit.webm",
+     "type": "audio/webm; codecs=opus"
+    },
+    {
+     "src": "assets/audio/ambient/spirit.m4a",
+     "type": "audio/mp4; codecs=mp4a.40.2"
+    }
+   ],
+   "status": "live",
+   "loop": true,
+   "gain": 0.5,
+   "fade_ms": [
+    1200,
+    1500
+   ],
+   "notes": "cold emptiness: wind, low distant texture, restrained"
+  },
+  {
+   "id": "home",
+   "sources": [
+    {
+     "src": "assets/audio/ambient/home.webm",
+     "type": "audio/webm; codecs=opus"
+    },
+    {
+     "src": "assets/audio/ambient/home.m4a",
+     "type": "audio/mp4; codecs=mp4a.40.2"
+    }
+   ],
+   "status": "live",
+   "loop": true,
+   "gain": 0.55,
+   "fade_ms": [
+    1200,
+    1500
+   ],
+   "notes": "calmer: soft wind, yard, a safe place"
+  }
+ ],
+ "transitions": [
+  {
+   "id": "village-forest",
+   "from": "village",
+   "to": "forest",
+   "sources": [
+    {
+     "src": "assets/audio/transitions/village-forest.webm",
+     "type": "audio/webm; codecs=opus"
+    },
+    {
+     "src": "assets/audio/transitions/village-forest.m4a",
+     "type": "audio/mp4; codecs=mp4a.40.2"
+    }
+   ],
+   "status": "live",
+   "loop": false,
+   "gain": 0.6,
+   "fade_ms": [
+    20,
+    400
+   ],
+   "notes": "leaving the village: a soft rise of wind into leaves"
+  },
+  {
+   "id": "forest-mine",
+   "from": "forest",
+   "to": "mine",
+   "sources": [
+    {
+     "src": "assets/audio/transitions/forest-mine.webm",
+     "type": "audio/webm; codecs=opus"
+    },
+    {
+     "src": "assets/audio/transitions/forest-mine.m4a",
+     "type": "audio/mp4; codecs=mp4a.40.2"
+    }
+   ],
+   "status": "live",
+   "loop": false,
+   "gain": 0.6,
+   "fade_ms": [
+    20,
+    400
+   ],
+   "notes": "into the mine: a hollow low air shift, a timber creak"
+  },
+  {
+   "id": "mine-spirit",
+   "from": "mine",
+   "to": "spirit",
+   "sources": [
+    {
+     "src": "assets/audio/transitions/mine-spirit.webm",
+     "type": "audio/webm; codecs=opus"
+    },
+    {
+     "src": "assets/audio/transitions/mine-spirit.m4a",
+     "type": "audio/mp4; codecs=mp4a.40.2"
+    }
+   ],
+   "status": "live",
+   "loop": false,
+   "gain": 0.6,
+   "fade_ms": [
+    20,
+    400
+   ],
+   "notes": "out of the dark: a cold thin exhale, restrained"
+  },
+  {
+   "id": "spirit-home",
+   "from": "spirit",
+   "to": "home",
+   "sources": [
+    {
+     "src": "assets/audio/transitions/spirit-home.webm",
+     "type": "audio/webm; codecs=opus"
+    },
+    {
+     "src": "assets/audio/transitions/spirit-home.m4a",
+     "type": "audio/mp4; codecs=mp4a.40.2"
+    }
+   ],
+   "status": "live",
+   "loop": false,
+   "gain": 0.6,
+   "fade_ms": [
+    20,
+    400
+   ],
+   "notes": "back to a safe place: a warm soft settle, no fanfare"
+  }
+ ]
+}

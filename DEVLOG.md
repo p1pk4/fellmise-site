@@ -5,6 +5,63 @@
 
 ---
 
+## 2026-09-20 00:03 — audio-assets-1: production-звук в /proto/
+
+- **Что:** 9 принятых звуков стали runtime-ассетами: `assets/audio/ambient/*` и
+  `assets/audio/transitions/*` в WebM/Opus (принятые файлы байт-в-байт) плюс
+  M4A/AAC как fallback из тех же мастеров; `audio.json` — все 9 записей
+  planned → live, `asset` → `sources` [{src, type}]. Формат выбирается один на
+  сессию по `canPlayType`, грузится только он; не декодировался — берётся
+  следующий; нечем играть — кнопка остаётся выключенной. Бесшовные петли в обоих
+  форматах (`tools/audio_loop_encode.py`: периодический поток, у AAC петля = 60 с
+  дважды). Gains, fades, якоря, default_muted и preload не менялись.
+- **Тип:** feat
+- **Проверка:** unit 85 · smoke 67/67 (+13 на production-файлах) · visual strict
+  против ветки движка SAME 27/27 · muted: 0 запросов, 0 байт · первое включение
+  677 KB (WebM) / 2171 KB (AAC) · весь маршрут 10 запросов, 3.4 MB / 10.7 MB
+- **Commit:** 141bdb0
+
+## 2026-09-20 00:10 — Звуки /proto/: генерация и выбор (audio batch 1–2)
+
+- **Что:** локальная генерация (Stable Audio 3 Medium в ComfyUI) и выбор 5 эмбиентов и 4
+  SFX переходов по ТЗ out/audio-planning/audio-briefs.md. Batch 1: mine и все 4 SFX приняты;
+  village/forest/spirit/home отклонены на слух — фон «дороги с машинами» (модель кладёт его
+  под любой промпт «звуки улицы»). Batch 2: эти четыре собраны из отдельных чистых дорожек
+  (шелест, птицы, далёкие куры) и обработанного шума, с проверкой на транспорт/гул/прибой;
+  приняты village A, forest A, spirit B, home B. Всё в out/ (не в repo).
+- **Тип:** chore
+- **Проверка:** n/a (review на слух: out/audio_batch1, out/audio_batch2)
+- **Commit:** — (файлы вне repo)
+
+## 2026-09-19 19:11 — audio-engine-1: звук /proto/ (движок, контракт, переключатель)
+
+- **Что:** один менеджер `proto/audio.js` + контракт `assets/topdown/audio.json`
+  (5 эмбиентов, 4 SFX переходов, все `planned`; `tools/audio_config.py --check`
+  в CI). По умолчанию выключено: до нажатия переключателя нет ни AudioContext,
+  ни одного запроса; сохранённое «вкл» — только на следующем жесте (не скролл).
+  Веса — чистая функция z через `biomeAt` грунта; SFX — при пересечении якоря
+  вниз по маршруту, перевзвод 8 м назад. Кнопка 36 px справа внизу, только live;
+  статика без звука и без кнопки. ТЗ на ассеты — out/audio-planning (не в repo).
+- **Тип:** feat
+- **Проверка:** build n/a · smoke 54/54 (из них 11 audio) · unit 84 · visual vs main:
+  27/27 live-кадров изменены только в рамке кнопки (1060 px) · muted: 0 запросов,
+  0 байт, 0 audio-узлов
+- **Commit:** d177504
+
+## 2026-09-19 18:45 — Fallback / Mobile 1 выпущен в production
+
+- **Что:** в main влит PR #16; production baseline
+  `ac10c1b64aab4c9128f4b4c2104066644843168a`. /proto/ получил статический
+  режим — тот же путь DOM-колонкой: ширина < 900, reduced motion, нет WebGL2,
+  `?static=1`, упавшая живая загрузка (правило — `proto/mode.js`); без JS —
+  текст и три key art через `<noscript>`. В статике three.js и мир не грузятся.
+  Десктоп live не изменился.
+- **Тип:** docs
+- **Проверка:** n/a (релиз проверен: CI PR и main success, Pages built ac10c1b,
+  матрица режимов на fellmise.com 390…1280/reduced/no-WebGL/?static=1, no-JS,
+  RU; production == main: live 61/61, статика 6/6 SAME)
+- **Commit:** 3650543, 139867b (PR #16), ac10c1b (merge → main)
+
 ## 2026-09-19 17:40 — fallback-mobile-1: порог 900 и key art без JS
 
 - **Что:** порог живого режима /proto/ 760 → 900 (`proto/mode.js`, единственный

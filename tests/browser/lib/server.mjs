@@ -19,6 +19,7 @@ const TYPES = {
   '.txt': 'text/plain; charset=utf-8', '.md': 'text/markdown; charset=utf-8',
   '.webp': 'image/webp', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg',
   '.svg': 'image/svg+xml', '.ico': 'image/x-icon', '.woff2': 'font/woff2', '.zip': 'application/zip',
+  '.webm': 'audio/webm', '.m4a': 'audio/mp4',
 };
 
 export function startServer({ root, port = 0 }) {

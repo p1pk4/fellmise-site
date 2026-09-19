@@ -5,6 +5,9 @@
   "(layout presentation: biome order, each transition's blend_z); a transition SFX plays when the camera crosses its anchor_z",
   "going down the route. status planned = no file yet, never requested; live = requested only after the visitor turns sound on",
   "(the ambient under the camera, the next one and the nearest transition SFX). This file itself is fetched only then.",
+  "sources = the same sound in preference order; the manager picks ONE type per session (canPlayType), fetches only that one,",
+  "and falls back to the next type only if decoding the chosen one fails. Ambients loop seamlessly (tools/audio_loop_encode.py;",
+  "the AAC fallback holds the 60 s loop twice: a 1024-sample AAC frame does not divide 60 s).",
   "fade_ms = [in, out]: an ambient voice fading in when it starts / out when it is released; an SFX attack / release.",
   "master.fade_ms: the whole mix on the toggle. gain = base gain, 0..1, before master.gain."
  ],
@@ -18,8 +21,17 @@
  "biomes": [
   {
    "id": "village",
-   "asset": "assets/audio/ambient_village.webm",
-   "status": "planned",
+   "sources": [
+    {
+     "src": "assets/audio/ambient/village.webm",
+     "type": "audio/webm; codecs=opus"
+    },
+    {
+     "src": "assets/audio/ambient/village.m4a",
+     "type": "audio/mp4; codecs=mp4a.40.2"
+    }
+   ],
+   "status": "live",
    "loop": true,
    "gain": 0.55,
    "fade_ms": [
@@ -30,8 +42,17 @@
   },
   {
    "id": "forest",
-   "asset": "assets/audio/ambient_forest.webm",
-   "status": "planned",
+   "sources": [
+    {
+     "src": "assets/audio/ambient/forest.webm",
+     "type": "audio/webm; codecs=opus"
+    },
+    {
+     "src": "assets/audio/ambient/forest.m4a",
+     "type": "audio/mp4; codecs=mp4a.40.2"
+    }
+   ],
+   "status": "live",
    "loop": true,
    "gain": 0.55,
    "fade_ms": [
@@ -42,8 +63,17 @@
   },
   {
    "id": "mine",
-   "asset": "assets/audio/ambient_mine.webm",
-   "status": "planned",
+   "sources": [
+    {
+     "src": "assets/audio/ambient/mine.webm",
+     "type": "audio/webm; codecs=opus"
+    },
+    {
+     "src": "assets/audio/ambient/mine.m4a",
+     "type": "audio/mp4; codecs=mp4a.40.2"
+    }
+   ],
+   "status": "live",
    "loop": true,
    "gain": 0.5,
    "fade_ms": [
@@ -54,8 +84,17 @@
   },
   {
    "id": "spirit",
-   "asset": "assets/audio/ambient_spirit.webm",
-   "status": "planned",
+   "sources": [
+    {
+     "src": "assets/audio/ambient/spirit.webm",
+     "type": "audio/webm; codecs=opus"
+    },
+    {
+     "src": "assets/audio/ambient/spirit.m4a",
+     "type": "audio/mp4; codecs=mp4a.40.2"
+    }
+   ],
+   "status": "live",
    "loop": true,
    "gain": 0.5,
    "fade_ms": [
@@ -66,8 +105,17 @@
   },
   {
    "id": "home",
-   "asset": "assets/audio/ambient_home.webm",
-   "status": "planned",
+   "sources": [
+    {
+     "src": "assets/audio/ambient/home.webm",
+     "type": "audio/webm; codecs=opus"
+    },
+    {
+     "src": "assets/audio/ambient/home.m4a",
+     "type": "audio/mp4; codecs=mp4a.40.2"
+    }
+   ],
+   "status": "live",
    "loop": true,
    "gain": 0.55,
    "fade_ms": [
@@ -82,8 +130,17 @@
    "id": "village-forest",
    "from": "village",
    "to": "forest",
-   "asset": "assets/audio/sfx_village_forest.webm",
-   "status": "planned",
+   "sources": [
+    {
+     "src": "assets/audio/transitions/village-forest.webm",
+     "type": "audio/webm; codecs=opus"
+    },
+    {
+     "src": "assets/audio/transitions/village-forest.m4a",
+     "type": "audio/mp4; codecs=mp4a.40.2"
+    }
+   ],
+   "status": "live",
    "loop": false,
    "gain": 0.6,
    "fade_ms": [
@@ -96,8 +153,17 @@
    "id": "forest-mine",
    "from": "forest",
    "to": "mine",
-   "asset": "assets/audio/sfx_forest_mine.webm",
-   "status": "planned",
+   "sources": [
+    {
+     "src": "assets/audio/transitions/forest-mine.webm",
+     "type": "audio/webm; codecs=opus"
+    },
+    {
+     "src": "assets/audio/transitions/forest-mine.m4a",
+     "type": "audio/mp4; codecs=mp4a.40.2"
+    }
+   ],
+   "status": "live",
    "loop": false,
    "gain": 0.6,
    "fade_ms": [
@@ -110,8 +176,17 @@
    "id": "mine-spirit",
    "from": "mine",
    "to": "spirit",
-   "asset": "assets/audio/sfx_mine_spirit.webm",
-   "status": "planned",
+   "sources": [
+    {
+     "src": "assets/audio/transitions/mine-spirit.webm",
+     "type": "audio/webm; codecs=opus"
+    },
+    {
+     "src": "assets/audio/transitions/mine-spirit.m4a",
+     "type": "audio/mp4; codecs=mp4a.40.2"
+    }
+   ],
+   "status": "live",
    "loop": false,
    "gain": 0.6,
    "fade_ms": [
@@ -124,8 +199,17 @@
    "id": "spirit-home",
    "from": "spirit",
    "to": "home",
-   "asset": "assets/audio/sfx_spirit_home.webm",
-   "status": "planned",
+   "sources": [
+    {
+     "src": "assets/audio/transitions/spirit-home.webm",
+     "type": "audio/webm; codecs=opus"
+    },
+    {
+     "src": "assets/audio/transitions/spirit-home.m4a",
+     "type": "audio/mp4; codecs=mp4a.40.2"
+    }
+   ],
+   "status": "live",
    "loop": false,
    "gain": 0.6,
    "fade_ms": [

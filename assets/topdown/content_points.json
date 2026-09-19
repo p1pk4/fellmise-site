@@ -1,0 +1,183 @@
+{
+ "_doc": [
+  "Content points of /proto/: one world anchor -> one DOM card. Source of truth for tools/build_proto_content.py,",
+  "which writes the <article>s into proto/index.html (static DOM: every word is in the HTML before any script).",
+  "Copy is NOT written here: every title/body is quoted verbatim from the site's own copy (copy_source),",
+  "and --check fails if it drifts from that source. No invented claims.",
+  "anchor.object: stable id of a layout object (assets/topdown/layout.runtime.json); its world x/z is the anchor.",
+  "activation: metres of camera z from the anchor; weight 1 within core, smooth to 0 at range (a pure function of z).",
+  "side: which side of the viewport the card sits on (left/right/auto = by the marker's side of the road)."
+ ],
+ "locales": [
+  "en",
+  "ru"
+ ],
+ "default_locale": "en",
+ "points": [
+  {
+   "id": "village-world",
+   "order": 1,
+   "biome": "village",
+   "anchor": {
+    "object": "village/board/world_plays_itself"
+   },
+   "marker": {
+    "kind": "signpost",
+    "object": "village/board/world_plays_itself"
+   },
+   "side": "left",
+   "activation": {
+    "core": 12,
+    "range": 30
+   },
+   "copy_source": {
+    "file": "tools/build_site.py",
+    "features_id": "world",
+    "kicker": "tools/biomes.py BIOMES[village].en/ru",
+    "why": "owner example; the only feature board of the village (the slogan board carries the root tagline, not a feature)"
+   },
+   "en": {
+    "kicker": "The village",
+    "title": "A world that plays itself",
+    "body": "Log off and the world stays. NPCs run dungeons, haul goods, haggle and drink in taverns. You are not arriving at an empty map."
+   },
+   "ru": {
+    "kicker": "Деревня",
+    "title": "Мир играет сам",
+    "body": "Вышел из игры — мир остался. NPC лезут в данжи, возят товар, торгуются и пьют в таверне. Ты приходишь не на пустую карту."
+   }
+  },
+  {
+   "id": "forest-skills",
+   "order": 2,
+   "biome": "forest",
+   "anchor": {
+    "object": "forest/board/skills_no_levels"
+   },
+   "marker": {
+    "kind": "signpost",
+    "object": "forest/board/skills_no_levels"
+   },
+   "side": "left",
+   "activation": {
+    "core": 12,
+    "range": 30
+   },
+   "copy_source": {
+    "file": "tools/build_site.py",
+    "features_id": "skills",
+    "kicker": "tools/biomes.py BIOMES[forest].en/ru",
+    "why": "the only board of the forest"
+   },
+   "en": {
+    "kicker": "The forest",
+    "title": "Skills, no levels",
+    "body": "No level next to your name. Swing a sword and your sword skill grows; pick locks and your lockpicking does. Want a different character — play differently, don't roll a new one."
+   },
+   "ru": {
+    "kicker": "Лес",
+    "title": "Скиллы вместо уровней",
+    "body": "Уровня нет. Машешь мечом — растёт меч, лезешь по замкам — растёт взлом. Нужен другой персонаж — играй по-другому, а не создавай нового."
+   }
+  },
+  {
+   "id": "mine-mining",
+   "order": 3,
+   "biome": "mine",
+   "anchor": {
+    "object": "mine/board/mining"
+   },
+   "marker": {
+    "kind": "signpost",
+    "object": "mine/board/mining"
+   },
+   "side": "right",
+   "activation": {
+    "core": 12,
+    "range": 30
+   },
+   "copy_source": {
+    "file": "tools/build_site.py",
+    "features_id": "mining",
+    "kicker": "tools/biomes.py BIOMES[mine].en/ru",
+    "why": "first board of the mine along the route, and the mine's own subject; alternatives on site: fights_that_last, crafting"
+   },
+   "en": {
+    "kicker": "The mine",
+    "title": "Mining and gathering",
+    "body": "Every ore, log, herb and fish was pulled out of the ground by somebody's hands. Veins run out. The best ground is where people get killed. What you haul back is what you keep."
+   },
+   "ru": {
+    "kicker": "Шахта",
+    "title": "Добыча",
+    "body": "Руду, дерево, траву и рыбу кто-то вытащил руками. Жилы кончаются, лучшее лежит там, где убивают. Сколько дотащил — столько и твоё."
+   }
+  },
+  {
+   "id": "spirit-death",
+   "order": 4,
+   "biome": "spirit",
+   "anchor": {
+    "object": "spirit/board/death_is_a_place"
+   },
+   "marker": {
+    "kind": "signpost",
+    "object": "spirit/board/death_is_a_place"
+   },
+   "side": "right",
+   "activation": {
+    "core": 12,
+    "range": 30
+   },
+   "copy_source": {
+    "file": "tools/build_site.py",
+    "features_id": "death",
+    "kicker": "tools/biomes.py BIOMES[spirit].en/ru",
+    "why": "the spirit world is where the dead go (ship of the dead); alternative on site: vendetta (first board along the route)"
+   },
+   "en": {
+    "kicker": "The spirit world",
+    "title": "Death is a place",
+    "body": "The living don't teach necromancy. Die, ride the ship of the dead as a ghost, and come back changed."
+   },
+   "ru": {
+    "kicker": "Мир духов",
+    "title": "Смерть — это место",
+    "body": "Некромантию не учат живые. Умри, сядь духом на корабль мёртвых — и вернись другим."
+   }
+  },
+  {
+   "id": "home-home",
+   "order": 5,
+   "biome": "home",
+   "anchor": {
+    "object": "home/board/a_home_to_come_back_to"
+   },
+   "marker": {
+    "kind": "signpost",
+    "object": "home/board/a_home_to_come_back_to"
+   },
+   "side": "right",
+   "activation": {
+    "core": 12,
+    "range": 30
+   },
+   "copy_source": {
+    "file": "tools/build_site.py",
+    "features_id": "home",
+    "kicker": "tools/biomes.py BIOMES[home].en/ru",
+    "why": "the final house; alternative on site: humans_and_monsters (first board along the route)"
+   },
+   "en": {
+    "kicker": "Home",
+    "title": "A home to come back to",
+    "body": "Claim an empty patch of land and build it in layers: foundation, walls, door, roof. Your chests hold everything you have earned. At night the monsters test the walls."
+   },
+   "ru": {
+    "kicker": "Дом",
+    "title": "Дом, куда возвращаешься",
+    "body": "Займи свободный клочок земли и строй слоями: фундамент, стены, дверь, крыша. В сундуках — всё нажитое. Ночью монстры проверят стены на прочность."
+   }
+  }
+ ]
+}

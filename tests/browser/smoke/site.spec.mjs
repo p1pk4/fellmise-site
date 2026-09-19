@@ -223,6 +223,84 @@ test.describe('/proto/', () => {
     expect(r[2].hw).toBe(0);
     clean(watch);
   });
+
+  /* Content points: every word is in the HTML before any script; the script
+     only sets how present each card is, as a function of the camera's z. */
+  const contentSrc = () => JSON.parse(fs.readFileSync(
+    path.join(HERE, '..', '..', '..', 'assets', 'topdown', 'content_points.json'), 'utf8'));
+  const contentCheckpoints = () => CONFIG.checkpoints.filter((c) => c.content);
+
+  test('content: all copy is static HTML (JS off), both locales, headings', async ({ browser, baseURL }) => {
+    const ctx = await browser.newContext({ javaScriptEnabled: false });
+    const page = await ctx.newPage();
+    await stubExternal(page);
+    await page.goto(baseURL + '/proto/');
+    const src = contentSrc();
+    for (const loc of ['en', 'ru']) {
+      const sec = page.locator(`section.content-locale[data-locale="${loc}"]`);
+      await expect(sec).toHaveAttribute('lang', loc);
+      await expect(sec.locator('h1')).toHaveCount(1);
+      const arts = sec.locator('article.content-point');
+      await expect(arts).toHaveCount(src.points.length);
+      for (const p of src.points) {
+        const a = sec.locator(`article[data-id="${p.id}"]`);
+        await expect(a.locator('h2')).toHaveText(p[loc].title);
+        await expect(a.locator('.content-point__body')).toHaveText(p[loc].body);
+        await expect(a.locator('.content-point__kicker')).toHaveText(p[loc].kicker);
+        expect(await a.getAttribute('aria-hidden')).toBeNull();
+      }
+    }
+    // noindex stays: /proto/ is still a prototype route
+    expect(await robots(page)).toContain('noindex');
+    await ctx.close();
+  });
+
+  test('content: one card per anchor, none between, deterministic, nothing created', async ({ page, watch }) => {
+    await page.goto('/proto/');
+    await page.waitForFunction(PROTO_READY, null, { timeout: CONFIG.routes['/proto/'].readyTimeoutMs });
+    const count = () => page.locator('article.content-point').count();
+    const before = await count();
+    const at = async (z, zoom = 'обзор') => {
+      await page.evaluate(([zz, zm]) => window.__PROTO.go(zz, zm), [z, zoom]);
+      return page.evaluate(() => window.__PROTO.content());
+    };
+    for (const c of contentCheckpoints()) {
+      for (const zoom of ['обзор', 'близко']) {
+        const s = await at(c.z, zoom);
+        const on = s.points.filter((p) => p.weight > 0);
+        expect(on.map((p) => p.id), `${c.id} ${zoom}`).toEqual([c.content]);
+        expect(on[0].weight).toBe(1);
+        expect(on[0].state).toBe('active');
+        const op = await page.locator(`section[data-locale="en"] article[data-id="${c.content}"]`)
+          .evaluate((el) => getComputedStyle(el).opacity);
+        expect(Number(op)).toBe(1);
+      }
+      // the same z twice gives the same state
+      expect(await at(c.z)).toEqual(await at(c.z));
+    }
+    // half-way between two points nothing is on screen
+    const mid = await at(-100);
+    expect(mid.points.every((p) => p.weight === 0)).toBe(true);
+    // sweeping the whole route: never two cards at once
+    for (let z = 20; z > -700; z -= 7) {
+      const s = await at(z);
+      expect(s.points.filter((p) => p.weight > 0).length, `z ${z}`).toBeLessThanOrEqual(1);
+    }
+    expect(await count()).toBe(before);
+    clean(watch);
+  });
+
+  test('content: locale is chosen by ?lang=, deterministically', async ({ page, watch }) => {
+    for (const [q, want] of [['', 'en'], ['?lang=ru', 'ru'], ['?lang=xx', 'en']]) {
+      await page.goto('/proto/' + q);
+      await page.waitForFunction(PROTO_READY, null, { timeout: CONFIG.routes['/proto/'].readyTimeoutMs });
+      expect((await page.evaluate(() => window.__PROTO.content())).locale).toBe(want);
+      const hidden = await page.evaluate(() => Object.fromEntries(
+        [...document.querySelectorAll('section.content-locale')].map((s) => [s.dataset.locale, s.hidden])));
+      expect(hidden).toEqual({ en: want !== 'en', ru: want !== 'ru' });
+    }
+    clean(watch);
+  });
 });
 
 /* ------------------------------------------------------------------- next */

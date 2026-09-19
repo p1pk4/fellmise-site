@@ -28,6 +28,11 @@
   {"id": "transition-spirit-home", "route": "/proto/", "z": -592, "zoom": "обзор", "note": "якорь перехода (presentation.json → runtime anchor_z): пик затемнения, середина смены грунта"},
   {"id": "proto-home", "route": "/proto/", "z": -640, "zoom": "обзор"},
   {"id": "proto-home-close", "route": "/proto/", "z": -657, "zoom": "близко", "note": "финальный дом (home/homestead/house); до world-composition-1 стоял на -614.5, где теперь по замыслу пустой луг"},
-  {"id": "proto-far-end", "route": "/proto/", "z": -680, "zoom": "обзор", "note": "дальний контрольный кадр, последние объекты (до -683)"}
+  {"id": "proto-far-end", "route": "/proto/", "z": -680, "zoom": "обзор", "note": "дальний контрольный кадр, последние объекты (до -683)"},
+  {"id": "content-village", "route": "/proto/", "z": -40, "zoom": "обзор", "content": "village-world", "note": "карточка «A world that plays itself» (village/board/world_plays_itself), знак слева от дороги"},
+  {"id": "content-forest", "route": "/proto/", "z": -172, "zoom": "обзор", "content": "forest-skills", "note": "карточка «Skills, no levels» (forest/board/skills_no_levels)"},
+  {"id": "content-mine", "route": "/proto/", "z": -319, "zoom": "обзор", "content": "mine-mining", "note": "карточка «Mining and gathering» (mine/board/mining)"},
+  {"id": "content-spirit", "route": "/proto/", "z": -508, "zoom": "обзор", "content": "spirit-death", "note": "карточка «Death is a place» (spirit/board/death_is_a_place)"},
+  {"id": "content-home", "route": "/proto/", "z": -644, "zoom": "обзор", "content": "home-home", "note": "карточка «A home to come back to»; z на 10 м дальше якоря — в кадре финальный дом"}
  ]
 }

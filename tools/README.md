@@ -217,12 +217,38 @@ assets/topdown/config.json         (biome_spacing, road_end_z)
 объектах, маркеры контакта) и `--review <git ref>` («было | стало»,
 `grounding-final-review.png`). Proto подменяется в памяти, файлы не трогаются.
 
+## Контентные точки /proto/
+
+```
+assets/topdown/content_points.json ─ tools/build_proto_content.py ─→ proto/index.html (статические <article>)
+                                                                  └→ proto/main.js только активирует их
+```
+
+* 5 точек, по одной на биом. Якорь — стабильный id доски layout
+  (`village/board/world_plays_itself` …); доска-якорь рисуется знаком
+  `prop_signpost` без букв, остальные доски в /proto/ не рисуются (в layout
+  остаются).
+* Тексты не сочиняются: каждый title/body — дословная цитата
+  `tools/build_site.py` FEATURES (kicker — имя биома из `tools/biomes.py`);
+  `--check` падает при расхождении, плейсхолдере, пустой локали, битом якоре
+  или перекрытии окон.
+* Все карточки обеих локалей есть в HTML до скрипта (SEO, screen reader,
+  будущий static fallback). EN видна, RU — в `hidden`-секции; `/proto/?lang=ru`.
+* Присутствие карточки — чистая функция z камеры (core/range из JSON), без
+  таймеров; окна не перекрываются, видна максимум одна.
+* `python tools/build_proto_content.py` — пересобрать HTML; `--check` — в CI;
+  `node tests/browser/content_review.mjs` — лист `content-points-review.png` и
+  `content-copy.md` (в CI — артефакт `content-review-*`).
+* Visual: мировые чекпоинты снимаются без слоя карточек, контентные
+  (`content` в checkpoints.json) — с ним.
+
 ## Проверки (они же в CI, `.github/workflows/ci.yml`)
 
 ```
 python tools/check_site_static.py        # страницы, CNAME, noindex, robots, sitemap
 python tools/generate_layout.py --check  # committed layouts актуальны
 python tools/topdown_layout.py --check   # overrides валидны, runtime актуален
+python tools/build_proto_content.py --check  # контентные точки: источник и proto/index.html
 python tools/test_layout.py              # стабильные id, overrides, потребители
 python tools/check_run_rules.py
 python tools/measure_foreshortening.py

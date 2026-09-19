@@ -5,6 +5,22 @@
 
 ---
 
+## 2026-09-19 03:16 — content-points-1: DOM-карточки, привязанные к миру
+
+- **Что:** в /proto/ первая система контентных точек: 5 точек (village,
+  forest, mine, spirit, home) из `assets/topdown/content_points.json` →
+  статические `<article>` EN+RU в `proto/index.html`
+  (`tools/build_proto_content.py`, `--check` в CI) → `main.js` только ставит
+  присутствие от z камеры. Тексты — дословно из `build_site.FEATURES`
+  (village — «A world that plays itself»). Якоря — доски layout; якорная доска
+  рисуется знаком `prop_signpost`, кремовые полосы убраны. `?lang=ru`. +5
+  контентных чекпоинтов (19), лист `content-points-review.png`.
+- **Тип:** feat
+- **Проверка:** test_layout 55/55 · smoke 18/18 · selftest 19/19 · `--check` ✓ ·
+  layout/next/root без изменений · visual vs main: мир 0.004–1.3% (доски→знаки,
+  счётчик HUD), content-* новые
+- **Commit:** <hash>
+
 ## 2026-09-19 03:03 — Biome Presentation 1 выпущен в production
 
 - **Что:** в main влит стек Biome Presentation 1 (PR #4 ← PR #6 ← PR #8),

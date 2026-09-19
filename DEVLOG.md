@@ -18,7 +18,7 @@
 - **Проверка:** test_layout 80/80 · smoke 38 passed (+11: матрица режимов,
   no-WebGL, без JS, RU, падение загрузки) · selftest 27/27 · `--check` ✓ ·
   visual strict vs main SAME (десктоп live пиксель-в-пиксель)
-- **Commit:** <hash>
+- **Commit:** 139867b
 
 ## 2026-09-19 16:58 — Key Art 1 выпущен в production
 

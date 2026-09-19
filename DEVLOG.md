@@ -5,6 +5,18 @@
 
 ---
 
+## 2026-09-20 00:10 — Звуки /proto/: генерация и выбор (audio batch 1–2)
+
+- **Что:** локальная генерация (Stable Audio 3 Medium в ComfyUI) и выбор 5 эмбиентов и 4
+  SFX переходов по ТЗ out/audio-planning/audio-briefs.md. Batch 1: mine и все 4 SFX приняты;
+  village/forest/spirit/home отклонены на слух — фон «дороги с машинами» (модель кладёт его
+  под любой промпт «звуки улицы»). Batch 2: эти четыре собраны из отдельных чистых дорожек
+  (шелест, птицы, далёкие куры) и обработанного шума, с проверкой на транспорт/гул/прибой;
+  приняты village A, forest A, spirit B, home B. Всё в out/ (не в repo).
+- **Тип:** chore
+- **Проверка:** n/a (review на слух: out/audio_batch1, out/audio_batch2)
+- **Commit:** — (файлы вне repo)
+
 ## 2026-09-19 19:11 — audio-engine-1: звук /proto/ (движок, контракт, переключатель)
 
 - **Что:** один менеджер `proto/audio.js` + контракт `assets/topdown/audio.json`

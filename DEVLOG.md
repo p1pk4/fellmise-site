@@ -17,7 +17,7 @@
 - **Тип:** feat
 - **Проверка:** test_layout 75/75 · smoke 27/27 · `--check` ✓ · next/ в синхроне ·
   visual vs PR #14: только proto-spirit (1.7%)
-- **Commit:** <hash>
+- **Commit:** 17bb8e8
 
 ## 2026-09-19 14:22 — key-art-spirit-d-1: spirit key art = вариант D
 

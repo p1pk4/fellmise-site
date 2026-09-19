@@ -5,6 +5,22 @@
 
 ---
 
+## 2026-09-20 00:03 — audio-assets-1: production-звук в /proto/
+
+- **Что:** 9 принятых звуков стали runtime-ассетами: `assets/audio/ambient/*` и
+  `assets/audio/transitions/*` в WebM/Opus (принятые файлы байт-в-байт) плюс
+  M4A/AAC как fallback из тех же мастеров; `audio.json` — все 9 записей
+  planned → live, `asset` → `sources` [{src, type}]. Формат выбирается один на
+  сессию по `canPlayType`, грузится только он; не декодировался — берётся
+  следующий; нечем играть — кнопка остаётся выключенной. Бесшовные петли в обоих
+  форматах (`tools/audio_loop_encode.py`: периодический поток, у AAC петля = 60 с
+  дважды). Gains, fades, якоря, default_muted и preload не менялись.
+- **Тип:** feat
+- **Проверка:** unit 85 · smoke 67/67 (+13 на production-файлах) · visual strict
+  против ветки движка SAME 27/27 · muted: 0 запросов, 0 байт · первое включение
+  677 KB (WebM) / 2171 KB (AAC) · весь маршрут 10 запросов, 3.4 MB / 10.7 MB
+- **Commit:** 141bdb0
+
 ## 2026-09-20 00:10 — Звуки /proto/: генерация и выбор (audio batch 1–2)
 
 - **Что:** локальная генерация (Stable Audio 3 Medium в ComfyUI) и выбор 5 эмбиентов и 4

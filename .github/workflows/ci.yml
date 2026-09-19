@@ -54,6 +54,8 @@ jobs:
         run: python tools/sprite_contact.py --check
       - name: content points are valid and proto/index.html is current
         run: python tools/build_proto_content.py --check
+      - name: camera choreography is valid
+        run: python tools/camera_choreography.py --check
       - name: layout tests
         run: python tools/test_layout.py
       - name: run rules are enforced
@@ -152,6 +154,17 @@ jobs:
       - name: content points review (sheet + copy table)
         if: always()
         run: node content_review.mjs --out ../../out/content-review
+      - name: zoom choreography review (15 frames + route strip)
+        if: always()
+        run: node zoom_review.mjs --out ../../out/zoom-review
+      - name: upload zoom review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: zoom-review-${{ env.CONTEXT }}-run${{ github.run_id }}
+          path: out/zoom-review
+          retention-days: 14
+          if-no-files-found: warn
       - name: upload content review
         if: always()
         uses: actions/upload-artifact@v4

@@ -733,5 +733,89 @@ class ContentPoints(unittest.TestCase):
             self.assertNotIn(bad, block)
 
 
+class CameraChoreography(unittest.TestCase):
+    """assets/topdown/camera_choreography.json: frame height = f(camera z)."""
+
+    VIEW = (1280, 800)          # checkpoints.json viewport: margins below are for it
+
+    def setUp(self):
+        import camera_choreography as CC
+        self.C = CC
+        self.data = CC.load()
+        self.rt = json.loads(read("assets/topdown/layout.runtime.json"))
+        self.pk = CC.peaks(self.data, self.rt)
+
+    def frame(self, z):
+        return self.C.frame_at(self.data, self.rt, z, self.pk)[0]
+
+    def test_source_valid(self):
+        self.assertEqual(self.C.check(self.data, self.rt), [])
+
+    def test_check_catches_bad_source(self):
+        for mutate in (
+            lambda d: d["focus"][0].__setitem__("frame_height", 12),       # past the pack's ceiling
+            lambda d: d["focus"][1].__setitem__("frame_height", 48),
+            lambda d: d["focus"][2].__setitem__("anchor", "mine/adit/nope"),
+            lambda d: d["focus"][2].__setitem__("approach", 40),           # into the forest→mine dim
+            lambda d: d["focus"].reverse(),
+        ):
+            d = copy.deepcopy(self.data)
+            mutate(d)
+            self.assertTrue(self.C.check(d, self.rt))
+
+    def test_limits_continuity_and_overview_between(self):
+        """16..40 everywhere; no jump anywhere (bounded slope); exactly the
+        overview between windows and at every transition anchor."""
+        z, dz, prev, steep = 20.0, 0.05, None, 0.0
+        while z > -720:
+            f = self.frame(z)
+            self.assertTrue(16 <= f <= 40, (z, f))
+            if prev is not None:
+                steep = max(steep, abs(f - prev) / dz)
+            prev, z = f, z - dz
+        # m of frame per m of route. The steepest ramp is the mine approach
+        # ((40 - 22) / 15 m × 1.875, smootherstep's peak slope = 2.25); a cut
+        # would show up here as (40 - 16) / 0.05 = 480
+        self.assertLess(steep, 3.0)
+        wins = [self.C.window(f, p) for f, p in self.pk]
+        for (e1, _), (_, s2) in zip(wins, wins[1:]):
+            self.assertEqual(self.frame((e1 + s2) / 2), 40)
+        for t in self.rt["presentation"]["transitions"]:
+            self.assertEqual(self.frame(t["anchor_z"]), 40, t["to"])
+        for f, p in self.pk:
+            self.assertEqual(self.frame(p), f["frame_height"], f["id"])
+
+    def test_deterministic_both_directions(self):
+        zs = [20 - i * 0.37 for i in range(1960)]
+        fwd = [self.frame(z) for z in zs]
+        back = [self.frame(z) for z in reversed(zs)][::-1]
+        self.assertEqual(fwd, back)
+
+    def test_focal_objects_whole_in_frame(self):
+        """At its peak each focal sprite quad is inside a 1280×800 viewport
+        (camera x = 0) with a margin; the final house above all."""
+        from PIL import Image
+        meta = json.loads(read("proto/sprite_contact.json"))["sprites"]
+        anchors = self.C.anchors(self.rt)
+        W, H = self.VIEW
+        for f, p in self.pk:
+            _, x, z, o = anchors[f["anchor"]]
+            with Image.open(ROOT / meta[o["t"]]["src"]) as im:
+                w = o["h"] * im.width / im.height
+            ppm = H / f["frame_height"]
+            left, right = W / 2 + (x - w / 2) * ppm, W / 2 + (x + w / 2) * ppm
+            top, bottom = H / 2 + (z - o["h"] / 2 - p) * ppm, H / 2 + (z + o["h"] / 2 - p) * ppm
+            margin = min(left, W - right, top, H - bottom)
+            self.assertGreaterEqual(margin, 24 if f["biome"] in ("home", "mine") else 8, (f["id"], margin))
+
+    def test_proto_mirrors_the_reference(self):
+        proto = read("proto/main.js")
+        self.assertIn("fetch(ASSETS + 'topdown/camera_choreography.json')", proto)
+        self.assertIn("x * x * x * (x * (x * 6 - 15) + 10)", proto)       # smootherstep, as here
+        self.assertIn("zoom: 'auto'", proto)
+        for bad in ("setTimeout", "setInterval", "performance.now", "Date.now"):
+            self.assertNotIn(bad, proto)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

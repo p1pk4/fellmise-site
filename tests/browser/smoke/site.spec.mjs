@@ -303,6 +303,93 @@ test.describe('/proto/', () => {
     clean(watch);
   });
 
+  /* Zoom choreography: auto by default, frame = f(z), the same function as
+     tools/camera_choreography.py (restated here from the JSON on purpose). */
+  test('zoom: auto by default, frame is a pure function of z, focal objects whole', async ({ page, watch }) => {
+    await page.goto('/proto/');
+    await page.waitForFunction(PROTO_READY, null, { timeout: CONFIG.routes['/proto/'].readyTimeoutMs });
+    const ch = JSON.parse(fs.readFileSync(path.join(HERE, '..', '..', '..', 'assets', 'topdown', 'camera_choreography.json'), 'utf8'));
+    const cam = (z) => page.evaluate((zz) => window.__PROTO.camera(zz), z);
+    expect((await page.evaluate(() => window.__PROTO.state.zoom))).toBe('auto');
+    expect((await page.evaluate(() => window.__PROTO.camera())).frame).toBe(ch.overview);
+    const focus = await page.evaluate(() => window.__PROTO.focus());
+    expect(focus.map((f) => f.id)).toEqual(ch.focus.map((f) => f.id));
+    const ss = (u) => { const x = Math.min(Math.max(u, 0), 1); return x * x * x * (x * (x * 6 - 15) + 10); };
+    const expected = (z) => {
+      let best = 0, fr = ch.overview;
+      for (const f of focus) {
+        const d = z - f.peak;
+        const w = Math.abs(d) <= f.hold ? 1 : d > 0 ? ss(1 - (d - f.hold) / f.approach) : ss(1 - (-d - f.hold) / f.exit);
+        if (w > best) { best = w; fr = ch.overview - (ch.overview - f.frame) * w; }
+      }
+      return fr;
+    };
+    for (let z = 20; z > -710; z -= 3.7) {
+      const c = await cam(z);
+      expect(Math.abs(c.auto_frame - expected(z)), `z ${z}`).toBeLessThan(1e-9);
+      expect(c.auto_frame).toBeGreaterThanOrEqual(ch.close);
+      expect(c.auto_frame).toBeLessThanOrEqual(ch.overview);
+    }
+    // forward and back through the same z: the same frame, whatever came before
+    for (const z of [-60, -200.2, -320, -658, -600]) {
+      await page.evaluate((zz) => window.__PROTO.go(zz, 'auto'), z);
+      const a = (await cam()).frame;
+      await page.evaluate(() => window.__PROTO.go(-400, 'auto'));
+      await page.evaluate((zz) => window.__PROTO.go(zz, 'auto'), z);
+      expect((await cam()).frame).toBe(a);
+    }
+    // at each peak the focal sprite quad is inside the viewport (camera x = 0)
+    const runtime = await (await page.request.get('/assets/topdown/layout.runtime.json')).json();
+    const meta = (await (await page.request.get('/proto/sprite_contact.json')).json()).sprites;
+    const vw = page.viewportSize().width, vh = page.viewportSize().height;
+    const bio = Object.keys(runtime.biomes);
+    for (const f of ch.focus) {
+      const bi = bio.findIndex((b) => runtime.biomes[b].sprites.some((o) => o.id === f.anchor));
+      const o = runtime.biomes[bio[bi]].sprites.find((x) => x.id === f.anchor);
+      const aspect = await page.evaluate(async (src) => { const i = new Image(); i.src = '/' + src; await i.decode(); return i.width / i.height; }, meta[o.t].src);
+      const peak = focus.find((x) => x.id === f.id).peak;
+      await page.evaluate((zz) => window.__PROTO.go(zz, 'auto'), peak);
+      const fr = (await cam()).frame;
+      expect(fr).toBe(f.frame_height);
+      const ppm = vh / fr, w = o.h * aspect, z = -bi * runtime.biome_spacing + o.pos[2];
+      const m = Math.min(vw / 2 + (o.pos[0] - w / 2) * ppm, vw - (vw / 2 + (o.pos[0] + w / 2) * ppm),
+                         vh / 2 + (z - o.h / 2 - peak) * ppm, vh - (vh / 2 + (z + o.h / 2 - peak) * ppm));
+      expect(m, `${f.id} margin`).toBeGreaterThanOrEqual(f.biome === 'home' || f.biome === 'mine' ? 24 : 8);
+    }
+    // explicit modes stay diagnostic snapshots
+    await page.evaluate(() => window.__PROTO.go(-658, 'overview'));
+    expect((await cam()).frame).toBe(40);
+    await page.evaluate(() => window.__PROTO.go(-658, 'close'));
+    expect((await cam()).frame).toBe(16);
+    expect(await page.evaluate(() => { try { window.__PROTO.go(0, 'zoomy'); return 'no'; } catch { return 'threw'; } })).toBe('threw');
+    // content activation does not depend on zoom
+    for (const c of contentCheckpoints()) {
+      for (const zm of ['auto', 'overview', 'close']) {
+        await page.evaluate(([zz, m]) => window.__PROTO.go(zz, m), [c.z, zm]);
+        const on = (await page.evaluate(() => window.__PROTO.content())).points.filter((p) => p.weight > 0).map((p) => p.id);
+        expect(on, `${c.id} ${zm}`).toEqual([c.content]);
+      }
+    }
+    clean(watch);
+  });
+
+  test('zoom: the Z key is a debug tool only', async ({ page, watch }) => {
+    await page.goto('/proto/');
+    await page.waitForFunction(PROTO_READY, null, { timeout: CONFIG.routes['/proto/'].readyTimeoutMs });
+    await page.keyboard.press('z');
+    expect(await page.evaluate(() => window.__PROTO.state.zoom)).toBe('auto');
+    await page.goto('/proto/?debug=hud');
+    await page.waitForFunction(PROTO_READY, null, { timeout: CONFIG.routes['/proto/'].readyTimeoutMs });
+    const seen = [];
+    for (let i = 0; i < 3; i++) {
+      await page.keyboard.press('z');
+      seen.push(await page.evaluate(() => window.__PROTO.state.zoom));
+    }
+    expect(seen).toEqual(['обзор', 'близко', 'auto']);
+    await expect(page.locator('#hud')).toContainText('хореография: фокус');
+    clean(watch);
+  });
+
   test('content: locale is chosen by ?lang=, deterministically', async ({ page, watch }) => {
     for (const [q, want] of [['', 'en'], ['?lang=ru', 'ru'], ['?lang=xx', 'en']]) {
       await page.goto('/proto/' + q);

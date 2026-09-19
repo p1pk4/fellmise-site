@@ -244,6 +244,21 @@ assets/topdown/content_points.json ─ tools/build_proto_content.py ─→ proto
 * Отладочная панель (HUD) скрыта; `/proto/?debug=hud` — показать. При падении
   сцены она открывается сама с текстом ошибки.
 
+## Хореография зума /proto/
+
+`assets/topdown/camera_choreography.json` → высота кадра — чистая функция z
+камеры (`frameAt` в `proto/main.js`, эталон и проверки — `tools/camera_choreography.py`).
+
+* Между фокусами — обзор 40 м; у фокуса (стабильный объект layout) кадр
+  плавно (smootherstep) сходится к своей высоте и возвращается. Пределы 16..40 м.
+* 5 фокусов: таверна, мёртвый дуб, вход в шахту, склеп, финальный дом.
+  Окна фокусов не заходят в затемнение переходов и не перекрываются.
+* Режим по умолчанию — `auto`. `__PROTO.go(z, 'auto' | 'overview' | 'close')`
+  (старые 'обзор'/'близко' тоже); клавиша Z — только с `?debug=hud` или `?debug=zoom`.
+* `python tools/camera_choreography.py` — профиль маршрута; `--check` — в CI;
+  `node tests/browser/zoom_review.mjs` — `zoom-choreography-review.png` и
+  `zoom-route-strip.png` (в CI — артефакт `zoom-review-*`).
+
 ## Проверки (они же в CI, `.github/workflows/ci.yml`)
 
 ```
@@ -251,6 +266,7 @@ python tools/check_site_static.py        # страницы, CNAME, noindex, rob
 python tools/generate_layout.py --check  # committed layouts актуальны
 python tools/topdown_layout.py --check   # overrides валидны, runtime актуален
 python tools/build_proto_content.py --check  # контентные точки: источник и proto/index.html
+python tools/camera_choreography.py --check   # хореография зума
 python tools/test_layout.py              # стабильные id, overrides, потребители
 python tools/check_run_rules.py
 python tools/measure_foreshortening.py

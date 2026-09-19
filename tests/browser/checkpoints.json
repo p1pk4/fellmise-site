@@ -33,6 +33,11 @@
   {"id": "content-forest", "route": "/proto/", "z": -172, "zoom": "обзор", "content": "forest-skills", "note": "карточка «Skills, no levels» (forest/board/skills_no_levels)"},
   {"id": "content-mine", "route": "/proto/", "z": -319, "zoom": "обзор", "content": "mine-mining", "note": "карточка «Mining and gathering» (mine/board/mining)"},
   {"id": "content-spirit", "route": "/proto/", "z": -508, "zoom": "обзор", "content": "spirit-death", "note": "карточка «Death is a place» (spirit/board/death_is_a_place)"},
-  {"id": "content-home", "route": "/proto/", "z": -644, "zoom": "обзор", "content": "home-home", "note": "карточка «A home to come back to»; z на 10 м дальше якоря — в кадре финальный дом"}
+  {"id": "content-home", "route": "/proto/", "z": -644, "zoom": "обзор", "content": "home-home", "note": "карточка «A home to come back to»; z на 10 м дальше якоря — в кадре финальный дом"},
+  {"id": "choreo-village", "route": "/proto/", "z": -72.4, "zoom": "auto", "note": "пик фокуса village-tavern (auto): таверна"},
+  {"id": "choreo-forest", "route": "/proto/", "z": -200.2, "zoom": "auto", "note": "пик фокуса forest-dead-oak (auto)"},
+  {"id": "choreo-mine", "route": "/proto/", "z": -331.1, "zoom": "auto", "note": "пик фокуса mine-adit (auto): вход в шахту"},
+  {"id": "choreo-spirit", "route": "/proto/", "z": -522.1, "zoom": "auto", "note": "пик фокуса spirit-crypt (auto): склеп"},
+  {"id": "choreo-home", "route": "/proto/", "z": -658.0, "zoom": "auto", "note": "пик фокуса home-final-house (auto): финальный дом целиком"}
  ]
 }

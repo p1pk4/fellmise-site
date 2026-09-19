@@ -5,6 +5,20 @@
 
 ---
 
+## 2026-09-19 04:38 — zoom-choreography-1: зум как функция маршрута
+
+- **Что:** в /proto/ зум по умолчанию `auto`: высота кадра — чистая функция z
+  камеры из `assets/topdown/camera_choreography.json` (smootherstep, 16..40 м).
+  5 фокусов на стабильных объектах: таверна (28 м), мёртвый дуб (24), вход в
+  шахту (22), склеп (22), финальный дом (22 — целиком в кадре, закрыт TODO).
+  Обзор между фокусами и на якорях переходов. Клавиша Z — только в отладке;
+  `__PROTO.go(z, 'auto'|'overview'|'close')`, `__PROTO.camera()`.
+- **Тип:** feat
+- **Проверка:** test_layout 61/61 · smoke 21/21 · selftest 23/24 · `--check` ✓ ·
+  layout/content/presentation без изменений · visual vs main: 19 прежних SAME,
+  5 новых choreo-*
+- **Commit:** <hash>
+
 ## 2026-09-19 04:23 — Content Points 1 выпущен в production
 
 - **Что:** в main влиты PR #9 (контентные точки) и PR #10 (полировка карточек,

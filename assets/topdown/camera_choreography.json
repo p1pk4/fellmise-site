@@ -1,0 +1,73 @@
+{
+ "_doc": [
+  "Camera choreography of /proto/: frame height (metres, world units) as a pure function of camera z.",
+  "Between focus windows the frame is `overview`; inside a window it eases to the focus frame and back.",
+  "Each focus is anchored to a stable layout object id; its world z (+ peak_offset) is where the focus peaks.",
+  "Window around the peak, along the route (z decreasing): approach metres ease in, hold metres (each side)",
+  "stay at the focus frame, exit metres ease out. Ease = smootherstep (no overshoot).",
+  "Limits: close <= frame <= overview (16..40 m) - the sprite pack has a resolution ceiling at 16 m.",
+  "The width follows from the viewport aspect in proto/main.js; nothing here assumes a screen size.",
+  "Checked by tools/camera_choreography.py (tests): anchors exist, route order, limits, no window overlaps a",
+  "biome transition's dim band, overview reached between windows."
+ ],
+ "overview": 40,
+ "close": 16,
+ "ease": "smootherstep",
+ "focus": [
+  {
+   "id": "village-tavern",
+   "biome": "village",
+   "anchor": "village/tavern/tavern",
+   "peak_offset": 0,
+   "frame_height": 28,
+   "approach": 26,
+   "hold": 3,
+   "exit": 22,
+   "why": "the lived-in village: tavern, lamp and road ('haggle and drink in taverns'); past the village card, so the card never covers it"
+  },
+  {
+   "id": "forest-dead-oak",
+   "biome": "forest",
+   "anchor": "forest/dead-oak/tree",
+   "peak_offset": 0,
+   "frame_height": 24,
+   "approach": 26,
+   "hold": 3,
+   "exit": 24,
+   "why": "the forest's one focal tree; kept at 24 m so the pines around it do not fill the frame"
+  },
+  {
+   "id": "mine-adit",
+   "biome": "mine",
+   "anchor": "mine/adit/frame",
+   "peak_offset": -1,
+   "frame_height": 22,
+   "approach": 15,
+   "hold": 3,
+   "exit": 24,
+   "why": "the mine entrance (timber adit + cart): the mine's main object"
+  },
+  {
+   "id": "spirit-crypt",
+   "biome": "spirit",
+   "anchor": "spirit/crypt/crypt",
+   "peak_offset": 0,
+   "frame_height": 22,
+   "approach": 26,
+   "hold": 3,
+   "exit": 24,
+   "why": "the crypt - 'death is a place'; left of the road, the spirit card sits right"
+  },
+  {
+   "id": "home-final-house",
+   "biome": "home",
+   "anchor": "home/homestead/house",
+   "peak_offset": 0,
+   "frame_height": 22,
+   "approach": 40,
+   "hold": 4,
+   "exit": 26,
+   "why": "the final house, whole in frame (22 m keeps it clear of the right-hand card)"
+  }
+ ]
+}

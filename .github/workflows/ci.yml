@@ -99,7 +99,9 @@ jobs:
   browser:
     name: browser smoke + visual regression
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    # the production audio tests (real files, real crossfades) added ~5 min:
+    # the job hit the old 30 min limit with every step green
+    timeout-minutes: 45
     env:
       CI: "1"
       # report: pixel changes are measured and published, the job stays green.

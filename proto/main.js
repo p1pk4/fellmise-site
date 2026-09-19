@@ -14,6 +14,12 @@
 import * as THREE from './vendor/three.module.min.js';
 
 const HUD = document.getElementById('hud');
+/* Отладочная панель — не часть страницы: видна только по явному ?debug=hud
+   (флаги через запятую, на будущее). Обновляется она всегда — тесты и
+   __PROTO читают состояние не из неё. При падении сцены она открывается сама:
+   ошибку лучше показать, чем оставить пустой экран. */
+const DEBUG = new Set((new URLSearchParams(location.search).get('debug') || '').split(',').filter(Boolean));
+HUD.hidden = !DEBUG.has('hud');
 const ASSETS = '../assets/';
 const LAYOUT = ASSETS + 'topdown/layout.runtime.json';
 const STRIPPED = './sprites_stripped/';
@@ -1063,4 +1069,4 @@ window.__PROTO = {
   roadAt: (z) => roadAt(z),
 };
 
-main().catch((e) => { HUD.textContent = 'ошибка: ' + e.message; throw e; });
+main().catch((e) => { HUD.hidden = false; HUD.textContent = 'ошибка: ' + e.message; throw e; });

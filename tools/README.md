@@ -241,6 +241,8 @@ assets/topdown/content_points.json ─ tools/build_proto_content.py ─→ proto
   `content-copy.md` (в CI — артефакт `content-review-*`).
 * Visual: мировые чекпоинты снимаются без слоя карточек, контентные
   (`content` в checkpoints.json) — с ним.
+* Отладочная панель (HUD) скрыта; `/proto/?debug=hud` — показать. При падении
+  сцены она открывается сама с текстом ошибки.
 
 ## Проверки (они же в CI, `.github/workflows/ci.yml`)
 

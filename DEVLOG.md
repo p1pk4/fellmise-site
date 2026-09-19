@@ -16,7 +16,7 @@
 - **Тип:** fix
 - **Проверка:** test_layout 80/80 · smoke 43 passed · selftest 27/27 ·
   `--check` ✓ · visual strict vs production 9f61ccd SAME
-- **Commit:** <hash>
+- **Commit:** 3650543
 
 ## 2026-09-19 17:12 — fallback-mobile-1: статический путь /proto/
 

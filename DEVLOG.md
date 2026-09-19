@@ -15,7 +15,7 @@
   вниз по маршруту, перевзвод 8 м назад. Кнопка 36 px справа внизу, только live;
   статика без звука и без кнопки. ТЗ на ассеты — out/audio-planning (не в repo).
 - **Тип:** feat
-- **Проверка:** build n/a · smoke 54/54 (+11 audio) · unit 84 · visual vs main:
+- **Проверка:** build n/a · smoke 54/54 (из них 11 audio) · unit 84 · visual vs main:
   27/27 live-кадров изменены только в рамке кнопки (1060 px) · muted: 0 запросов,
   0 байт, 0 audio-узлов
 - **Commit:** d177504

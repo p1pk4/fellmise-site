@@ -91,7 +91,7 @@ test.describe('/proto/', () => {
   test('boots WebGL, loads the layout, reaches done, survives zoom and moves', async ({ page, watch }) => {
     const layouts = [];
     page.on('response', (r) => { if (/\/layout[^/]*\.json$/.test(r.url())) layouts.push(r); });
-    const r = await page.goto('/proto/');
+    const r = await page.goto('/proto/?debug=hud');    // the checks below read the debug HUD
     expect(r.status()).toBe(200);
     expect(await robots(page)).toContain('noindex');
 
@@ -287,6 +287,19 @@ test.describe('/proto/', () => {
       expect(s.points.filter((p) => p.weight > 0).length, `z ${z}`).toBeLessThanOrEqual(1);
     }
     expect(await count()).toBe(before);
+    clean(watch);
+  });
+
+  test('debug HUD: hidden by default, shown only with ?debug=hud', async ({ page, watch }) => {
+    for (const [q, shown] of [['', false], ['?debug=hud', true], ['?debug=other', false]]) {
+      await page.goto('/proto/' + q);
+      await page.waitForFunction(PROTO_READY, null, { timeout: CONFIG.routes['/proto/'].readyTimeoutMs });
+      if (shown) await expect(page.locator('#hud')).toBeVisible();
+      else await expect(page.locator('#hud')).toBeHidden();
+      // it is kept up to date either way; the hooks do not depend on it
+      await expect(page.locator('#hud')).toContainText('зум:');
+      expect(await page.evaluate(() => typeof window.__PROTO.content)).toBe('function');
+    }
     clean(watch);
   });
 

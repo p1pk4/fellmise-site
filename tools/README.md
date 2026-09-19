@@ -296,9 +296,10 @@ assets/topdown/content_points.json ─ tools/build_proto_content.py ─→ proto
 ## /proto/: живой и статический режим
 
 Одно правило — `proto/mode.js` (классический скрипт в `<head>`): **live** —
-ширина ≥ 760, без `prefers-reduced-motion`, есть WebGL2; иначе **static**:
+ширина ≥ 900, без `prefers-reduced-motion`, есть WebGL2; иначе **static**:
 узкий экран, reduced motion, нет WebGL2, `?static=1`, упавшая живая загрузка
-(`FELLMISE_MODE.fail`). Без JS класса нет — это тоже статика.
+(`FELLMISE_MODE.fail`). Без JS класса нет — это тоже статика; картинки key art
+тогда приходят из `<noscript>`-двойников (при JS они инертны).
 
 * `proto/boot.js` импортирует мир (`main.js`, three.js, раскладку, спрайты)
   только в live; статика их не грузит вовсе.

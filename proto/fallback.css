@@ -87,6 +87,9 @@
   opacity: 1 !important;
   transform: none !important;
 }
+/* без JavaScript (mode.js не поставил data-mode): ленивая <img data-src>
+   пустая — показывается её <noscript>-двойник с настоящим src */
+:root:not(.mode-live):not([data-mode]) .key-art img[data-src] { display: none; }
 :root:not(.mode-live) .key-art img {
   display: block;
   width: 100%; max-width: 44rem; height: auto; aspect-ratio: 3 / 2;

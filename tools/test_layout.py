@@ -1037,7 +1037,7 @@ class SpriteOverrides(unittest.TestCase):
 class ProtoModes(unittest.TestCase):
     """/proto/ live vs static: one rule (proto/mode.js), static = the default markup."""
 
-    NARROW = 760           # mirrors proto/mode.js
+    NARROW = 900           # mirrors proto/mode.js
 
     def test_single_rule_in_mode_js(self):
         mode = read("proto/mode.js")
@@ -1048,8 +1048,10 @@ class ProtoModes(unittest.TestCase):
         # no other file decides the mode or repeats the threshold
         for f in ("proto/main.js", "proto/boot.js", "proto/fallback.css", "proto/index.html"):
             txt = read(f)
-            self.assertNotIn("760", txt, f)
-            self.assertNotIn("759", txt, f)
+            # no width breakpoint anywhere else: no innerWidth comparisons, no width media queries
+            self.assertIsNone(re.search(r"innerWidth\s*[<>]=?|[<>]=?\s*innerWidth", txt), f)
+            self.assertIsNone(re.search(r"\((?:max|min)-width\s*:", txt), f)
+            self.assertIsNone(re.search(rf"({self.NARROW}|{self.NARROW - 1})px", txt), f)
             self.assertNotIn("prefers-reduced-motion: reduce)').matches", txt.replace("REDUCED_MOTION = matchMedia('(prefers-reduced-motion: reduce)').matches", ""), f)
 
     def test_boot_order_and_no_world_in_static(self):

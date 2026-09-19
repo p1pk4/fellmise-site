@@ -5,7 +5,8 @@
  *
  *   fallback-mobile-review.png   390×844: start, village, forest, mine, spirit, home/end
  *   fallback-desktop-review.png  1280×800 ?static=1: the same points
- *   fallback-extra-review.png    430×932 and 768×1024 (live) sanity, RU at 390
+ *   fallback-extra-review.png    768/834 static, 900/1024 live, 430×932 and RU at 390
+ *   fallback-nojs-review.png     430×932 with JavaScript disabled: copy + the three pictures
  *
  * Nothing in the repository is written.
  */
@@ -74,14 +75,46 @@ await sheet(path.join(OUT, 'fallback-desktop-review.png'), 'static journey — 1
   [{ title: '1280×800 ?static=1', ...d1280, w: 520 }], 1640);
 const m430 = await flow('m430', { viewport: { width: 430, height: 932 }, isMobile: true, hasTouch: true, deviceScaleFactor: 1 }, '');
 const ru = await flow('ru390', { viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, deviceScaleFactor: 1 }, '?lang=ru');
-const tablet = await (async () => {
-  const ctx = await browser.newContext({ viewport: { width: 768, height: 1024 } }); const p = await ctx.newPage(); await stubExternal(p);
+async function liveShot(tag, w, h) {
+  const ctx = await browser.newContext({ viewport: { width: w, height: h } }); const p = await ctx.newPage(); await stubExternal(p);
   await p.goto(srv.url + '/proto/'); await p.waitForFunction(() => window.__PROTO?.state.done, null, { timeout: 120000 });
-  const file = path.join(OUT, 'shots', 'tablet768-live.png'); await p.screenshot({ path: file });
-  const mode = await p.evaluate(() => [document.documentElement.dataset.mode]); await ctx.close();
-  return { mode, shots: [{ label: 'live at start', file }] };
+  const mode = await p.evaluate(() => [document.documentElement.dataset.mode]);
+  const shots = [];
+  for (const [label, z] of [['start', -20], ['village card', -40], ['mine card + adit', -319]]) {
+    await p.evaluate((zz) => window.__PROTO.go(zz, 'auto'), z);
+    await p.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+    const file = path.join(OUT, 'shots', `${tag}-${label.replace(/\W+/g, '_')}.png`); await p.screenshot({ path: file });
+    shots.push({ label, file });
+  }
+  await ctx.close();
+  return { mode, shots };
+}
+const t768 = await flow('t768', { viewport: { width: 768, height: 1024 }, deviceScaleFactor: 1 }, '');
+const t834 = await flow('t834', { viewport: { width: 834, height: 1194 }, deviceScaleFactor: 1 }, '');
+const l900 = await liveShot('l900', 900, 700);
+const l1024 = await liveShot('l1024', 1024, 768);
+await sheet(path.join(OUT, 'fallback-extra-review.png'), 'breakpoint 900 — 768 and 834 static; 900 and 1024 live; 430×932 and RU at 390 static',
+  [{ title: '768×1024', ...t768, w: 240 }, { title: '834×1194', ...t834, w: 240 },
+   { title: '900×700 (live)', ...l900, w: 440 }, { title: '1024×768 (live)', ...l1024, w: 440 },
+   { title: '430×932', ...m430, w: 220 }, { title: '390×844 ?lang=ru', ...ru, w: 220 }], 1560);
+// no JavaScript: the <noscript> pictures
+const nojs = await (async () => {
+  const ctx = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 430, height: 932 }, deviceScaleFactor: 1 });
+  const p = await ctx.newPage(); await stubExternal(p);
+  await p.goto(srv.url + '/proto/');
+  const shots = [];
+  for (const [label, sel] of [['start (copy)', null], ['village art', 'village-life'], ['mine art', 'mine-work'], ['spirit art', 'spirit-afterlife']]) {
+    if (sel) await p.locator(`figure.key-art[data-id="${sel}"] img[src]`).scrollIntoViewIfNeeded();
+    else await p.evaluate(() => scrollTo(0, 0));
+    await p.waitForLoadState('networkidle');
+    await p.evaluate(() => Promise.all([...document.images].filter((i) => i.getAttribute('src')).map((i) => i.decode().catch(() => {}))));
+    const file = path.join(OUT, 'shots', `nojs-${label.replace(/\W+/g, '_')}.png`); await p.screenshot({ path: file });
+    shots.push({ label, file });
+  }
+  await ctx.close();
+  return { mode: ['no JavaScript'], shots };
 })();
-await sheet(path.join(OUT, 'fallback-extra-review.png'), 'static journey — 430×932, RU at 390×844, and the 768×1024 boundary (live)',
-  [{ title: '430×932', ...m430, w: 240 }, { title: '390×844 ?lang=ru', ...ru, w: 240 }, { title: '768×1024', ...tablet, w: 300 }], 1560);
+await sheet(path.join(OUT, 'fallback-nojs-review.png'), '/proto/ with JavaScript disabled — 430×932: copy + the three approved pictures (<noscript> twins)',
+  [{ title: '430×932, JS off', ...nojs, w: 300 }], 1300);
 await browser.close(); await srv.close();
-console.log(`-> ${OUT}`, JSON.stringify({ m390: m390.mode, d1280: d1280.mode, m430: m430.mode, ru: ru.mode, tablet: tablet.mode }));
+console.log(`-> ${OUT}`, JSON.stringify({ m390: m390.mode, d1280: d1280.mode, m430: m430.mode, ru: ru.mode, t768: t768.mode, t834: t834.mode, l900: l900.mode, l1024: l1024.mode }));

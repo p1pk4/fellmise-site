@@ -5,6 +5,19 @@
 
 ---
 
+## 2026-09-19 17:40 — fallback-mobile-1: порог 900 и key art без JS
+
+- **Что:** порог живого режима /proto/ 760 → 900 (`proto/mode.js`, единственный
+  источник): 768/820/834/899 — статика, 900/1024/1280 — live. Без JavaScript
+  три key art показываются: `tools/key_art.py` добавляет в каждую figure
+  `<noscript><img src loading=lazy alt></noscript>`, пустая `img[data-src]` без
+  JS скрыта; при JS `<noscript>` инертен — ленивая загрузка и одна картинка
+  на figure как раньше.
+- **Тип:** fix
+- **Проверка:** test_layout 80/80 · smoke 43 passed · selftest 27/27 ·
+  `--check` ✓ · visual strict vs production 9f61ccd SAME
+- **Commit:** <hash>
+
 ## 2026-09-19 17:12 — fallback-mobile-1: статический путь /proto/
 
 - **Что:** у /proto/ появился статический режим — тот же путь village →

@@ -542,14 +542,17 @@ test.describe('/proto/', () => {
 /* ------------------------------------------------------------ proto modes */
 /* One rule (proto/mode.js): live = desktop >= NARROW px, no reduced motion,
    WebGL2; everything else - and a failed live boot - is the static journey. */
-const NARROW = 760;                                           // mirrors proto/mode.js
+const NARROW = 900;                                           // mirrors proto/mode.js
 const MODE_MATRIX = [
   ['desktop 1280 WebGL', { viewport: { width: 1280, height: 800 } }, '', 'live', null],
   ['desktop 1280 ?static=1', { viewport: { width: 1280, height: 800 } }, '?static=1', 'static', 'forced'],
   ['desktop 1280 reduced motion', { viewport: { width: 1280, height: 800 }, reducedMotion: 'reduce' }, '', 'static', 'reduced-motion'],
   ['mobile 390', { viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true }, '', 'static', 'narrow'],
   ['mobile 430', { viewport: { width: 430, height: 932 }, isMobile: true, hasTouch: true }, '', 'static', 'narrow'],
-  ['tablet 768', { viewport: { width: 768, height: 1024 } }, '', 'live', null],
+  ['tablet 768', { viewport: { width: 768, height: 1024 } }, '', 'static', 'narrow'],
+  ['tablet 820', { viewport: { width: 820, height: 1180 } }, '', 'static', 'narrow'],
+  ['tablet 834', { viewport: { width: 834, height: 1194 } }, '', 'static', 'narrow'],
+  ['desktop 1024', { viewport: { width: 1024, height: 768 } }, '', 'live', null],
   [`width ${NARROW - 1}`, { viewport: { width: NARROW - 1, height: 900 } }, '', 'static', 'narrow'],
   [`width ${NARROW}`, { viewport: { width: NARROW, height: 900 } }, '', 'live', null],
 ];
@@ -636,7 +639,47 @@ test.describe('/proto/ modes', () => {
     await expect(page.locator('section[data-locale="en"] h2')).toHaveCount(5);
     const ov = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
     expect(ov).toBeLessThanOrEqual(0);
+    // the three approved pictures are real images (the <noscript> twins), EN alt
+    const plan = JSON.parse(fs.readFileSync(path.join(HERE, '..', '..', '..', 'assets', 'topdown', 'key_art.json'), 'utf8'));
+    for (const s of plan.slots) {
+      const img = page.locator(`figure.key-art[data-id="${s.id}"] img[src]`);
+      await expect(img).toHaveCount(1);
+      expect(await img.getAttribute('src')).toBe('../' + s.src);
+      expect(await img.getAttribute('alt')).toBe(s.alt.en);
+      await img.scrollIntoViewIfNeeded();
+      await expect.poll(() => img.evaluate((i) => i.complete && i.naturalWidth)).toBe(1536);
+      await expect(page.locator(`figure.key-art[data-id="${s.id}"] img[data-src]`)).toBeHidden();
+    }
     await ctx.close();
+  });
+
+  test('without JavaScript nothing of the world is requested', async ({ browser, baseURL }) => {
+    const ctx = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 430, height: 932 } });
+    const page = await ctx.newPage();
+    await stubExternal(page);
+    const reqs = [];
+    page.on('request', (r) => reqs.push(r.url()));
+    await page.goto(baseURL + '/proto/');
+    await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
+    await page.waitForLoadState('networkidle');
+    expect(reqs.filter((u) => /three\.module|layout\.runtime|sprites_|sprite_contact|\/proto\/main\.js/.test(u))).toEqual([]);
+    await ctx.close();
+  });
+
+  test('with JavaScript the <noscript> twins stay inert: one image per figure, lazy as before', async ({ page, watch }) => {
+    const art = [];
+    page.on('request', (r) => { if (/\/assets\/keyart\//.test(r.url())) art.push(r.url()); });
+    for (const q of ['?static=1', '']) {
+      await page.goto('/proto/' + q);
+      if (q) await page.waitForLoadState('networkidle');
+      else await page.waitForFunction(PROTO_READY, null, { timeout: CONFIG.routes['/proto/'].readyTimeoutMs });
+      const imgs = await page.evaluate(() => [...document.querySelectorAll('figure.key-art')].map((f) => f.querySelectorAll('img').length));
+      expect(imgs).toEqual([1, 1, 1]);
+    }
+    // live start: only the window within preload distance was requested
+    const live = art.filter((u) => u.includes('keyart'));
+    expect(live.length).toBeLessThanOrEqual(4);
+    clean(watch);
   });
 
   test('a failed live boot turns into the static journey (error only in ?debug=hud)', async ({ page }) => {

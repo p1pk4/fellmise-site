@@ -2,15 +2,15 @@
    пути. ЕДИНСТВЕННОЕ место, где это решается (классический скрипт в <head>,
    до отрисовки body — без мигания).
 
-     live    desktop, ширина >= 760, без reduced motion, есть WebGL2
-     static  всё остальное: ширина < 760, prefers-reduced-motion, нет WebGL2,
+     live    desktop, ширина >= 900, без reduced motion, есть WebGL2
+     static  всё остальное: ширина < 900, prefers-reduced-motion, нет WebGL2,
              ?static=1 (диагностика), падение живой загрузки (fail())
 
    Без JavaScript класса нет вовсе — это тоже статическая версия: разметка по
    умолчанию и есть fallback, живому режиму нужен класс mode-live. Причину
    выбора видно только в ?debug=hud (data-mode-reason на <html>). */
 (function () {
-  var NARROW = 760;                       // единственный порог ширины; тесты зеркалят его
+  var NARROW = 900;                       // единственный порог ширины; тесты зеркалят его
   var q = new URLSearchParams(location.search);
   var root = document.documentElement;
 

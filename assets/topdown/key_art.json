@@ -122,8 +122,8 @@
    },
    "brief": "keyart-spirit-afterlife",
    "alt": {
-    "en": "The ship of the dead rests in low mist on the mossy ground of the spirit world; a small ghost stands nearby among dead trees and gravestones.",
-    "ru": "Корабль мёртвых стоит в низком тумане на моховой земле мира духов; рядом маленький призрак, мёртвые деревья и надгробия.",
+    "en": "A spectral ship of the dead, pale blue and translucent, drifts on low mist over the mossy ground of the spirit world; a small ghost stands nearby among dead trees and gravestones.",
+    "ru": "Призрачный корабль мёртвых, бледно-голубой и полупрозрачный, плывёт в низком тумане над моховой землёй мира духов; рядом маленький призрак, мёртвые деревья и надгробия.",
     "decorative": false
    },
    "lazy": {
@@ -133,7 +133,7 @@
    "why": "the camera never frames the ship of the dead (x -21.6, too wide for a focus); the copy rides it - the picture comes first, then the card 'Death is a place' and the crypt; peak moved to -440 and the exit shortened (-445 -> -453) so the illustrated ship is gone before the world ship enters the frame (-455.95): art ship -> a few metres of world -> world ship. Entry shortened to -423 to stay out of the mine->spirit dim (to -422)",
    "master": "assets/keyart/spirit-afterlife.png",
    "src": "assets/keyart/spirit-afterlife.webp",
-   "art_batch": "out/key_art_batch1/final/keyart_spirit_afterlife_final.png (owner-approved)",
+   "art_batch": "out/key_art_batch1/final/keyart_spirit_spectral_d.png (variant D, owner-chosen)",
    "yields_to": {
     "object": "spirit/shipwreck/ship",
     "gap_m": 2

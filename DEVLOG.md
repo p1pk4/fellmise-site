@@ -5,6 +5,19 @@
 
 ---
 
+## 2026-09-19 14:22 — key-art-spirit-d-1: spirit key art = вариант D
+
+- **Что:** арт окна spirit-afterlife заменён на вариант D (призрачный
+  бледно-голубой корабль, `keyart_spirit_spectral_d.png`, мастер побайтно) и
+  WebP q90 пересобран; временная заглушка (placeholder / ghost) убрана, путь
+  прежний `assets/keyart/spirit-afterlife.*`. alt EN/RU обновлены под D.
+  Окно, тайминги (пик −440, выход −453), сторона, размер, маска, village/mine
+  — без изменений.
+- **Тип:** feat
+- **Проверка:** test_layout 70/70 · smoke 25/25 · `--check` ✓ · visual vs PR #13:
+  только keyart-spirit (3.7%)
+- **Commit:** <hash>
+
 ## 2026-09-19 12:23 — key-art-integration-1: spirit — арт-корабль уходит до мирового
 
 - **Что:** окно spirit-afterlife больше не пересекается с мировым кораблём:

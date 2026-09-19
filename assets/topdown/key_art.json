@@ -7,7 +7,8 @@
   "master: the approved art (PNG, exact bytes of the art batch); src: the runtime WebP derived from it by tools/key_art.py.",
   "tools/key_art.py writes the static <figure>s into proto/index.html (alt EN in the HTML, RU in data-alt-ru); main.js only",
   "sets presence and assigns src when the camera is within range + lazy.preload_ahead_m of the peak.",
-  "Display: 480x320 css at a 1280x800 desktop, soft-edged (CSS mask), no frame. /proto/?debug=keyart outlines the windows."
+  "Display: 480x320 css at a 1280x800 desktop, soft-edged (CSS mask), no frame. /proto/?debug=keyart outlines the windows.",
+  "activation.exit_core / exit_range (optional): the fade on the far side of the peak, when it differs; yields_to: a world object the window must be gone before (gap_m metres of route) it enters the frame."
  ],
  "status": "live",
  "max_slots": 3,
@@ -98,11 +99,13 @@
    "status": "live",
    "anchor": {
     "object": "spirit/shipwreck/ship",
-    "peak_offset": 30.6
+    "peak_offset": 40.592
    },
    "activation": {
     "core": 8,
-    "range": 25
+    "range": 17,
+    "exit_core": 5,
+    "exit_range": 13
    },
    "side": "left",
    "aspect": "3:2",
@@ -127,10 +130,14 @@
     "preload_ahead_m": 120,
     "priority": "low"
    },
-   "why": "the camera never frames the ship of the dead (x -21.6, too wide for a focus); the copy rides it - the picture comes first, then the card 'Death is a place' and the crypt",
+   "why": "the camera never frames the ship of the dead (x -21.6, too wide for a focus); the copy rides it - the picture comes first, then the card 'Death is a place' and the crypt; peak moved to -440 and the exit shortened (-445 -> -453) so the illustrated ship is gone before the world ship enters the frame (-455.95): art ship -> a few metres of world -> world ship. Entry shortened to -423 to stay out of the mine->spirit dim (to -422)",
    "master": "assets/keyart/spirit-afterlife.png",
    "src": "assets/keyart/spirit-afterlife.webp",
-   "art_batch": "out/key_art_batch1/final/keyart_spirit_afterlife_final.png (owner-approved)"
+   "art_batch": "out/key_art_batch1/final/keyart_spirit_afterlife_final.png (owner-approved)",
+   "yields_to": {
+    "object": "spirit/shipwreck/ship",
+    "gap_m": 2
+   }
   }
  ],
  "rejected": [

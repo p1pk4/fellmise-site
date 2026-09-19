@@ -44,10 +44,50 @@ def peak(slot, rt):
     return CC.anchors(rt)[slot["anchor"]["object"]][2] + slot["anchor"].get("peak_offset", 0)
 
 
+def exit_range(slot):
+    a = slot["activation"]
+    return a.get("exit_range", a["range"])
+
+
 def window(slot, rt):
-    """(z_end, z_start): where the slot is on screen at all (presence > 0)."""
+    """(z_end, z_start): where the slot is on screen at all (presence > 0).
+    The far side (smaller z) may fade faster: activation.exit_core/exit_range."""
     p = peak(slot, rt)
-    return p - slot["activation"]["range"], p + slot["activation"]["range"]
+    return p - exit_range(slot), p + slot["activation"]["range"]
+
+
+def presence(slot, rt, z):
+    """The runtime presence (proto/main.js keyArtWeight), for checks."""
+    a, p = slot["activation"], peak(slot, rt)
+    core, rng = (a["core"], a["range"]) if z >= p else (a.get("exit_core", a["core"]), exit_range(slot))
+    d = abs(z - p)
+    if d <= core:
+        return 1.0
+    if d >= rng:
+        return 0.0
+    u = (d - core) / (rng - core)
+    return 1 - u * u * (3 - 2 * u)
+
+
+def first_visible(obj_id, rt):
+    """Camera z (route direction) where a world object's lowest opaque row
+    first enters the top of a 1280x800 frame at the auto zoom."""
+    from PIL import Image
+    import numpy as np
+    _, x, z, o = CC.anchors(rt)[obj_id]
+    src = json.loads((ROOT / "proto" / "sprite_contact.json").read_text(encoding="utf-8"))["sprites"][o["t"]]["src"]
+    with Image.open(ROOT / src) as im:
+        al = np.asarray(im.convert("RGBA"))[..., 3] > 16
+    rows = np.nonzero(al.any(1))[0]
+    z_low = z - o["h"] / 2 + (rows.max() + 1) / al.shape[0] * o["h"]
+    ch = CC.load()
+    pk = CC.peaks(ch, rt)
+    zc = z_low + 40
+    while zc > z_low - 40:
+        if zc - CC.frame_at(ch, rt, zc, pk)[0] / 2 < z_low:
+            return zc
+        zc -= 0.05
+    return None
 
 
 def aspect(slot):
@@ -117,6 +157,9 @@ def check(data, rt=None):
         if not (isinstance(act.get("core"), (int, float)) and isinstance(act.get("range"), (int, float))
                 and 0 < act["core"] < act["range"] <= 40):
             bad.append(f"{sid}: activation {act}")
+        if ("exit_core" in act) != ("exit_range" in act) or (
+                "exit_core" in act and not 0 < act["exit_core"] < act["exit_range"] <= 40):
+            bad.append(f"{sid}: exit_core/exit_range {act}")
         if not re.fullmatch(r"\d+:\d+", str(s.get("aspect", ""))) or not 0.6 <= aspect(s) <= 2.0:
             bad.append(f"{sid}: aspect {s.get('aspect')}")
             continue
@@ -163,6 +206,15 @@ def check(data, rt=None):
         for bs, be, what in busy(rt):
             if e < bs and s > be:
                 bad.append(f"{slot['id']}: окно {s:.0f}..{e:.0f} пересекается с «{what}» ({bs:.0f}..{be:.0f})")
+        y = slot.get("yields_to")
+        if y:
+            if y.get("object") not in CC.anchors(rt):
+                bad.append(f"{slot['id']}: yields_to {y} нет в layout")
+            else:
+                fv = first_visible(y["object"], rt)
+                if fv is None or e < fv + y.get("gap_m", 0):
+                    bad.append(f"{slot['id']}: окно гаснет на z {e:.2f}, а {y['object']} входит в кадр на "
+                               f"{fv:.2f} — нужен зазор {y.get('gap_m', 0)} м")
     return bad
 
 
@@ -188,7 +240,9 @@ def region(data):
             f'  <figure class="key-art" data-id="{att(s["id"])}" data-biome="{att(s["biome"])}"'
             f' data-anchor="{att(s["anchor"]["object"])}" data-peak-offset="{s["anchor"].get("peak_offset", 0)}"'
             f' data-core="{s["activation"]["core"]}" data-range="{s["activation"]["range"]}"'
-            f' data-side="{att(s["side"])}" data-preload="{s["lazy"]["preload_ahead_m"]}"'
+            + (f' data-exit-core="{s["activation"]["exit_core"]}" data-exit-range="{s["activation"]["exit_range"]}"'
+               if "exit_range" in s["activation"] else "")
+            + f' data-side="{att(s["side"])}" data-preload="{s["lazy"]["preload_ahead_m"]}"'
             f' data-supports="{att(s["supports"]["content_point"])}">')
         out.append(
             f'    <img data-src="../{att(s["src"])}" width="{s["target_px"][0]}" height="{s["target_px"][1]}"'

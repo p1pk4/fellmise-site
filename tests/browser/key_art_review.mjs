@@ -7,6 +7,7 @@
  *                                   id, biome, z, camera frame, display px, side
  *   key-art-peak-close-review.png   each window at its peak, 1:1, cropped around it
  *   key-art-route-review.png        30 frames at equal z steps over the whole route
+ *   key-art-spirit-handover.png     spirit: art ship fades -> world -> world ship
  *   key-art.json                    numbers + collision checks at every peak
  *
  * Nothing in the repository is written.
@@ -60,8 +61,7 @@ const overlap = (a, b) => a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h 
 const rows = [];
 const report = { slots: [] };
 for (const s of slots) {
-  const mid = (s.core + s.range) / 2;
-  const cols = [['enter', s.z + mid], ['peak', s.z], ['exit', s.z - mid]];
+  const cols = [['enter', s.z + (s.core + s.range) / 2], ['peak', s.z], ['exit', s.z - (s.exitCore + s.exitRange) / 2]];
   const cells = [];
   for (const [kind, z] of cols) {
     const file = path.join(OUT, 'shots', `${s.id}-${kind}.png`);
@@ -93,7 +93,7 @@ for (const s of slots) {
     other_art_visible: pk.art.filter((a) => a.id !== s.id).map((a) => a.id),
     rect: me.rect,
   };
-  report.slots.push({ ...s, enter_z: s.z + s.range, exit_z: s.z - s.range, checks: chk,
+  report.slots.push({ ...s, enter_z: s.z + s.range, exit_z: s.z - s.exitRange, checks: chk,
     frames: cells.map((c) => ({ kind: c.kind, z: c.z, frame: c.st.cam.frame, art: c.st.art.map((a) => `${a.id} ${a.opacity}`), cards: c.st.cards.map((x) => `${x.id} ${x.opacity}`) })) });
   rows.push({ s, cells, chk });
 }
@@ -108,6 +108,15 @@ for (let i = 0; i < N; i++) {
   strip.push({ z, file, st });
 }
 report.route = strip.map((x) => ({ z: x.z, frame: +x.st.cam.frame.toFixed(1), art: x.st.art.map((a) => a.id), cards: x.st.cards.map((c) => c.id) }));
+// spirit hand-over: the illustrated ship fades, a few metres of world, then the world ship
+const handover = [];
+for (const z of [-440, -445, -449, -453, -455.95, -459]) {
+  const file = path.join(OUT, 'shots', `spirit-handover-${String(-z).replace('.', '_')}.png`);
+  const st = await at(z);
+  await page.screenshot({ path: file, animations: 'disabled', caret: 'hide' });
+  handover.push({ z, file, art: st.art.find((a) => a.id === 'spirit-afterlife')?.opacity ?? 0 });
+}
+report.spirit_handover = handover.map(({ z, art }) => ({ z, art }));
 fs.writeFileSync(path.join(OUT, 'key-art.json'), JSON.stringify(report, null, 1) + '\n');
 await ctx.close();
 
@@ -153,6 +162,11 @@ await render(`<!doctype html><meta charset="utf-8"><style>${CSS}</style>
   <h1>key art at peak — 1:1 (${VW}×${VH}, DPR ${CONFIG.deviceScaleFactor}), window + 70 px of world around it</h1>
   <table>${close.map((c) => `<tr><th>${esc(c.s.id)}<br><small>peak z ${c.s.z.toFixed(1)} · ${esc(c.s.side)}</small></th><td><img style="width:${c.w}px" src="${pathToFileURL(c.file).href}"></td></tr>`).join('')}</table>`,
 path.join(OUT, 'key-art-peak-close-review.png'), 1000);
+const HLAB = { '-440': 'peak', '-445': 'fade starts', '-449': 'fading', '-453': 'art gone', '-455.95': 'world ship enters (top edge)', '-459': 'world ship' };
+await render(`<!doctype html><meta charset="utf-8"><style>${CSS} .g{display:grid;grid-template-columns:repeat(3,520px);gap:8px;padding:8px}</style>
+  <h1>spirit hand-over — key art ship → a few metres of world → the world ship (plain /proto/, ${VW}×${VH})</h1>
+  <div class="g">${handover.map((h) => `<div><img style="width:520px" src="${pathToFileURL(h.file).href}"><div class="cap">z ${h.z} · ${HLAB[String(h.z)]} · art opacity ${h.art.toFixed(2)}</div></div>`).join('')}</div>`,
+path.join(OUT, 'key-art-spirit-handover.png'), 1620);
 await render(`<!doctype html><meta charset="utf-8"><style>${CSS} .g{display:grid;grid-template-columns:repeat(6,270px);gap:8px;padding:8px} .on{outline:3px solid #ffc857}</style>
   <h1>key art on the route — ${N} frames, z 20 → route end ${routeEnd.toFixed(2)}; outlined = a key art window is on screen (plain /proto/)</h1>
   <div class="g">${strip.map((x) => `<div><img class="${x.st.art.length ? 'on' : ''}" style="width:270px" src="${pathToFileURL(x.file).href}"><div class="cap">z ${x.z} · ${x.st.cam.frame.toFixed(0)} m${x.st.art.length ? ' · ART ' + esc(x.st.art.map((a) => a.id).join(',')) : ''}${x.st.cards.length ? ' · card' : ''}</div></div>`).join('')}</div>`,

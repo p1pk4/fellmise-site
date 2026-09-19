@@ -5,6 +5,19 @@
 
 ---
 
+## 2026-09-19 12:23 — key-art-integration-1: spirit — арт-корабль уходит до мирового
+
+- **Что:** окно spirit-afterlife больше не пересекается с мировым кораблём:
+  пик −450 → −440, выход укорочен и плавный (−445 → −453, `exit_core`/
+  `exit_range`), вход −423 (вне затемнения mine→spirit до −422). Мировой
+  корабль входит в кадр на −455.95 — между ними ~3 м мира. `yields_to` в
+  key_art.json + проверка в tools/key_art.py. village/mine, арт, мир — без
+  изменений. Лист `key-art-spirit-handover.png`.
+- **Тип:** fix
+- **Проверка:** test_layout 70/70 · smoke 25/25 · `--check` ✓ · visual vs PR #13:
+  только keyart-spirit
+- **Commit:** <hash>
+
 ## 2026-09-19 11:27 — key-art-integration-1: 3 key art в /proto/
 
 - **Что:** три одобренные иллюстрации (village-life B fix1, mine-work B fix1,

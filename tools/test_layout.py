@@ -930,6 +930,37 @@ class KeyArt(unittest.TestCase):
         self.assertIn("document.querySelectorAll('.key-art')", proto)
         self.assertNotIn("key_art.json')", proto)
 
+    def test_spirit_art_gone_before_world_ship(self):
+        """spirit-afterlife: peak -440, smooth fade out by -453, then a few
+        metres of world before the world ship (spirit/shipwreck/ship) enters
+        the frame: never both on screen. The other two windows are untouched."""
+        slot = next(x for x in self.data["slots"] if x["id"] == "spirit-afterlife")
+        self.assertAlmostEqual(self.K.peak(slot, self.rt), -440.0, places=3)
+        fv = self.K.first_visible("spirit/shipwreck/ship", self.rt)
+        e, st = self.K.window(slot, self.rt)
+        self.assertGreaterEqual(e - fv, 2.0)
+        self.assertLessEqual(e - fv, 5.0)
+        z = st
+        while z >= fv - 20:
+            if z <= fv:                                   # ship on screen
+                self.assertEqual(self.K.presence(slot, self.rt, z), 0.0, z)
+            z -= 0.05
+        a = slot["activation"]
+        self.assertGreaterEqual(a["exit_range"] - a["exit_core"], 6)   # a fade, not a cut
+        mt = next(t for t in self.rt["presentation"]["transitions"] if t["from"] == "mine")
+        self.assertLess(st, mt["anchor_z"] - mt["dim"]["half_width"])   # entry clear of the dim
+        v = {x["id"]: x for x in self.data["slots"]}
+        self.assertEqual((v["village-life"]["anchor"], v["village-life"]["activation"]),
+                         ({"object": "village/tavern/tavern", "peak_offset": -31.5}, {"core": 4, "range": 10}))
+        self.assertEqual((v["mine-work"]["anchor"], v["mine-work"]["activation"]),
+                         ({"object": "mine/deep-adit/cave", "peak_offset": -5.4}, {"core": 5, "range": 16}))
+
+    def test_yields_to_is_enforced(self):
+        d = copy.deepcopy(self.data)
+        s = next(x for x in d["slots"] if x["id"] == "spirit-afterlife")
+        s["activation"]["exit_range"] = 17                 # would still show at -457
+        self.assertTrue(self.K.check(d, self.rt))
+
     def test_soft_edge_no_card_chrome(self):
         """The window fades into the world (mask), no frame or popup shadow."""
         page = read("proto/index.html")

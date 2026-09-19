@@ -41,6 +41,6 @@
   {"id": "choreo-home", "route": "/proto/", "z": -658.0, "zoom": "auto", "note": "пик фокуса home-final-house (auto): финальный дом целиком"},
   {"id": "keyart-village", "route": "/proto/", "z": -103.919, "zoom": "auto", "keyart": "village-life", "note": "key art village-life на пике: окно справа, мягкий край"},
   {"id": "keyart-mine", "route": "/proto/", "z": -375.9, "zoom": "auto", "keyart": "mine-work", "note": "key art mine-work на пике: окно слева"},
-  {"id": "keyart-spirit", "route": "/proto/", "z": -450.0, "zoom": "auto", "keyart": "spirit-afterlife", "note": "key art spirit-afterlife на пике: окно слева"}
+  {"id": "keyart-spirit", "route": "/proto/", "z": -440.0, "zoom": "auto", "keyart": "spirit-afterlife", "note": "key art spirit-afterlife на пике (−440): окно слева; к −453 гаснет, мировой корабль входит в кадр на −455.95"}
  ]
 }

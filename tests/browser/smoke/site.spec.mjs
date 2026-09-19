@@ -441,6 +441,40 @@ test.describe('/proto/', () => {
     clean(watch);
   });
 
+  test('key art: the spirit picture is gone before the world ship enters the frame', async ({ page, watch }) => {
+    await page.goto('/proto/');
+    await page.waitForFunction(PROTO_READY, null, { timeout: CONFIG.routes['/proto/'].readyTimeoutMs });
+    const runtime = await (await page.request.get('/assets/topdown/layout.runtime.json')).json();
+    const meta = (await (await page.request.get('/proto/sprite_contact.json')).json()).sprites;
+    const bio = Object.keys(runtime.biomes);
+    const bi = bio.indexOf('spirit');
+    const ship = runtime.biomes.spirit.sprites.find((o) => o.id === 'spirit/shipwreck/ship');
+    // lowest opaque row of the ship texture, measured in the page
+    const low = await page.evaluate(async (src) => {
+      const i = new Image(); i.src = '/' + src; await i.decode();
+      const c = document.createElement('canvas'); c.width = i.width; c.height = i.height;
+      const g = c.getContext('2d'); g.drawImage(i, 0, 0);
+      const d = g.getImageData(0, 0, i.width, i.height).data;
+      for (let y = i.height - 1; y >= 0; y--) for (let x = 0; x < i.width; x++) if (d[(y * i.width + x) * 4 + 3] > 16) return (y + 1) / i.height;
+      return 1;
+    }, meta[ship.t].src);
+    const zLow = -bi * runtime.biome_spacing + ship.pos[2] - ship.h / 2 + low * ship.h;
+    const vh = page.viewportSize().height;
+    let lastArt = null, firstShip = null;
+    for (let z = -415; z >= -470; z -= 0.25) {
+      await page.evaluate((zz) => window.__PROTO.go(zz, 'auto'), z);
+      const [k, cam] = await page.evaluate(() => [window.__PROTO.keyArt().find((x) => x.id === 'spirit-afterlife'), window.__PROTO.camera()]);
+      const shipRow = vh / 2 + (zLow - z) * (vh / cam.frame);          // screen y of the hull's lowest row
+      const shipOn = shipRow > 0;
+      expect(k.weight > 0 && shipOn, `z ${z}: art ${k.weight} with the world ship on screen`).toBe(false);
+      if (k.weight > 0) lastArt = z;
+      if (shipOn && firstShip === null) firstShip = z;
+    }
+    expect(lastArt - firstShip).toBeGreaterThanOrEqual(2);                // a few metres of plain world between
+    expect((await page.evaluate(() => window.__PROTO.keyArt().find((x) => x.id === 'spirit-afterlife'))).z).toBeCloseTo(-440, 3);
+    clean(watch);
+  });
+
   test('key art: RU alt with ?lang=ru; ?debug=keyart outlines the same windows', async ({ page, watch }) => {
     const plan = JSON.parse(fs.readFileSync(path.join(HERE, '..', '..', '..', 'assets', 'topdown', 'key_art.json'), 'utf8'));
     await page.goto('/proto/?lang=ru');

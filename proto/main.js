@@ -596,15 +596,25 @@ function initKeyArt(layout) {
     if (!where.has(el.dataset.anchor)) throw new Error('key art ' + el.dataset.id + ': якоря ' + el.dataset.anchor + ' нет в layout');
     if (CONTENT_LOCALE === 'ru' && img.dataset.altRu !== undefined) img.alt = img.dataset.altRu;
     if (DEBUG.has('keyart')) el.classList.add('debug');
+    const exitCore = el.dataset.exitCore !== undefined ? +el.dataset.exitCore : +el.dataset.core;
+    const exitRange = el.dataset.exitRange !== undefined ? +el.dataset.exitRange : +el.dataset.range;
     KEYART.push({ id: el.dataset.id, el, img, side: el.dataset.side, core: +el.dataset.core, range: +el.dataset.range,
-                  preload: +el.dataset.preload, z: where.get(el.dataset.anchor) + +el.dataset.peakOffset });
+                  exitCore, exitRange, preload: +el.dataset.preload,
+                  z: where.get(el.dataset.anchor) + +el.dataset.peakOffset });
   }
+}
+
+/* Присутствие окна: как у карточек, но дальняя сторона (z меньше пика) может
+   гаснуть быстрее — exit_core/exit_range: окно уходит раньше, чем в кадр
+   войдёт объект мира, который оно показывает. */
+function keyArtWeight(k, z) {
+  return z >= k.z ? presence(k, z) : presence({ z: k.z, core: k.exitCore, range: k.exitRange }, z);
 }
 
 function updateKeyArt() {
   for (const k of KEYART) {
-    if (!k.img.getAttribute('src') && Math.abs(state.z - k.z) <= k.range + k.preload) k.img.src = k.img.dataset.src;
-    k.weight = presence(k, state.z);
+    if (!k.img.getAttribute('src') && Math.abs(state.z - k.z) <= Math.max(k.range, k.exitRange) + k.preload) k.img.src = k.img.dataset.src;
+    k.weight = keyArtWeight(k, state.z);
     k.el.style.opacity = k.weight.toFixed(3);
     k.el.style.setProperty('--enter', REDUCED_MOTION ? '0px' : ((1 - k.weight) * 10).toFixed(1) + 'px');
   }
@@ -1180,7 +1190,8 @@ window.__PROTO = {
   // key art: только в ?debug=keyart (планирование); иначе пусто
   keyArt: () => KEYART.map((k) => {
     const r = k.el.getBoundingClientRect();
-    return { id: k.id, z: k.z, core: k.core, range: k.range, side: k.side, preload: k.preload,
+    return { id: k.id, z: k.z, core: k.core, range: k.range, exitCore: k.exitCore, exitRange: k.exitRange,
+             side: k.side, preload: k.preload,
              w: r.width, h: r.height, weight: k.weight ?? 0,
              requested: !!k.img.getAttribute('src'), loaded: k.img.complete && k.img.naturalWidth > 0 };
   }),

@@ -1051,7 +1051,7 @@ class ProtoModes(unittest.TestCase):
             # no width breakpoint anywhere else: no innerWidth comparisons, no width media queries
             self.assertIsNone(re.search(r"innerWidth\s*[<>]=?|[<>]=?\s*innerWidth", txt), f)
             self.assertIsNone(re.search(r"\((?:max|min)-width\s*:", txt), f)
-            self.assertIsNone(re.search(rf"({self.NARROW}|{self.NARROW - 1})px", txt), f)
+            self.assertIsNone(re.search(rf"\b({self.NARROW}|{self.NARROW - 1})px\b", txt), f)
             self.assertNotIn("prefers-reduced-motion: reduce)').matches", txt.replace("REDUCED_MOTION = matchMedia('(prefers-reduced-motion: reduce)').matches", ""), f)
 
     def test_boot_order_and_no_world_in_static(self):
@@ -1096,6 +1096,73 @@ class ProtoModes(unittest.TestCase):
         proto = read("proto/main.js")
         self.assertIn("if (!LIVE()) return;", proto)
         self.assertIn("window.FELLMISE_MODE.fail(e)", proto)
+
+
+class Audio(unittest.TestCase):
+    """/proto/ sound: assets/topdown/audio.json is data (tools/audio_config.py),
+    proto/audio.js the one manager; muted by default, live mode only."""
+
+    @classmethod
+    def setUpClass(cls):
+        import audio_config as AC
+        cls.AC = AC
+        cls.cfg, cls.pres = AC.load()
+
+    def bad(self, mutate, root=ROOT):
+        cfg = copy.deepcopy(self.cfg)
+        mutate(cfg)
+        return self.AC.validate(cfg, self.pres, root)
+
+    def test_committed_config_is_valid_and_all_planned(self):
+        self.assertEqual(self.AC.validate(self.cfg, self.pres), [])
+        self.assertEqual([b["id"] for b in self.cfg["biomes"]], ["village", "forest", "mine", "spirit", "home"])
+        self.assertEqual([t["id"] for t in self.cfg["transitions"]],
+                         ["village-forest", "forest-mine", "mine-spirit", "spirit-home"])
+        # no sound files in this batch: every asset is planned and none is committed
+        self.assertEqual({e["status"] for e in self.cfg["biomes"] + self.cfg["transitions"]}, {"planned"})
+        self.assertFalse(list((ROOT / "assets").rglob("*.webm")) + list((ROOT / "assets").rglob("*.ogg"))
+                         + list((ROOT / "assets").rglob("*.wav")))
+
+    def test_validator_refuses(self):
+        self.assertTrue(self.bad(lambda c: c["master"].update(default_muted=False)))
+        self.assertTrue(self.bad(lambda c: c["biomes"].reverse()))
+        self.assertTrue(self.bad(lambda c: c["transitions"].pop()))
+        self.assertTrue(self.bad(lambda c: c["biomes"][0].update(when="z < -100")))      # logic key
+        self.assertTrue(self.bad(lambda c: c["biomes"][0].update(status="live")))       # live, no file
+        self.assertTrue(self.bad(lambda c: c["transitions"][0].update(loop=True)))
+        self.assertTrue(self.bad(lambda c: c["biomes"][1].update(fade_ms=[100])))
+        self.assertTrue(self.bad(lambda c: c["biomes"][2].update(asset="sounds/mine.wav")))
+        with tempfile.TemporaryDirectory() as d:                                     # planned, but a file exists
+            f = pathlib.Path(d) / self.cfg["biomes"][0]["asset"]
+            f.parent.mkdir(parents=True)
+            f.write_bytes(b"x")
+            self.assertTrue(any("planned but" in b for b in self.bad(lambda c: None, pathlib.Path(d))))
+
+    def test_one_manager_live_only(self):
+        js = read("proto/audio.js")
+        main = read("proto/main.js")
+        self.assertIn("import { createAudio } from './audio.js';", main)
+        self.assertIn("if (AUDIO) AUDIO.update(state.z);", main)
+        for f in ("proto/boot.js", "proto/mode.js", "proto/index.html", "proto/fallback.css"):
+            self.assertFalse("./audio.js" in read(f) or "AudioContext" in read(f), f)
+        self.assertNotIn("AudioContext", main)
+        # the context is created in one place, and only from the toggle or a gesture
+        self.assertEqual(js.count("new AC()"), 1)
+        self.assertEqual(len(re.findall(r"\bensureContext\(\);", js)), 1)
+        self.assertEqual(len(re.findall(r"\bturnOn\(\);", js)), 2)
+        self.assertIn("'fellmise.audio.enabled'", js)
+        self.assertNotIn("autoplay", read("proto/index.html"))
+        # no scroll-driven unlock: only pointerdown / keydown / click
+        self.assertNotRegex(js, r"addEventListener\('(wheel|scroll|touchmove)'")
+        # weights come from the presentation blend bands, not a second map
+        self.assertIn("presentation.transitions", js)
+        self.assertNotRegex(js, r"-1[0-9]{2}\b|-[3-6][0-9]{2}\b")               # no hard-coded z
+
+    def test_toggle_scoped_to_live(self):
+        page = read("proto/index.html")
+        self.assertIn(".mode-live .audio-toggle {", page)
+        self.assertIn(".mode-live .audio-toggle:focus-visible", page)
+        self.assertNotIn("audio-toggle", read("proto/fallback.css"))
 
 
 if __name__ == "__main__":

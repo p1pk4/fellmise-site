@@ -17,7 +17,7 @@
 - **Тип:** feat
 - **Проверка:** test_layout 68/68 · smoke 24/24 · selftest 27/27 · `--check` ✓ ·
   visual vs main: 24 прежних SAME, 3 новых keyart-*
-- **Commit:** <hash>
+- **Commit:** 1fc2eca
 
 ## 2026-09-19 06:02 — key-art-planning-1: поправки по review
 

@@ -17,7 +17,7 @@
 - **Тип:** fix
 - **Проверка:** test_layout 67/67 · smoke 23/23 · `--check` ✓ · visual strict
   vs main 24/24 SAME
-- **Commit:** <hash>
+- **Commit:** 49fe4f2
 
 ## 2026-09-19 05:39 — key-art-planning-1: слоты под key art (без арта)
 

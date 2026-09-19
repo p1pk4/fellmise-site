@@ -293,6 +293,24 @@ assets/topdown/content_points.json ─ tools/build_proto_content.py ─→ proto
   призрачный мировой корабль (родня key art D), тень 25% (вариант B). Собирается
   детерминированно из `assets/feat_death_alt.webp`: `python tools/make_ghost_ship.py`.
 
+## /proto/: живой и статический режим
+
+Одно правило — `proto/mode.js` (классический скрипт в `<head>`): **live** —
+ширина ≥ 900, без `prefers-reduced-motion`, есть WebGL2; иначе **static**:
+узкий экран, reduced motion, нет WebGL2, `?static=1`, упавшая живая загрузка
+(`FELLMISE_MODE.fail`). Без JS класса нет — это тоже статика; картинки key art
+тогда приходят из `<noscript>`-двойников (при JS они инертны).
+
+* `proto/boot.js` импортирует мир (`main.js`, three.js, раскладку, спрайты)
+  только в live; статика их не грузит вовсе.
+* Статика — та же разметка (статьи content points и figure key art), что и
+  у живого режима: `proto/fallback.css` (весь под `:root:not(.mode-live)`)
+  выстраивает её одной колонкой по маршруту, полосами цвета биомов. Живой CSS
+  в `proto/index.html` — весь под `.mode-live`.
+* Причина режима — `data-mode-reason` на `<html>`, текст ошибки — только в
+  `?debug=hud`. `node tests/browser/fallback_review.mjs` → листы 390/1280/430/RU
+  (в CI — артефакт `fallback-review-*`).
+
 ## Проверки (они же в CI, `.github/workflows/ci.yml`)
 
 ```

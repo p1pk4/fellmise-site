@@ -115,6 +115,9 @@ export async function capture({ root, out, mutate = false, quiet = false }) {
         // a lazily loaded picture must be decoded before the shot
         await page.evaluate(() => Promise.all([...document.images].filter((i) => i.getAttribute('src'))
           .map((i) => i.decode().catch(() => {}))));
+        // a freshly decoded picture is first composited at draft resampling
+        // quality, then re-rastered; give key art frames time to settle
+        if (c.keyart) await page.waitForTimeout(250);
         await rafs(page);        // the frame go() drew has to reach the compositor
         const file = path.join(out, `${c.id}.png`);
         await page.screenshot({ path: file, animations: 'disabled', caret: 'hide' });

@@ -964,7 +964,7 @@ class KeyArt(unittest.TestCase):
     def test_soft_edge_no_card_chrome(self):
         """The window fades into the world (mask), no frame or popup shadow."""
         page = read("proto/index.html")
-        css = page[page.index("  .key-art {"):page.index("  .key-art[data-side=\"left\"]")]
+        css = page[page.index("  .mode-live .key-art {"):page.index("  .mode-live .key-art[data-side=\"left\"]")]
         self.assertIn("mask-image: radial-gradient(", css)
         for bad in ("border:", "box-shadow", "border-radius"):
             self.assertNotIn(bad, css)
@@ -1032,6 +1032,70 @@ class SpriteOverrides(unittest.TestCase):
         proto = read("proto/main.js")
         self.assertIn("opacity: PRES.contact_shadow.opacity * (art.shadowOpacity ?? 1)", proto)
         self.assertIn("const art = await spriteFor(o);", proto)
+
+
+class ProtoModes(unittest.TestCase):
+    """/proto/ live vs static: one rule (proto/mode.js), static = the default markup."""
+
+    NARROW = 900           # mirrors proto/mode.js
+
+    def test_single_rule_in_mode_js(self):
+        mode = read("proto/mode.js")
+        self.assertIn(f"var NARROW = {self.NARROW};", mode)
+        for needle in ("q.get('static') === '1'", "innerWidth < NARROW", "prefers-reduced-motion: reduce",
+                       "getContext('webgl2')", "fail: function"):
+            self.assertIn(needle, mode)
+        # no other file decides the mode or repeats the threshold
+        for f in ("proto/main.js", "proto/boot.js", "proto/fallback.css", "proto/index.html"):
+            txt = read(f)
+            # no width breakpoint anywhere else: no innerWidth comparisons, no width media queries
+            self.assertIsNone(re.search(r"innerWidth\s*[<>]=?|[<>]=?\s*innerWidth", txt), f)
+            self.assertIsNone(re.search(r"\((?:max|min)-width\s*:", txt), f)
+            self.assertIsNone(re.search(rf"({self.NARROW}|{self.NARROW - 1})px", txt), f)
+            self.assertNotIn("prefers-reduced-motion: reduce)').matches", txt.replace("REDUCED_MOTION = matchMedia('(prefers-reduced-motion: reduce)').matches", ""), f)
+
+    def test_boot_order_and_no_world_in_static(self):
+        """mode.js is a blocking head script (class before first paint); the
+        world module is imported only by boot.js and only in live mode."""
+        page = read("proto/index.html")
+        self.assertLess(page.index('<script src="./mode.js"></script>'), page.index("</head>"))
+        self.assertIn('<script type="module" src="./boot.js"></script>', page)
+        self.assertNotIn('src="./main.js"', page)
+        boot = read("proto/boot.js")
+        self.assertIn("if (M && M.mode === 'live')", boot)
+        self.assertIn("import('./main.js').catch((e) => M.fail(e))", boot)
+
+    def test_live_css_scoped_and_fallback_css_scoped(self):
+        """Every live rule needs .mode-live; every fallback rule needs
+        :root:not(.mode-live): neither leaks into the other mode."""
+        page = read("proto/index.html")
+        css = page[page.index("<style>") + 7:page.index("</style>")]
+        css = re.sub(r"/\*.*?\*/", "", css, flags=re.S)
+        for sel in re.findall(r"([^{}]+)\{", css):
+            for one in sel.split(","):
+                one = one.strip()
+                self.assertTrue(one.startswith((".mode-live", "html.mode-live", ".content-visually-hidden")), one)
+        fb = re.sub(r"/\*.*?\*/", "", read("proto/fallback.css"), flags=re.S)
+        for block in re.findall(r"([^{}]+)\{[^{}]*\}", re.sub(r"@media[^{]*\{", "", fb)):
+            for one in block.split(","):
+                one = one.strip()
+                if one:
+                    self.assertTrue(one.startswith(":root:not(.mode-live)"), one)
+
+    def test_static_order_is_the_route(self):
+        """The fallback column follows the route: village(+art) forest mine(+art) (art)spirit home."""
+        fb = read("proto/fallback.css")
+        orders = dict(re.findall(r'(\.content-point\[data-order="\d"\]|\.key-art\[data-id="[a-z-]+"\]) \{ order: (\d+); \}', fb))
+        seq = sorted(orders, key=lambda k: int(orders[k]))
+        self.assertEqual(seq, ['.content-point[data-order="1"]', '.key-art[data-id="village-life"]',
+                               '.content-point[data-order="2"]', '.content-point[data-order="3"]',
+                               '.key-art[data-id="mine-work"]', '.key-art[data-id="spirit-afterlife"]',
+                               '.content-point[data-order="4"]', '.content-point[data-order="5"]'])
+
+    def test_live_handlers_guarded(self):
+        proto = read("proto/main.js")
+        self.assertIn("if (!LIVE()) return;", proto)
+        self.assertIn("window.FELLMISE_MODE.fail(e)", proto)
 
 
 if __name__ == "__main__":

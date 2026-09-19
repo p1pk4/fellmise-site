@@ -5,6 +5,49 @@
 
 ---
 
+## 2026-09-19 17:40 — fallback-mobile-1: порог 900 и key art без JS
+
+- **Что:** порог живого режима /proto/ 760 → 900 (`proto/mode.js`, единственный
+  источник): 768/820/834/899 — статика, 900/1024/1280 — live. Без JavaScript
+  три key art показываются: `tools/key_art.py` добавляет в каждую figure
+  `<noscript><img src loading=lazy alt></noscript>`, пустая `img[data-src]` без
+  JS скрыта; при JS `<noscript>` инертен — ленивая загрузка и одна картинка
+  на figure как раньше.
+- **Тип:** fix
+- **Проверка:** test_layout 80/80 · smoke 43 passed · selftest 27/27 ·
+  `--check` ✓ · visual strict vs production 9f61ccd SAME
+- **Commit:** 3650543
+
+## 2026-09-19 17:12 — fallback-mobile-1: статический путь /proto/
+
+- **Что:** у /proto/ появился статический режим — тот же путь village →
+  forest → mine → spirit → home в DOM (статьи content points + key art одной
+  колонкой, полосы цвета биомов), без WebGL. Правило одно — `proto/mode.js`:
+  ширина < 760, reduced motion, нет WebGL2, `?static=1`, упавшая загрузка;
+  без JS — тоже статика. `boot.js` грузит мир только в live. Живой CSS —
+  под `.mode-live`, статический — `proto/fallback.css`. Старый KNOWN BUG
+  «нет fallback без WebGL» закрыт. Тексты, арт, мир — без изменений.
+- **Тип:** feat
+- **Проверка:** test_layout 80/80 · smoke 38 passed (+11: матрица режимов,
+  no-WebGL, без JS, RU, падение загрузки) · selftest 27/27 · `--check` ✓ ·
+  visual strict vs main SAME (десктоп live пиксель-в-пиксель)
+- **Commit:** 139867b
+
+## 2026-09-19 16:58 — Key Art 1 выпущен в production
+
+- **Что:** в main влит стек PR #12 ← #13 ← #14 ← #15; production baseline
+  `9f61ccd082612f120c1d61c54aba238e778bd8f6`. В нём: 3 окна key art в /proto/
+  (village-life справа, mine-work слева, spirit-afterlife слева; 480×320,
+  мягкая маска, ленивая загрузка, alt EN/RU); spirit — вариант D (призрачный
+  корабль), пик −440, гаснет к −453; призрачный мировой корабль только в
+  /proto/ (`proto/sprite_overrides.json`, тень 25%, контакт по корпусу),
+  входит в кадр на −455.87 — зазор ~3 м. `assets/feat_death_alt.webp`,
+  раскладка, /next/, /full/, корень не менялись.
+- **Тип:** docs
+- **Проверка:** n/a (релиз проверен: CI каждого PR и main success, Pages built
+  9f61ccd, / /ru/ /proto/ /next/ /full/ — 200, production == main 61/61 SAME)
+- **Commit:** 1751af1 (#15), 83e727b (#14), beeab9e (#13), 9f61ccd (#12 → main)
+
 ## 2026-09-19 15:24 — world-ghostship-1: призрачный мировой корабль (только /proto/)
 
 - **Что:** объект `spirit/shipwreck/ship` в /proto/ рисуется призрачным

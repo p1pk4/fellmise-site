@@ -1,0 +1,132 @@
+/* /proto/ — статическая версия того же пути (узкий экран, reduced motion, нет
+   WebGL, ?static=1, упавшая живая загрузка, выключенный JS). Режим решает
+   proto/mode.js; живому режиму нужен класс mode-live, поэтому ВСЁ здесь
+   ограничено :root:not(.mode-live) и в живом режиме не действует.
+
+   Разметка — та же, что у живого режима (статические статьи content points и
+   figure key art из proto/index.html): контейнеры «растворяются»
+   (display: contents), и статьи с картинками выстраиваются одной колонкой в
+   порядке маршрута — village → forest → mine → spirit → home. Каждая точка —
+   полоса своего биома: цвет земли биома, текст, иллюстрация. Своих текстов
+   и картинок у статики нет. */
+
+:root:not(.mode-live) {
+  --fb-ink: #f3edda;
+  --fb-ink-soft: rgba(243, 237, 218, .9);
+  --fb-gold: #ffc857;
+  --fb-village: #34502a;
+  --fb-forest: #25391f;
+  --fb-mine: #2c251d;
+  --fb-spirit: #1d2c25;
+  --fb-home: #36532c;
+  background: #1a2216;
+  color: var(--fb-ink);
+  -webkit-text-size-adjust: 100%;
+}
+:root:not(.mode-live) body {
+  margin: 0;
+  background: #1a2216;
+  overflow-x: hidden;
+}
+
+/* живые слои без смысла в статике */
+:root:not(.mode-live) #biome-transition-overlay,
+:root:not(.mode-live) body > canvas { display: none; }
+:root:not(.mode-live) #hud { position: fixed; left: 8px; top: 8px; z-index: 10; padding: 6px 10px;
+  background: rgba(18, 22, 24, .9); color: #fdf6e0; font: 12px/1.4 ui-monospace, monospace; white-space: pre; }
+
+/* одна колонка в порядке маршрута */
+:root:not(.mode-live) #journey { display: flex; flex-direction: column; }
+:root:not(.mode-live) #content-overlay,
+:root:not(.mode-live) #keyart-overlay,
+:root:not(.mode-live) .content-locale { display: contents; }
+:root:not(.mode-live) .content-locale[hidden] { display: none; }
+
+/* заголовок страницы (в живом режиме он только для скринридера) */
+:root:not(.mode-live) .content-locale > h1 {
+  order: 0;
+  position: static; width: auto; height: auto; margin: 0; overflow: visible;
+  clip: auto; white-space: normal;
+  padding: clamp(40px, 9vw, 72px) 20px clamp(28px, 6vw, 48px);
+  background: linear-gradient(180deg, #1a2216, var(--fb-village));
+  color: var(--fb-ink);
+  font: 700 clamp(28px, 7vw, 44px)/1.12 Georgia, "Iowan Old Style", "Palatino Linotype", "Times New Roman", serif;
+  text-align: center;
+}
+
+/* точка маршрута — полоса своего биома */
+:root:not(.mode-live) .content-point {
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0;
+  padding: clamp(28px, 6vw, 48px) 20px clamp(24px, 5vw, 40px);
+  opacity: 1 !important;                  /* на случай упавшей живой загрузки */
+  transform: none !important;
+}
+:root:not(.mode-live) .content-point > * { max-width: 38rem; margin-left: auto; margin-right: auto; }
+:root:not(.mode-live) .content-point__kicker {
+  margin-bottom: 12px; color: var(--fb-gold);
+  font: 600 12px/1.3 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  letter-spacing: .16em; text-transform: uppercase;
+}
+:root:not(.mode-live) .content-point__title {
+  margin-top: 0; margin-bottom: 14px; color: #fdf6e0;
+  font: 700 clamp(26px, 6.4vw, 34px)/1.18 Georgia, "Iowan Old Style", "Palatino Linotype", "Times New Roman", serif;
+}
+:root:not(.mode-live) .content-point__body {
+  margin-top: 0; margin-bottom: 0; color: var(--fb-ink-soft);
+  font: 400 17px/1.65 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+/* иллюстрация — обычная картинка внутри полосы своего биома */
+:root:not(.mode-live) .key-art {
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0;
+  padding: 0 20px clamp(28px, 6vw, 48px);
+  opacity: 1 !important;
+  transform: none !important;
+}
+/* без JavaScript (mode.js не поставил data-mode): ленивая <img data-src>
+   пустая — показывается её <noscript>-двойник с настоящим src */
+:root:not(.mode-live):not([data-mode]) .key-art img[data-src] { display: none; }
+:root:not(.mode-live) .key-art img {
+  display: block;
+  width: 100%; max-width: 44rem; height: auto; aspect-ratio: 3 / 2;
+  margin: 0 auto;
+  object-fit: cover;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, .18);         /* место под ещё не загруженную картинку */
+}
+
+/* порядок маршрута: статьи по data-order, картинки рядом со своей точкой
+   (village и mine — после текста, spirit — перед: так же, как на живом пути) */
+:root:not(.mode-live) .content-point[data-order="1"] { order: 10; }
+:root:not(.mode-live) .key-art[data-id="village-life"] { order: 11; }
+:root:not(.mode-live) .content-point[data-order="2"] { order: 20; }
+:root:not(.mode-live) .content-point[data-order="3"] { order: 30; }
+:root:not(.mode-live) .key-art[data-id="mine-work"] { order: 31; }
+:root:not(.mode-live) .key-art[data-id="spirit-afterlife"] { order: 39; }
+:root:not(.mode-live) .content-point[data-order="4"] { order: 40; }
+:root:not(.mode-live) .content-point[data-order="5"] { order: 50; }
+
+/* цвет полос — земля биома; соседние полосы одного биома сливаются */
+:root:not(.mode-live) [data-biome="village"] { background: var(--fb-village); }
+:root:not(.mode-live) [data-biome="forest"] { background: linear-gradient(180deg, var(--fb-village) 0, var(--fb-forest) 64px); }
+:root:not(.mode-live) [data-biome="mine"] { background: var(--fb-mine); }
+:root:not(.mode-live) .content-point[data-biome="mine"] { background: linear-gradient(180deg, var(--fb-forest) 0, var(--fb-mine) 64px); }
+:root:not(.mode-live) [data-biome="spirit"] { background: var(--fb-spirit); }
+:root:not(.mode-live) .key-art[data-biome="spirit"] { background: linear-gradient(180deg, var(--fb-mine) 0, var(--fb-spirit) 64px); }
+:root:not(.mode-live) .key-art[data-biome="spirit"] { padding-top: clamp(28px, 6vw, 48px); }
+:root:not(.mode-live) [data-biome="home"] {
+  background: linear-gradient(180deg, var(--fb-spirit) 0, var(--fb-home) 64px);
+  padding-bottom: clamp(56px, 12vw, 96px);
+}
+
+:root:not(.mode-live) :focus-visible { outline: 2px solid var(--fb-gold); outline-offset: 3px; }
+
+@media (prefers-reduced-motion: reduce) {
+  :root:not(.mode-live) *, :root:not(.mode-live) *::before, :root:not(.mode-live) *::after {
+    animation: none !important; transition: none !important; scroll-behavior: auto !important;
+  }
+}

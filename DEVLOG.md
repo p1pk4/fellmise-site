@@ -17,7 +17,7 @@
 - **Проверка:** test_layout 61/61 · smoke 21/21 · selftest 23/24 · `--check` ✓ ·
   layout/content/presentation без изменений · visual vs main: 19 прежних SAME,
   5 новых choreo-*
-- **Commit:** <hash>
+- **Commit:** 2ed3ad3
 
 ## 2026-09-19 04:23 — Content Points 1 выпущен в production
 

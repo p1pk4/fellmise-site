@@ -16,7 +16,7 @@
 - **Проверка:** test_layout 55/55 · smoke 19/19 · selftest 18/19 (порог 10) ·
   `--check` ✓ · visual vs PR #9: мир −HUD (6.0% во всех 14), content-* — HUD +
   карточка
-- **Commit:** <hash>
+- **Commit:** 488a44b
 
 ## 2026-09-19 03:16 — content-points-1: DOM-карточки, привязанные к миру
 

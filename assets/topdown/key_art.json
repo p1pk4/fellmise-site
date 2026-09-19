@@ -6,7 +6,8 @@
   "Windows live only where the route is free: no content card visible, no camera focus, no transition dim",
   "(tools/key_art.py checks it against content_points.json, camera_choreography.json and the layout presentation).",
   "Sizes: display width in CSS px at a 1280x800 desktop; target_px is the art to commission (>= 2x display, DPR 2 + headroom).",
-  "Review only: /proto/?debug=keyart shows neutral placeholders; tests/browser/key_art_review.mjs renders the sheets."
+  "Review only: /proto/?debug=keyart shows neutral placeholders; tests/browser/key_art_review.mjs renders the sheets.",
+  "Windows may touch the very tail of a camera focus only where its weight is <= 0.05 (the frame is ~40 m), and must end before the ground blend that leaves their own biome starts."
  ],
  "status": "planning",
  "max_slots": 3,
@@ -17,11 +18,11 @@
    "status": "planned",
    "anchor": {
     "object": "village/tavern/tavern",
-    "peak_offset": -47
+    "peak_offset": -31.5
    },
    "activation": {
-    "core": 6,
-    "range": 18
+    "core": 4,
+    "range": 10
    },
    "side": "right",
    "aspect": "3:2",
@@ -47,7 +48,7 @@
     "preload_ahead_m": 120,
     "priority": "low"
    },
-   "why": "the village on screen is empty of people; the copy says the world lives without you (NPCs haul, haggle, drink) - the picture shows that life. After the tavern focus, before the forest"
+   "why": "the village on screen is empty of people; the copy says the world lives without you (NPCs haul, haggle, drink) - the picture shows that life. Right after the tavern focus (focus weight <= 0.03), while the ground is still the village's: out before the village->forest ground blend starts (z -114)"
   },
   {
    "id": "mine-work",

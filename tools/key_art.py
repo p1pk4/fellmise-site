@@ -5,7 +5,9 @@
 
 A slot is a DOM illustration window over the world, anchored to a stable
 layout object. Its window (peak ± range of camera z) must sit where the route
-is free: no content card visible, no camera focus, no biome transition dim.
+is free: no content card visible, no biome transition dim, a camera focus at
+most at its tail (weight <= 0.05, frame ~40 m), and out before the ground
+blend that leaves the slot's own biome starts.
 Nothing here is drawn in production; /proto/?debug=keyart shows placeholders.
 """
 
@@ -50,13 +52,26 @@ def display_px(slot):
     return w, round(w / aspect(slot))
 
 
+FOCUS_MAX = 0.05       # camera focus weight a key art window may coexist with (frame ~40 m)
+
+
+def focus_max(slot, rt):
+    """Highest camera-focus weight anywhere the slot is on screen."""
+    ch = CC.load()
+    pk = CC.peaks(ch, rt)
+    e, s = window(slot, rt)
+    z, top = s, 0.0
+    while z >= e:
+        top = max(top, CC.frame_at(ch, rt, z, pk)[2])
+        z -= 0.25
+    return top
+
+
 def busy(rt):
-    """Route spans already taken: (z_start, z_end, what)."""
-    ch, cp = CC.load(), BPC.load()
+    """Route spans already taken: (z_start, z_end, what). Camera focus is
+    checked by weight (focus_max), not by its window."""
+    cp = BPC.load()
     out = []
-    for f, p in CC.peaks(ch, rt):
-        e, s = CC.window(f, p, CC.route_end(ch, rt))
-        out.append((s, e, "camera focus " + f["id"]))
     for p in cp["points"]:
         z = BPC.anchor_z(rt, p["anchor"]["object"])
         out.append((z + p["activation"]["range"], z - p["activation"]["range"], "content card " + p["id"]))
@@ -119,6 +134,12 @@ def check(data, rt=None):
     for (e, s), slot in wins:
         if e < end:
             bad.append(f"{slot['id']}: окно заходит за конец маршрута")
+        fm = focus_max(slot, rt)
+        if fm > FOCUS_MAX:
+            bad.append(f"{slot['id']}: на окне вес фокуса камеры до {fm:.2f} (> {FOCUS_MAX})")
+        for t in rt["presentation"]["transitions"]:
+            if t["from"] == slot["biome"] and e < t["blend_z"][0]:
+                bad.append(f"{slot['id']}: окно заходит в смешение грунта {t['from']}→{t['to']} (с z {t['blend_z'][0]})")
         for bs, be, what in busy(rt):
             if e < bs and s > be:
                 bad.append(f"{slot['id']}: окно {s:.0f}..{e:.0f} пересекается с «{what}» ({bs:.0f}..{be:.0f})")
@@ -144,7 +165,8 @@ def main():
         p = peak(s, rt)
         w, h = display_px(s)
         print(f"{s['id']:17} {s['biome']:8} enter {st:7.1f}  peak {p:7.1f} (±{s['activation']['core']})  "
-              f"exit {e:7.1f}  {s['side']:5} {s['aspect']} {w}×{h} css  target {s['target_px'][0]}×{s['target_px'][1]}")
+              f"exit {e:7.1f}  {s['side']:5} {s['aspect']} {w}×{h} css  target {s['target_px'][0]}×{s['target_px'][1]}"
+              f"  focus<= {focus_max(s, rt):.3f}")
 
 
 if __name__ == "__main__":

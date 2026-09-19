@@ -879,6 +879,34 @@ class KeyArtPlanning(unittest.TestCase):
             mutate(d)
             self.assertTrue(self.K.check(d, self.rt))
 
+    def test_village_life_between_tavern_and_forest(self):
+        """village-life: after the tavern focus core, out before the forest
+        ground blend and its transition dim, no card at the peak, the camera
+        focus at most a tail (<= 0.05) anywhere in the window."""
+        import build_proto_content as BPC
+        import camera_choreography as CC
+        slot = next(x for x in self.data["slots"] if x["id"] == "village-life")
+        e, st = self.K.window(slot, self.rt)
+        p = self.K.peak(slot, self.rt)
+        vf = next(t for t in self.rt["presentation"]["transitions"] if t["from"] == "village")
+        self.assertGreaterEqual(e, vf["blend_z"][0])                       # before forest ground
+        self.assertGreater(e, vf["anchor_z"] + vf["dim"]["half_width"])     # before the dim
+        ch = CC.load()
+        tav, tp = next((f, z) for f, z in CC.peaks(ch, self.rt) if f["id"] == "village-tavern")
+        self.assertLess(p, tp - tav["hold"])                                # after the focus core
+        self.assertLessEqual(self.K.focus_max(slot, self.rt), 0.05)
+        self.assertEqual(CC.frame_at(ch, self.rt, p)[0], 40)
+        for pt in BPC.load()["points"]:
+            d = abs(p - BPC.anchor_z(self.rt, pt["anchor"]["object"]))
+            self.assertGreaterEqual(d, pt["activation"]["range"], pt["id"])    # no card at the peak
+
+    def test_new_rules_catch(self):
+        """A window deep in the tavern focus, or into the forest ground blend, is refused."""
+        for off in (-8, -40):
+            d = copy.deepcopy(self.data)
+            d["slots"][0]["anchor"]["peak_offset"] = off
+            self.assertTrue(self.K.check(d, self.rt), off)
+
     def test_no_production_dependency(self):
         """Planning only: no image file, and /proto/ reads the plan only in ?debug=keyart."""
         proto = read("proto/main.js")

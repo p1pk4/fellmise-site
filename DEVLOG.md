@@ -15,7 +15,7 @@
 - **Тип:** fix
 - **Проверка:** test_layout 62/62 · smoke 22/22 · selftest 24/24 · `--check` ✓ ·
   layout/content/road без изменений · visual vs PR #11: 24/24 SAME
-- **Commit:** <hash>
+- **Commit:** 9e47a87
 
 ## 2026-09-19 04:38 — zoom-choreography-1: зум как функция маршрута
 

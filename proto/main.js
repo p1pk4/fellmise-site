@@ -14,6 +14,12 @@
 import * as THREE from './vendor/three.module.min.js';
 
 const HUD = document.getElementById('hud');
+/* Отладочная панель — не часть страницы: видна только по явному ?debug=hud
+   (флаги через запятую, на будущее). Обновляется она всегда — тесты и
+   __PROTO читают состояние не из неё. При падении сцены она открывается сама:
+   ошибку лучше показать, чем оставить пустой экран. */
+const DEBUG = new Set((new URLSearchParams(location.search).get('debug') || '').split(',').filter(Boolean));
+HUD.hidden = !DEBUG.has('hud');
 const ASSETS = '../assets/';
 const LAYOUT = ASSETS + 'topdown/layout.runtime.json';
 const STRIPPED = './sprites_stripped/';
@@ -437,6 +443,83 @@ function shadowFor(art, o, z) {
   return q;
 }
 
+// ------------------------------------------------------- контентные точки --
+/* Слова — в DOM (proto/index.html, собирается tools/build_proto_content.py
+   из assets/topdown/content_points.json): все карточки обеих локалей есть в
+   HTML до запуска скрипта. Здесь их ничего не создаёт и не удаляет — только
+   решает, насколько каждая видна.
+
+   Присутствие — чистая функция z камеры: 1 внутри core метров от якоря,
+   плавно до 0 к range. Ни таймеров, ни истории: кадр на одном z всегда один и
+   тот же, а моргать у границы нечему — функция непрерывна. Окна точек не
+   перекрываются (проверяет build_proto_content.py), поэтому полностью видна
+   максимум одна карточка.
+
+   Якорь — стабильный id объекта layout; его мировая x/z проецируется в экран
+   (для выбора стороны при side=auto и для проверок). Карточка привязана к краю
+   вьюпорта, а не к точке: при смене зума она не прыгает. */
+const MARKER = { t: 'prop_signpost', h: 3.0 };     // принятый спрайт пака, без букв
+const CONTENT = [];
+let CONTENT_MARKERS = new Set();
+let CONTENT_LOCALE = 'en';
+const REDUCED_MOTION = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function initContent(layout) {
+  const q = new URLSearchParams(location.search).get('lang');
+  const sections = [...document.querySelectorAll('.content-locale')];
+  const have = sections.map((s) => s.dataset.locale);
+  CONTENT_LOCALE = have.includes(q) ? q : (have[0] || 'en');
+  for (const s of sections) s.hidden = s.dataset.locale !== CONTENT_LOCALE;
+
+  const where = new Map();
+  Object.values(layout.biomes).forEach((b, bi) => {
+    for (const o of [...b.sprites, ...(b.boards || [])]) {
+      where.set(o.id, { x: o.pos[0], z: -bi * BIOME_SPACING + o.pos[2] });
+    }
+  });
+  const byId = new Map();
+  for (const el of document.querySelectorAll('.content-point')) {
+    const id = el.dataset.id;
+    if (!byId.has(id)) {
+      const a = where.get(el.dataset.anchor);
+      if (!a) throw new Error('контентная точка ' + id + ': якоря ' + el.dataset.anchor + ' нет в layout');
+      byId.set(id, { id, x: a.x, z: a.z, core: +el.dataset.core, range: +el.dataset.range,
+                     side: el.dataset.side, marker: el.dataset.marker, els: [] });
+    }
+    byId.get(id).els.push(el);
+  }
+  CONTENT.push(...byId.values());
+  CONTENT_MARKERS = new Set(CONTENT.map((p) => p.marker));
+}
+
+function presence(p, z) {
+  const d = Math.abs(z - p.z);
+  if (d <= p.core) return 1;
+  if (d >= p.range) return 0;
+  const u = (d - p.core) / (p.range - p.core);
+  return 1 - u * u * (3 - 2 * u);
+}
+
+const _proj = new THREE.Vector3();
+function updateContent() {
+  for (const p of CONTENT) {
+    const w = presence(p, state.z);
+    _proj.set(p.x, 0, p.z).project(camera);
+    p.screen = { x: (_proj.x + 1) / 2 * innerWidth, y: (1 - _proj.y) / 2 * innerHeight };
+    const side = p.side !== 'auto' ? p.side : (p.x < roadAt(p.z).cx ? 'left' : 'right');
+    p.weight = w;
+    p.state = w === 0 ? 'hidden' : w === 1 ? 'active' : state.z > p.z ? 'entering' : 'leaving';
+    for (const el of p.els) {
+      el.style.opacity = w.toFixed(3);
+      el.style.setProperty('--enter', REDUCED_MOTION ? '0px' : ((1 - w) * 14).toFixed(1) + 'px');
+      el.dataset.state = p.state;
+      el.dataset.side = side;
+      el.style.setProperty('--marker-x', p.screen.x.toFixed(1) + 'px');
+      el.style.setProperty('--marker-y', p.screen.y.toFixed(1) + 'px');
+    }
+  }
+}
+
 /* Сегменты одного отрезка: та же X и разрыв по Z не больше шага. Забор в пробе
    рисуется одним прямоугольником — смотрим, как читается линейный объект. */
 function groupRuns(segs) {
@@ -674,6 +757,7 @@ async function main() {
     throw new Error('в ' + LAYOUT + ' нет biome_spacing');
   }
   BIOME_SPACING = layout.biome_spacing;
+  initContent(layout);
   const dbg = layout.debug;
   const ids = Object.keys(layout.biomes);
   state.biomes = ids.length;
@@ -820,15 +904,19 @@ async function biome(layout, ids, i) {
       if (isFence(o) || isSky(o) || o.visible === false) continue;
       const z = z0 + o.pos[2];
       if (!o.t) {
-        // вывеска: лица у неё нет, в боевой сцене оно рисуется в canvas
-        const q = new THREE.Mesh(
-          new THREE.PlaneGeometry(o.h * 0.94, 0.6),
-          new THREE.MeshBasicMaterial({ color: 0xfdf6e0, depthTest: false }));
-        q.rotation.x = -Math.PI / 2;
-        q.rotation.z = o.rotY || 0;
-        q.position.set(o.pos[0], 1, z);
-        q.renderOrder = orderOf(z + 0.3);
-        scene.add(q);
+        /* Доска. Кремовая полоса на её месте читалась как отладка, а текста
+           на ней всё равно нет: слова — в DOM-карточке. Доска, к которой
+           привязана контентная точка, рисуется указателем (существующий
+           спрайт знака, без букв); остальные доски ждут своих точек и не
+           рисуются. Раскладка и её проверки не меняются: доска остаётся в
+           layout со своим следом. */
+        if (!CONTENT_MARKERS.has(o.id)) continue;
+        const art = await sprite(MARKER.t);
+        if (!art) continue;
+        const m = { pos: [o.pos[0], null, 0], h: MARKER.h, rotY: o.rotY || 0 };
+        const mz = z + 0.3 - MARKER.h / 2;          // низ знака = низ следа доски
+        scene.add(shadowFor(art, m, mz));
+        scene.add(flatQuad(art, m, mz));
         state.objects++;
         continue;
       }
@@ -890,6 +978,7 @@ function draw() {
   camera.up.set(0, 0, -1);
   camera.updateMatrixWorld();
   renderer.render(scene, camera);
+  updateContent();
   const halfM = ZOOM[state.zoom];
   const tiles = (halfM * 2) / TILE_M;                 // высота кадра в тайлах
   const asOrtho = halfM / TILE_M;                     // тот же кадр у камеры игры
@@ -971,7 +1060,13 @@ window.__PROTO = {
   // только чтение: для отчётов и тестов (что под камерой, где дорога)
   presentationAt: (z) => presentationAt(z ?? state.z),
   shadows: () => SHADOWS.map((s) => ({ ...s })),
+  // контентные точки: что видно на текущем z (только чтение)
+  content: () => ({
+    locale: CONTENT_LOCALE,
+    points: CONTENT.map((p) => ({ id: p.id, x: p.x, z: p.z, core: p.core, range: p.range,
+      weight: p.weight ?? 0, state: p.state ?? 'hidden', side: p.els[0]?.dataset.side, screen: p.screen })),
+  }),
   roadAt: (z) => roadAt(z),
 };
 
-main().catch((e) => { HUD.textContent = 'ошибка: ' + e.message; throw e; });
+main().catch((e) => { HUD.hidden = false; HUD.textContent = 'ошибка: ' + e.message; throw e; });

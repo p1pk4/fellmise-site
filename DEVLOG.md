@@ -5,6 +5,50 @@
 
 ---
 
+## 2026-09-19 03:54 — content-points-polish-1: карточки и скрытый HUD
+
+- **Что:** отладочная панель /proto/ скрыта, включается `?debug=hud`
+  (открывается сама при ошибке сцены). Карточки: ширина 340→364 px, текст
+  15→16 px, межстрочный 1.5→1.62, больше воздуха, панель — вуаль с градиентом
+  вместо чёрного прямоугольника, тоньше золотая линия, почти без тени. Тексты,
+  якоря, окна активации, статический DOM — без изменений.
+- **Тип:** feat
+- **Проверка:** test_layout 55/55 · smoke 19/19 · selftest 18/19 (порог 10) ·
+  `--check` ✓ · visual vs PR #9: мир −HUD (6.0% во всех 14), content-* — HUD +
+  карточка
+- **Commit:** 488a44b
+
+## 2026-09-19 03:16 — content-points-1: DOM-карточки, привязанные к миру
+
+- **Что:** в /proto/ первая система контентных точек: 5 точек (village,
+  forest, mine, spirit, home) из `assets/topdown/content_points.json` →
+  статические `<article>` EN+RU в `proto/index.html`
+  (`tools/build_proto_content.py`, `--check` в CI) → `main.js` только ставит
+  присутствие от z камеры. Тексты — дословно из `build_site.FEATURES`
+  (village — «A world that plays itself»). Якоря — доски layout; якорная доска
+  рисуется знаком `prop_signpost`, кремовые полосы убраны. `?lang=ru`. +5
+  контентных чекпоинтов (19), лист `content-points-review.png`.
+- **Тип:** feat
+- **Проверка:** test_layout 55/55 · smoke 18/18 · selftest 19/19 · `--check` ✓ ·
+  layout/next/root без изменений · visual vs main: мир 0.004–1.3% (доски→знаки,
+  счётчик HUD), content-* новые
+- **Commit:** 778daa9
+
+## 2026-09-19 03:03 — Biome Presentation 1 выпущен в production
+
+- **Что:** в main влит стек Biome Presentation 1 (PR #4 ← PR #6 ← PR #8),
+  production baseline `2d189d33144c7f5b20ad1fb1603a17b08f55e9d3`. В нём:
+  World Composition (PR #3, влит раньше); biome ground/palette и 4 перехода
+  village→forest→mine→spirit→home; road terminal у финального дома; модель
+  контактной тени по линии контакта (PR #6); отремонтированный низ B для
+  hero_house_a / hero_house_b / hero_well (PR #8). Collisions 0, road
+  intrusions 0. PR #5 закрыт как superseded, PR #7 (ground patches) — закрыт
+  как experiment/reference, в runtime не входит.
+- **Тип:** docs
+- **Проверка:** n/a (релиз проверен: CI main success, Pages built 2d189d3,
+  / /ru/ /proto/ /next/ — 200, production /proto/ == main 14/14 SAME strict)
+- **Commit:** 93343d1 (PR #8), 1270311 (PR #6), 2d189d3 (PR #4 → main)
+
 ## 2026-09-19 02:35 — sprite-repair-integration-1: отремонтированный низ 3 спрайтов
 
 - **Что:** `hero_house_b`, `hero_house_a`, `hero_well` в /proto/ заменены на

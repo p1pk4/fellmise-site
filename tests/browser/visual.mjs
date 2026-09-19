@@ -102,6 +102,13 @@ export async function capture({ root, out, mutate = false, quiet = false }) {
       }
       for (const c of list) {
         await page.evaluate(([z, zoom]) => window.__PROTO.go(z, zoom), [c.z, c.zoom]);
+        // world checkpoints judge the world, content checkpoints (with a
+        // `content` field) judge the cards: the DOM card layer is shown only
+        // on the latter. A page without the layer is unaffected.
+        await page.evaluate((show) => {
+          const o = document.getElementById('content-overlay');
+          if (o) o.style.visibility = show ? '' : 'hidden';
+        }, !!c.content);
         await rafs(page);        // the frame go() drew has to reach the compositor
         const file = path.join(out, `${c.id}.png`);
         await page.screenshot({ path: file, animations: 'disabled', caret: 'hide' });

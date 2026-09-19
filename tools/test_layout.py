@@ -636,5 +636,102 @@ class SpriteRepair(unittest.TestCase):
         self.assertIn("if n in repaired:", src)
 
 
+class ContentPoints(unittest.TestCase):
+    """assets/topdown/content_points.json -> static <article>s in proto/index.html."""
+
+    def setUp(self):
+        import build_proto_content as BPC
+        self.B = BPC
+        self.data = BPC.load()
+        self.runtime = json.loads(read("assets/topdown/layout.runtime.json"))
+
+    def test_source_valid(self):
+        """Schema, 5 stable ids, one per biome in route order, EN+RU, anchors and
+        markers resolve, windows do not overlap, copy quotes the site verbatim."""
+        self.assertEqual(self.B.check(self.data), [])
+        pts = self.data["points"]
+        self.assertEqual(len({p["id"] for p in pts}), 5)
+        self.assertEqual([p["biome"] for p in sorted(pts, key=lambda p: p["order"])],
+                         ["village", "forest", "mine", "spirit", "home"])
+
+    def test_check_catches_bad_source(self):
+        """Invented copy, a missing anchor, overlapping windows and an empty
+        locale are all refused."""
+        for mutate in (
+            lambda d: d["points"][0]["en"].__setitem__("body", "Coming 2027 with 10 000 players."),
+            lambda d: d["points"][1]["anchor"].__setitem__("object", "forest/board/nope"),
+            lambda d: d["points"][2]["activation"].__setitem__("range", 200),
+            lambda d: d["points"][3]["ru"].__setitem__("title", ""),
+            lambda d: d["points"][4]["ru"].__setitem__("body", "TODO"),
+        ):
+            d = copy.deepcopy(self.data)
+            mutate(d)
+            self.assertTrue(self.B.check(d, self.runtime))
+
+    def test_owner_example_is_the_village_point(self):
+        v = next(p for p in self.data["points"] if p["biome"] == "village")
+        self.assertEqual(v["en"]["title"], "A world that plays itself")
+        self.assertEqual(v["en"]["body"], "Log off and the world stays. NPCs run dungeons, haul goods, "
+                                          "haggle and drink in taverns. You are not arriving at an empty map.")
+
+    def test_static_html_is_current_and_holds_every_word(self):
+        """The page itself (no script) carries all 5 points in both locales."""
+        from html.parser import HTMLParser
+        page = read("proto/index.html")
+        self.assertEqual(self.B.render(page, self.data), page)
+
+        class P(HTMLParser):
+            def __init__(s):
+                super().__init__(); s.stack = []; s.found = []; s.locale = None; s.hidden = {}
+            def handle_starttag(s, tag, attrs):
+                a = dict(attrs)
+                if tag == "section" and "data-locale" in a:
+                    s.locale = a["data-locale"]; s.hidden[s.locale] = "hidden" in a
+                if tag == "article":
+                    s.found.append({"locale": s.locale, "id": a["data-id"], "text": {}})
+                cls = a.get("class", "")
+                s.stack.append(cls.replace("content-point__", "") if cls.startswith("content-point__") else None)
+            def handle_endtag(s, tag):
+                if s.stack: s.stack.pop()
+            def handle_data(s, d):
+                if s.stack and s.stack[-1] in ("kicker", "title", "body") and s.found:
+                    s.found[-1]["text"][s.stack[-1]] = s.found[-1]["text"].get(s.stack[-1], "") + d
+        pp = P(); pp.feed(page)
+        self.assertEqual(pp.hidden, {"en": False, "ru": True})
+        self.assertEqual(len(pp.found), 10)
+        for art in pp.found:
+            src = next(p for p in self.data["points"] if p["id"] == art["id"])[art["locale"]]
+            self.assertEqual(art["text"], {k: src[k] for k in ("kicker", "title", "body")}, art)
+
+    def test_one_card_at_a_time_along_the_route(self):
+        """presence() of proto/main.js, sampled every 0.5 m of the route: never
+        two cards at once, and each point reaches full presence at its anchor."""
+        pts = [(self.B.anchor_z(self.runtime, p["anchor"]["object"]), p["activation"]) for p in self.data["points"]]
+
+        def w(z, az, a):
+            d = abs(z - az)
+            if d <= a["core"]:
+                return 1.0
+            if d >= a["range"]:
+                return 0.0
+            u = (d - a["core"]) / (a["range"] - a["core"])
+            return 1 - u * u * (3 - 2 * u)
+        z = 20.0
+        while z > -720:
+            self.assertLessEqual(sum(1 for az, a in pts if w(z, az, a) > 0), 1, z)
+            z -= 0.5
+        for az, a in pts:
+            self.assertEqual(w(az, az, a), 1.0)
+
+    def test_proto_only_activates_never_writes_copy(self):
+        """main.js reads the articles; it does not create, fill or remove them."""
+        proto = read("proto/main.js")
+        self.assertIn("document.querySelectorAll('.content-point')", proto)
+        self.assertIsNone(re.search(r"fetch\([^)]*content_points", proto))
+        block = proto[proto.index("контентные точки --"):proto.index("/* Сегменты одного отрезка")]
+        for bad in ("createElement(", ".remove()", "textContent", "innerHTML", "innerText"):
+            self.assertNotIn(bad, block)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

@@ -18,7 +18,7 @@
 - **Тип:** feat
 - **Проверка:** test_layout 65/65 · smoke 23/23 · selftest 24/24 · `--check` ✓ ·
   visual strict vs main 24/24 SAME
-- **Commit:** <hash>
+- **Commit:** e476dc0
 
 ## 2026-09-19 05:31 — Zoom Choreography 1 выпущен в production
 

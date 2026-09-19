@@ -5,6 +5,21 @@
 
 ---
 
+## 2026-09-19 16:58 — Key Art 1 выпущен в production
+
+- **Что:** в main влит стек PR #12 ← #13 ← #14 ← #15; production baseline
+  `9f61ccd082612f120c1d61c54aba238e778bd8f6`. В нём: 3 окна key art в /proto/
+  (village-life справа, mine-work слева, spirit-afterlife слева; 480×320,
+  мягкая маска, ленивая загрузка, alt EN/RU); spirit — вариант D (призрачный
+  корабль), пик −440, гаснет к −453; призрачный мировой корабль только в
+  /proto/ (`proto/sprite_overrides.json`, тень 25%, контакт по корпусу),
+  входит в кадр на −455.87 — зазор ~3 м. `assets/feat_death_alt.webp`,
+  раскладка, /next/, /full/, корень не менялись.
+- **Тип:** docs
+- **Проверка:** n/a (релиз проверен: CI каждого PR и main success, Pages built
+  9f61ccd, / /ru/ /proto/ /next/ /full/ — 200, production == main 61/61 SAME)
+- **Commit:** 1751af1 (#15), 83e727b (#14), beeab9e (#13), 9f61ccd (#12 → main)
+
 ## 2026-09-19 15:24 — world-ghostship-1: призрачный мировой корабль (только /proto/)
 
 - **Что:** объект `spirit/shipwreck/ship` в /proto/ рисуется призрачным

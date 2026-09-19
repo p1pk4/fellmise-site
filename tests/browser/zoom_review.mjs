@@ -54,6 +54,7 @@ const aspects = await page.evaluate(async (srcs) => {
   return out;
 }, Object.fromEntries(Object.entries(meta).map(([t, m]) => [t, m.src])));
 const focus = await page.evaluate(() => window.__PROTO.focus());
+const routeEnd = await page.evaluate(() => window.__PROTO.state.routeEnd);
 
 async function shot(z, file) {
   await page.evaluate((zz) => window.__PROTO.go(zz, 'auto'), z);
@@ -66,7 +67,8 @@ const rows = [];
 const report = { focus: [] };
 for (const f of focus) {
   const spec = CH.focus.find((x) => x.id === f.id);
-  const cols = [['approach', f.peak + f.hold + f.approach], ['focus', f.peak], ['exit', f.peak - f.hold - f.exit]];
+  const cols = [['approach', f.peak + f.hold + f.approach], ['focus', f.peak],
+                f.final ? ['route-end', routeEnd] : ['exit', f.peak - f.hold - f.exit]];
   const cells = [];
   for (const [kind, z] of cols) {
     const file = path.join(OUT, 'shots', `${f.id}-${kind}.png`);
@@ -85,13 +87,22 @@ for (const f of focus) {
 
 // route strip: equal z steps over the whole route
 const strip = [];
-const z0 = 20, z1 = -700, N = 28;
+const z0 = 20, z1 = routeEnd, N = 28;       // the strip ends where the visitor's route ends
 for (let i = 0; i < N; i++) {
   const z = +(z0 + (z1 - z0) * i / (N - 1)).toFixed(1);
   const file = path.join(OUT, 'shots', `strip-${String(i).padStart(2, '0')}.png`);
   const s = await shot(z, file);
   strip.push({ z, file, ...s });
 }
+// the finale up close: the last 5 m-steps up to the end of the route
+const finale = [];
+for (let i = 4; i >= 0; i--) {
+  const z = +(routeEnd + i * 4).toFixed(2);
+  const file = path.join(OUT, 'shots', `finale-${4 - i}.png`);
+  finale.push({ z, file, ...(await shot(z, file)) });
+}
+report.routeEnd = routeEnd;
+report.finale = finale.map((s) => ({ z: s.z, frame: +s.cam.frame.toFixed(2), cards: s.cards }));
 report.strip = strip.map((s) => ({ z: s.z, frame: +s.cam.frame.toFixed(2), focus: s.cam.auto_focus, weight: +s.cam.auto_weight.toFixed(3) }));
 fs.writeFileSync(path.join(OUT, 'zoom.json'), JSON.stringify(report, null, 1) + '\n');
 await ctx.close();
@@ -113,13 +124,15 @@ const CSS = `body{margin:0;background:#18191a;color:#e8e6dc;font:12px ui-monospa
 const cap = (c) => `z ${c.z.toFixed(1)} · frame ${c.cam.frame.toFixed(1)} m · focus ${esc(c.cam.auto_focus || '—')} · w ${c.cam.auto_weight.toFixed(2)}`;
 await render(`<!doctype html><meta charset="utf-8"><style>${CSS}</style>
   <h1>zoom choreography — auto zoom, production view (cards on, no debug HUD), ${VW}×${VH} DPR ${CONFIG.deviceScaleFactor}</h1>
-  <table><tr><th></th><th>approach (window start)</th><th>focus (peak)</th><th>exit (window end)</th></tr>
+  <table><tr><th></th><th>approach (window start)</th><th>focus (peak)</th><th>exit (window end) · home: route end</th></tr>
   ${rows.map(({ f, spec, cells, margin }) => `<tr><th>${esc(spec.biome)}<br><small>${esc(f.id)}<br>anchor ${esc(spec.anchor)}<br>peak frame ${spec.frame_height} m<br>focal quad margin ${Math.round(margin)} px</small></th>
   ${cells.map((c) => `<td><img style="width:480px" src="${pathToFileURL(c.file).href}"><div class="cap">${cap(c)}</div></td>`).join('')}</tr>`).join('')}</table>`,
 path.join(OUT, 'zoom-choreography-review.png'), 1700);
 await render(`<!doctype html><meta charset="utf-8"><style>${CSS} .g{display:grid;grid-template-columns:repeat(7,236px);gap:8px;padding:8px}</style>
-  <h1>zoom route strip — ${N} frames, z ${z0} → ${z1}, equal steps, auto zoom</h1>
-  <div class="g">${strip.map((s) => `<div><img style="width:236px" src="${pathToFileURL(s.file).href}"><div class="cap">z ${s.z} · ${s.cam.frame.toFixed(1)} m${s.cam.auto_focus ? ' · ' + esc(s.cam.auto_focus) : ''}</div></div>`).join('')}</div>`,
+  <h1>zoom route strip — ${N} frames, z ${z0} → route end ${z1.toFixed(2)}, equal steps, auto zoom</h1>
+  <div class="g">${strip.map((s) => `<div><img style="width:236px" src="${pathToFileURL(s.file).href}"><div class="cap">z ${s.z} · ${s.cam.frame.toFixed(1)} m${s.cam.auto_focus ? ' · ' + esc(s.cam.auto_focus) : ''}</div></div>`).join('')}</div>
+  <h1>finale — the last 16 m of the route, 4 m steps, ending at the route end (the scroll stops here)</h1>
+  <div class="g" style="grid-template-columns:repeat(5,330px)">${finale.map((s) => `<div><img style="width:330px" src="${pathToFileURL(s.file).href}"><div class="cap">z ${s.z} · ${s.cam.frame.toFixed(1)} m · cards ${esc(s.cards.join(', ') || 'none')}</div></div>`).join('')}</div>`,
 path.join(OUT, 'zoom-route-strip.png'), 1720);
 await browser.close();
 await srv.close();

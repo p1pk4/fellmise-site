@@ -54,12 +54,23 @@ def weight(f, peak, z):
         return 1.0
     if d > 0:                                   # before the peak: approach
         return smootherstep(1 - (d - f["hold"]) / f["approach"])
+    if f.get("final"):                          # the finale holds to the end of the route
+        return 1.0
     return smootherstep(1 - (-d - f["hold"]) / f["exit"])
 
 
-def window(f, peak):
-    """[z_end, z_start] of the focus window (z_end < z_start)."""
+def window(f, peak, end=None):
+    """[z_end, z_start] of the focus window (z_end < z_start); a final focus
+    runs to the end of the route."""
+    if f.get("final"):
+        return (end if end is not None else peak - f["hold"]), peak + f["hold"] + f["approach"]
     return peak - f["hold"] - f["exit"], peak + f["hold"] + f["approach"]
+
+
+def route_end(data, rt):
+    """Camera z where the visitor's route stops."""
+    e = data["route_end"]
+    return anchors(rt)[e["anchor"]][2] + e.get("offset", 0)
 
 
 def frame_at(data, rt, z, _pk=None):
@@ -96,9 +107,14 @@ def check(data, rt=None):
             bad.append(f"{fid}: якорь стоит не в биоме {f.get('biome')}")
         if not (isinstance(f.get("frame_height"), (int, float)) and cl <= f["frame_height"] <= ov):
             bad.append(f"{fid}: frame_height {f.get('frame_height')} вне {cl}..{ov}")
-        for k in ("approach", "hold", "exit"):
+        for k in ("approach", "hold") + (() if f.get("final") else ("exit",)):
             if not (isinstance(f.get(k), (int, float)) and f[k] >= (0 if k == "hold" else 4)):
                 bad.append(f"{fid}: {k} {f.get(k)}")
+    finals = [i for i, f in enumerate(data.get("focus", [])) if f.get("final")]
+    if finals != [len(data.get("focus", [])) - 1]:
+        bad.append("final — ровно один и только последний фокус")
+    if data.get("route_end", {}).get("anchor") not in a:
+        bad.append(f"route_end: якоря {data.get('route_end')} нет в layout")
     if bad:
         return bad
     if [f["biome"] for f in data["focus"]] != BIOMES:
@@ -106,7 +122,11 @@ def check(data, rt=None):
     pk = peaks(data, rt)
     if [p for _, p in pk] != sorted((p for _, p in pk), reverse=True):
         bad.append("фокусы не в порядке маршрута (z убывает)")
-    wins = [window(f, p) for f, p in pk]
+    end = route_end(data, rt)
+    last, lp = pk[-1]
+    if not (lp - last["hold"] - 6 <= end <= lp + last["hold"]):
+        bad.append(f"route_end {end:.1f}: должен быть у финального фокуса ({lp:.1f}), не дальше 6 м после удержания")
+    wins = [window(f, p, end) for f, p in pk]
     for (e1, _), (_, s2), (f1, _), (f2, _) in zip(wins, wins[1:], pk, pk[1:]):
         if s2 >= e1:
             bad.append(f"окна {f1['id']} и {f2['id']} перекрываются: между ними нет обзора")
@@ -133,8 +153,10 @@ def main():
     if args.check:
         print("актуален: assets/topdown/camera_choreography.json")
         return
+    end = route_end(data, rt)
+    print(f"route end z {end:.2f}")
     for f, p in peaks(data, rt):
-        e, s = window(f, p)
+        e, s = window(f, p, end)
         print(f"{f['id']:18} peak z {p:7.1f}  frame {f['frame_height']:>4} m  window {s:.0f}..{e:.0f}")
 
 

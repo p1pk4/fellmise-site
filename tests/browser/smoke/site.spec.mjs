@@ -319,7 +319,7 @@ test.describe('/proto/', () => {
       let best = 0, fr = ch.overview;
       for (const f of focus) {
         const d = z - f.peak;
-        const w = Math.abs(d) <= f.hold ? 1 : d > 0 ? ss(1 - (d - f.hold) / f.approach) : ss(1 - (-d - f.hold) / f.exit);
+        const w = Math.abs(d) <= f.hold ? 1 : d > 0 ? ss(1 - (d - f.hold) / f.approach) : f.final ? 1 : ss(1 - (-d - f.hold) / f.exit);
         if (w > best) { best = w; fr = ch.overview - (ch.overview - f.frame) * w; }
       }
       return fr;
@@ -370,6 +370,40 @@ test.describe('/proto/', () => {
         expect(on, `${c.id} ${zm}`).toEqual([c.content]);
       }
     }
+    clean(watch);
+  });
+
+  test('zoom: the route ends at the final house; the wheel stops there, and goes back', async ({ page, watch }) => {
+    await page.goto('/proto/');
+    await page.waitForFunction(PROTO_READY, null, { timeout: CONFIG.routes['/proto/'].readyTimeoutMs });
+    const ch = JSON.parse(fs.readFileSync(path.join(HERE, '..', '..', '..', 'assets', 'topdown', 'camera_choreography.json'), 'utf8'));
+    const runtime = await (await page.request.get('/assets/topdown/layout.runtime.json')).json();
+    const bio = Object.keys(runtime.biomes);
+    const bi = bio.findIndex((b) => runtime.biomes[b].sprites.some((o) => o.id === ch.route_end.anchor));
+    const house = runtime.biomes[bio[bi]].sprites.find((o) => o.id === ch.route_end.anchor);
+    const houseZ = -bi * runtime.biome_spacing + house.pos[2];
+    const end = await page.evaluate(() => window.__PROTO.state.routeEnd);
+    expect(Math.abs(end - (houseZ + ch.route_end.offset))).toBeLessThan(1e-9);
+    // scroll forward far past the end: the camera stops at route_end, in auto
+    await page.evaluate((z) => window.__PROTO.go(z, 'auto'), end + 30);
+    await page.mouse.move(640, 400);
+    for (let i = 0; i < 40; i++) await page.mouse.wheel(0, 400);
+    await expect.poll(() => page.evaluate(() => window.__PROTO.state.z)).toBe(end);
+    for (let i = 0; i < 10; i++) await page.mouse.wheel(0, 400);
+    expect(await page.evaluate(() => window.__PROTO.state.z)).toBe(end);
+    const cam = await page.evaluate(() => window.__PROTO.camera());
+    expect(cam.frame).toBe(ch.focus[ch.focus.length - 1].frame_height);
+    // the final house is whole inside the viewport at the stop
+    const meta = (await (await page.request.get('/proto/sprite_contact.json')).json()).sprites;
+    const aspect = await page.evaluate(async (src) => { const i = new Image(); i.src = '/' + src; await i.decode(); return i.width / i.height; }, meta[house.t].src);
+    const vw = page.viewportSize().width, vh = page.viewportSize().height, ppm = vh / cam.frame, w = house.h * aspect;
+    const m = Math.min(vw / 2 + (house.pos[0] - w / 2) * ppm, vw - (vw / 2 + (house.pos[0] + w / 2) * ppm),
+                       vh / 2 + (houseZ - house.h / 2 - end) * ppm, vh - (vh / 2 + (houseZ + house.h / 2 - end) * ppm));
+    expect(m).toBeGreaterThanOrEqual(24);
+    expect(houseZ - end).toBeLessThanOrEqual(6);                 // not behind the house
+    // backward scroll works from the stop
+    for (let i = 0; i < 5; i++) await page.mouse.wheel(0, -400);
+    await expect.poll(() => page.evaluate(() => window.__PROTO.state.z)).toBeGreaterThan(end + 50);
     clean(watch);
   });
 

@@ -8,7 +8,9 @@
   "Limits: close <= frame <= overview (16..40 m) - the sprite pack has a resolution ceiling at 16 m.",
   "The width follows from the viewport aspect in proto/main.js; nothing here assumes a screen size.",
   "Checked by tools/camera_choreography.py (tests): anchors exist, route order, limits, no window overlaps a",
-  "biome transition's dim band, overview reached between windows."
+  "biome transition's dim band, overview reached between windows.",
+  "The last focus is `final`: no exit - it holds to route_end, where the visitor's scroll stops.",
+  "route_end: where the camera route ends (anchor + offset): the final house is the end of the journey."
  ],
  "overview": 40,
  "close": 16,
@@ -66,8 +68,13 @@
    "frame_height": 22,
    "approach": 40,
    "hold": 4,
-   "exit": 26,
-   "why": "the final house, whole in frame (22 m keeps it clear of the right-hand card)"
+   "why": "the final house, whole in frame (22 m keeps it clear of the right-hand card); the finale: approach, then hold to the end of the route - no zoom-out into the woods behind",
+   "final": true
   }
- ]
+ ],
+ "route_end": {
+  "anchor": "home/homestead/house",
+  "offset": -4,
+  "why": "4 m past the house centre: the house whole and main (road leading up to it), the home card faded out (0.03)"
+ }
 }

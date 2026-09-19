@@ -63,7 +63,7 @@ const ZOOM = { обзор: 40 / 2, близко: 16 / 2 };
    Z в режиме отладки). */
 const ZOOM_MODES = { auto: 'auto', overview: 'обзор', close: 'близко', обзор: 'обзор', близко: 'близко' };
 let CHOREO = { overview: 40, close: 16, focus: [] };
-const FOCUS = [];                            // { id, peak, frame, approach, hold, exit }
+const FOCUS = [];                            // { id, peak, frame, approach, hold, exit, final }
 
 function smootherstep(u) {
   const x = Math.min(Math.max(u, 0), 1);
@@ -73,8 +73,8 @@ function smootherstep(u) {
 function focusWeight(f, z) {
   const d = z - f.peak;
   if (Math.abs(d) <= f.hold) return 1;
-  return d > 0 ? smootherstep(1 - (d - f.hold) / f.approach)
-               : smootherstep(1 - (-d - f.hold) / f.exit);
+  if (d > 0) return smootherstep(1 - (d - f.hold) / f.approach);
+  return f.final ? 1 : smootherstep(1 - (-d - f.hold) / f.exit);   // финал держится до конца пути
 }
 
 /* (высота кадра, фокус, вес) на z камеры */
@@ -101,8 +101,13 @@ function initChoreography(choreo, layout) {
   for (const f of choreo.focus) {
     if (!where.has(f.anchor)) throw new Error('фокус ' + f.id + ': якоря ' + f.anchor + ' нет в layout');
     FOCUS.push({ id: f.id, peak: where.get(f.anchor) + (f.peak_offset || 0), frame: f.frame_height,
-                 approach: f.approach, hold: f.hold, exit: f.exit });
+                 approach: f.approach, hold: f.hold, exit: f.exit, final: !!f.final });
   }
+  /* Конец пути камеры — у финального дома (route_end): дальше за домом только
+     лес, и путешествие кончается домом. Колесо дальше не везёт. */
+  const e = choreo.route_end;
+  if (!where.has(e.anchor)) throw new Error('route_end: якоря ' + e.anchor + ' нет в layout');
+  state.routeEnd = where.get(e.anchor) + (e.offset || 0);
 }
 let BIOME_SPACING = null;                    // из runtime layout (assets/topdown/config.json)
 const SEED = 'fellmise-proto-1';
@@ -1058,7 +1063,8 @@ function draw() {
 }
 
 addEventListener('wheel', (e) => {
-  state.z = Math.min(20, Math.max(-state.len - 20, state.z - e.deltaY * 0.06));
+  // путь посетителя: от начала деревни до финального дома, не дальше
+  state.z = Math.min(20, Math.max(state.routeEnd ?? -state.len - 20, state.z - e.deltaY * 0.06));
   draw();
 }, { passive: true });
 

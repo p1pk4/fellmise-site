@@ -758,6 +758,9 @@ class CameraChoreography(unittest.TestCase):
             lambda d: d["focus"][2].__setitem__("anchor", "mine/adit/nope"),
             lambda d: d["focus"][2].__setitem__("approach", 40),           # into the forest→mine dim
             lambda d: d["focus"].reverse(),
+            lambda d: d["focus"][2].__setitem__("final", True),            # final only last
+            lambda d: d["route_end"].__setitem__("offset", -20),          # past the house
+            lambda d: d["route_end"].__setitem__("anchor", "home/nope"),
         ):
             d = copy.deepcopy(self.data)
             mutate(d)
@@ -808,11 +811,39 @@ class CameraChoreography(unittest.TestCase):
             margin = min(left, W - right, top, H - bottom)
             self.assertGreaterEqual(margin, 24 if f["biome"] in ("home", "mine") else 8, (f["id"], margin))
 
+    def test_route_ends_at_the_final_house(self):
+        """The visitor's route stops at route_end: the final house whole in a
+        1280×800 frame, the camera no more than 6 m past its centre, the frame
+        still the finale's (no zoom-out into the woods), the home card faded."""
+        from PIL import Image
+        import build_proto_content as BPC
+        end = self.C.route_end(self.data, self.rt)
+        f, peak = self.pk[-1]
+        self.assertTrue(f.get("final"))
+        _, x, zc, o = self.C.anchors(self.rt)["home/homestead/house"]
+        self.assertAlmostEqual(end, zc - 4, places=6)
+        self.assertLessEqual(zc - end, 6)                          # not behind the house
+        self.assertEqual(self.frame(end), f["frame_height"])        # holds, no exit
+        meta = json.loads(read("proto/sprite_contact.json"))["sprites"]
+        with Image.open(ROOT / meta[o["t"]]["src"]) as im:
+            w = o["h"] * im.width / im.height
+        W, H = self.VIEW
+        ppm = H / self.frame(end)
+        m = min(W / 2 + (x - w / 2) * ppm, W - (W / 2 + (x + w / 2) * ppm),
+                H / 2 + (zc - o["h"] / 2 - end) * ppm, H - (H / 2 + (zc + o["h"] / 2 - end) * ppm))
+        self.assertGreaterEqual(m, 24, m)
+        home = next(p for p in BPC.load()["points"] if p["biome"] == "home")
+        d = abs(end - BPC.anchor_z(self.rt, home["anchor"]["object"]))
+        a = home["activation"]
+        u = min(max((d - a["core"]) / (a["range"] - a["core"]), 0), 1)
+        self.assertLess(1 - u * u * (3 - 2 * u), 0.05)             # the card has had its say
+
     def test_proto_mirrors_the_reference(self):
         proto = read("proto/main.js")
         self.assertIn("fetch(ASSETS + 'topdown/camera_choreography.json')", proto)
         self.assertIn("x * x * x * (x * (x * 6 - 15) + 10)", proto)       # smootherstep, as here
         self.assertIn("zoom: 'auto'", proto)
+        self.assertIn("Math.max(state.routeEnd ?? -state.len - 20,", proto)   # the wheel stops at route_end
         for bad in ("setTimeout", "setInterval", "performance.now", "Date.now"):
             self.assertNotIn(bad, proto)
 

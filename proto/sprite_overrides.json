@@ -1,0 +1,20 @@
+{
+ "_doc": [
+  "Per-object sprite overrides of /proto/ (top-down only): stable layout object id -> runtime sprite.",
+  "The object's type `t` does not change, so the layout (footprint, collisions, y-sort) and every legacy",
+  "consumer of the type (/next/, /full/, assets/) are untouched. `contact_from`: contact metadata is taken",
+  "from that type (the physical hull), not measured on the override (its spectral haze is not a base).",
+  "`shadow_opacity`: multiplier of the global contact_shadow.opacity for this object only.",
+  "Checked by tools/test_layout.py (SpriteOverrides)."
+ ],
+ "overrides": {
+  "spirit/shipwreck/ship": {
+   "sprite": "sprites_special/feat_death_alt_ghost.webp",
+   "master": "sprites_special/feat_death_alt_ghost.png",
+   "made_by": "tools/make_ghost_ship.py from assets/feat_death_alt.webp (spectral restyle, same canvas/silhouette)",
+   "contact_from": "feat_death_alt",
+   "shadow_opacity": 0.25,
+   "why": "the world ship of the dead reads as the same spectral ship as the spirit key art D; shadow variant B (25%): it floats, it is not a heavy house"
+  }
+ }
+}

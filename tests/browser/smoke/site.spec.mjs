@@ -449,6 +449,7 @@ test.describe('/proto/', () => {
     const bio = Object.keys(runtime.biomes);
     const bi = bio.indexOf('spirit');
     const ship = runtime.biomes.spirit.sprites.find((o) => o.id === 'spirit/shipwreck/ship');
+    const overrides = (await (await page.request.get('/proto/sprite_overrides.json')).json()).overrides;
     // lowest opaque row of the ship texture, measured in the page
     const low = await page.evaluate(async (src) => {
       const i = new Image(); i.src = '/' + src; await i.decode();
@@ -457,7 +458,7 @@ test.describe('/proto/', () => {
       const d = g.getImageData(0, 0, i.width, i.height).data;
       for (let y = i.height - 1; y >= 0; y--) for (let x = 0; x < i.width; x++) if (d[(y * i.width + x) * 4 + 3] > 16) return (y + 1) / i.height;
       return 1;
-    }, meta[ship.t].src);
+    }, overrides[ship.id] ? 'proto/' + overrides[ship.id].sprite : meta[ship.t].src);
     const zLow = -bi * runtime.biome_spacing + ship.pos[2] - ship.h / 2 + low * ship.h;
     const vh = page.viewportSize().height;
     let lastArt = null, firstShip = null;
@@ -472,6 +473,27 @@ test.describe('/proto/', () => {
     }
     expect(lastArt - firstShip).toBeGreaterThanOrEqual(2);                // a few metres of plain world between
     expect((await page.evaluate(() => window.__PROTO.keyArt().find((x) => x.id === 'spirit-afterlife'))).z).toBeCloseTo(-440, 3);
+    clean(watch);
+  });
+
+  test('world ghost ship: /proto/ draws the override for one object, legacy asset elsewhere', async ({ page, watch }) => {
+    const got = [];
+    page.on('response', (r) => { if (/feat_death_alt/.test(r.url())) got.push([r.url().replace(/^https?:\/\/[^/]+/, ''), r.status()]); });
+    await page.goto('/proto/');
+    await page.waitForFunction(PROTO_READY, null, { timeout: CONFIG.routes['/proto/'].readyTimeoutMs });
+    expect(got.map(([u]) => u)).toEqual(['/proto/sprites_special/feat_death_alt_ghost.webp']);   // no wooden ship in /proto/
+    expect(got[0][1]).toBe(200);
+    const sh = await page.evaluate(() => window.__PROTO.shadows());
+    const ship = sh.find((s) => s.id === 'spirit/shipwreck/ship');
+    const runtime = await (await page.request.get('/assets/topdown/layout.runtime.json')).json();
+    const base = runtime.presentation.contact_shadow.opacity;
+    expect(Math.abs(ship.opacity - 0.25 * base)).toBeLessThan(1e-9);
+    expect(ship.sprite).toBe('sprites_special/feat_death_alt_ghost.webp');
+    const others = sh.filter((s) => s.id !== 'spirit/shipwreck/ship');
+    expect(others.every((s) => Math.abs(s.opacity - base) < 1e-9 && s.sprite === null)).toBe(true);
+    // legacy consumers still serve the original file, untouched
+    const legacy = await page.request.get('/assets/feat_death_alt.webp');
+    expect(legacy.status()).toBe(200);
     clean(watch);
   });
 

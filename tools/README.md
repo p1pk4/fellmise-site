@@ -281,6 +281,18 @@ assets/topdown/content_points.json ─ tools/build_proto_content.py ─→ proto
   `key-art-route-review.png` (в CI — артефакт `key-art-*`). В visual CI окна
   видны только на чекпоинтах `keyart-*`.
 
+## Спрайт-оверрайды /proto/
+
+`proto/sprite_overrides.json`: стабильный id объекта → свой спрайт только в /proto/.
+Тип объекта в layout не меняется — раскладка, след, y-sort и legacy-потребители
+типа (/next/, /full/, `assets/`) не затронуты. `contact_from` — контакт берётся у
+типа (физический корпус), а не у оверрайда; `shadow_opacity` — множитель
+контактной тени только для этого объекта.
+
+* `spirit/shipwreck/ship` → `proto/sprites_special/feat_death_alt_ghost.webp`:
+  призрачный мировой корабль (родня key art D), тень 25% (вариант B). Собирается
+  детерминированно из `assets/feat_death_alt.webp`: `python tools/make_ghost_ship.py`.
+
 ## Проверки (они же в CI, `.github/workflows/ci.yml`)
 
 ```

@@ -5,6 +5,33 @@
 
 ---
 
+## 2026-09-19 15:24 — world-ghostship-1: призрачный мировой корабль (только /proto/)
+
+- **Что:** объект `spirit/shipwreck/ship` в /proto/ рисуется призрачным
+  спрайтом (`proto/sprites_special/feat_death_alt_ghost.webp`, перекраска
+  `feat_death_alt` под key art D, `tools/make_ghost_ship.py`) через новый
+  `proto/sprite_overrides.json` (id → спрайт). Контакт — от корпуса
+  (`contact_from: feat_death_alt`), тень 25% только у него. Тип объекта,
+  раскладка, `assets/feat_death_alt.webp`, /next/, /full/ — без изменений.
+  Переход: арт гаснет −453, корабль входит −455.87, зазор 2.87 м.
+- **Тип:** feat
+- **Проверка:** test_layout 75/75 · smoke 27/27 · `--check` ✓ · next/ в синхроне ·
+  visual vs PR #14: только proto-spirit (1.7%)
+- **Commit:** 17bb8e8
+
+## 2026-09-19 14:22 — key-art-spirit-d-1: spirit key art = вариант D
+
+- **Что:** арт окна spirit-afterlife заменён на вариант D (призрачный
+  бледно-голубой корабль, `keyart_spirit_spectral_d.png`, мастер побайтно) и
+  WebP q90 пересобран; временная заглушка (placeholder / ghost) убрана, путь
+  прежний `assets/keyart/spirit-afterlife.*`. alt EN/RU обновлены под D.
+  Окно, тайминги (пик −440, выход −453), сторона, размер, маска, village/mine
+  — без изменений.
+- **Тип:** feat
+- **Проверка:** test_layout 70/70 · smoke 25/25 · `--check` ✓ · visual vs PR #13:
+  только keyart-spirit (3.7%)
+- **Commit:** 90bf798
+
 ## 2026-09-19 12:23 — key-art-integration-1: spirit — арт-корабль уходит до мирового
 
 - **Что:** окно spirit-afterlife больше не пересекается с мировым кораблём:

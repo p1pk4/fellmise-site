@@ -398,6 +398,30 @@ let strippedSet = new Set();
 let CONTACT = { sprites: {} };
 const SHADOWS = [];                          // для __PROTO.shadows(): проверки и отчёты
 
+/* Спрайт конкретного объекта: по умолчанию — спрайт его типа; объект из
+   proto/sprite_overrides.json (стабильный id) получает свой спрайт только в
+   /proto/. Тип объекта не меняется: раскладка и все legacy-потребители типа
+   (/next/, /full/, assets/) не затронуты. Контакт берётся у типа contact_from
+   (физический корпус), а не меряется по оверрайду; shadow_opacity — множитель
+   контактной тени только для этого объекта. */
+let OVERRIDES = {};
+
+function spriteFor(o) {
+  const ov = OVERRIDES[o.id];
+  if (!ov) return sprite(o.t);
+  const key = 'override:' + o.id;
+  if (!cache.has(key)) {
+    cache.set(key, tex('./' + ov.sprite).then((map) => ({
+      map,
+      aspect: map.image.width / map.image.height,
+      contact: CONTACT.sprites[ov.contact_from || o.t] || null,
+      shadowOpacity: ov.shadow_opacity ?? 1,
+      override: ov.sprite,
+    })).catch(() => null));
+  }
+  return cache.get(key);
+}
+
 function sprite(t) {
   if (!cache.has(t)) {
     const url = (strippedSet.has(t) ? STRIPPED : ASSETS) + t + '.webp';
@@ -490,13 +514,14 @@ function shadowFor(art, o, z) {
   const q = new THREE.Mesh(
     new THREE.PlaneGeometry(w, d),
     new THREE.MeshBasicMaterial({
-      map: shadowTexture(), transparent: true, opacity: PRES.contact_shadow.opacity,
+      map: shadowTexture(), transparent: true, opacity: PRES.contact_shadow.opacity * (art.shadowOpacity ?? 1),
       depthTest: false, depthWrite: false, color: 0x1a1a14,
     }));
   q.rotation.x = -Math.PI / 2;
   q.position.set(p.x, 0.5, p.z);
   q.renderOrder = ORDER.shadow;
-  if (o.id) SHADOWS.push({ id: o.id, t: o.t, x: p.x, z: p.z, w, d });
+  if (o.id) SHADOWS.push({ id: o.id, t: o.t, x: p.x, z: p.z, w, d, opacity: q.material.opacity,
+                           sprite: art.override || null });
   return q;
 }
 
@@ -841,15 +866,17 @@ function presentationAt(z) {
 let roadAt = () => ({ cx: 0, hw: 3.2 });
 
 async function main() {
-  const [layout, spline, index, contact, choreo] = await Promise.all([
+  const [layout, spline, index, contact, choreo, overrides] = await Promise.all([
     fetch(LAYOUT).then((r) => r.json()),
     fetch(ASSETS + 'road_spline.json').then((r) => r.json()),
     fetch(STRIPPED + 'index.json').then((r) => r.json()).catch(() => ({ stripped: [] })),
     fetch('./sprite_contact.json').then((r) => r.json()),
     fetch(ASSETS + 'topdown/camera_choreography.json').then((r) => r.json()),
+    fetch('./sprite_overrides.json').then((r) => r.json()),
   ]);
   strippedSet = new Set(index.stripped);
   CONTACT = contact;
+  OVERRIDES = overrides.overrides;
   if (typeof layout.road_half_width !== 'number') {
     throw new Error('в ' + LAYOUT + ' нет road_half_width');
   }
@@ -1023,7 +1050,7 @@ async function biome(layout, ids, i) {
         state.objects++;
         continue;
       }
-      const art = await sprite(o.t);
+      const art = await spriteFor(o);
       if (!art) continue;
       scene.add(shadowFor(art, o, z));
       scene.add(flatQuad(art, o, z));

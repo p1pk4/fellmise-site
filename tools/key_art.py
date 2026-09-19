@@ -75,7 +75,12 @@ def first_visible(obj_id, rt):
     from PIL import Image
     import numpy as np
     _, x, z, o = CC.anchors(rt)[obj_id]
-    src = json.loads((ROOT / "proto" / "sprite_contact.json").read_text(encoding="utf-8"))["sprites"][o["t"]]["src"]
+    ov = json.loads((ROOT / "proto" / "sprite_overrides.json").read_text(encoding="utf-8"))["overrides"].get(obj_id)
+    # the texture /proto/ really draws for this object: its override if it has one
+    if ov:
+        src = "proto/" + ov["sprite"]
+    else:
+        src = json.loads((ROOT / "proto" / "sprite_contact.json").read_text(encoding="utf-8"))["sprites"][o["t"]]["src"]
     with Image.open(ROOT / src) as im:
         al = np.asarray(im.convert("RGBA"))[..., 3] > 16
     rows = np.nonzero(al.any(1))[0]

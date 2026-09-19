@@ -5,6 +5,21 @@
 
 ---
 
+## 2026-09-19 17:12 — fallback-mobile-1: статический путь /proto/
+
+- **Что:** у /proto/ появился статический режим — тот же путь village →
+  forest → mine → spirit → home в DOM (статьи content points + key art одной
+  колонкой, полосы цвета биомов), без WebGL. Правило одно — `proto/mode.js`:
+  ширина < 760, reduced motion, нет WebGL2, `?static=1`, упавшая загрузка;
+  без JS — тоже статика. `boot.js` грузит мир только в live. Живой CSS —
+  под `.mode-live`, статический — `proto/fallback.css`. Старый KNOWN BUG
+  «нет fallback без WebGL» закрыт. Тексты, арт, мир — без изменений.
+- **Тип:** feat
+- **Проверка:** test_layout 80/80 · smoke 38 passed (+11: матрица режимов,
+  no-WebGL, без JS, RU, падение загрузки) · selftest 27/27 · `--check` ✓ ·
+  visual strict vs main SAME (десктоп live пиксель-в-пиксель)
+- **Commit:** <hash>
+
 ## 2026-09-19 16:58 — Key Art 1 выпущен в production
 
 - **Что:** в main влит стек PR #12 ← #13 ← #14 ← #15; production baseline

@@ -6,18 +6,18 @@
 <meta name="robots" content="noindex, nofollow">
 <title>Fellmise — проба top-down</title>
 <style>
-  html, body { margin: 0; height: 100%; background: #4d7a3a; overflow: hidden; }
-  canvas { display: block; }
-  #hud {
+  html.mode-live, .mode-live body { margin: 0; height: 100%; background: #4d7a3a; overflow: hidden; }
+  .mode-live canvas { display: block; }
+  .mode-live #hud {
     position: fixed; left: 12px; top: 12px; z-index: 10;
     padding: 8px 12px; background: rgba(18,22,24,.86); color: #fdf6e0;
     font: 12px/1.5 ui-monospace, monospace; white-space: pre;
     pointer-events: none;
   }
-  #hud b { color: #ffc857; font-weight: 700; }
-  #hud[hidden] { display: none; }   /* отладка: только с ?debug=hud */
+  .mode-live #hud b { color: #ffc857; font-weight: 700; }
+  .mode-live #hud[hidden] { display: none; }   /* отладка: только с ?debug=hud */
   /* затемнение перехода между биомами: не контент, без текста и событий */
-  #biome-transition-overlay {
+  .mode-live #biome-transition-overlay {
     position: fixed; inset: 0; z-index: 5; background: #000; opacity: 0;
     pointer-events: none;
   }
@@ -26,8 +26,8 @@
      assets/topdown/content_points.json); main.js only sets how present each
      card is from the camera's z. The world stays the picture: one quiet
      panel at the side, the road and the marker left in view. */
-  #content-overlay { position: fixed; inset: 0; z-index: 8; pointer-events: none; }
-  .content-point {
+  .mode-live #content-overlay { position: fixed; inset: 0; z-index: 8; pointer-events: none; }
+  .mode-live .content-point {
     position: absolute; top: 50%; width: min(364px, calc(50vw - 150px));
     transform: translateY(calc(-50% + var(--enter, 0px)));
     box-sizing: border-box; padding: 24px 26px 26px 24px;
@@ -39,21 +39,21 @@
     box-shadow: 0 4px 14px rgba(0, 0, 0, .14);
     opacity: 0;                  /* main.js: presence 0..1 from state.z */
   }
-  .content-point[data-side="left"] { left: 24px; }
-  .content-point[data-side="right"] { right: 24px; }
-  .content-point[data-side="right"] {
+  .mode-live .content-point[data-side="left"] { left: 24px; }
+  .mode-live .content-point[data-side="right"] { right: 24px; }
+  .mode-live .content-point[data-side="right"] {
     background: linear-gradient(270deg, rgba(14, 16, 12, .74), rgba(14, 16, 12, .60));
   }
-  .content-point__kicker {
+  .mode-live .content-point__kicker {
     margin: 0 0 10px; color: #ffc857;
     font: 600 11px/1.3 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     letter-spacing: .16em; text-transform: uppercase;
   }
-  .content-point__title {
+  .mode-live .content-point__title {
     margin: 0 0 14px; color: #fdf6e0;
     font: 700 24px/1.2 Georgia, "Iowan Old Style", "Palatino Linotype", "Times New Roman", serif;
   }
-  .content-point__body {
+  .mode-live .content-point__body {
     margin: 0; color: rgba(243, 237, 218, .92);
     font: 400 16px/1.62 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   }
@@ -61,20 +61,20 @@
      figures). No frame, no card: the picture fades into the world at its edges
      (an elliptical mask), so it reads as a window, not a pasted rectangle.
      main.js sets presence (opacity) from the camera's z. */
-  #keyart-overlay { position: fixed; inset: 0; z-index: 7; pointer-events: none; }
-  .key-art {
+  .mode-live #keyart-overlay { position: fixed; inset: 0; z-index: 7; pointer-events: none; }
+  .mode-live .key-art {
     position: absolute; top: 50%; width: 480px; height: 320px; margin: 0;
     transform: translateY(calc(-50% + var(--enter, 0px)));
     opacity: 0;
     -webkit-mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 62%, rgba(0,0,0,.55) 82%, transparent 100%);
             mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 62%, rgba(0,0,0,.55) 82%, transparent 100%);
   }
-  .key-art[data-side="left"] { left: 24px; }
-  .key-art[data-side="right"] { right: 24px; }
-  .key-art img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .mode-live .key-art[data-side="left"] { left: 24px; }
+  .mode-live .key-art[data-side="right"] { right: 24px; }
+  .mode-live .key-art img { display: block; width: 100%; height: 100%; object-fit: cover; }
   /* ?debug=keyart: outline the windows (review only) */
-  .key-art.debug { -webkit-mask-image: none; mask-image: none; outline: 2px dashed rgba(255, 200, 87, .9); }
-  .key-art.debug::after {
+  .mode-live .key-art.debug { -webkit-mask-image: none; mask-image: none; outline: 2px dashed rgba(255, 200, 87, .9); }
+  .mode-live .key-art.debug::after {
     content: attr(data-id); position: absolute; left: 6px; top: 4px;
     font: 600 12px ui-monospace, monospace; color: #ffc857; text-shadow: 0 1px 2px #000;
   }
@@ -83,10 +83,13 @@
     overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
   }
 </style>
+<link rel="stylesheet" href="./fallback.css">
+<script src="./mode.js"></script>
 </head>
 <body>
 <div id="biome-transition-overlay" aria-hidden="true"></div>
 <div id="hud" hidden>загрузка…</div>
+<main id="journey">
 <!-- content-points:begin — generated by tools/build_proto_content.py from assets/topdown/content_points.json; do not edit -->
 <div id="content-overlay">
   <section class="content-locale" lang="en" data-locale="en">
@@ -160,6 +163,7 @@
   </figure>
 </div>
 <!-- key-art:end -->
-<script type="module" src="./main.js"></script>
+</main>
+<script type="module" src="./boot.js"></script>
 </body>
 </html>

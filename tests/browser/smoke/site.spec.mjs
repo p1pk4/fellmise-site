@@ -539,6 +539,124 @@ test.describe('/proto/', () => {
   });
 });
 
+/* ------------------------------------------------------------ proto modes */
+/* One rule (proto/mode.js): live = desktop >= NARROW px, no reduced motion,
+   WebGL2; everything else - and a failed live boot - is the static journey. */
+const NARROW = 760;                                           // mirrors proto/mode.js
+const MODE_MATRIX = [
+  ['desktop 1280 WebGL', { viewport: { width: 1280, height: 800 } }, '', 'live', null],
+  ['desktop 1280 ?static=1', { viewport: { width: 1280, height: 800 } }, '?static=1', 'static', 'forced'],
+  ['desktop 1280 reduced motion', { viewport: { width: 1280, height: 800 }, reducedMotion: 'reduce' }, '', 'static', 'reduced-motion'],
+  ['mobile 390', { viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true }, '', 'static', 'narrow'],
+  ['mobile 430', { viewport: { width: 430, height: 932 }, isMobile: true, hasTouch: true }, '', 'static', 'narrow'],
+  ['tablet 768', { viewport: { width: 768, height: 1024 } }, '', 'live', null],
+  [`width ${NARROW - 1}`, { viewport: { width: NARROW - 1, height: 900 } }, '', 'static', 'narrow'],
+  [`width ${NARROW}`, { viewport: { width: NARROW, height: 900 } }, '', 'live', null],
+];
+
+test.describe('/proto/ modes', () => {
+  for (const [name, opts, q, want, reason] of MODE_MATRIX) {
+    test.describe(name, () => {
+      test.use(opts);
+      test(`${want}${reason ? ' (' + reason + ')' : ''}: boots, no overlay, no errors`, async ({ page, watch }) => {
+        const reqs = [];
+        page.on('request', (r) => reqs.push(r.url()));
+        await page.goto('/proto/' + q);
+        if (want === 'live') await page.waitForFunction(PROTO_READY, null, { timeout: CONFIG.routes['/proto/'].readyTimeoutMs });
+        else await page.waitForLoadState('networkidle');
+        const m = await page.evaluate(() => ({ mode: document.documentElement.dataset.mode, reason: document.documentElement.dataset.modeReason || null,
+          cls: document.documentElement.className }));
+        expect(m).toEqual({ mode: want, reason, cls: `mode-${want}` });
+        await expect(page.locator('#hud')).toBeHidden();            // no loading text left on screen
+        const world = reqs.filter((u) => /three\.module|layout\.runtime|sprites_stripped/.test(u));
+        if (want === 'static') {
+          expect(world, 'static loads no world').toEqual([]);
+          // the journey is there, in route order, one locale, readable width
+          const order = await page.evaluate(() => [...document.querySelectorAll('#journey article.content-point, #journey figure.key-art')]
+            .filter((e) => e.offsetParent !== null).sort((a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top)
+            .map((e) => e.dataset.id));
+          expect(order).toEqual(['village-world', 'village-life', 'forest-skills', 'mine-mining', 'mine-work',
+                                 'spirit-afterlife', 'spirit-death', 'home-home']);
+          const ov = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+          expect(ov, 'no horizontal overflow').toBeLessThanOrEqual(0);
+          expect(await page.evaluate(() => getComputedStyle(document.body).overflowY)).not.toBe('hidden');
+          const fontPx = await page.locator('section.content-locale:not([hidden]) .content-point__body').first()
+            .evaluate((e) => parseFloat(getComputedStyle(e).fontSize));
+          expect(fontPx).toBeGreaterThanOrEqual(16);
+          for (const f of await page.locator('figure.key-art').all()) {
+            const box = await f.boundingBox();
+            expect(box.x >= 0 && box.x + box.width <= page.viewportSize().width + 0.5).toBe(true);
+          }
+        } else {
+          expect(world.length).toBeGreaterThan(0);
+        }
+        clean(watch);
+      });
+    });
+  }
+
+  test('static: wheel scrolls the document, not a camera; images lazy with alt', async ({ page, watch }) => {
+    await page.goto('/proto/?static=1');
+    await page.waitForLoadState('networkidle');
+    await page.mouse.move(640, 400);
+    await page.mouse.wheel(0, 900);
+    await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(0);
+    expect(await page.evaluate(() => typeof window.__PROTO)).toBe('undefined');
+    const plan = JSON.parse(fs.readFileSync(path.join(HERE, '..', '..', '..', 'assets', 'topdown', 'key_art.json'), 'utf8'));
+    for (const s of plan.slots) {
+      const img = page.locator(`figure.key-art[data-id="${s.id}"] img`);
+      expect(await img.getAttribute('loading')).toBe('lazy');
+      expect(await img.getAttribute('alt')).toBe(s.alt.en);
+    }
+    clean(watch);
+  });
+
+  test('static: RU with ?lang=ru, one locale in the accessibility tree', async ({ page, watch }) => {
+    const plan = JSON.parse(fs.readFileSync(path.join(HERE, '..', '..', '..', 'assets', 'topdown', 'key_art.json'), 'utf8'));
+    for (const [q, loc] of [['?static=1', 'en'], ['?static=1&lang=ru', 'ru']]) {
+      await page.goto('/proto/' + q);
+      await page.waitForLoadState('networkidle');
+      const shown = await page.evaluate(() => [...document.querySelectorAll('section.content-locale')].filter((s) => !s.hidden).map((s) => s.dataset.locale));
+      expect(shown).toEqual([loc]);
+      expect(await page.evaluate(() => document.documentElement.lang)).toBe(loc);
+      const h2 = await page.getByRole('heading', { level: 2 }).allTextContents();
+      expect(h2.length).toBe(5);                                    // five points, not ten
+      for (const s of plan.slots) expect(await page.locator(`figure.key-art[data-id="${s.id}"] img`).getAttribute('alt')).toBe(s.alt[loc]);
+    }
+    clean(watch);
+  });
+
+  test('static without JavaScript: all copy in the HTML, EN first', async ({ browser, baseURL }) => {
+    const ctx = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
+    const page = await ctx.newPage();
+    await stubExternal(page);
+    await page.goto(baseURL + '/proto/');
+    const vis = await page.evaluate(() => [...document.querySelectorAll('section.content-locale')].map((s) => [s.dataset.locale, s.hidden]));
+    expect(vis).toEqual([['en', false], ['ru', true]]);
+    await expect(page.locator('section[data-locale="en"] h2')).toHaveCount(5);
+    const ov = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    expect(ov).toBeLessThanOrEqual(0);
+    await ctx.close();
+  });
+
+  test('a failed live boot turns into the static journey (error only in ?debug=hud)', async ({ page }) => {
+    await page.route(/\/assets\/topdown\/layout\.runtime\.json$/, (r) => r.fulfill({ status: 200, contentType: 'application/json', body: '{"broken": true}' }));
+    await page.goto('/proto/');
+    await page.waitForFunction(() => document.documentElement.dataset.mode === 'static', null, { timeout: 60000 });
+    expect(await page.evaluate(() => document.documentElement.dataset.modeReason)).toBe('boot-failed');
+    await expect(page.locator('#hud')).toBeHidden();
+    expect(await page.locator('body > canvas').count()).toBe(0);
+    await expect(page.locator('section[data-locale="en"] article.content-point').first()).toBeVisible();
+    await page.mouse.move(640, 400);
+    await page.mouse.wheel(0, 600);
+    await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(0);
+    await page.goto('/proto/?debug=hud');
+    await page.waitForFunction(() => document.documentElement.dataset.mode === 'static', null, { timeout: 60000 });
+    await expect(page.locator('#hud')).toBeVisible();
+    await expect(page.locator('#hud')).toContainText('ошибка');
+  });
+});
+
 /* ------------------------------------------------------------------- next */
 test.describe('/next/', () => {
   test('desktop: live WebGL journey boots', async ({ page, watch }) => {
@@ -612,16 +730,23 @@ test.describe('no WebGL (--disable-3d-apis)', () => {
     expect(errors).toEqual([]);
   });
 
-  test('KNOWN BUG: /proto/ has no fallback without WebGL', async ({ baseURL }) => {
-    // The renderer is created at module load and throws; the HUD stays at
-    // "загрузка…" and nothing else is shown.
-    test.fail();
+  test('/proto/ falls back to the static journey without WebGL', async ({ baseURL }) => {
     const page = await (await browser.newContext({ viewport: { width: 1280, height: 800 } })).newPage();
-    const errors = [];
+    await stubExternal(page);
+    const errors = [], failed = [], reqs = [];
     page.on('pageerror', (e) => errors.push(e.message));
+    page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
+    page.on('requestfailed', (r) => failed.push(r.url()));
+    page.on('request', (r) => reqs.push(r.url()));
     await page.goto(baseURL + '/proto/');
     await page.waitForLoadState('networkidle');
-    expect(errors, 'no uncaught error without WebGL').toEqual([]);
+    expect(await page.evaluate(() => [document.documentElement.dataset.mode, document.documentElement.dataset.modeReason]))
+      .toEqual(['static', 'no-webgl']);
+    await expect(page.locator('section.content-locale[data-locale="en"] article.content-point')).toHaveCount(5);
+    await expect(page.locator('#hud')).toBeHidden();
+    expect(reqs.filter((u) => /three\.module|layout\.runtime|sprites_stripped|sprite_contact/.test(u))).toEqual([]);
+    expect(errors).toEqual([]);
+    expect(failed).toEqual([]);
   });
 });
 

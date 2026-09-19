@@ -170,6 +170,17 @@ jobs:
           path: out/key-art-integration
           retention-days: 14
           if-no-files-found: warn
+      - name: static journey review (mobile, forced static, RU, tablet boundary)
+        if: always()
+        run: node fallback_review.mjs --out ../../out/fallback-review
+      - name: upload static journey review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fallback-review-${{ env.CONTEXT }}-run${{ github.run_id }}
+          path: out/fallback-review
+          retention-days: 14
+          if-no-files-found: warn
       - name: upload zoom review
         if: always()
         uses: actions/upload-artifact@v4

@@ -1134,7 +1134,12 @@ function draw() {
     + `тест сортировки: <b>${state.sortTest}</b>`;
 }
 
+// колесо, клавиши и размер окна ведут камеру только в живом режиме; в статике —
+// обычная прокрутка документа
+const LIVE = () => !window.FELLMISE_MODE || window.FELLMISE_MODE.mode === 'live';
+
 addEventListener('wheel', (e) => {
+  if (!LIVE()) return;
   // путь посетителя: от начала деревни до финального дома, не дальше
   state.z = Math.min(20, Math.max(state.routeEnd ?? -state.len - 20, state.z - e.deltaY * 0.06));
   draw();
@@ -1143,7 +1148,7 @@ addEventListener('wheel', (e) => {
 addEventListener('keydown', (e) => {
   // ручной зум — только диагностика (?debug=hud или ?debug=zoom): посетитель
   // получает хореографию; переключение мгновенное, без анимации
-  if (!DEBUG.has('hud') && !DEBUG.has('zoom')) return;
+  if (!LIVE() || (!DEBUG.has('hud') && !DEBUG.has('zoom'))) return;
   if ('zZяЯ'.includes(e.key)) {
     state.zoom = { auto: 'обзор', обзор: 'близко', близко: 'auto' }[state.zoom];
     resize();
@@ -1151,7 +1156,7 @@ addEventListener('keydown', (e) => {
   }
 });
 
-addEventListener('resize', () => { resize(); draw(); });
+addEventListener('resize', () => { if (LIVE()) { resize(); draw(); } });
 
 /* Где НА САМОМ ДЕЛЕ проходит кромка дороги.
    Полуширина ROAD_HALF — это гладкая ось; видимый край гуляет от неё на шум.
@@ -1231,4 +1236,9 @@ window.__PROTO = {
   roadAt: (z) => roadAt(z),
 };
 
-main().catch((e) => { HUD.hidden = false; HUD.textContent = 'ошибка: ' + e.message; throw e; });
+/* Ошибка сборки живой сцены — тот же путь в статике (mode.js); текст ошибки
+   виден только в ?debug=hud. Без mode.js (прямой импорт) — как раньше. */
+main().catch((e) => {
+  if (window.FELLMISE_MODE) { window.FELLMISE_MODE.fail(e); return; }
+  HUD.hidden = false; HUD.textContent = 'ошибка: ' + e.message; throw e;
+});

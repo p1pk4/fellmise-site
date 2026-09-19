@@ -5,6 +5,104 @@
 
 ---
 
+## 2026-09-19 15:24 — world-ghostship-1: призрачный мировой корабль (только /proto/)
+
+- **Что:** объект `spirit/shipwreck/ship` в /proto/ рисуется призрачным
+  спрайтом (`proto/sprites_special/feat_death_alt_ghost.webp`, перекраска
+  `feat_death_alt` под key art D, `tools/make_ghost_ship.py`) через новый
+  `proto/sprite_overrides.json` (id → спрайт). Контакт — от корпуса
+  (`contact_from: feat_death_alt`), тень 25% только у него. Тип объекта,
+  раскладка, `assets/feat_death_alt.webp`, /next/, /full/ — без изменений.
+  Переход: арт гаснет −453, корабль входит −455.87, зазор 2.87 м.
+- **Тип:** feat
+- **Проверка:** test_layout 75/75 · smoke 27/27 · `--check` ✓ · next/ в синхроне ·
+  visual vs PR #14: только proto-spirit (1.7%)
+- **Commit:** 17bb8e8
+
+## 2026-09-19 14:22 — key-art-spirit-d-1: spirit key art = вариант D
+
+- **Что:** арт окна spirit-afterlife заменён на вариант D (призрачный
+  бледно-голубой корабль, `keyart_spirit_spectral_d.png`, мастер побайтно) и
+  WebP q90 пересобран; временная заглушка (placeholder / ghost) убрана, путь
+  прежний `assets/keyart/spirit-afterlife.*`. alt EN/RU обновлены под D.
+  Окно, тайминги (пик −440, выход −453), сторона, размер, маска, village/mine
+  — без изменений.
+- **Тип:** feat
+- **Проверка:** test_layout 70/70 · smoke 25/25 · `--check` ✓ · visual vs PR #13:
+  только keyart-spirit (3.7%)
+- **Commit:** 90bf798
+
+## 2026-09-19 12:23 — key-art-integration-1: spirit — арт-корабль уходит до мирового
+
+- **Что:** окно spirit-afterlife больше не пересекается с мировым кораблём:
+  пик −450 → −440, выход укорочен и плавный (−445 → −453, `exit_core`/
+  `exit_range`), вход −423 (вне затемнения mine→spirit до −422). Мировой
+  корабль входит в кадр на −455.95 — между ними ~3 м мира. `yields_to` в
+  key_art.json + проверка в tools/key_art.py. village/mine, арт, мир — без
+  изменений. Лист `key-art-spirit-handover.png`.
+- **Тип:** fix
+- **Проверка:** test_layout 70/70 · smoke 25/25 · `--check` ✓ · visual vs PR #13:
+  только keyart-spirit
+- **Commit:** c07e5af
+
+## 2026-09-19 11:27 — key-art-integration-1: 3 key art в /proto/
+
+- **Что:** три одобренные иллюстрации (village-life B fix1, mine-work B fix1,
+  spirit-afterlife final) встроены в обычный /proto/ по плану PR #12: те же
+  окна (enter/peak/exit), стороны, 480×320 css. Мастера PNG в
+  `assets/keyart/` (байт-в-байт), runtime WebP q90 (~80 КБ) собирает
+  `tools/key_art.py`, он же пишет статические `<figure>` в `proto/index.html`
+  (alt EN/RU). Ленивая загрузка за `range + 120 м` до пика. Мягкий край —
+  эллиптическая CSS-маска, без рамки. `?debug=keyart` обводит окна.
+- **Тип:** feat
+- **Проверка:** test_layout 68/68 · smoke 24/24 · selftest 27/27 · `--check` ✓ ·
+  visual vs main: 24 прежних SAME, 3 новых keyart-*
+- **Commit:** 1fc2eca
+
+## 2026-09-19 06:02 — key-art-planning-1: поправки по review
+
+- **Что:** окно village-life сдвинуто раньше — z −93.9 → −103.9 → −113.9
+  (было −101.4 → −119.4 → −137.4): сразу после фокуса на таверне (вес ≤ 0.03,
+  кадр ~40 м) и до начала лесного грунта (−114). Валидатор: фокус камеры —
+  по весу (≤ 0.05), не по окну; окно не заходит в смешение грунта на выходе
+  из своего биома. mine-work и spirit-afterlife не двигались. ТЗ
+  (`out/key-art-planning/art-briefs.md`): ракурс — только orthographic
+  top-down, как в игре (без cinematic/eye-level/горизонта/изометрии).
+- **Тип:** fix
+- **Проверка:** test_layout 67/67 · smoke 23/23 · `--check` ✓ · visual strict
+  vs main 24/24 SAME
+- **Commit:** 49fe4f2
+
+## 2026-09-19 05:39 — key-art-planning-1: слоты под key art (без арта)
+
+- **Что:** план 3 иллюстраций-окон на маршруте /proto/ —
+  `assets/topdown/key_art.json` (status planned): village-life (после таверны,
+  z −101…−137, справа), mine-work (у глубокой штольни, −360…−392, слева),
+  spirit-afterlife (перед карточкой духов, якорь — корабль мёртвых,
+  −425…−475, слева); 3:2, 480×320 css, арт 1536×1024. Окна только там, где
+  нет карточки, фокуса и перехода (`tools/key_art.py --check`). Заглушки —
+  только `?debug=keyart`; в обычном /proto/ ничего. ТЗ для ART —
+  `out/key-art-planning/art-briefs.md`.
+- **Тип:** feat
+- **Проверка:** test_layout 65/65 · smoke 23/23 · selftest 24/24 · `--check` ✓ ·
+  visual strict vs main 24/24 SAME
+- **Commit:** e476dc0
+
+## 2026-09-19 05:31 — Zoom Choreography 1 выпущен в production
+
+- **Что:** в main влит PR #11; production baseline
+  `8ec8d557238138739cfef697b89f0b536354623f`. В нём: зум /proto/ по умолчанию
+  `auto` — высота кадра как чистая функция z камеры
+  (`assets/topdown/camera_choreography.json`, 16..40 м, smootherstep); 5
+  фокусов (таверна 28 м, мёртвый дуб 24, вход в шахту 22, склеп 22, финальный
+  дом 22); `route_end` = финальный дом − 4 м (z −661.97) — колесо дальше не
+  везёт, финал держится на доме. Мир, контент, корень, /next/ не менялись.
+- **Тип:** docs
+- **Проверка:** n/a (релиз проверен: CI PR #11 и main success, Pages built
+  8ec8d55, / /ru/ /proto/ /next/ — 200, production == main 48/48 SAME,
+  упор колеса и обратная прокрутка проверены на живом сайте)
+- **Commit:** 9e47a87, 2ed3ad3 (PR #11), 8ec8d55 (merge → main)
+
 ## 2026-09-19 05:02 — zoom-choreography-1: финал пути — финальный дом
 
 - **Что:** путь камеры /proto/ кончается у финального дома: `route_end` =

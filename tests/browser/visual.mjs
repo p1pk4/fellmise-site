@@ -105,10 +105,16 @@ export async function capture({ root, out, mutate = false, quiet = false }) {
         // world checkpoints judge the world, content checkpoints (with a
         // `content` field) judge the cards: the DOM card layer is shown only
         // on the latter. A page without the layer is unaffected.
-        await page.evaluate((show) => {
+        await page.evaluate(([show, art]) => {
           const o = document.getElementById('content-overlay');
           if (o) o.style.visibility = show ? '' : 'hidden';
-        }, !!c.content);
+          // key art windows likewise: shown only on key art checkpoints (`keyart`)
+          const k = document.getElementById('keyart-overlay');
+          if (k) k.style.visibility = art ? '' : 'hidden';
+        }, [!!c.content, !!c.keyart]);
+        // a lazily loaded picture must be decoded before the shot
+        await page.evaluate(() => Promise.all([...document.images].filter((i) => i.getAttribute('src'))
+          .map((i) => i.decode().catch(() => {}))));
         await rafs(page);        // the frame go() drew has to reach the compositor
         const file = path.join(out, `${c.id}.png`);
         await page.screenshot({ path: file, animations: 'disabled', caret: 'hide' });

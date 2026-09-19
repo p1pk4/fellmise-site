@@ -398,6 +398,30 @@ let strippedSet = new Set();
 let CONTACT = { sprites: {} };
 const SHADOWS = [];                          // для __PROTO.shadows(): проверки и отчёты
 
+/* Спрайт конкретного объекта: по умолчанию — спрайт его типа; объект из
+   proto/sprite_overrides.json (стабильный id) получает свой спрайт только в
+   /proto/. Тип объекта не меняется: раскладка и все legacy-потребители типа
+   (/next/, /full/, assets/) не затронуты. Контакт берётся у типа contact_from
+   (физический корпус), а не меряется по оверрайду; shadow_opacity — множитель
+   контактной тени только для этого объекта. */
+let OVERRIDES = {};
+
+function spriteFor(o) {
+  const ov = OVERRIDES[o.id];
+  if (!ov) return sprite(o.t);
+  const key = 'override:' + o.id;
+  if (!cache.has(key)) {
+    cache.set(key, tex('./' + ov.sprite).then((map) => ({
+      map,
+      aspect: map.image.width / map.image.height,
+      contact: CONTACT.sprites[ov.contact_from || o.t] || null,
+      shadowOpacity: ov.shadow_opacity ?? 1,
+      override: ov.sprite,
+    })).catch(() => null));
+  }
+  return cache.get(key);
+}
+
 function sprite(t) {
   if (!cache.has(t)) {
     const url = (strippedSet.has(t) ? STRIPPED : ASSETS) + t + '.webp';
@@ -490,13 +514,14 @@ function shadowFor(art, o, z) {
   const q = new THREE.Mesh(
     new THREE.PlaneGeometry(w, d),
     new THREE.MeshBasicMaterial({
-      map: shadowTexture(), transparent: true, opacity: PRES.contact_shadow.opacity,
+      map: shadowTexture(), transparent: true, opacity: PRES.contact_shadow.opacity * (art.shadowOpacity ?? 1),
       depthTest: false, depthWrite: false, color: 0x1a1a14,
     }));
   q.rotation.x = -Math.PI / 2;
   q.position.set(p.x, 0.5, p.z);
   q.renderOrder = ORDER.shadow;
-  if (o.id) SHADOWS.push({ id: o.id, t: o.t, x: p.x, z: p.z, w, d });
+  if (o.id) SHADOWS.push({ id: o.id, t: o.t, x: p.x, z: p.z, w, d, opacity: q.material.opacity,
+                           sprite: art.override || null });
   return q;
 }
 
@@ -574,6 +599,49 @@ function updateContent() {
       el.style.setProperty('--marker-x', p.screen.x.toFixed(1) + 'px');
       el.style.setProperty('--marker-y', p.screen.y.toFixed(1) + 'px');
     }
+  }
+}
+
+// ------------------------------------------------------------------ key art --
+/* Иллюстрации-окна над миром (assets/topdown/key_art.json → tools/key_art.py →
+   статические <figure> в proto/index.html). Здесь их ничего не создаёт: только
+   присутствие (та же чистая функция z, что у карточек, окна не пересекаются с
+   ними — проверяет key_art.py) и ленивая загрузка — src ставится, когда камера
+   ближе preload + range метров к пику окна; первый кадр не тянет лишнего.
+   Край — мягкая маска в CSS, рамки нет. ?debug=keyart обводит окна. */
+const KEYART = [];
+
+function initKeyArt(layout) {
+  const where = new Map();
+  Object.values(layout.biomes).forEach((b, bi) => {
+    for (const o of [...b.sprites, ...(b.boards || [])]) where.set(o.id, -bi * BIOME_SPACING + o.pos[2]);
+  });
+  for (const el of document.querySelectorAll('.key-art')) {
+    const img = el.querySelector('img');
+    if (!where.has(el.dataset.anchor)) throw new Error('key art ' + el.dataset.id + ': якоря ' + el.dataset.anchor + ' нет в layout');
+    if (CONTENT_LOCALE === 'ru' && img.dataset.altRu !== undefined) img.alt = img.dataset.altRu;
+    if (DEBUG.has('keyart')) el.classList.add('debug');
+    const exitCore = el.dataset.exitCore !== undefined ? +el.dataset.exitCore : +el.dataset.core;
+    const exitRange = el.dataset.exitRange !== undefined ? +el.dataset.exitRange : +el.dataset.range;
+    KEYART.push({ id: el.dataset.id, el, img, side: el.dataset.side, core: +el.dataset.core, range: +el.dataset.range,
+                  exitCore, exitRange, preload: +el.dataset.preload,
+                  z: where.get(el.dataset.anchor) + +el.dataset.peakOffset });
+  }
+}
+
+/* Присутствие окна: как у карточек, но дальняя сторона (z меньше пика) может
+   гаснуть быстрее — exit_core/exit_range: окно уходит раньше, чем в кадр
+   войдёт объект мира, который оно показывает. */
+function keyArtWeight(k, z) {
+  return z >= k.z ? presence(k, z) : presence({ z: k.z, core: k.exitCore, range: k.exitRange }, z);
+}
+
+function updateKeyArt() {
+  for (const k of KEYART) {
+    if (!k.img.getAttribute('src') && Math.abs(state.z - k.z) <= Math.max(k.range, k.exitRange) + k.preload) k.img.src = k.img.dataset.src;
+    k.weight = keyArtWeight(k, state.z);
+    k.el.style.opacity = k.weight.toFixed(3);
+    k.el.style.setProperty('--enter', REDUCED_MOTION ? '0px' : ((1 - k.weight) * 10).toFixed(1) + 'px');
   }
 }
 
@@ -798,15 +866,17 @@ function presentationAt(z) {
 let roadAt = () => ({ cx: 0, hw: 3.2 });
 
 async function main() {
-  const [layout, spline, index, contact, choreo] = await Promise.all([
+  const [layout, spline, index, contact, choreo, overrides] = await Promise.all([
     fetch(LAYOUT).then((r) => r.json()),
     fetch(ASSETS + 'road_spline.json').then((r) => r.json()),
     fetch(STRIPPED + 'index.json').then((r) => r.json()).catch(() => ({ stripped: [] })),
     fetch('./sprite_contact.json').then((r) => r.json()),
     fetch(ASSETS + 'topdown/camera_choreography.json').then((r) => r.json()),
+    fetch('./sprite_overrides.json').then((r) => r.json()),
   ]);
   strippedSet = new Set(index.stripped);
   CONTACT = contact;
+  OVERRIDES = overrides.overrides;
   if (typeof layout.road_half_width !== 'number') {
     throw new Error('в ' + LAYOUT + ' нет road_half_width');
   }
@@ -817,6 +887,7 @@ async function main() {
   BIOME_SPACING = layout.biome_spacing;
   initContent(layout);
   initChoreography(choreo, layout);
+  initKeyArt(layout);
   const dbg = layout.debug;
   const ids = Object.keys(layout.biomes);
   state.biomes = ids.length;
@@ -979,7 +1050,7 @@ async function biome(layout, ids, i) {
         state.objects++;
         continue;
       }
-      const art = await sprite(o.t);
+      const art = await spriteFor(o);
       if (!art) continue;
       scene.add(shadowFor(art, o, z));
       scene.add(flatQuad(art, o, z));
@@ -1045,6 +1116,7 @@ function draw() {
   camera.updateMatrixWorld();
   renderer.render(scene, camera);
   updateContent();
+  updateKeyArt();
   const halfM = frameHeight() / 2;
   const fa = frameAt(state.z);
   const tiles = (halfM * 2) / TILE_M;                 // высота кадра в тайлах
@@ -1142,6 +1214,14 @@ window.__PROTO = {
              auto_frame: a.frame, auto_focus: a.focus, auto_weight: a.weight };
   },
   focus: () => FOCUS.map((f) => ({ ...f })),
+  // key art: только в ?debug=keyart (планирование); иначе пусто
+  keyArt: () => KEYART.map((k) => {
+    const r = k.el.getBoundingClientRect();
+    return { id: k.id, z: k.z, core: k.core, range: k.range, exitCore: k.exitCore, exitRange: k.exitRange,
+             side: k.side, preload: k.preload,
+             w: r.width, h: r.height, weight: k.weight ?? 0,
+             requested: !!k.img.getAttribute('src'), loaded: k.img.complete && k.img.naturalWidth > 0 };
+  }),
   // контентные точки: что видно на текущем z (только чтение)
   content: () => ({
     locale: CONTENT_LOCALE,

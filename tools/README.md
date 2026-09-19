@@ -261,6 +261,38 @@ assets/topdown/content_points.json ─ tools/build_proto_content.py ─→ proto
   `node tests/browser/zoom_review.mjs` — `zoom-choreography-review.png` и
   `zoom-route-strip.png` (в CI — артефакт `zoom-review-*`).
 
+## Key art /proto/
+
+`assets/topdown/key_art.json` → `tools/key_art.py` → статические `<figure>` в
+`proto/index.html` + WebP в `assets/keyart/`.
+
+* 3 окна-иллюстрации: village-life, mine-work, spirit-afterlife. Мастер —
+  одобренный PNG из art-батча (`assets/keyart/<id>.png`, байт-в-байт), runtime —
+  WebP q90, собранный из мастера (`python tools/key_art.py`; `--check` в CI
+  падает, если WebP или HTML устарели).
+* Окно — DOM, как карточка: якорь — объект layout + `peak_offset`, присутствие —
+  та же функция z (core/range), 480×320 css у края вьюпорта. Край — мягкая
+  эллиптическая маска (`mask-image`), без рамки и тени.
+* Ленивая загрузка: `src` ставится, когда камера ближе `range + preload_ahead_m`
+  к пику; alt EN в HTML, RU — `data-alt-ru` (`?lang=ru`).
+* Окна стоят только там, где нет карточки, фокуса камеры, затемнения перехода.
+* `?debug=keyart` — обводит окна. `node tests/browser/key_art_review.mjs` →
+  `key-art-integration-review.png`, `key-art-peak-close-review.png`,
+  `key-art-route-review.png` (в CI — артефакт `key-art-*`). В visual CI окна
+  видны только на чекпоинтах `keyart-*`.
+
+## Спрайт-оверрайды /proto/
+
+`proto/sprite_overrides.json`: стабильный id объекта → свой спрайт только в /proto/.
+Тип объекта в layout не меняется — раскладка, след, y-sort и legacy-потребители
+типа (/next/, /full/, `assets/`) не затронуты. `contact_from` — контакт берётся у
+типа (физический корпус), а не у оверрайда; `shadow_opacity` — множитель
+контактной тени только для этого объекта.
+
+* `spirit/shipwreck/ship` → `proto/sprites_special/feat_death_alt_ghost.webp`:
+  призрачный мировой корабль (родня key art D), тень 25% (вариант B). Собирается
+  детерминированно из `assets/feat_death_alt.webp`: `python tools/make_ghost_ship.py`.
+
 ## Проверки (они же в CI, `.github/workflows/ci.yml`)
 
 ```
@@ -269,6 +301,7 @@ python tools/generate_layout.py --check  # committed layouts актуальны
 python tools/topdown_layout.py --check   # overrides валидны, runtime актуален
 python tools/build_proto_content.py --check  # контентные точки: источник и proto/index.html
 python tools/camera_choreography.py --check   # хореография зума
+python tools/key_art.py --check               # key art: план, WebP, proto/index.html
 python tools/test_layout.py              # стабильные id, overrides, потребители
 python tools/check_run_rules.py
 python tools/measure_foreshortening.py

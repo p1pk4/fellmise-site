@@ -5,6 +5,20 @@
 
 ---
 
+## 2026-09-19 15:24 — world-ghostship-1: призрачный мировой корабль (только /proto/)
+
+- **Что:** объект `spirit/shipwreck/ship` в /proto/ рисуется призрачным
+  спрайтом (`proto/sprites_special/feat_death_alt_ghost.webp`, перекраска
+  `feat_death_alt` под key art D, `tools/make_ghost_ship.py`) через новый
+  `proto/sprite_overrides.json` (id → спрайт). Контакт — от корпуса
+  (`contact_from: feat_death_alt`), тень 25% только у него. Тип объекта,
+  раскладка, `assets/feat_death_alt.webp`, /next/, /full/ — без изменений.
+  Переход: арт гаснет −453, корабль входит −455.87, зазор 2.87 м.
+- **Тип:** feat
+- **Проверка:** test_layout 75/75 · smoke 27/27 · `--check` ✓ · next/ в синхроне ·
+  visual vs PR #14: только proto-spirit (1.7%)
+- **Commit:** 17bb8e8
+
 ## 2026-09-19 14:22 — key-art-spirit-d-1: spirit key art = вариант D
 
 - **Что:** арт окна spirit-afterlife заменён на вариант D (призрачный

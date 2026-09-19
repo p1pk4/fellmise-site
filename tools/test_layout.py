@@ -970,5 +970,69 @@ class KeyArt(unittest.TestCase):
             self.assertNotIn(bad, css)
 
 
+class SpriteOverrides(unittest.TestCase):
+    """proto/sprite_overrides.json: the spectral world ship, /proto/ only."""
+
+    LEGACY_SHIP_SHA256 = "0d8d65f903be28f76659694741df437a78afe0dddfe668c851940ebb2c785c04"
+
+    def setUp(self):
+        self.ov = json.loads(read("proto/sprite_overrides.json"))["overrides"]
+        self.rt = json.loads(read("assets/topdown/layout.runtime.json"))
+
+    def test_resolves_exactly_one_object(self):
+        objs = [o for b in self.rt["biomes"].values() for o in b["sprites"]]
+        self.assertEqual(sorted(self.ov), ["spirit/shipwreck/ship"])
+        hits = [o for o in objs if o["id"] in self.ov]
+        self.assertEqual(len(hits), 1)
+        self.assertEqual(hits[0]["t"], "feat_death_alt")       # the type is unchanged
+
+    def test_legacy_asset_and_layout_untouched(self):
+        """assets/feat_death_alt.webp byte-identical (it feeds /next/ and /full/);
+        the layout still says feat_death_alt, so footprint and composition hold."""
+        import hashlib
+        self.assertEqual(hashlib.sha256((ROOT / "assets" / "feat_death_alt.webp").read_bytes()).hexdigest(),
+                         self.LEGACY_SHIP_SHA256)
+        self.assertNotIn("sprites_special", read("assets/layout.json"))
+        self.assertNotIn("feat_death_alt_ghost", read("assets/topdown/layout.runtime.json"))
+        for f in ("full/index.html", "full/ru/index.html"):
+            self.assertNotIn("feat_death_alt_ghost", read(f))
+        TC._dims.clear()
+        self.assertEqual(TC.dims("feat_death_alt"), TC.dims("feat_death_alt"))   # measured on the legacy texture
+        self.assertIn(str(ROOT / "assets"), str(TC.ASSETS))
+
+    def test_override_asset_same_canvas_and_reproducible(self):
+        from PIL import Image
+        import subprocess
+        ov = self.ov["spirit/shipwreck/ship"]
+        with Image.open(ROOT / "assets" / "feat_death_alt.webp") as a, Image.open(ROOT / "proto" / ov["sprite"]) as b:
+            self.assertEqual(a.size, b.size)                     # same canvas -> same quad, aspect, y-sort
+        before = (ROOT / "proto" / ov["sprite"]).read_bytes()
+        subprocess.run([sys.executable, str(ROOT / "tools" / "make_ghost_ship.py")], check=True, capture_output=True)
+        self.assertEqual((ROOT / "proto" / ov["sprite"]).read_bytes(), before)
+
+    def test_contact_is_the_hull_not_the_haze(self):
+        """Contact comes from the legacy type; the override's solid core (alpha
+        > 0.5) has the same base row, while its haze (alpha > 16/255) would
+        widen it - so the haze is deliberately not measured."""
+        import numpy as np
+        from PIL import Image
+        ov = self.ov["spirit/shipwreck/ship"]
+        self.assertEqual(ov["contact_from"], "feat_death_alt")
+        meta = json.loads(read("proto/sprite_contact.json"))["sprites"]["feat_death_alt"]
+        with Image.open(ROOT / "proto" / ov["sprite"]) as im:
+            al = np.asarray(im.convert("RGBA"))[..., 3]
+        core = al > 128
+        low = (np.nonzero(core.any(1))[0].max() + 1) / al.shape[0]
+        self.assertLess(abs(low - meta["contact_row"]), 0.03)
+        haze = al > 16
+        self.assertGreater((np.nonzero(haze.any(1))[0].max() + 1) / al.shape[0], meta["contact_row"])
+
+    def test_shadow_quarter_for_this_object_only(self):
+        self.assertEqual(self.ov["spirit/shipwreck/ship"]["shadow_opacity"], 0.25)
+        proto = read("proto/main.js")
+        self.assertIn("opacity: PRES.contact_shadow.opacity * (art.shadowOpacity ?? 1)", proto)
+        self.assertIn("const art = await spriteFor(o);", proto)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

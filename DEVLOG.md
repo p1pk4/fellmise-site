@@ -5,6 +5,21 @@
 
 ---
 
+## 2026-09-19 03:03 — Biome Presentation 1 выпущен в production
+
+- **Что:** в main влит стек Biome Presentation 1 (PR #4 ← PR #6 ← PR #8),
+  production baseline `2d189d33144c7f5b20ad1fb1603a17b08f55e9d3`. В нём:
+  World Composition (PR #3, влит раньше); biome ground/palette и 4 перехода
+  village→forest→mine→spirit→home; road terminal у финального дома; модель
+  контактной тени по линии контакта (PR #6); отремонтированный низ B для
+  hero_house_a / hero_house_b / hero_well (PR #8). Collisions 0, road
+  intrusions 0. PR #5 закрыт как superseded, PR #7 (ground patches) — закрыт
+  как experiment/reference, в runtime не входит.
+- **Тип:** docs
+- **Проверка:** n/a (релиз проверен: CI main success, Pages built 2d189d3,
+  / /ru/ /proto/ /next/ — 200, production /proto/ == main 14/14 SAME strict)
+- **Commit:** 93343d1 (PR #8), 1270311 (PR #6), 2d189d3 (PR #4 → main)
+
 ## 2026-09-19 02:35 — sprite-repair-integration-1: отремонтированный низ 3 спрайтов
 
 - **Что:** `hero_house_b`, `hero_house_a`, `hero_well` в /proto/ заменены на

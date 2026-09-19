@@ -728,7 +728,7 @@ class ContentPoints(unittest.TestCase):
         proto = read("proto/main.js")
         self.assertIn("document.querySelectorAll('.content-point')", proto)
         self.assertIsNone(re.search(r"fetch\([^)]*content_points", proto))
-        block = proto[proto.index("контентные точки --"):proto.index("key art (только планирование) --")]
+        block = proto[proto.index("контентные точки --"):proto.index("---- key art --")]
         for bad in ("createElement(", ".remove()", "textContent", "innerHTML", "innerText"):
             self.assertNotIn(bad, block)
 
@@ -848,8 +848,8 @@ class CameraChoreography(unittest.TestCase):
             self.assertNotIn(bad, proto)
 
 
-class KeyArtPlanning(unittest.TestCase):
-    """assets/topdown/key_art.json: planned illustration windows (no art yet)."""
+class KeyArt(unittest.TestCase):
+    """assets/topdown/key_art.json: three live illustration windows over the world."""
 
     def setUp(self):
         import key_art as KA
@@ -872,8 +872,11 @@ class KeyArtPlanning(unittest.TestCase):
             lambda d: d["slots"][2]["anchor"].__setitem__("peak_offset", 0),     # onto the spirit card
             lambda d: d["slots"][0].__setitem__("aspect", "7:1"),
             lambda d: d["slots"][0].__setitem__("target_px", [800, 533]),
-            lambda d: d["slots"][1]["alt"].__setitem__("en", "a miner"),         # alt before the art
-            lambda d: d["slots"][2].__setitem__("status", "live"),
+            lambda d: d["slots"][1].__setitem__("status", "planned"),            # planned with alt = alt before art
+            lambda d: d["slots"][2].__setitem__("status", "shipped"),
+            lambda d: d["slots"][0]["alt"].__setitem__("ru", ""),                # live without RU alt
+            lambda d: d["slots"][1].__setitem__("src", "assets/keyart/nope.webp"),
+            lambda d: d["slots"][2].__setitem__("target_px", [1920, 1280]),      # master is not that size
         ):
             d = copy.deepcopy(self.data)
             mutate(d)
@@ -907,15 +910,128 @@ class KeyArtPlanning(unittest.TestCase):
             d["slots"][0]["anchor"]["peak_offset"] = off
             self.assertTrue(self.K.check(d, self.rt), off)
 
-    def test_no_production_dependency(self):
-        """Planning only: no image file, and /proto/ reads the plan only in ?debug=keyart."""
-        proto = read("proto/main.js")
-        self.assertIn("if (!DEBUG.has('keyart')) return;", proto)
-        i = proto.index("fetch(ASSETS + 'topdown/key_art.json')")
-        self.assertLess(proto.index("if (!DEBUG.has('keyart')) return;"), i)
-        self.assertNotIn("key_art", read("proto/index.html"))
+    def test_live_assets_and_static_figures(self):
+        """Each slot is live: the approved PNG master (1536x1024), the WebP derived
+        from it and current, a static <figure> in proto/index.html with alt EN
+        and RU; main.js activates the figures and never fetches the plan."""
+        from PIL import Image
+        self.assertEqual([s["status"] for s in self.data["slots"]], ["live"] * 3)
         for s in self.data["slots"]:
-            self.assertNotIn("src", s)
+            with Image.open(ROOT / s["master"]) as im:
+                self.assertEqual((im.size, im.mode), ((1536, 1024), "RGB"), s["id"])
+            self.assertEqual((ROOT / s["src"]).read_bytes(), self.K.webp_bytes(ROOT / s["master"]), s["id"])
+        page = read("proto/index.html")
+        self.assertEqual(self.K.render(page, self.data), page)
+        for s in self.data["slots"]:
+            self.assertIn(f'data-id="{s["id"]}"', page)
+            self.assertIn(f'data-src="../{s["src"]}"', page)
+            self.assertIn(s["alt"]["ru"], page)
+        proto = read("proto/main.js")
+        self.assertIn("document.querySelectorAll('.key-art')", proto)
+        self.assertNotIn("key_art.json')", proto)
+
+    def test_spirit_art_gone_before_world_ship(self):
+        """spirit-afterlife: peak -440, smooth fade out by -453, then a few
+        metres of world before the world ship (spirit/shipwreck/ship) enters
+        the frame: never both on screen. The other two windows are untouched."""
+        slot = next(x for x in self.data["slots"] if x["id"] == "spirit-afterlife")
+        self.assertAlmostEqual(self.K.peak(slot, self.rt), -440.0, places=3)
+        fv = self.K.first_visible("spirit/shipwreck/ship", self.rt)
+        e, st = self.K.window(slot, self.rt)
+        self.assertGreaterEqual(e - fv, 2.0)
+        self.assertLessEqual(e - fv, 5.0)
+        z = st
+        while z >= fv - 20:
+            if z <= fv:                                   # ship on screen
+                self.assertEqual(self.K.presence(slot, self.rt, z), 0.0, z)
+            z -= 0.05
+        a = slot["activation"]
+        self.assertGreaterEqual(a["exit_range"] - a["exit_core"], 6)   # a fade, not a cut
+        mt = next(t for t in self.rt["presentation"]["transitions"] if t["from"] == "mine")
+        self.assertLess(st, mt["anchor_z"] - mt["dim"]["half_width"])   # entry clear of the dim
+        v = {x["id"]: x for x in self.data["slots"]}
+        self.assertEqual((v["village-life"]["anchor"], v["village-life"]["activation"]),
+                         ({"object": "village/tavern/tavern", "peak_offset": -31.5}, {"core": 4, "range": 10}))
+        self.assertEqual((v["mine-work"]["anchor"], v["mine-work"]["activation"]),
+                         ({"object": "mine/deep-adit/cave", "peak_offset": -5.4}, {"core": 5, "range": 16}))
+
+    def test_yields_to_is_enforced(self):
+        d = copy.deepcopy(self.data)
+        s = next(x for x in d["slots"] if x["id"] == "spirit-afterlife")
+        s["activation"]["exit_range"] = 17                 # would still show at -457
+        self.assertTrue(self.K.check(d, self.rt))
+
+    def test_soft_edge_no_card_chrome(self):
+        """The window fades into the world (mask), no frame or popup shadow."""
+        page = read("proto/index.html")
+        css = page[page.index("  .key-art {"):page.index("  .key-art[data-side=\"left\"]")]
+        self.assertIn("mask-image: radial-gradient(", css)
+        for bad in ("border:", "box-shadow", "border-radius"):
+            self.assertNotIn(bad, css)
+
+
+class SpriteOverrides(unittest.TestCase):
+    """proto/sprite_overrides.json: the spectral world ship, /proto/ only."""
+
+    LEGACY_SHIP_SHA256 = "0d8d65f903be28f76659694741df437a78afe0dddfe668c851940ebb2c785c04"
+
+    def setUp(self):
+        self.ov = json.loads(read("proto/sprite_overrides.json"))["overrides"]
+        self.rt = json.loads(read("assets/topdown/layout.runtime.json"))
+
+    def test_resolves_exactly_one_object(self):
+        objs = [o for b in self.rt["biomes"].values() for o in b["sprites"]]
+        self.assertEqual(sorted(self.ov), ["spirit/shipwreck/ship"])
+        hits = [o for o in objs if o["id"] in self.ov]
+        self.assertEqual(len(hits), 1)
+        self.assertEqual(hits[0]["t"], "feat_death_alt")       # the type is unchanged
+
+    def test_legacy_asset_and_layout_untouched(self):
+        """assets/feat_death_alt.webp byte-identical (it feeds /next/ and /full/);
+        the layout still says feat_death_alt, so footprint and composition hold."""
+        import hashlib
+        self.assertEqual(hashlib.sha256((ROOT / "assets" / "feat_death_alt.webp").read_bytes()).hexdigest(),
+                         self.LEGACY_SHIP_SHA256)
+        self.assertNotIn("sprites_special", read("assets/layout.json"))
+        self.assertNotIn("feat_death_alt_ghost", read("assets/topdown/layout.runtime.json"))
+        for f in ("full/index.html", "full/ru/index.html"):
+            self.assertNotIn("feat_death_alt_ghost", read(f))
+        TC._dims.clear()
+        self.assertEqual(TC.dims("feat_death_alt"), TC.dims("feat_death_alt"))   # measured on the legacy texture
+        self.assertIn(str(ROOT / "assets"), str(TC.ASSETS))
+
+    def test_override_asset_same_canvas_and_reproducible(self):
+        from PIL import Image
+        import subprocess
+        ov = self.ov["spirit/shipwreck/ship"]
+        with Image.open(ROOT / "assets" / "feat_death_alt.webp") as a, Image.open(ROOT / "proto" / ov["sprite"]) as b:
+            self.assertEqual(a.size, b.size)                     # same canvas -> same quad, aspect, y-sort
+        before = (ROOT / "proto" / ov["sprite"]).read_bytes()
+        subprocess.run([sys.executable, str(ROOT / "tools" / "make_ghost_ship.py")], check=True, capture_output=True)
+        self.assertEqual((ROOT / "proto" / ov["sprite"]).read_bytes(), before)
+
+    def test_contact_is_the_hull_not_the_haze(self):
+        """Contact comes from the legacy type; the override's solid core (alpha
+        > 0.5) has the same base row, while its haze (alpha > 16/255) would
+        widen it - so the haze is deliberately not measured."""
+        import numpy as np
+        from PIL import Image
+        ov = self.ov["spirit/shipwreck/ship"]
+        self.assertEqual(ov["contact_from"], "feat_death_alt")
+        meta = json.loads(read("proto/sprite_contact.json"))["sprites"]["feat_death_alt"]
+        with Image.open(ROOT / "proto" / ov["sprite"]) as im:
+            al = np.asarray(im.convert("RGBA"))[..., 3]
+        core = al > 128
+        low = (np.nonzero(core.any(1))[0].max() + 1) / al.shape[0]
+        self.assertLess(abs(low - meta["contact_row"]), 0.03)
+        haze = al > 16
+        self.assertGreater((np.nonzero(haze.any(1))[0].max() + 1) / al.shape[0], meta["contact_row"])
+
+    def test_shadow_quarter_for_this_object_only(self):
+        self.assertEqual(self.ov["spirit/shipwreck/ship"]["shadow_opacity"], 0.25)
+        proto = read("proto/main.js")
+        self.assertIn("opacity: PRES.contact_shadow.opacity * (art.shadowOpacity ?? 1)", proto)
+        self.assertIn("const art = await spriteFor(o);", proto)
 
 
 if __name__ == "__main__":

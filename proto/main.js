@@ -12,6 +12,7 @@
  */
 
 import * as THREE from './vendor/three.module.min.js';
+import { createAudio } from './audio.js';
 
 const HUD = document.getElementById('hud');
 /* Отладочная панель — не часть страницы: видна только по явному ?debug=hud
@@ -921,6 +922,9 @@ async function main() {
 
   PRES = layout.presentation;
   if (!PRES || PRES.biomes.length !== ids.length) throw new Error('в ' + LAYOUT + ' нет presentation');
+  // звук: выключен, пока посетитель сам не включит; до этого ни одного запроса
+  AUDIO = createAudio({ configUrl: ASSETS + 'topdown/audio.json', presentation: PRES, biomeAt,
+                        assetsBase: ASSETS.replace(/assets\/$/, ''), locale: CONTENT_LOCALE });
   const T = PRES.textures;
   /* Все текстуры грунта грузятся ДО первого кадра: state.ready/done ставятся
      только после них, и скриншот не может поймать землю без текстуры. */
@@ -1106,6 +1110,7 @@ function resize() {
    прозрачность которого задаёт положение камеры. Своих таймеров и анимаций
    у него нет, поэтому кадр в заданной Z всегда один и тот же. */
 const OVERLAY = document.getElementById('biome-transition-overlay');
+let AUDIO = null;
 
 function draw() {
   if (OVERLAY && PRES) OVERLAY.style.opacity = dimAt(state.z).toFixed(3);
@@ -1117,6 +1122,7 @@ function draw() {
   renderer.render(scene, camera);
   updateContent();
   updateKeyArt();
+  if (AUDIO) AUDIO.update(state.z);
   const halfM = frameHeight() / 2;
   const fa = frameAt(state.z);
   const tiles = (halfM * 2) / TILE_M;                 // высота кадра в тайлах
@@ -1131,7 +1137,8 @@ function draw() {
     + `<b>игровой кадр = ${GAME_FRAME_M.toFixed(1)} м — недостижим при текущем разрешении пака</b>\n`
     + `камера z = <b>${state.z.toFixed(0)}</b> — колесо мыши\n`
     + `${state.objects} объектов, ${state.decals} декалей, ${state.biomes} биомов\n`
-    + `тест сортировки: <b>${state.sortTest}</b>`;
+    + `тест сортировки: <b>${state.sortTest}</b>`
+    + (AUDIO ? '\n' + AUDIO.hud() : '');
 }
 
 // колесо, клавиши и размер окна ведут камеру только в живом режиме; в статике —
@@ -1234,11 +1241,14 @@ window.__PROTO = {
       weight: p.weight ?? 0, state: p.state ?? 'hidden', side: p.els[0]?.dataset.side, screen: p.screen })),
   }),
   roadAt: (z) => roadAt(z),
+  // звук: состояние (веса по z, контекст, запросы, последний SFX); weights(z) — без камеры
+  audio: (z) => (AUDIO ? (z === undefined ? AUDIO.state() : AUDIO.weights(z)) : null),
 };
 
 /* Ошибка сборки живой сцены — тот же путь в статике (mode.js); текст ошибки
    виден только в ?debug=hud. Без mode.js (прямой импорт) — как раньше. */
 main().catch((e) => {
+  if (AUDIO) { AUDIO.destroy(); AUDIO = null; }
   if (window.FELLMISE_MODE) { window.FELLMISE_MODE.fail(e); return; }
   HUD.hidden = false; HUD.textContent = 'ошибка: ' + e.message; throw e;
 });

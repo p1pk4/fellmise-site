@@ -72,6 +72,24 @@
   .mode-live .key-art[data-side="left"] { left: 24px; }
   .mode-live .key-art[data-side="right"] { right: 24px; }
   .mode-live .key-art img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  /* Sound toggle (proto/audio.js creates it, live mode only): a small quiet
+     round button in the bottom-right corner, under nothing and over nothing —
+     cards and key art sit at mid-height, far from the corner. */
+  .mode-live .audio-toggle {
+    position: fixed; right: 16px; bottom: 16px; z-index: 9;
+    width: 36px; height: 36px; padding: 0; margin: 0;
+    display: grid; place-items: center;
+    border: 1px solid rgba(243, 237, 218, .28); border-radius: 50%;
+    background: rgba(14, 16, 12, .52); color: rgba(243, 237, 218, .72);
+    -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
+    cursor: pointer; transition: color .15s, border-color .15s, background-color .15s;
+  }
+  .mode-live .audio-toggle:hover { color: #f3edda; border-color: rgba(243, 237, 218, .5); }
+  .mode-live .audio-toggle:focus-visible { outline: 2px solid #ffc857; outline-offset: 3px; }
+  .mode-live .audio-toggle[aria-pressed="true"] { color: #ffc857; border-color: rgba(255, 200, 87, .6); }
+  .mode-live .audio-toggle .audio-toggle__on { display: none; }
+  .mode-live .audio-toggle[aria-pressed="true"] .audio-toggle__on { display: inline; }
+  .mode-live .audio-toggle[aria-pressed="true"] .audio-toggle__off { display: none; }
   /* ?debug=keyart: outline the windows (review only) */
   .mode-live .key-art.debug { -webkit-mask-image: none; mask-image: none; outline: 2px dashed rgba(255, 200, 87, .9); }
   .mode-live .key-art.debug::after {

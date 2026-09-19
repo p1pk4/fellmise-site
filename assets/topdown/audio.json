@@ -1,0 +1,138 @@
+{
+ "_doc": [
+  "Audio of /proto/ (live mode only; the static journey is silent). Read by proto/audio.js, checked by tools/audio_config.py.",
+  "Data only; the rules live in proto/audio.js. Ambient levels follow the camera's z through the SAME biome map as the ground",
+  "(layout presentation: biome order, each transition's blend_z); a transition SFX plays when the camera crosses its anchor_z",
+  "going down the route. status planned = no file yet, never requested; live = requested only after the visitor turns sound on",
+  "(the ambient under the camera, the next one and the nearest transition SFX). This file itself is fetched only then.",
+  "fade_ms = [in, out]: an ambient voice fading in when it starts / out when it is released; an SFX attack / release.",
+  "master.fade_ms: the whole mix on the toggle. gain = base gain, 0..1, before master.gain."
+ ],
+ "master": {
+  "default_muted": true,
+  "gain": 0.8,
+  "fade_ms": 600,
+  "smoothing_s": 0.08,
+  "preload_ahead_m": 60
+ },
+ "biomes": [
+  {
+   "id": "village",
+   "asset": "assets/audio/ambient_village.webm",
+   "status": "planned",
+   "loop": true,
+   "gain": 0.55,
+   "fade_ms": [
+    1200,
+    1500
+   ],
+   "notes": "quiet lived-in village: wind, distant activity, no music"
+  },
+  {
+   "id": "forest",
+   "asset": "assets/audio/ambient_forest.webm",
+   "status": "planned",
+   "loop": true,
+   "gain": 0.55,
+   "fade_ms": [
+    1200,
+    1500
+   ],
+   "notes": "forest air: wind in leaves, rare birds"
+  },
+  {
+   "id": "mine",
+   "asset": "assets/audio/ambient_mine.webm",
+   "status": "planned",
+   "loop": true,
+   "gain": 0.5,
+   "fade_ms": [
+    1200,
+    1500
+   ],
+   "notes": "enclosed stone space: distant drips, timber creaks, rare stone"
+  },
+  {
+   "id": "spirit",
+   "asset": "assets/audio/ambient_spirit.webm",
+   "status": "planned",
+   "loop": true,
+   "gain": 0.5,
+   "fade_ms": [
+    1200,
+    1500
+   ],
+   "notes": "cold emptiness: wind, low distant texture, restrained"
+  },
+  {
+   "id": "home",
+   "asset": "assets/audio/ambient_home.webm",
+   "status": "planned",
+   "loop": true,
+   "gain": 0.55,
+   "fade_ms": [
+    1200,
+    1500
+   ],
+   "notes": "calmer: soft wind, yard, a safe place"
+  }
+ ],
+ "transitions": [
+  {
+   "id": "village-forest",
+   "from": "village",
+   "to": "forest",
+   "asset": "assets/audio/sfx_village_forest.webm",
+   "status": "planned",
+   "loop": false,
+   "gain": 0.6,
+   "fade_ms": [
+    20,
+    400
+   ],
+   "notes": "leaving the village: a soft rise of wind into leaves"
+  },
+  {
+   "id": "forest-mine",
+   "from": "forest",
+   "to": "mine",
+   "asset": "assets/audio/sfx_forest_mine.webm",
+   "status": "planned",
+   "loop": false,
+   "gain": 0.6,
+   "fade_ms": [
+    20,
+    400
+   ],
+   "notes": "into the mine: a hollow low air shift, a timber creak"
+  },
+  {
+   "id": "mine-spirit",
+   "from": "mine",
+   "to": "spirit",
+   "asset": "assets/audio/sfx_mine_spirit.webm",
+   "status": "planned",
+   "loop": false,
+   "gain": 0.6,
+   "fade_ms": [
+    20,
+    400
+   ],
+   "notes": "out of the dark: a cold thin exhale, restrained"
+  },
+  {
+   "id": "spirit-home",
+   "from": "spirit",
+   "to": "home",
+   "asset": "assets/audio/sfx_spirit_home.webm",
+   "status": "planned",
+   "loop": false,
+   "gain": 0.6,
+   "fade_ms": [
+    20,
+    400
+   ],
+   "notes": "back to a safe place: a warm soft settle, no fanfare"
+  }
+ ]
+}

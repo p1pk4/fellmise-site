@@ -407,34 +407,49 @@ test.describe('/proto/', () => {
     clean(watch);
   });
 
-  test('key art planning: nothing in production, placeholders only with ?debug=keyart', async ({ page, watch }) => {
-    const plans = [];
-    page.on('request', (r) => { if (/key_art\.json/.test(r.url())) plans.push(r.url()); });
+  test('key art: three windows in plain /proto/, lazy, loaded at peak, clear of cards', async ({ page, watch }) => {
+    const art = [];
+    page.on('response', (r) => { if (/\/assets\/keyart\/[^/]+\.webp$/.test(r.url())) art.push([r.url().split('/').pop(), r.status()]); });
     await page.goto('/proto/');
     await page.waitForFunction(PROTO_READY, null, { timeout: CONFIG.routes['/proto/'].readyTimeoutMs });
-    expect(plans).toEqual([]);
-    await expect(page.locator('#keyart-review, .keyart-slot')).toHaveCount(0);
-    expect(await page.evaluate(() => window.__PROTO.keyArt())).toEqual([]);
-
-    await page.goto('/proto/?debug=keyart');
-    await page.waitForFunction(() => window.__PROTO?.state.done && window.__PROTO.keyArt().length > 0, null, { timeout: 120000 });
     const plan = JSON.parse(fs.readFileSync(path.join(HERE, '..', '..', '..', 'assets', 'topdown', 'key_art.json'), 'utf8'));
-    const slots = await page.evaluate(() => window.__PROTO.keyArt());
-    expect(slots.map((s) => s.id)).toEqual(plan.slots.map((s) => s.id));
-    await expect(page.locator('.keyart-slot')).toHaveCount(plan.slots.length);
-    await expect(page.locator('#hud')).toBeHidden();
-    for (const s of slots) {
-      await page.evaluate((z) => window.__PROTO.go(z, 'auto'), s.z);
-      const on = (await page.evaluate(() => window.__PROTO.keyArt())).filter((k) => k.weight > 0);
-      expect(on.map((k) => k.id)).toEqual([s.id]);
-      expect(on[0].weight).toBe(1);
+    await expect(page.locator('#keyart-overlay figure.key-art')).toHaveCount(plan.slots.length);
+    // lazy: at the start only what is within range + preload of the camera is requested
+    const start = await page.evaluate(() => window.__PROTO.keyArt());
+    for (const k of start) expect(k.requested, k.id).toBe(Math.abs(-20 - k.z) <= k.range + k.preload);
+    expect(start.every((k) => k.weight === 0)).toBe(true);
+    for (const s of plan.slots) {
+      const k = start.find((x) => x.id === s.id);
+      await page.evaluate((z) => window.__PROTO.go(z, 'auto'), k.z);
+      await page.waitForFunction((id) => window.__PROTO.keyArt().find((x) => x.id === id).loaded, s.id, { timeout: 15000 });
+      const now = await page.evaluate(() => window.__PROTO.keyArt());
+      expect(now.filter((x) => x.weight > 0).map((x) => x.id), s.id).toEqual([s.id]);
+      expect(now.find((x) => x.id === s.id).weight).toBe(1);
       const cards = (await page.evaluate(() => window.__PROTO.content())).points.filter((p) => p.weight > 0);
       expect(cards, `${s.id}: no card at the key art peak`).toEqual([]);
-      expect((await page.evaluate(() => window.__PROTO.camera())).auto_weight).toBe(0);
-      const box = await page.locator(`.keyart-slot[data-id="${s.id}"]`).boundingBox();
+      expect((await page.evaluate(() => window.__PROTO.camera())).auto_weight).toBeLessThanOrEqual(0.05);
+      const fig = page.locator(`figure.key-art[data-id="${s.id}"]`);
+      const box = await fig.boundingBox();
       const vp = page.viewportSize();
-      expect(box.x >= 0 && box.y >= 0 && box.x + box.width <= vp.width && box.y + box.height <= vp.height).toBe(true);
+      expect(Math.round(box.width)).toBe(480);
+      expect(Math.round(box.height)).toBe(320);
+      expect(box.x >= 0 && box.y >= 0 && box.x + box.width <= vp.width && box.y + box.height <= vp.height, s.id).toBe(true);
+      expect(await fig.locator('img').getAttribute('alt')).toBe(s.alt.en);
     }
+    expect(art.map(([n]) => n).sort()).toEqual(plan.slots.map((s) => s.src.split('/').pop()).sort());
+    expect(art.every(([, st]) => st === 200)).toBe(true);
+    clean(watch);
+  });
+
+  test('key art: RU alt with ?lang=ru; ?debug=keyart outlines the same windows', async ({ page, watch }) => {
+    const plan = JSON.parse(fs.readFileSync(path.join(HERE, '..', '..', '..', 'assets', 'topdown', 'key_art.json'), 'utf8'));
+    await page.goto('/proto/?lang=ru');
+    await page.waitForFunction(PROTO_READY, null, { timeout: CONFIG.routes['/proto/'].readyTimeoutMs });
+    for (const s of plan.slots) expect(await page.locator(`figure.key-art[data-id="${s.id}"] img`).getAttribute('alt')).toBe(s.alt.ru);
+    await page.goto('/proto/?debug=keyart');
+    await page.waitForFunction(PROTO_READY, null, { timeout: CONFIG.routes['/proto/'].readyTimeoutMs });
+    await expect(page.locator('figure.key-art.debug')).toHaveCount(plan.slots.length);
+    await expect(page.locator('#hud')).toBeHidden();
     clean(watch);
   });
 

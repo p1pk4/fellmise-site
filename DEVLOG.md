@@ -5,6 +5,20 @@
 
 ---
 
+## 2026-09-19 11:27 — key-art-integration-1: 3 key art в /proto/
+
+- **Что:** три одобренные иллюстрации (village-life B fix1, mine-work B fix1,
+  spirit-afterlife final) встроены в обычный /proto/ по плану PR #12: те же
+  окна (enter/peak/exit), стороны, 480×320 css. Мастера PNG в
+  `assets/keyart/` (байт-в-байт), runtime WebP q90 (~80 КБ) собирает
+  `tools/key_art.py`, он же пишет статические `<figure>` в `proto/index.html`
+  (alt EN/RU). Ленивая загрузка за `range + 120 м` до пика. Мягкий край —
+  эллиптическая CSS-маска, без рамки. `?debug=keyart` обводит окна.
+- **Тип:** feat
+- **Проверка:** test_layout 68/68 · smoke 24/24 · selftest 27/27 · `--check` ✓ ·
+  visual vs main: 24 прежних SAME, 3 новых keyart-*
+- **Commit:** <hash>
+
 ## 2026-09-19 06:02 — key-art-planning-1: поправки по review
 
 - **Что:** окно village-life сдвинуто раньше — z −93.9 → −103.9 → −113.9

@@ -1,15 +1,15 @@
-/* Key art planning review: where the planned illustration windows sit.
+/* Key art review: the illustration windows as the visitor sees them.
  *
- *   node key_art_review.mjs [--out <dir>]      (default out/key-art-planning)
+ *   node key_art_review.mjs [--out <dir>]      (default out/key-art-integration)
  *
- *   key-art-slots-review.png   per slot: enter / peak / exit, /proto/?debug=keyart
- *                              (neutral placeholders at the planned size), with
- *                              id, biome, z, camera frame, aspect, display px, side
- *   key-art-route-review.png   30 frames at equal z steps over the whole route:
- *                              how often a picture shows up
- *   key-art.json               the numbers + collision checks at every peak
+ *   key-art-integration-review.png  per slot: enter / peak / exit, plain /proto/
+ *                                   (real art, soft-edged, cards on, no HUD), with
+ *                                   id, biome, z, camera frame, display px, side
+ *   key-art-peak-close-review.png   each window at its peak, 1:1, cropped around it
+ *   key-art-route-review.png        30 frames at equal z steps over the whole route
+ *   key-art.json                    numbers + collision checks at every peak
  *
- * Placeholders exist only in ?debug=keyart. Nothing in the repository is written.
+ * Nothing in the repository is written.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -21,7 +21,7 @@ import { LAUNCH, stubExternal } from './lib/browser.mjs';
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const REPO = path.resolve(HERE, '..', '..');
 const arg = (k, d) => { const i = process.argv.indexOf(k); return i > 0 ? process.argv[i + 1] : d; };
-const OUT = path.resolve(arg('--out', path.join(REPO, 'out', 'key-art-planning')));
+const OUT = path.resolve(arg('--out', path.join(REPO, 'out', 'key-art-integration')));
 const CONFIG = JSON.parse(fs.readFileSync(path.join(HERE, 'checkpoints.json'), 'utf8'));
 const PLAN = JSON.parse(fs.readFileSync(path.join(REPO, 'assets', 'topdown', 'key_art.json'), 'utf8'));
 const VW = CONFIG.viewport.width, VH = CONFIG.viewport.height;
@@ -33,7 +33,7 @@ const browser = await chromium.launch(LAUNCH);
 const ctx = await browser.newContext({ viewport: CONFIG.viewport, deviceScaleFactor: CONFIG.deviceScaleFactor });
 const page = await ctx.newPage();
 await stubExternal(page);
-await page.goto(srv.url + '/proto/?debug=keyart');
+await page.goto(srv.url + '/proto/');
 await page.waitForFunction(() => window.__PROTO?.state.done && window.__PROTO.keyArt().length > 0, null, { timeout: 120000 });
 if (await page.locator('#hud').isVisible()) throw new Error('debug HUD visible');
 const slots = await page.evaluate(() => window.__PROTO.keyArt());
@@ -42,12 +42,13 @@ const routeEnd = await page.evaluate(() => window.__PROTO.state.routeEnd);
 async function at(z) {
   await page.evaluate((zz) => window.__PROTO.go(zz, 'auto'), z);
   await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+  await page.evaluate(() => Promise.all([...document.querySelectorAll('.key-art img[src]')].map((i) => i.decode().catch(() => {}))));
   return page.evaluate(() => {
     const P = window.__PROTO;
     const rect = (el) => { const r = el.getBoundingClientRect(); return { x: r.x, y: r.y, w: r.width, h: r.height }; };
     const cards = [...document.querySelectorAll('section.content-locale:not([hidden]) .content-point')]
       .map((el) => ({ id: el.dataset.id, opacity: +getComputedStyle(el).opacity, rect: rect(el) })).filter((c) => c.opacity > 0);
-    const art = [...document.querySelectorAll('.keyart-slot')]
+    const art = [...document.querySelectorAll('.key-art')]
       .map((el) => ({ id: el.dataset.id, opacity: +el.style.opacity, rect: rect(el) })).filter((a) => a.opacity > 0);
     const cam = P.camera();
     return { cam, cards, art, dim: +document.getElementById('biome-transition-overlay').style.opacity,
@@ -125,13 +126,35 @@ const CSS = `body{margin:0;background:#18191a;color:#e8e6dc;font:12px ui-monospa
   th{text-align:left;vertical-align:top;color:#ffc857;width:200px} small{color:#9a9e8c} img{display:block} .cap{padding:3px 0 0;color:#cfcab8}`;
 const spec = (id) => PLAN.slots.find((x) => x.id === id);
 await render(`<!doctype html><meta charset="utf-8"><style>${CSS}</style>
-  <h1>key art slots — PLANNING placeholders (/proto/?debug=keyart), auto zoom, ${VW}×${VH} DPR ${CONFIG.deviceScaleFactor}</h1>
+  <h1>key art integration — plain /proto/ (real art, soft edge, cards on, no debug HUD), auto zoom, ${VW}×${VH} DPR ${CONFIG.deviceScaleFactor}</h1>
   <table><tr><th></th><th>enter</th><th>peak</th><th>exit</th></tr>
   ${rows.map(({ s, cells, chk }) => { const p = spec(s.id); return `<tr><th>${esc(s.id)}<br><small>biome ${esc(p.biome)}<br>anchor ${esc(p.anchor.object)}<br>window ${(s.z + s.range).toFixed(1)} … ${(s.z - s.range).toFixed(1)}<br>peak ${s.z.toFixed(1)} ±${s.core}<br>aspect ${esc(p.aspect)} · ${s.w}×${s.h} css · side ${esc(s.side)}<br>target ${p.target_px.join('×')} px<br>at peak: frame ${chk.camera_frame} m, focus w ${chk.camera_focus_weight}, dim ${chk.transition_dim}<br>cards at peak: ${esc(chk.cards_visible_at_peak.join(', ') || 'none')}<br>road gap ${chk.road_gap_px} px · in viewport ${chk.inside_viewport}</small></th>
   ${cells.map((c) => `<td><img style="width:430px" src="${pathToFileURL(c.file).href}"><div class="cap">z ${c.z.toFixed(1)} · frame ${c.st.cam.frame.toFixed(1)} m · art ${esc(c.st.art.map((a) => a.opacity.toFixed(2)).join(', ') || '0')}</div></td>`).join('')}</tr>`; }).join('')}</table>`,
-path.join(OUT, 'key-art-slots-review.png'), 1620);
+path.join(OUT, 'key-art-integration-review.png'), 1620);
+// peak close-ups: the window and its surroundings at 1:1
+const close = [];
+for (const { s, cells, chk } of rows) {
+  const r = chk.rect, pad = 70;
+  const clip = { x: Math.max(0, r.x - pad), y: Math.max(0, r.y - pad), width: 0, height: 0 };
+  clip.width = Math.min(VW - clip.x, r.w + 2 * pad); clip.height = Math.min(VH - clip.y, r.h + 2 * pad);
+  const c2 = await browser.newContext({ viewport: CONFIG.viewport, deviceScaleFactor: CONFIG.deviceScaleFactor });
+  const p2 = await c2.newPage(); await stubExternal(p2);
+  await p2.goto(srv.url + '/proto/');
+  await p2.waitForFunction(CONFIG.routes['/proto/'].ready, null, { timeout: CONFIG.routes['/proto/'].readyTimeoutMs });
+  await p2.evaluate((z) => window.__PROTO.go(z, 'auto'), s.z);
+  await p2.evaluate(() => Promise.all([...document.querySelectorAll('.key-art img[src]')].map((i) => i.decode().catch(() => {}))));
+  await p2.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+  const file = path.join(OUT, 'shots', `${s.id}-close.png`);
+  await p2.screenshot({ path: file, clip });
+  close.push({ s, file, w: clip.width });
+  await c2.close();
+}
+await render(`<!doctype html><meta charset="utf-8"><style>${CSS}</style>
+  <h1>key art at peak — 1:1 (${VW}×${VH}, DPR ${CONFIG.deviceScaleFactor}), window + 70 px of world around it</h1>
+  <table>${close.map((c) => `<tr><th>${esc(c.s.id)}<br><small>peak z ${c.s.z.toFixed(1)} · ${esc(c.s.side)}</small></th><td><img style="width:${c.w}px" src="${pathToFileURL(c.file).href}"></td></tr>`).join('')}</table>`,
+path.join(OUT, 'key-art-peak-close-review.png'), 1000);
 await render(`<!doctype html><meta charset="utf-8"><style>${CSS} .g{display:grid;grid-template-columns:repeat(6,270px);gap:8px;padding:8px} .on{outline:3px solid #ffc857}</style>
-  <h1>key art on the route — ${N} frames, z 20 → route end ${routeEnd.toFixed(2)}; outlined = a key art window is on screen</h1>
+  <h1>key art on the route — ${N} frames, z 20 → route end ${routeEnd.toFixed(2)}; outlined = a key art window is on screen (plain /proto/)</h1>
   <div class="g">${strip.map((x) => `<div><img class="${x.st.art.length ? 'on' : ''}" style="width:270px" src="${pathToFileURL(x.file).href}"><div class="cap">z ${x.z} · ${x.st.cam.frame.toFixed(0)} m${x.st.art.length ? ' · ART ' + esc(x.st.art.map((a) => a.id).join(',')) : ''}${x.st.cards.length ? ' · card' : ''}</div></div>`).join('')}</div>`,
 path.join(OUT, 'key-art-route-review.png'), 1720);
 await browser.close();

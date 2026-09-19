@@ -1,21 +1,21 @@
 {
  "_doc": [
-  "Key art slots of /proto/ - PLANNING ONLY (status 'planned'): no image exists and nothing is drawn in production.",
-  "A slot is an illustration window over the world (DOM, like the content cards), anchored to a stable layout object:",
-  "peak = anchor z + peak_offset; presence 1 within `core` metres of camera z from the peak, smooth to 0 at `range`.",
-  "Windows live only where the route is free: no content card visible, no camera focus, no transition dim",
-  "(tools/key_art.py checks it against content_points.json, camera_choreography.json and the layout presentation).",
-  "Sizes: display width in CSS px at a 1280x800 desktop; target_px is the art to commission (>= 2x display, DPR 2 + headroom).",
-  "Review only: /proto/?debug=keyart shows neutral placeholders; tests/browser/key_art_review.mjs renders the sheets.",
-  "Windows may touch the very tail of a camera focus only where its weight is <= 0.05 (the frame is ~40 m), and must end before the ground blend that leaves their own biome starts."
+  "Key art of /proto/: 3 illustration windows over the world, anchored to stable layout objects.",
+  "peak = anchor z + peak_offset; presence 1 within `core` metres of camera z from the peak, smooth to 0 at `range` (the cards' function).",
+  "Windows live only where the route is free: no content card, no camera focus beyond a tail (<= 0.05), no transition dim,",
+  "out before the ground blend leaving the slot's biome (tools/key_art.py checks it).",
+  "master: the approved art (PNG, exact bytes of the art batch); src: the runtime WebP derived from it by tools/key_art.py.",
+  "tools/key_art.py writes the static <figure>s into proto/index.html (alt EN in the HTML, RU in data-alt-ru); main.js only",
+  "sets presence and assigns src when the camera is within range + lazy.preload_ahead_m of the peak.",
+  "Display: 480x320 css at a 1280x800 desktop, soft-edged (CSS mask), no frame. /proto/?debug=keyart outlines the windows."
  ],
- "status": "planning",
+ "status": "live",
  "max_slots": 3,
  "slots": [
   {
    "id": "village-life",
    "biome": "village",
-   "status": "planned",
+   "status": "live",
    "anchor": {
     "object": "village/tavern/tavern",
     "peak_offset": -31.5
@@ -39,21 +39,23 @@
    },
    "brief": "keyart-village-life",
    "alt": {
-    "en": null,
-    "ru": null,
-    "decorative": null,
-    "status": "TODO: write from the delivered art"
+    "en": "Villagers going about their day by the tavern: one unloads goods from a cart, two shop at a striped market stall, two talk at the tavern door.",
+    "ru": "Деревня живёт своей жизнью у таверны: один разгружает повозку, двое у полосатого прилавка, двое беседуют у двери таверны.",
+    "decorative": false
    },
    "lazy": {
     "preload_ahead_m": 120,
     "priority": "low"
    },
-   "why": "the village on screen is empty of people; the copy says the world lives without you (NPCs haul, haggle, drink) - the picture shows that life. Right after the tavern focus (focus weight <= 0.03), while the ground is still the village's: out before the village->forest ground blend starts (z -114)"
+   "why": "the village on screen is empty of people; the copy says the world lives without you (NPCs haul, haggle, drink) - the picture shows that life. Right after the tavern focus (focus weight <= 0.03), while the ground is still the village's: out before the village->forest ground blend starts (z -114)",
+   "master": "assets/keyart/village-life.png",
+   "src": "assets/keyart/village-life.webp",
+   "art_batch": "out/key_art_batch1/final/keyart_village_life_b_fix1.png (owner-approved)"
   },
   {
    "id": "mine-work",
    "biome": "mine",
-   "status": "planned",
+   "status": "live",
    "anchor": {
     "object": "mine/deep-adit/cave",
     "peak_offset": -5.4
@@ -77,21 +79,23 @@
    },
    "brief": "keyart-mine-work",
    "alt": {
-    "en": null,
-    "ru": null,
-    "decorative": null,
-    "status": "TODO: write from the delivered art"
+    "en": "A miner swings a pickaxe beside a boulder with a rust-coloured ore vein, near a timber mine entrance, a brazier and a cart of ore.",
+    "ru": "Шахтёр с киркой у валуна с рыжей рудной жилой, рядом вход в штольню, жаровня и вагонетка с рудой.",
+    "decorative": false
    },
    "lazy": {
     "preload_ahead_m": 120,
     "priority": "low"
    },
-   "why": "props show a mine, not work in it: ore pulled out by hands, veins running out, the haul - after the adit focus, by the deep adit, before the spirit crossing"
+   "why": "props show a mine, not work in it: ore pulled out by hands, veins running out, the haul - after the adit focus, by the deep adit, before the spirit crossing",
+   "master": "assets/keyart/mine-work.png",
+   "src": "assets/keyart/mine-work.webp",
+   "art_batch": "out/key_art_batch1/final/keyart_mine_work_b_fix1.png (owner-approved)"
   },
   {
    "id": "spirit-afterlife",
    "biome": "spirit",
-   "status": "planned",
+   "status": "live",
    "anchor": {
     "object": "spirit/shipwreck/ship",
     "peak_offset": 30.6
@@ -115,16 +119,18 @@
    },
    "brief": "keyart-spirit-afterlife",
    "alt": {
-    "en": null,
-    "ru": null,
-    "decorative": null,
-    "status": "TODO: write from the delivered art"
+    "en": "The ship of the dead rests in low mist on the mossy ground of the spirit world; a small ghost stands nearby among dead trees and gravestones.",
+    "ru": "Корабль мёртвых стоит в низком тумане на моховой земле мира духов; рядом маленький призрак, мёртвые деревья и надгробия.",
+    "decorative": false
    },
    "lazy": {
     "preload_ahead_m": 120,
     "priority": "low"
    },
-   "why": "the camera never frames the ship of the dead (x -21.6, too wide for a focus); the copy rides it - the picture comes first, then the card 'Death is a place' and the crypt"
+   "why": "the camera never frames the ship of the dead (x -21.6, too wide for a focus); the copy rides it - the picture comes first, then the card 'Death is a place' and the crypt",
+   "master": "assets/keyart/spirit-afterlife.png",
+   "src": "assets/keyart/spirit-afterlife.webp",
+   "art_batch": "out/key_art_batch1/final/keyart_spirit_afterlife_final.png (owner-approved)"
   }
  ],
  "rejected": [

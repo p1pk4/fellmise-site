@@ -577,55 +577,36 @@ function updateContent() {
   }
 }
 
-// -------------------------------------------- key art (только планирование) --
-/* Слоты будущих иллюстраций (assets/topdown/key_art.json, status planned).
-   Картинок ещё нет, и в обычном /proto/ здесь не происходит НИЧЕГО: ни
-   запроса, ни DOM. С ?debug=keyart на месте каждого слота — нейтральная
-   заглушка (сетка, рамка, подпись) того размера и в том месте, где будет
-   иллюстрация: для ревью ритма и столкновений. Присутствие — та же чистая
-   функция z, что у карточек. */
+// ------------------------------------------------------------------ key art --
+/* Иллюстрации-окна над миром (assets/topdown/key_art.json → tools/key_art.py →
+   статические <figure> в proto/index.html). Здесь их ничего не создаёт: только
+   присутствие (та же чистая функция z, что у карточек, окна не пересекаются с
+   ними — проверяет key_art.py) и ленивая загрузка — src ставится, когда камера
+   ближе preload + range метров к пику окна; первый кадр не тянет лишнего.
+   Край — мягкая маска в CSS, рамки нет. ?debug=keyart обводит окна. */
 const KEYART = [];
 
-async function initKeyArtReview(layout) {
-  if (!DEBUG.has('keyart')) return;
-  const plan = await fetch(ASSETS + 'topdown/key_art.json').then((r) => r.json());
+function initKeyArt(layout) {
   const where = new Map();
   Object.values(layout.biomes).forEach((b, bi) => {
     for (const o of [...b.sprites, ...(b.boards || [])]) where.set(o.id, -bi * BIOME_SPACING + o.pos[2]);
   });
-  const layer = document.createElement('div');
-  layer.id = 'keyart-review';
-  layer.setAttribute('aria-hidden', 'true');           // диагностика, не контент
-  Object.assign(layer.style, { position: 'fixed', inset: '0', zIndex: '7', pointerEvents: 'none' });
-  document.body.appendChild(layer);
-  for (const s of plan.slots) {
-    const [a, b] = s.aspect.split(':').map(Number);
-    const w = s.display.width, h = Math.round(w * b / a);
-    const el = document.createElement('div');
-    el.className = 'keyart-slot';
-    el.dataset.id = s.id;
-    Object.assign(el.style, {
-      position: 'absolute', top: '50%', [s.side]: '24px', width: w + 'px', height: h + 'px',
-      transform: 'translateY(-50%)', boxSizing: 'border-box', opacity: '0',
-      border: '2px dashed rgba(255, 200, 87, .9)', background: 'rgba(20, 22, 18, .55)',
-      backgroundImage: 'linear-gradient(rgba(255,255,255,.08) 1px, transparent 1px),'
-        + 'linear-gradient(90deg, rgba(255,255,255,.08) 1px, transparent 1px)',
-      backgroundSize: '40px 40px', color: '#ffc857', display: 'flex', alignItems: 'center',
-      justifyContent: 'center', textAlign: 'center', font: '600 15px/1.5 ui-monospace, monospace',
-    });
-    el.textContent = `KEY ART: ${s.biome.toUpperCase()}\n${s.id} · ${s.aspect} · ${w}×${h} css`;
-    el.style.whiteSpace = 'pre';
-    layer.appendChild(el);
-    KEYART.push({ id: s.id, side: s.side, w, h, el, core: s.activation.core, range: s.activation.range,
-                  z: where.get(s.anchor.object) + (s.anchor.peak_offset || 0) });
+  for (const el of document.querySelectorAll('.key-art')) {
+    const img = el.querySelector('img');
+    if (!where.has(el.dataset.anchor)) throw new Error('key art ' + el.dataset.id + ': якоря ' + el.dataset.anchor + ' нет в layout');
+    if (CONTENT_LOCALE === 'ru' && img.dataset.altRu !== undefined) img.alt = img.dataset.altRu;
+    if (DEBUG.has('keyart')) el.classList.add('debug');
+    KEYART.push({ id: el.dataset.id, el, img, side: el.dataset.side, core: +el.dataset.core, range: +el.dataset.range,
+                  preload: +el.dataset.preload, z: where.get(el.dataset.anchor) + +el.dataset.peakOffset });
   }
-  draw();
 }
 
 function updateKeyArt() {
   for (const k of KEYART) {
+    if (!k.img.getAttribute('src') && Math.abs(state.z - k.z) <= k.range + k.preload) k.img.src = k.img.dataset.src;
     k.weight = presence(k, state.z);
     k.el.style.opacity = k.weight.toFixed(3);
+    k.el.style.setProperty('--enter', REDUCED_MOTION ? '0px' : ((1 - k.weight) * 10).toFixed(1) + 'px');
   }
 }
 
@@ -869,7 +850,7 @@ async function main() {
   BIOME_SPACING = layout.biome_spacing;
   initContent(layout);
   initChoreography(choreo, layout);
-  initKeyArtReview(layout);
+  initKeyArt(layout);
   const dbg = layout.debug;
   const ids = Object.keys(layout.biomes);
   state.biomes = ids.length;
@@ -1197,8 +1178,12 @@ window.__PROTO = {
   },
   focus: () => FOCUS.map((f) => ({ ...f })),
   // key art: только в ?debug=keyart (планирование); иначе пусто
-  keyArt: () => KEYART.map((k) => ({ id: k.id, z: k.z, core: k.core, range: k.range, side: k.side,
-                                     w: k.w, h: k.h, weight: k.weight ?? 0 })),
+  keyArt: () => KEYART.map((k) => {
+    const r = k.el.getBoundingClientRect();
+    return { id: k.id, z: k.z, core: k.core, range: k.range, side: k.side, preload: k.preload,
+             w: r.width, h: r.height, weight: k.weight ?? 0,
+             requested: !!k.img.getAttribute('src'), loaded: k.img.complete && k.img.naturalWidth > 0 };
+  }),
   // контентные точки: что видно на текущем z (только чтение)
   content: () => ({
     locale: CONTENT_LOCALE,

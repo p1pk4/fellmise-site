@@ -728,7 +728,7 @@ class ContentPoints(unittest.TestCase):
         proto = read("proto/main.js")
         self.assertIn("document.querySelectorAll('.content-point')", proto)
         self.assertIsNone(re.search(r"fetch\([^)]*content_points", proto))
-        block = proto[proto.index("контентные точки --"):proto.index("key art (только планирование) --")]
+        block = proto[proto.index("контентные точки --"):proto.index("---- key art --")]
         for bad in ("createElement(", ".remove()", "textContent", "innerHTML", "innerText"):
             self.assertNotIn(bad, block)
 
@@ -848,8 +848,8 @@ class CameraChoreography(unittest.TestCase):
             self.assertNotIn(bad, proto)
 
 
-class KeyArtPlanning(unittest.TestCase):
-    """assets/topdown/key_art.json: planned illustration windows (no art yet)."""
+class KeyArt(unittest.TestCase):
+    """assets/topdown/key_art.json: three live illustration windows over the world."""
 
     def setUp(self):
         import key_art as KA
@@ -872,8 +872,11 @@ class KeyArtPlanning(unittest.TestCase):
             lambda d: d["slots"][2]["anchor"].__setitem__("peak_offset", 0),     # onto the spirit card
             lambda d: d["slots"][0].__setitem__("aspect", "7:1"),
             lambda d: d["slots"][0].__setitem__("target_px", [800, 533]),
-            lambda d: d["slots"][1]["alt"].__setitem__("en", "a miner"),         # alt before the art
-            lambda d: d["slots"][2].__setitem__("status", "live"),
+            lambda d: d["slots"][1].__setitem__("status", "planned"),            # planned with alt = alt before art
+            lambda d: d["slots"][2].__setitem__("status", "shipped"),
+            lambda d: d["slots"][0]["alt"].__setitem__("ru", ""),                # live without RU alt
+            lambda d: d["slots"][1].__setitem__("src", "assets/keyart/nope.webp"),
+            lambda d: d["slots"][2].__setitem__("target_px", [1920, 1280]),      # master is not that size
         ):
             d = copy.deepcopy(self.data)
             mutate(d)
@@ -907,15 +910,33 @@ class KeyArtPlanning(unittest.TestCase):
             d["slots"][0]["anchor"]["peak_offset"] = off
             self.assertTrue(self.K.check(d, self.rt), off)
 
-    def test_no_production_dependency(self):
-        """Planning only: no image file, and /proto/ reads the plan only in ?debug=keyart."""
-        proto = read("proto/main.js")
-        self.assertIn("if (!DEBUG.has('keyart')) return;", proto)
-        i = proto.index("fetch(ASSETS + 'topdown/key_art.json')")
-        self.assertLess(proto.index("if (!DEBUG.has('keyart')) return;"), i)
-        self.assertNotIn("key_art", read("proto/index.html"))
+    def test_live_assets_and_static_figures(self):
+        """Each slot is live: the approved PNG master (1536x1024), the WebP derived
+        from it and current, a static <figure> in proto/index.html with alt EN
+        and RU; main.js activates the figures and never fetches the plan."""
+        from PIL import Image
+        self.assertEqual([s["status"] for s in self.data["slots"]], ["live"] * 3)
         for s in self.data["slots"]:
-            self.assertNotIn("src", s)
+            with Image.open(ROOT / s["master"]) as im:
+                self.assertEqual((im.size, im.mode), ((1536, 1024), "RGB"), s["id"])
+            self.assertEqual((ROOT / s["src"]).read_bytes(), self.K.webp_bytes(ROOT / s["master"]), s["id"])
+        page = read("proto/index.html")
+        self.assertEqual(self.K.render(page, self.data), page)
+        for s in self.data["slots"]:
+            self.assertIn(f'data-id="{s["id"]}"', page)
+            self.assertIn(f'data-src="../{s["src"]}"', page)
+            self.assertIn(s["alt"]["ru"], page)
+        proto = read("proto/main.js")
+        self.assertIn("document.querySelectorAll('.key-art')", proto)
+        self.assertNotIn("key_art.json')", proto)
+
+    def test_soft_edge_no_card_chrome(self):
+        """The window fades into the world (mask), no frame or popup shadow."""
+        page = read("proto/index.html")
+        css = page[page.index("  .key-art {"):page.index("  .key-art[data-side=\"left\"]")]
+        self.assertIn("mask-image: radial-gradient(", css)
+        for bad in ("border:", "box-shadow", "border-radius"):
+            self.assertNotIn(bad, css)
 
 
 if __name__ == "__main__":

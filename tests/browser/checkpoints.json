@@ -38,6 +38,9 @@
   {"id": "choreo-forest", "route": "/proto/", "z": -200.2, "zoom": "auto", "note": "пик фокуса forest-dead-oak (auto)"},
   {"id": "choreo-mine", "route": "/proto/", "z": -331.1, "zoom": "auto", "note": "пик фокуса mine-adit (auto): вход в шахту"},
   {"id": "choreo-spirit", "route": "/proto/", "z": -522.1, "zoom": "auto", "note": "пик фокуса spirit-crypt (auto): склеп"},
-  {"id": "choreo-home", "route": "/proto/", "z": -658.0, "zoom": "auto", "note": "пик фокуса home-final-house (auto): финальный дом целиком"}
+  {"id": "choreo-home", "route": "/proto/", "z": -658.0, "zoom": "auto", "note": "пик фокуса home-final-house (auto): финальный дом целиком"},
+  {"id": "keyart-village", "route": "/proto/", "z": -103.919, "zoom": "auto", "keyart": "village-life", "note": "key art village-life на пике: окно справа, мягкий край"},
+  {"id": "keyart-mine", "route": "/proto/", "z": -375.9, "zoom": "auto", "keyart": "mine-work", "note": "key art mine-work на пике: окно слева"},
+  {"id": "keyart-spirit", "route": "/proto/", "z": -450.0, "zoom": "auto", "keyart": "spirit-afterlife", "note": "key art spirit-afterlife на пике: окно слева"}
  ]
 }

@@ -261,22 +261,25 @@ assets/topdown/content_points.json ─ tools/build_proto_content.py ─→ proto
   `node tests/browser/zoom_review.mjs` — `zoom-choreography-review.png` и
   `zoom-route-strip.png` (в CI — артефакт `zoom-review-*`).
 
-## Key art /proto/ (планирование)
+## Key art /proto/
 
-`assets/topdown/key_art.json` — слоты будущих иллюстраций (status `planned`, картинок нет).
+`assets/topdown/key_art.json` → `tools/key_art.py` → статические `<figure>` в
+`proto/index.html` + WebP в `assets/keyart/`.
 
-* Слот — DOM-окно поверх мира, как контентная карточка: якорь — стабильный
-  объект layout + `peak_offset`, присутствие — та же функция z (core/range),
-  сторона и вертикаль — как у карточки. Мир (Three.js) не трогается.
-* Окна — только там, где маршрут свободен: нет карточки, фокуса камеры,
-  затемнения перехода (`python tools/key_art.py --check`, в CI).
-* В обычном /proto/ нет ничего: ни запроса, ни DOM. `/proto/?debug=keyart` —
-  нейтральные заглушки нужного размера; `node tests/browser/key_art_review.mjs`
-  → `key-art-slots-review.png`, `key-art-route-review.png` (в CI — артефакт
-  `key-art-planning-*`). ТЗ для ART-сессии — `out/key-art-planning/art-briefs.md`.
-* Потом: `<figure><img loading=lazy>` с размерами из JSON; грузить за
-  `preload_ahead_m` до окна; в статическом fallback — картинка рядом со своей
-  контентной точкой (`supports.content_point`); alt EN/RU — по готовому арту.
+* 3 окна-иллюстрации: village-life, mine-work, spirit-afterlife. Мастер —
+  одобренный PNG из art-батча (`assets/keyart/<id>.png`, байт-в-байт), runtime —
+  WebP q90, собранный из мастера (`python tools/key_art.py`; `--check` в CI
+  падает, если WebP или HTML устарели).
+* Окно — DOM, как карточка: якорь — объект layout + `peak_offset`, присутствие —
+  та же функция z (core/range), 480×320 css у края вьюпорта. Край — мягкая
+  эллиптическая маска (`mask-image`), без рамки и тени.
+* Ленивая загрузка: `src` ставится, когда камера ближе `range + preload_ahead_m`
+  к пику; alt EN в HTML, RU — `data-alt-ru` (`?lang=ru`).
+* Окна стоят только там, где нет карточки, фокуса камеры, затемнения перехода.
+* `?debug=keyart` — обводит окна. `node tests/browser/key_art_review.mjs` →
+  `key-art-integration-review.png`, `key-art-peak-close-review.png`,
+  `key-art-route-review.png` (в CI — артефакт `key-art-*`). В visual CI окна
+  видны только на чекпоинтах `keyart-*`.
 
 ## Проверки (они же в CI, `.github/workflows/ci.yml`)
 
@@ -286,7 +289,7 @@ python tools/generate_layout.py --check  # committed layouts актуальны
 python tools/topdown_layout.py --check   # overrides валидны, runtime актуален
 python tools/build_proto_content.py --check  # контентные точки: источник и proto/index.html
 python tools/camera_choreography.py --check   # хореография зума
-python tools/key_art.py --check               # план key art (слоты)
+python tools/key_art.py --check               # key art: план, WebP, proto/index.html
 python tools/test_layout.py              # стабильные id, overrides, потребители
 python tools/check_run_rules.py
 python tools/measure_foreshortening.py

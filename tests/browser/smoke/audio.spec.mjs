@@ -5,8 +5,9 @@
  * scroll is not one). Levels are a pure function of the camera's z through
  * the ground's own biome blend; a transition SFX fires crossing its anchor
  * down the route, once, re-armed only 8 m back above it. Static modes have
- * no sound and no toggle. Real sound files do not exist yet: tests that need
- * sound get a synthetic WAV through lib/audio_fixture.mjs. */
+ * no sound and no toggle. These are the engine's rules, checked with short
+ * synthetic tones (lib/audio_fixture.mjs); the production files are tested
+ * in audio-assets.spec.mjs. */
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -67,7 +68,7 @@ test.describe('/proto/ audio', () => {
     let s = await A(page);
     expect([s.enabled, s.context, s.unlocked]).toEqual([true, 'running', true]);
     // at the start of the route: the config and the village ambient only
-    expect(seen).toEqual(['/assets/topdown/audio.json', '/' + AUDIO_CONFIG.biomes[0].asset]);
+    expect(seen).toEqual(['/assets/topdown/audio.json', '/' + AUDIO_CONFIG.biomes[0].sources[0].src]);   // WebM chosen
     expect(await page.evaluate(() => localStorage.getItem('fellmise.audio.enabled'))).toBe('true');
     await toggle(page).click();
     await expect(toggle(page)).toHaveAttribute('aria-pressed', 'false');
@@ -158,7 +159,7 @@ test.describe('/proto/ audio', () => {
     await go(page, a + 4); await go(page, a - 4);                        // cross down
     let s = await A(page);
     expect([s.sfxCount, s.lastSfx.id]).toEqual([1, 'village-forest']);
-    await expect.poll(() => seen.includes('/' + AUDIO_CONFIG.transitions[0].asset)).toBe(true);
+    await expect.poll(() => seen.includes('/' + AUDIO_CONFIG.transitions[0].sources[0].src)).toBe(true);
     for (let i = 0; i < 10; i++) { await go(page, a + 3); await go(page, a - 3); }   // wheel jitter at the anchor
     await go(page, a + 4);                                               // back up: silent
     expect((await A(page)).sfxCount).toBe(1);

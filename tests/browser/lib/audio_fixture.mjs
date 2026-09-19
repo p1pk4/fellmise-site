@@ -1,10 +1,11 @@
-/* Test sound for /proto/ — never committed as an asset, never served by the site.
+/* Synthetic test sound for /proto/ — never committed as an asset.
  *
- * The committed assets/topdown/audio.json lists every sound as `planned`
- * (no files yet), so the engine requests nothing. A test that needs sound
- * answers the config with a copy where every entry is `live`, and every
- * assets/audio/* request with a synthetic WAV built here in memory (the
- * browser decodes by content, not by extension). */
+ * Unit layer of the audio tests: the engine's rules (weights, SFX, unlock,
+ * persistence) are checked with short synthetic tones instead of the real
+ * 60 s production files. routeLiveAudio answers the config with a copy where
+ * every entry is `live` and every assets/audio/* request with a synthetic WAV
+ * built here in memory (the browser decodes by content, not by extension).
+ * The production files themselves are tested in smoke/audio-assets.spec.mjs. */
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -34,8 +35,10 @@ export async function routeLiveAudio(page) {
   const seen = [];
   const live = JSON.parse(JSON.stringify(AUDIO_CONFIG));
   for (const e of [...live.biomes, ...live.transitions]) e.status = 'live';
-  const tone = Object.fromEntries([...live.biomes.map((b, i) => [b.asset, synthWav(160 + 40 * i, 2)]),
-    ...live.transitions.map((t, i) => [t.asset, synthWav(600 + 100 * i, 0.4)])]);
+  // every source of an entry (either format) answers with the same synthetic WAV;
+  // the browser decodes by content, so the chosen type does not matter here
+  const tone = Object.fromEntries([...live.biomes.map((b, i) => b.sources.map((x) => [x.src, synthWav(160 + 40 * i, 2)])).flat(),
+    ...live.transitions.map((t, i) => t.sources.map((x) => [x.src, synthWav(600 + 100 * i, 0.4)])).flat()]);
   await page.route(/\/assets\/topdown\/audio\.json$/, (r) => {
     seen.push(new URL(r.request().url()).pathname);
     r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(live) });

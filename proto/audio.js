@@ -17,6 +17,10 @@
    спамит; путь назад — без звука).
 
    Сам assets/topdown/audio.json запрашивается только при включении звука.
+   У каждой записи sources — один и тот же звук в порядке предпочтения
+   (WebM/Opus, затем M4A/AAC). Формат выбирается ОДИН на сессию по
+   canPlayType (без User-Agent), грузится только он; следующий — лишь если
+   выбранный не декодировался. Нечем играть — кнопка остаётся выключенной.
    Файлы со status planned не запрашиваются никогда; live — лениво: звучащий
    эмбиент, следующий по маршруту (когда до его полосы меньше preload_ahead_m)
    и SFX ближайшего перехода. Раскодированный файл остаётся в памяти до ухода
@@ -43,10 +47,12 @@ export function createAudio({ configUrl, presentation, biomeAt, assetsBase, loca
     return configP;
   }
 
+  let codec, noCodec = false;   // chosen source type (undefined: not decided yet)
+  const failedTypes = new Set();
   let enabled = false;          // what the visitor asked for (toggle)
   let wanted = false;           // stored "on", waiting for a gesture
   let ctx = null, master = null;
-  const buffers = new Map();    // asset -> Promise<AudioBuffer|null>
+  const buffers = new Map();    // entry id -> Promise<AudioBuffer|null>
   const voices = new Map();     // biome id -> { src, gain }
   const armed = new Map(trans.map((t) => [t.id, true]));
   const requested = [];
@@ -69,15 +75,34 @@ export function createAudio({ configUrl, presentation, biomeAt, assetsBase, loca
 
   // ------------------------------------------------------------------- load
   const live = (a) => a && a.status === 'live';
-  function load(asset) {
-    if (!buffers.has(asset)) {
-      requested.push(asset);
-      buffers.set(asset, fetch(assetsBase + asset)
-        .then((r) => (r.ok ? r.arrayBuffer() : Promise.reject(new Error(r.status))))
-        .then((ab) => new Promise((ok, no) => ctx.decodeAudioData(ab, ok, no)))   // callback form: older Safari
-        .catch(() => null));
+  // one type for the whole session: the first source type (config order) the
+  // browser says it can play and that has not failed to decode here
+  function pickCodec() {
+    const probe = document.createElement('audio');
+    const types = [...new Set([...config.biomes, ...config.transitions].flatMap((e) => (e.sources || []).map((s) => s.type)))];
+    codec = types.find((t) => !failedTypes.has(t) && probe.canPlayType && probe.canPlayType(t) !== '') || null;
+    noCodec = !codec;
+    return codec;
+  }
+  function load(entry) {
+    if (!buffers.has(entry.id)) {
+      const src = codec && (entry.sources || []).find((s) => s.type === codec);
+      if (!src) return Promise.resolve(null);
+      const type = codec;
+      requested.push(src.src);
+      buffers.set(entry.id, fetch(assetsBase + src.src)
+        .then((r) => (r.ok ? r.arrayBuffer() : Promise.reject(new Error('http ' + r.status))))
+        .then((ab) => new Promise((ok, no) => ctx.decodeAudioData(ab, ok, (e) => no(Object.assign(e || new Error('decode'), { decode: true })))))
+        .catch((e) => {
+          if (!e || !e.decode || !ctx) return null;               // network: no format change
+          // the chosen type does not decode in this browser: demote it once, retry with the next
+          if (codec === type) { failedTypes.add(type); pickCodec(); }
+          buffers.delete(entry.id);
+          if (!codec) { unplayable(); return null; }
+          return load(entry);
+        }));
     }
-    return buffers.get(asset);
+    return buffers.get(entry.id);
   }
 
   // ------------------------------------------------------------- the engine
@@ -104,7 +129,7 @@ export function createAudio({ configUrl, presentation, biomeAt, assetsBase, loca
     v.gain.gain.value = 0;
     v.gain.connect(master);
     voices.set(id, v);
-    load(b.asset).then((buf) => {
+    load(b).then((buf) => {
       if (!buf || voices.get(id) !== v || !ctx) return;
       v.src = ctx.createBufferSource();
       v.src.buffer = buf;
@@ -146,7 +171,7 @@ export function createAudio({ configUrl, presentation, biomeAt, assetsBase, loca
         now < v.until ? Math.max(M.smoothing_s, fadeIn(b) / 3) : M.smoothing_s);
     }
     for (const t of trans) {
-      if (live(t.sfx) && Math.abs(z - t.anchor_z) <= M.preload_ahead_m) load(t.sfx.asset);
+      if (live(t.sfx) && Math.abs(z - t.anchor_z) <= M.preload_ahead_m) load(t.sfx);
     }
   }
 
@@ -160,7 +185,7 @@ export function createAudio({ configUrl, presentation, biomeAt, assetsBase, loca
         lastSfx = { id: t.id, z: +nextZ.toFixed(2) };
         sfxCount++;
         if (ctx && enabled && live(t.sfx)) {
-          load(t.sfx.asset).then((buf) => {
+          load(t.sfx).then((buf) => {
             if (!buf || !ctx || !enabled) return;
             const s = ctx.createBufferSource(), g = ctx.createGain(), t0 = ctx.currentTime;
             const a = Math.min(fadeIn(t.sfx), buf.duration / 2), r = Math.min(fadeOut(t.sfx), buf.duration - a);
@@ -177,6 +202,7 @@ export function createAudio({ configUrl, presentation, biomeAt, assetsBase, loca
   }
 
   async function turnOn() {
+    if (noCodec) return;
     ensureContext();              // synchronously inside the gesture
     if (!ctx) return;
     enabled = true;
@@ -186,9 +212,22 @@ export function createAudio({ configUrl, presentation, biomeAt, assetsBase, loca
       await loadConfig();
     } catch (e) { enabled = false; render(); return; }
     if (!enabled) return;          // turned off while loading
+    if (codec === undefined) pickCodec();
+    if (!codec) { unplayable(); return; }
     master.gain.cancelScheduledValues(ctx.currentTime);
     master.gain.setTargetAtTime(M.gain, ctx.currentTime, M.fade_ms / 3000);
     applyLevels();
+    render();
+  }
+
+  // no source type this browser can play: stay silent, say so to assistive tech, no errors
+  function unplayable() {
+    noCodec = true;
+    enabled = false;
+    for (const id of [...voices.keys()]) stopVoice(id, true);
+    if (ctx) ctx.close().catch(() => {});
+    ctx = null; master = null;
+    btn.setAttribute('aria-disabled', 'true');
     render();
   }
 
@@ -224,6 +263,7 @@ export function createAudio({ configUrl, presentation, biomeAt, assetsBase, loca
     btn.dataset.state = enabled ? 'on' : 'off';
   }
   btn.addEventListener('click', () => {
+    if (noCodec) return;
     if (enabled) { store(false); wanted = false; turnOff(); } else { store(true); wanted = false; turnOn(); }
   });
   document.body.appendChild(btn);
@@ -254,13 +294,15 @@ export function createAudio({ configUrl, presentation, biomeAt, assetsBase, loca
         weights: z === null ? null : weights(z),
         ambients: Object.fromEntries([...voices].map(([id, v]) => [id, +v.gain.gain.value.toFixed(3)])),
         playing: [...voices].filter(([, v]) => v.src).map(([id]) => id),
-        requested: [...requested], lastSfx, sfxCount,
+        requested: [...requested], lastSfx, sfxCount, codec: codec ?? null, unplayable: noCodec,
+        failedTypes: [...failedTypes],
       };
     },
     hud() {
       const s = this.state();
       const top = s.weights ? Object.entries(s.weights).filter(([, v]) => v > 0).map(([k, v]) => `${k} ${v.toFixed(2)}`).join(', ') : '—';
-      return `звук: <b>${s.enabled ? 'вкл' : 'выкл'}</b> · контекст ${s.context}${s.pendingRestore ? ' · ждёт жеста' : ''}\n`
+      return `звук: <b>${s.enabled ? 'вкл' : 'выкл'}</b> · контекст ${s.context}${s.pendingRestore ? ' · ждёт жеста' : ''}`
+        + ` · формат ${s.unplayable ? 'нет' : (s.codec || '—')}\n`
         + `эмбиент: ${top} · SFX: ${s.lastSfx ? s.lastSfx.id + ' @' + s.lastSfx.z : '—'} (${s.sfxCount})`;
     },
     button: btn,

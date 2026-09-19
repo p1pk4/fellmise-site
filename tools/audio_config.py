@@ -7,9 +7,10 @@ The file is data only (proto/audio.js holds the rules). Checked here:
   * biomes: exactly the presentation biomes of layout.runtime.json, in route
     order (no second biome map: the engine takes the blend bands from there);
   * transitions: exactly the presentation transitions (from/to, id from-to);
-  * every entry: id, asset under assets/audio/, status planned|live, loop,
+  * every entry: id, sources [{src, type}] under assets/audio/ (WebM/Opus then
+    M4A/AAC, extension matching the type), status planned|live, loop,
     gain 0..1, fade_ms [in, out], notes; no logic keys;
-  * status live => the file is committed; planned => nothing is requested,
+  * status live => every source file is committed; planned => nothing is requested,
     so a planned file must NOT be committed (no placeholder sounds in main).
 """
 import json
@@ -19,8 +20,9 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 CONFIG = ROOT / "assets" / "topdown" / "audio.json"
 LAYOUT = ROOT / "assets" / "topdown" / "layout.runtime.json"
-FORMATS = (".webm", ".ogg", ".opus", ".m4a", ".mp3")
-ENTRY_KEYS = {"id", "asset", "status", "loop", "gain", "fade_ms", "notes"}
+# source types in preference order, with the file extension each must carry
+TYPES = {"audio/webm; codecs=opus": ".webm", "audio/mp4; codecs=mp4a.40.2": ".m4a"}
+ENTRY_KEYS = {"id", "sources", "status", "loop", "gain", "fade_ms", "notes"}
 MASTER_KEYS = {"default_muted", "gain", "fade_ms", "smoothing_s", "preload_ahead_m"}
 
 
@@ -48,16 +50,24 @@ def validate(cfg, presentation, root=ROOT):
             bad.append(f"{where}: missing {sorted(missing)}")
         if extra:
             bad.append(f"{where}: unexpected keys {sorted(extra)} (data only, no logic)")
-        asset = e.get("asset", "")
-        if not (asset.startswith("assets/audio/") and asset.endswith(FORMATS)):
-            bad.append(f"{where}: asset {asset!r} must be assets/audio/*{{{','.join(FORMATS)}}}")
+        src = e.get("sources")
+        if not (isinstance(src, list) and src and all(isinstance(x, dict) and set(x) == {"src", "type"} for x in src)):
+            bad.append(f"{where}: sources must be a non-empty list of {{src, type}}")
+            src = []
+        types = [x["type"] for x in src]
+        if types != list(TYPES)[:len(types)] or len(types) != len(TYPES):
+            bad.append(f"{where}: sources must be {list(TYPES)} in this order (primary, then fallback)")
+        for x in src:
+            want = TYPES.get(x["type"], "?")
+            if not (x["src"].startswith("assets/audio/") and x["src"].endswith(want)):
+                bad.append(f"{where}: {x['src']!r} must be assets/audio/*{want} for {x['type']!r}")
         if e.get("status") not in ("planned", "live"):
             bad.append(f"{where}: status must be planned|live")
-        exists = (root / asset).is_file() if asset else False
-        if e.get("status") == "live" and not exists:
-            bad.append(f"{where}: live but {asset} is not committed")
-        if e.get("status") == "planned" and exists:
-            bad.append(f"{where}: planned but {asset} exists (no placeholder sounds; mark it live)")
+        exists = [(root / x["src"]).is_file() for x in src]
+        if e.get("status") == "live" and not all(exists):
+            bad.append(f"{where}: live but not every source is committed")
+        if e.get("status") == "planned" and any(exists):
+            bad.append(f"{where}: planned but a source file exists (no placeholder sounds; mark it live)")
         if e.get("loop") is not loop:
             bad.append(f"{where}: loop must be {str(loop).lower()}")
         if not (isinstance(e.get("gain"), (int, float)) and 0 < e["gain"] <= 1):
@@ -100,7 +110,7 @@ def main(argv):
     if bad:
         return 1
     live = [e["id"] for e in cfg["biomes"] + cfg["transitions"] if e["status"] == "live"]
-    print(f"audio.json ok: {len(cfg['biomes'])} ambients, {len(cfg['transitions'])} transition SFX, "
+    print(f"audio.json ok: {len(cfg['biomes'])} ambients, {len(cfg['transitions'])} transition SFX, {len(TYPES)} formats each, "
           f"live: {', '.join(live) or 'none (all planned)'}")
     return 0
 

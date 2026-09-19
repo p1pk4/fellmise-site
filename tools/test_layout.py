@@ -11,6 +11,7 @@ import copy
 import json
 import pathlib
 import re
+import struct
 import sys
 import tempfile
 import unittest
@@ -1113,30 +1114,80 @@ class Audio(unittest.TestCase):
         mutate(cfg)
         return self.AC.validate(cfg, self.pres, root)
 
-    def test_committed_config_is_valid_and_all_planned(self):
+    def test_committed_config_is_valid_and_all_live(self):
         self.assertEqual(self.AC.validate(self.cfg, self.pres), [])
         self.assertEqual([b["id"] for b in self.cfg["biomes"]], ["village", "forest", "mine", "spirit", "home"])
         self.assertEqual([t["id"] for t in self.cfg["transitions"]],
                          ["village-forest", "forest-mine", "mine-spirit", "spirit-home"])
-        # no sound files in this batch: every asset is planned and none is committed
-        self.assertEqual({e["status"] for e in self.cfg["biomes"] + self.cfg["transitions"]}, {"planned"})
-        self.assertFalse(list((ROOT / "assets").rglob("*.webm")) + list((ROOT / "assets").rglob("*.ogg"))
-                         + list((ROOT / "assets").rglob("*.wav")))
+        entries = self.cfg["biomes"] + self.cfg["transitions"]
+        self.assertEqual({e["status"] for e in entries}, {"live"})
+        # exactly the 18 runtime files (9 sounds x WebM/Opus + M4A/AAC), nothing else, no masters
+        want = sorted(x["src"] for e in entries for x in e["sources"])
+        have = sorted(p.relative_to(ROOT).as_posix() for p in (ROOT / "assets" / "audio").rglob("*") if p.is_file())
+        self.assertEqual(have, want)
+        self.assertEqual(len(want), 18)
+        self.assertFalse(list((ROOT / "assets").rglob("*.wav")))
+        # the engine contract is unchanged by going live
+        self.assertEqual(self.cfg["master"], {"default_muted": True, "gain": 0.8, "fade_ms": 600, "smoothing_s": 0.08,
+                                              "preload_ahead_m": 60})
 
     def test_validator_refuses(self):
         self.assertTrue(self.bad(lambda c: c["master"].update(default_muted=False)))
         self.assertTrue(self.bad(lambda c: c["biomes"].reverse()))
         self.assertTrue(self.bad(lambda c: c["transitions"].pop()))
         self.assertTrue(self.bad(lambda c: c["biomes"][0].update(when="z < -100")))      # logic key
-        self.assertTrue(self.bad(lambda c: c["biomes"][0].update(status="live")))       # live, no file
         self.assertTrue(self.bad(lambda c: c["transitions"][0].update(loop=True)))
         self.assertTrue(self.bad(lambda c: c["biomes"][1].update(fade_ms=[100])))
-        self.assertTrue(self.bad(lambda c: c["biomes"][2].update(asset="sounds/mine.wav")))
+        self.assertTrue(self.bad(lambda c: c["biomes"][2]["sources"].reverse()))          # fallback first
+        self.assertTrue(self.bad(lambda c: c["biomes"][2]["sources"].pop()))              # no fallback
+        self.assertTrue(self.bad(lambda c: c["biomes"][2]["sources"][0].update(src="sounds/mine.webm")))
+        self.assertTrue(self.bad(lambda c: c["biomes"][2]["sources"][1].update(src="assets/audio/ambient/mine.mp3")))
+        self.assertTrue(self.bad(lambda c: c["biomes"][3]["sources"][0].update(src="assets/audio/ambient/none.webm")))  # live, missing
         with tempfile.TemporaryDirectory() as d:                                     # planned, but a file exists
-            f = pathlib.Path(d) / self.cfg["biomes"][0]["asset"]
+            f = pathlib.Path(d) / self.cfg["biomes"][0]["sources"][0]["src"]
             f.parent.mkdir(parents=True)
             f.write_bytes(b"x")
-            self.assertTrue(any("planned but" in b for b in self.bad(lambda c: None, pathlib.Path(d))))
+            self.assertTrue(any("planned but" in b for b in self.bad(lambda c: c["biomes"][0].update(status="planned"),
+                                                                      pathlib.Path(d))))
+
+    def test_production_files(self):
+        """Container, codec, channels and length of the 18 runtime files (the decode itself,
+        durations and seamless loops are checked in the browser: tests/browser/smoke/audio.spec.mjs)."""
+        def mp4(b, path, off=0, end=None):
+            end = len(b) if end is None else end
+            while off < end:
+                size, typ = struct.unpack(">I4s", b[off:off + 8])
+                if typ.decode("latin1") == path[0]:
+                    return (off, size) if len(path) == 1 else mp4(b, path[1:], off + 8, off + size)
+                off += size
+            return None
+        for e in self.cfg["biomes"] + self.cfg["transitions"]:
+            ambient = "from" not in e
+            webm, m4a = ((ROOT / x["src"]).read_bytes() for x in e["sources"])
+            with self.subTest(e["id"], fmt="webm"):
+                self.assertEqual(webm[:4], bytes.fromhex("1a45dfa3"))                  # EBML
+                self.assertIn(b"webm", webm[:64])
+                self.assertIn(b"A_OPUS", webm[:512])
+                self.assertLess(len(webm), 800_000 if ambient else 40_000)
+            with self.subTest(e["id"], fmt="m4a"):
+                self.assertEqual(m4a[4:8], b"ftyp")
+                self.assertIn(b"mp4a", m4a)
+                mvhd = mp4(m4a, ["moov", "mvhd"])
+                ts = struct.unpack_from(">I", m4a, mvhd[0] + 20)[0]
+                elst = mp4(m4a, ["moov", "trak", "edts", "elst"])
+                self.assertIsNotNone(elst, "edit list trims encoder priming / padding")
+                v = m4a[elst[0] + 8]
+                seg, media_time = struct.unpack_from(">Qq" if v else ">Ii", m4a, elst[0] + 16)
+                self.assertGreater(media_time, 0)                                     # priming skipped
+                if ambient:                                                            # the 60 s loop twice (AAC frame != 60 s)
+                    self.assertEqual(seg, 120 * ts)
+                    self.assertLess(len(m4a), 2_600_000)
+                else:
+                    self.assertLess(seg, 4 * ts)
+                    self.assertLess(len(m4a), 40_000)
+                stsd = mp4(m4a, ["moov", "trak", "mdia", "minf", "stbl", "stsd"])
+                ch = struct.unpack_from(">H", m4a, stsd[0] + 16 + 8 + 16)[0]          # mp4a sample entry: channelcount
+                self.assertEqual(ch, 2 if ambient else 1)
 
     def test_one_manager_live_only(self):
         js = read("proto/audio.js")
@@ -1151,6 +1202,9 @@ class Audio(unittest.TestCase):
         self.assertEqual(len(re.findall(r"\bensureContext\(\);", js)), 1)
         self.assertEqual(len(re.findall(r"\bturnOn\(\);", js)), 2)
         self.assertIn("'fellmise.audio.enabled'", js)
+        # the format is chosen by capability, never by browser name; one type per session
+        self.assertIn("canPlayType", js)
+        self.assertNotRegex(js, r"userAgent|navigator\.vendor|Safari")
         self.assertNotIn("autoplay", read("proto/index.html"))
         # no scroll-driven unlock: only pointerdown / keydown / click
         self.assertNotRegex(js, r"addEventListener\('(wheel|scroll|touchmove)'")

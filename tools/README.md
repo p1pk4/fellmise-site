@@ -283,27 +283,37 @@ assets/topdown/content_points.json ─ tools/build_proto_content.py ─→ proto
 
 ## Звук /proto/
 
-`assets/topdown/audio.json` (контракт ассетов: 5 эмбиентов + 4 SFX переходов;
-путь, `status` planned/live, loop, gain, `fade_ms` [in, out], notes) →
-`proto/audio.js` (единственный менеджер) ← `tools/audio_config.py --check` (CI).
+`assets/topdown/audio.json` (контракт: 5 эмбиентов + 4 SFX переходов, все `live`;
+`sources` [{src, type}] — WebM/Opus, затем M4A/AAC; loop, gain, `fade_ms` [in, out],
+notes) → `proto/audio.js` (единственный менеджер) ← `tools/audio_config.py --check` (CI).
+Файлы — `assets/audio/ambient/<биом>.{webm,m4a}`, `assets/audio/transitions/<from>-<to>.{webm,m4a}`;
+мастера WAV в repo не лежат (out/audio_batch1, out/audio_batch2).
 
 * По умолчанию выключено. До нажатия переключателя (круглая кнопка в правом
   нижнем углу, только live) нет ни AudioContext, ни одного запроса — даже
   `audio.json` грузится при включении. `localStorage` `fellmise.audio.enabled`
   возвращает «вкл» только на следующем жесте (pointerdown/keydown; скролл — нет).
+* Формат — один на сессию, по `canPlayType` (не по User-Agent): WebM/Opus, иначе
+  M4A/AAC; второй грузится, только если первый не декодировался. Нечем играть —
+  кнопка остаётся выключенной (`aria-disabled`), ошибок нет.
 * Уровни — чистая функция z: вес эмбиента i = max(0, 1 − |biomeAt(z) − i|),
   `biomeAt` — та же функция main.js, что смешивает грунт.
 * SFX — при пересечении `anchor_z` вниз по маршруту, один раз; перевзвод — когда
   камера вернулась выше якоря на 8 м. Путь назад — без звука.
-* planned-файлы не запрашиваются никогда; live — звучащий эмбиент, следующий
-  (до его полосы < `preload_ahead_m`) и SFX ближайшего перехода.
+* Грузится звучащий эмбиент, следующий (до его полосы < `preload_ahead_m`) и SFX
+  ближайшего перехода. planned-файлы не запрашиваются никогда.
+* Бесшовные петли: `python tools/audio_loop_encode.py --opus-loop|--aac-loop|--sfx
+  IN.wav OUT` (кодирует петлю ×3 и оставляет периодический средний период; Opus —
+  pre-skip/granule, AAC — edit list; AAC-петля = 60 с дважды: кадр 1024 не делит 60 с).
 * Статика (узкий экран, reduced motion, нет WebGL, `?static=1`) — без звука и
   без кнопки: `audio.js` импортирует только main.js.
-* `?debug=hud` — строки «звук / эмбиент / SFX»; `__PROTO.audio()` — состояние,
+* `?debug=hud` — строки «звук / формат / эмбиент / SFX»; `__PROTO.audio()` — состояние,
   `__PROTO.audio(z)` — веса. `node tests/browser/audio_review.mjs` →
-  `audio-ui-review.png`, `audio-state-report.md` (в CI — артефакт `audio-review-*`).
-  Тестовый звук — синтетический WAV в памяти (`tests/browser/lib/audio_fixture.mjs`),
-  в репозиторий не попадает.
+  `audio-ui-review.png`, `audio-state-report.md` (в CI — артефакт `audio-review-*`);
+  `node tests/browser/audio_integration_review.mjs` → сеть, переходы, выбор формата
+  с production-файлами (out/audio-integration). Правила движка в smoke проверяются
+  и на синтетическом WAV (`tests/browser/lib/audio_fixture.mjs`), файлы — в
+  `smoke/audio-assets.spec.mjs`.
 
 ## Спрайт-оверрайды /proto/
 

@@ -5,6 +5,21 @@
 
 ---
 
+## 2026-09-19 05:39 — key-art-planning-1: слоты под key art (без арта)
+
+- **Что:** план 3 иллюстраций-окон на маршруте /proto/ —
+  `assets/topdown/key_art.json` (status planned): village-life (после таверны,
+  z −101…−137, справа), mine-work (у глубокой штольни, −360…−392, слева),
+  spirit-afterlife (перед карточкой духов, якорь — корабль мёртвых,
+  −425…−475, слева); 3:2, 480×320 css, арт 1536×1024. Окна только там, где
+  нет карточки, фокуса и перехода (`tools/key_art.py --check`). Заглушки —
+  только `?debug=keyart`; в обычном /proto/ ничего. ТЗ для ART —
+  `out/key-art-planning/art-briefs.md`.
+- **Тип:** feat
+- **Проверка:** test_layout 65/65 · smoke 23/23 · selftest 24/24 · `--check` ✓ ·
+  visual strict vs main 24/24 SAME
+- **Commit:** <hash>
+
 ## 2026-09-19 05:31 — Zoom Choreography 1 выпущен в production
 
 - **Что:** в main влит PR #11; production baseline

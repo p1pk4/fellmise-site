@@ -728,7 +728,7 @@ class ContentPoints(unittest.TestCase):
         proto = read("proto/main.js")
         self.assertIn("document.querySelectorAll('.content-point')", proto)
         self.assertIsNone(re.search(r"fetch\([^)]*content_points", proto))
-        block = proto[proto.index("контентные точки --"):proto.index("/* Сегменты одного отрезка")]
+        block = proto[proto.index("контентные точки --"):proto.index("key art (только планирование) --")]
         for bad in ("createElement(", ".remove()", "textContent", "innerHTML", "innerText"):
             self.assertNotIn(bad, block)
 
@@ -846,6 +846,48 @@ class CameraChoreography(unittest.TestCase):
         self.assertIn("Math.max(state.routeEnd ?? -state.len - 20,", proto)   # the wheel stops at route_end
         for bad in ("setTimeout", "setInterval", "performance.now", "Date.now"):
             self.assertNotIn(bad, proto)
+
+
+class KeyArtPlanning(unittest.TestCase):
+    """assets/topdown/key_art.json: planned illustration windows (no art yet)."""
+
+    def setUp(self):
+        import key_art as KA
+        self.K = KA
+        self.data = KA.load()
+        self.rt = json.loads(read("assets/topdown/layout.runtime.json"))
+
+    def test_plan_valid(self):
+        """<= 3 slots, unique ids, valid biome, anchors resolve, ranges ordered,
+        sane aspect/size, 2x art target, windows only where the route is free
+        (no card, no camera focus, no transition dim, within the route)."""
+        self.assertEqual(self.K.check(self.data, self.rt), [])
+        self.assertLessEqual(len(self.data["slots"]), 3)
+
+    def test_check_catches_bad_plan(self):
+        for mutate in (
+            lambda d: d["slots"].append(dict(d["slots"][0], id="fourth")),
+            lambda d: d["slots"][0]["anchor"].__setitem__("object", "village/nope"),
+            lambda d: d["slots"][1]["activation"].__setitem__("range", 40),     # into the adit focus
+            lambda d: d["slots"][2]["anchor"].__setitem__("peak_offset", 0),     # onto the spirit card
+            lambda d: d["slots"][0].__setitem__("aspect", "7:1"),
+            lambda d: d["slots"][0].__setitem__("target_px", [800, 533]),
+            lambda d: d["slots"][1]["alt"].__setitem__("en", "a miner"),         # alt before the art
+            lambda d: d["slots"][2].__setitem__("status", "live"),
+        ):
+            d = copy.deepcopy(self.data)
+            mutate(d)
+            self.assertTrue(self.K.check(d, self.rt))
+
+    def test_no_production_dependency(self):
+        """Planning only: no image file, and /proto/ reads the plan only in ?debug=keyart."""
+        proto = read("proto/main.js")
+        self.assertIn("if (!DEBUG.has('keyart')) return;", proto)
+        i = proto.index("fetch(ASSETS + 'topdown/key_art.json')")
+        self.assertLess(proto.index("if (!DEBUG.has('keyart')) return;"), i)
+        self.assertNotIn("key_art", read("proto/index.html"))
+        for s in self.data["slots"]:
+            self.assertNotIn("src", s)
 
 
 if __name__ == "__main__":

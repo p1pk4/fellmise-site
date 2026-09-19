@@ -56,6 +56,8 @@ jobs:
         run: python tools/build_proto_content.py --check
       - name: camera choreography is valid
         run: python tools/camera_choreography.py --check
+      - name: key art plan is valid (planning only)
+        run: python tools/key_art.py --check
       - name: layout tests
         run: python tools/test_layout.py
       - name: run rules are enforced
@@ -157,6 +159,17 @@ jobs:
       - name: zoom choreography review (15 frames + route strip)
         if: always()
         run: node zoom_review.mjs --out ../../out/zoom-review
+      - name: key art planning review (placeholders, ?debug=keyart)
+        if: always()
+        run: node key_art_review.mjs --out ../../out/key-art-planning
+      - name: upload key art planning review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: key-art-planning-${{ env.CONTEXT }}-run${{ github.run_id }}
+          path: out/key-art-planning
+          retention-days: 14
+          if-no-files-found: warn
       - name: upload zoom review
         if: always()
         uses: actions/upload-artifact@v4

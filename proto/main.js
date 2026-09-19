@@ -577,6 +577,58 @@ function updateContent() {
   }
 }
 
+// -------------------------------------------- key art (только планирование) --
+/* Слоты будущих иллюстраций (assets/topdown/key_art.json, status planned).
+   Картинок ещё нет, и в обычном /proto/ здесь не происходит НИЧЕГО: ни
+   запроса, ни DOM. С ?debug=keyart на месте каждого слота — нейтральная
+   заглушка (сетка, рамка, подпись) того размера и в том месте, где будет
+   иллюстрация: для ревью ритма и столкновений. Присутствие — та же чистая
+   функция z, что у карточек. */
+const KEYART = [];
+
+async function initKeyArtReview(layout) {
+  if (!DEBUG.has('keyart')) return;
+  const plan = await fetch(ASSETS + 'topdown/key_art.json').then((r) => r.json());
+  const where = new Map();
+  Object.values(layout.biomes).forEach((b, bi) => {
+    for (const o of [...b.sprites, ...(b.boards || [])]) where.set(o.id, -bi * BIOME_SPACING + o.pos[2]);
+  });
+  const layer = document.createElement('div');
+  layer.id = 'keyart-review';
+  layer.setAttribute('aria-hidden', 'true');           // диагностика, не контент
+  Object.assign(layer.style, { position: 'fixed', inset: '0', zIndex: '7', pointerEvents: 'none' });
+  document.body.appendChild(layer);
+  for (const s of plan.slots) {
+    const [a, b] = s.aspect.split(':').map(Number);
+    const w = s.display.width, h = Math.round(w * b / a);
+    const el = document.createElement('div');
+    el.className = 'keyart-slot';
+    el.dataset.id = s.id;
+    Object.assign(el.style, {
+      position: 'absolute', top: '50%', [s.side]: '24px', width: w + 'px', height: h + 'px',
+      transform: 'translateY(-50%)', boxSizing: 'border-box', opacity: '0',
+      border: '2px dashed rgba(255, 200, 87, .9)', background: 'rgba(20, 22, 18, .55)',
+      backgroundImage: 'linear-gradient(rgba(255,255,255,.08) 1px, transparent 1px),'
+        + 'linear-gradient(90deg, rgba(255,255,255,.08) 1px, transparent 1px)',
+      backgroundSize: '40px 40px', color: '#ffc857', display: 'flex', alignItems: 'center',
+      justifyContent: 'center', textAlign: 'center', font: '600 15px/1.5 ui-monospace, monospace',
+    });
+    el.textContent = `KEY ART: ${s.biome.toUpperCase()}\n${s.id} · ${s.aspect} · ${w}×${h} css`;
+    el.style.whiteSpace = 'pre';
+    layer.appendChild(el);
+    KEYART.push({ id: s.id, side: s.side, w, h, el, core: s.activation.core, range: s.activation.range,
+                  z: where.get(s.anchor.object) + (s.anchor.peak_offset || 0) });
+  }
+  draw();
+}
+
+function updateKeyArt() {
+  for (const k of KEYART) {
+    k.weight = presence(k, state.z);
+    k.el.style.opacity = k.weight.toFixed(3);
+  }
+}
+
 /* Сегменты одного отрезка: та же X и разрыв по Z не больше шага. Забор в пробе
    рисуется одним прямоугольником — смотрим, как читается линейный объект. */
 function groupRuns(segs) {
@@ -817,6 +869,7 @@ async function main() {
   BIOME_SPACING = layout.biome_spacing;
   initContent(layout);
   initChoreography(choreo, layout);
+  initKeyArtReview(layout);
   const dbg = layout.debug;
   const ids = Object.keys(layout.biomes);
   state.biomes = ids.length;
@@ -1045,6 +1098,7 @@ function draw() {
   camera.updateMatrixWorld();
   renderer.render(scene, camera);
   updateContent();
+  updateKeyArt();
   const halfM = frameHeight() / 2;
   const fa = frameAt(state.z);
   const tiles = (halfM * 2) / TILE_M;                 // высота кадра в тайлах
@@ -1142,6 +1196,9 @@ window.__PROTO = {
              auto_frame: a.frame, auto_focus: a.focus, auto_weight: a.weight };
   },
   focus: () => FOCUS.map((f) => ({ ...f })),
+  // key art: только в ?debug=keyart (планирование); иначе пусто
+  keyArt: () => KEYART.map((k) => ({ id: k.id, z: k.z, core: k.core, range: k.range, side: k.side,
+                                     w: k.w, h: k.h, weight: k.weight ?? 0 })),
   // контентные точки: что видно на текущем z (только чтение)
   content: () => ({
     locale: CONTENT_LOCALE,

@@ -1,0 +1,147 @@
+{
+ "_doc": [
+  "Key art slots of /proto/ - PLANNING ONLY (status 'planned'): no image exists and nothing is drawn in production.",
+  "A slot is an illustration window over the world (DOM, like the content cards), anchored to a stable layout object:",
+  "peak = anchor z + peak_offset; presence 1 within `core` metres of camera z from the peak, smooth to 0 at `range`.",
+  "Windows live only where the route is free: no content card visible, no camera focus, no transition dim",
+  "(tools/key_art.py checks it against content_points.json, camera_choreography.json and the layout presentation).",
+  "Sizes: display width in CSS px at a 1280x800 desktop; target_px is the art to commission (>= 2x display, DPR 2 + headroom).",
+  "Review only: /proto/?debug=keyart shows neutral placeholders; tests/browser/key_art_review.mjs renders the sheets."
+ ],
+ "status": "planning",
+ "max_slots": 3,
+ "slots": [
+  {
+   "id": "village-life",
+   "biome": "village",
+   "status": "planned",
+   "anchor": {
+    "object": "village/tavern/tavern",
+    "peak_offset": -47
+   },
+   "activation": {
+    "core": 6,
+    "range": 18
+   },
+   "side": "right",
+   "aspect": "3:2",
+   "display": {
+    "width": 480
+   },
+   "target_px": [
+    1536,
+    1024
+   ],
+   "supports": {
+    "content_point": "village-world",
+    "copy": "tools/build_site.py FEATURES[world]"
+   },
+   "brief": "keyart-village-life",
+   "alt": {
+    "en": null,
+    "ru": null,
+    "decorative": null,
+    "status": "TODO: write from the delivered art"
+   },
+   "lazy": {
+    "preload_ahead_m": 120,
+    "priority": "low"
+   },
+   "why": "the village on screen is empty of people; the copy says the world lives without you (NPCs haul, haggle, drink) - the picture shows that life. After the tavern focus, before the forest"
+  },
+  {
+   "id": "mine-work",
+   "biome": "mine",
+   "status": "planned",
+   "anchor": {
+    "object": "mine/deep-adit/cave",
+    "peak_offset": -5.4
+   },
+   "activation": {
+    "core": 5,
+    "range": 16
+   },
+   "side": "left",
+   "aspect": "3:2",
+   "display": {
+    "width": 480
+   },
+   "target_px": [
+    1536,
+    1024
+   ],
+   "supports": {
+    "content_point": "mine-mining",
+    "copy": "tools/build_site.py FEATURES[mining]"
+   },
+   "brief": "keyart-mine-work",
+   "alt": {
+    "en": null,
+    "ru": null,
+    "decorative": null,
+    "status": "TODO: write from the delivered art"
+   },
+   "lazy": {
+    "preload_ahead_m": 120,
+    "priority": "low"
+   },
+   "why": "props show a mine, not work in it: ore pulled out by hands, veins running out, the haul - after the adit focus, by the deep adit, before the spirit crossing"
+  },
+  {
+   "id": "spirit-afterlife",
+   "biome": "spirit",
+   "status": "planned",
+   "anchor": {
+    "object": "spirit/shipwreck/ship",
+    "peak_offset": 30.6
+   },
+   "activation": {
+    "core": 8,
+    "range": 25
+   },
+   "side": "left",
+   "aspect": "3:2",
+   "display": {
+    "width": 480
+   },
+   "target_px": [
+    1536,
+    1024
+   ],
+   "supports": {
+    "content_point": "spirit-death",
+    "copy": "tools/build_site.py FEATURES[death]"
+   },
+   "brief": "keyart-spirit-afterlife",
+   "alt": {
+    "en": null,
+    "ru": null,
+    "decorative": null,
+    "status": "TODO: write from the delivered art"
+   },
+   "lazy": {
+    "preload_ahead_m": 120,
+    "priority": "low"
+   },
+   "why": "the camera never frames the ship of the dead (x -21.6, too wide for a focus); the copy rides it - the picture comes first, then the card 'Death is a place' and the crypt"
+  }
+ ],
+ "rejected": [
+  {
+   "biome": "forest",
+   "why": "no forest subject in the site copy ('Skills, no levels' is not about the forest); the dead-oak focus carries the biome"
+  },
+  {
+   "biome": "home",
+   "why": "the final house is the culmination and the end of the route; a picture would cover the finale"
+  },
+  {
+   "where": "route start (z 20..-10)",
+   "why": "the opening frame of the page; the world must speak first"
+  },
+  {
+   "where": "spirit after the crypt (z -549..-580)",
+   "why": "30 m before the spirit->home crossing - a second spirit picture, too close to the first and to the transition"
+  }
+ ]
+}

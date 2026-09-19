@@ -407,6 +407,37 @@ test.describe('/proto/', () => {
     clean(watch);
   });
 
+  test('key art planning: nothing in production, placeholders only with ?debug=keyart', async ({ page, watch }) => {
+    const plans = [];
+    page.on('request', (r) => { if (/key_art\.json/.test(r.url())) plans.push(r.url()); });
+    await page.goto('/proto/');
+    await page.waitForFunction(PROTO_READY, null, { timeout: CONFIG.routes['/proto/'].readyTimeoutMs });
+    expect(plans).toEqual([]);
+    await expect(page.locator('#keyart-review, .keyart-slot')).toHaveCount(0);
+    expect(await page.evaluate(() => window.__PROTO.keyArt())).toEqual([]);
+
+    await page.goto('/proto/?debug=keyart');
+    await page.waitForFunction(() => window.__PROTO?.state.done && window.__PROTO.keyArt().length > 0, null, { timeout: 120000 });
+    const plan = JSON.parse(fs.readFileSync(path.join(HERE, '..', '..', '..', 'assets', 'topdown', 'key_art.json'), 'utf8'));
+    const slots = await page.evaluate(() => window.__PROTO.keyArt());
+    expect(slots.map((s) => s.id)).toEqual(plan.slots.map((s) => s.id));
+    await expect(page.locator('.keyart-slot')).toHaveCount(plan.slots.length);
+    await expect(page.locator('#hud')).toBeHidden();
+    for (const s of slots) {
+      await page.evaluate((z) => window.__PROTO.go(z, 'auto'), s.z);
+      const on = (await page.evaluate(() => window.__PROTO.keyArt())).filter((k) => k.weight > 0);
+      expect(on.map((k) => k.id)).toEqual([s.id]);
+      expect(on[0].weight).toBe(1);
+      const cards = (await page.evaluate(() => window.__PROTO.content())).points.filter((p) => p.weight > 0);
+      expect(cards, `${s.id}: no card at the key art peak`).toEqual([]);
+      expect((await page.evaluate(() => window.__PROTO.camera())).auto_weight).toBe(0);
+      const box = await page.locator(`.keyart-slot[data-id="${s.id}"]`).boundingBox();
+      const vp = page.viewportSize();
+      expect(box.x >= 0 && box.y >= 0 && box.x + box.width <= vp.width && box.y + box.height <= vp.height).toBe(true);
+    }
+    clean(watch);
+  });
+
   test('zoom: the Z key is a debug tool only', async ({ page, watch }) => {
     await page.goto('/proto/');
     await page.waitForFunction(PROTO_READY, null, { timeout: CONFIG.routes['/proto/'].readyTimeoutMs });

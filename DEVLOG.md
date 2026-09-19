@@ -5,6 +5,46 @@
 
 ---
 
+## 2026-09-19 05:02 — zoom-choreography-1: финал пути — финальный дом
+
+- **Что:** путь камеры /proto/ кончается у финального дома: `route_end` =
+  дом − 4 м (z −661.97), колесо дальше не везёт (было −710, лес за домом).
+  Фокус дома — `final`: подход и удержание 22 м до конца пути, без отъезда в
+  обзор. Карточка дома дочитывается и гаснет к финалу (0.03). Чекпоинт
+  `proto-far-end` (−680, за домом) заменён на `proto-finale-end`.
+- **Тип:** fix
+- **Проверка:** test_layout 62/62 · smoke 22/22 · selftest 24/24 · `--check` ✓ ·
+  layout/content/road без изменений · visual vs PR #11: 24/24 SAME
+- **Commit:** 9e47a87
+
+## 2026-09-19 04:38 — zoom-choreography-1: зум как функция маршрута
+
+- **Что:** в /proto/ зум по умолчанию `auto`: высота кадра — чистая функция z
+  камеры из `assets/topdown/camera_choreography.json` (smootherstep, 16..40 м).
+  5 фокусов на стабильных объектах: таверна (28 м), мёртвый дуб (24), вход в
+  шахту (22), склеп (22), финальный дом (22 — целиком в кадре, закрыт TODO).
+  Обзор между фокусами и на якорях переходов. Клавиша Z — только в отладке;
+  `__PROTO.go(z, 'auto'|'overview'|'close')`, `__PROTO.camera()`.
+- **Тип:** feat
+- **Проверка:** test_layout 61/61 · smoke 21/21 · selftest 23/24 · `--check` ✓ ·
+  layout/content/presentation без изменений · visual vs main: 19 прежних SAME,
+  5 новых choreo-*
+- **Commit:** 2ed3ad3
+
+## 2026-09-19 04:23 — Content Points 1 выпущен в production
+
+- **Что:** в main влиты PR #9 (контентные точки) и PR #10 (полировка карточек,
+  скрытый HUD); production baseline `a455734935ff6cd9ce591b0bf1ba04e3ebb36a0b`.
+  В нём: 5 контентных точек (village, forest, mine, spirit, home) статическим
+  DOM в `proto/index.html` — 5 EN + 5 RU статей в HTML-ответе без JS; тексты —
+  дословно из `build_site.FEATURES`; `?lang=ru`; отладочный HUD скрыт,
+  `?debug=hud` — показать; якорные доски — знаки `prop_signpost`. /proto/
+  по-прежнему noindex; корень, /ru/, /next/, SEO не менялись.
+- **Тип:** docs
+- **Проверка:** n/a (релиз проверен: CI PR #9 и main success, Pages built
+  a455734, / /ru/ /proto/ /next/ — 200, production == main 21/21 SAME)
+- **Commit:** 4bf0da3 (PR #10), a455734 (PR #9 → main)
+
 ## 2026-09-19 03:54 — content-points-polish-1: карточки и скрытый HUD
 
 - **Что:** отладочная панель /proto/ скрыта, включается `?debug=hud`

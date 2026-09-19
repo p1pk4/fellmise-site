@@ -52,6 +52,63 @@ const GAME_FRAME_M = GAME_ORTHO_SIZE * 2 * TILE_M;   // 11.67 м по высот
  * Зумы заданы тем, что реально читается на экране: 16 м — дом с окружением,
  * 40 м — усадьба с соседями и куском дороги. */
 const ZOOM = { обзор: 40 / 2, близко: 16 / 2 };
+
+/* ХОРЕОГРАФИЯ ЗУМА (zoom-choreography-1). Обычный режим — 'auto': высота кадра —
+   чистая функция z камеры, из assets/topdown/camera_choreography.json. Между
+   фокусами — обзор 40 м, у фокуса (стабильный объект layout) кадр плавно
+   (smootherstep, без отскока) сходится до своей высоты и возвращается. Ни
+   таймеров, ни скорости колеса, ни памяти направления: один z — один кадр,
+   вперёд и назад одинаково. Эталон функции и проверки — tools/camera_choreography.py.
+   'обзор' / 'близко' остаются диагностическими снимками (checkpoints, клавиша
+   Z в режиме отладки). */
+const ZOOM_MODES = { auto: 'auto', overview: 'обзор', close: 'близко', обзор: 'обзор', близко: 'близко' };
+let CHOREO = { overview: 40, close: 16, focus: [] };
+const FOCUS = [];                            // { id, peak, frame, approach, hold, exit, final }
+
+function smootherstep(u) {
+  const x = Math.min(Math.max(u, 0), 1);
+  return x * x * x * (x * (x * 6 - 15) + 10);
+}
+
+function focusWeight(f, z) {
+  const d = z - f.peak;
+  if (Math.abs(d) <= f.hold) return 1;
+  if (d > 0) return smootherstep(1 - (d - f.hold) / f.approach);
+  return f.final ? 1 : smootherstep(1 - (-d - f.hold) / f.exit);   // финал держится до конца пути
+}
+
+/* (высота кадра, фокус, вес) на z камеры */
+function frameAt(z) {
+  let best = 0, focus = null;
+  for (const f of FOCUS) {
+    const w = focusWeight(f, z);
+    if (w > best) { best = w; focus = f; }
+  }
+  const ov = CHOREO.overview;
+  return { frame: focus ? ov - (ov - focus.frame) * best : ov, focus: focus ? focus.id : null, weight: best };
+}
+
+function frameHeight() {
+  return state.zoom === 'auto' ? frameAt(state.z).frame : ZOOM[state.zoom] * 2;
+}
+
+function initChoreography(choreo, layout) {
+  CHOREO = choreo;
+  const where = new Map();
+  Object.values(layout.biomes).forEach((b, bi) => {
+    for (const o of [...b.sprites, ...(b.boards || [])]) where.set(o.id, -bi * BIOME_SPACING + o.pos[2]);
+  });
+  for (const f of choreo.focus) {
+    if (!where.has(f.anchor)) throw new Error('фокус ' + f.id + ': якоря ' + f.anchor + ' нет в layout');
+    FOCUS.push({ id: f.id, peak: where.get(f.anchor) + (f.peak_offset || 0), frame: f.frame_height,
+                 approach: f.approach, hold: f.hold, exit: f.exit, final: !!f.final });
+  }
+  /* Конец пути камеры — у финального дома (route_end): дальше за домом только
+     лес, и путешествие кончается домом. Колесо дальше не везёт. */
+  const e = choreo.route_end;
+  if (!where.has(e.anchor)) throw new Error('route_end: якоря ' + e.anchor + ' нет в layout');
+  state.routeEnd = where.get(e.anchor) + (e.offset || 0);
+}
 let BIOME_SPACING = null;                    // из runtime layout (assets/topdown/config.json)
 const SEED = 'fellmise-proto-1';
 
@@ -74,7 +131,7 @@ const RUT_HALF = 0.53;                      // та же доля дороги, 
 const ORDER = { ground: -1000, decalFar: -900, decalNear: -880, shadow: -500 };
 const OBJECT_BASE = 1000;                   // + (z нижнего края + 800) * 10
 
-const state = { zoom: 'обзор', z: -20, len: 400, objects: 0, decals: 0,
+const state = { zoom: 'auto', z: -20, len: 400, objects: 0, decals: 0,
                 biomes: 0, ready: false, done: false, sortTest: '—' };
 
 const scene = new THREE.Scene();
@@ -741,11 +798,12 @@ function presentationAt(z) {
 let roadAt = () => ({ cx: 0, hw: 3.2 });
 
 async function main() {
-  const [layout, spline, index, contact] = await Promise.all([
+  const [layout, spline, index, contact, choreo] = await Promise.all([
     fetch(LAYOUT).then((r) => r.json()),
     fetch(ASSETS + 'road_spline.json').then((r) => r.json()),
     fetch(STRIPPED + 'index.json').then((r) => r.json()).catch(() => ({ stripped: [] })),
     fetch('./sprite_contact.json').then((r) => r.json()),
+    fetch(ASSETS + 'topdown/camera_choreography.json').then((r) => r.json()),
   ]);
   strippedSet = new Set(index.stripped);
   CONTACT = contact;
@@ -758,6 +816,7 @@ async function main() {
   }
   BIOME_SPACING = layout.biome_spacing;
   initContent(layout);
+  initChoreography(choreo, layout);
   const dbg = layout.debug;
   const ids = Object.keys(layout.biomes);
   state.biomes = ids.length;
@@ -955,15 +1014,21 @@ async function sortTest(where) {
 }
 
 // ---------------------------------------------------------------- камера ---
-function resize() {
-  const w = innerWidth, h = innerHeight;
-  const half = ZOOM[state.zoom];
-  camera.left = -half * (w / h);
-  camera.right = half * (w / h);
+/* Границы ортокамеры: высота кадра — из режима (auto — от z), ширина — из
+   пропорций окна. Считается на каждом кадре: в auto кадр зависит от z. */
+function applyFrame() {
+  const half = frameHeight() / 2, a = innerWidth / innerHeight;
+  if (camera.top === half && camera.right === half * a) return;
+  camera.left = -half * a;
+  camera.right = half * a;
   camera.top = half;
   camera.bottom = -half;
   camera.updateProjectionMatrix();
-  renderer.setSize(w, h);
+}
+
+function resize() {
+  applyFrame();
+  renderer.setSize(innerWidth, innerHeight);
 }
 
 /* Затемнение перехода — не контент: пустой слой поверх канваса и под панелью,
@@ -973,19 +1038,22 @@ const OVERLAY = document.getElementById('biome-transition-overlay');
 
 function draw() {
   if (OVERLAY && PRES) OVERLAY.style.opacity = dimAt(state.z).toFixed(3);
+  applyFrame();
   camera.position.set(0, 120, state.z);
   camera.lookAt(0, 0, state.z);
   camera.up.set(0, 0, -1);
   camera.updateMatrixWorld();
   renderer.render(scene, camera);
   updateContent();
-  const halfM = ZOOM[state.zoom];
+  const halfM = frameHeight() / 2;
+  const fa = frameAt(state.z);
   const tiles = (halfM * 2) / TILE_M;                 // высота кадра в тайлах
   const asOrtho = halfM / TILE_M;                     // тот же кадр у камеры игры
   const same = Math.abs(asOrtho - GAME_ORTHO_SIZE) < 0.15;
   HUD.innerHTML = 'top-down проба · ортокамера, взгляд вниз\n'
     + `зум: <b>${state.zoom}</b> — эквивалент orthographicSize `
-    + `<b>${asOrtho.toFixed(1)}</b>${same ? ' <b>(игровой кадр)</b>' : ''} — клавиша Z\n`
+    + `<b>${asOrtho.toFixed(1)}</b>${same ? ' <b>(игровой кадр)</b>' : ''} — клавиша Z (auto → обзор → близко, в отладке)\n`
+    + `хореография: фокус <b>${fa.focus || '—'}</b> · вес ${fa.weight.toFixed(2)} · кадр auto ${fa.frame.toFixed(1)} м\n`
     + `кадр ${(halfM * 2).toFixed(1)} м = ${tiles.toFixed(1)} тайла игры · `
     + `1 м сайта = ${(1 / TILE_M).toFixed(2)} тайла\n`
     + `<b>игровой кадр = ${GAME_FRAME_M.toFixed(1)} м — недостижим при текущем разрешении пака</b>\n`
@@ -995,14 +1063,17 @@ function draw() {
 }
 
 addEventListener('wheel', (e) => {
-  state.z = Math.min(20, Math.max(-state.len - 20, state.z - e.deltaY * 0.06));
+  // путь посетителя: от начала деревни до финального дома, не дальше
+  state.z = Math.min(20, Math.max(state.routeEnd ?? -state.len - 20, state.z - e.deltaY * 0.06));
   draw();
 }, { passive: true });
 
 addEventListener('keydown', (e) => {
-  // без анимаций и плавностей: два фиксированных уровня, переключение мгновенно
+  // ручной зум — только диагностика (?debug=hud или ?debug=zoom): посетитель
+  // получает хореографию; переключение мгновенное, без анимации
+  if (!DEBUG.has('hud') && !DEBUG.has('zoom')) return;
   if ('zZяЯ'.includes(e.key)) {
-    state.zoom = state.zoom === 'обзор' ? 'близко' : 'обзор';
+    state.zoom = { auto: 'обзор', обзор: 'близко', близко: 'auto' }[state.zoom];
     resize();
     draw();
   }
@@ -1048,8 +1119,12 @@ function edgeStats(z0, z1) {
 
 /* Ручка для скриншотов: та же камера, тот же путь, без анимаций. */
 window.__PROTO = {
+  // zoom: 'auto' (хореография) | 'overview'/'обзор' | 'close'/'близко'; без него — прежний режим
   go(z, zoom) {
-    if (zoom) state.zoom = zoom;
+    if (zoom) {
+      if (!ZOOM_MODES[zoom]) throw new Error('неизвестный зум: ' + zoom);
+      state.zoom = ZOOM_MODES[zoom];
+    }
     state.z = z;
     resize();
     draw();
@@ -1060,6 +1135,13 @@ window.__PROTO = {
   // только чтение: для отчётов и тестов (что под камерой, где дорога)
   presentationAt: (z) => presentationAt(z ?? state.z),
   shadows: () => SHADOWS.map((s) => ({ ...s })),
+  // камера: режим и высота кадра сейчас; auto_* — что даёт хореография на z
+  camera: (z) => {
+    const a = frameAt(z ?? state.z);
+    return { z: z ?? state.z, mode: state.zoom, frame: frameHeight(),
+             auto_frame: a.frame, auto_focus: a.focus, auto_weight: a.weight };
+  },
+  focus: () => FOCUS.map((f) => ({ ...f })),
   // контентные точки: что видно на текущем z (только чтение)
   content: () => ({
     locale: CONTENT_LOCALE,

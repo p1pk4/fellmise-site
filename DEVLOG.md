@@ -19,7 +19,7 @@
 - **Проверка:** test_layout 55/55 · smoke 18/18 · selftest 19/19 · `--check` ✓ ·
   layout/next/root без изменений · visual vs main: мир 0.004–1.3% (доски→знаки,
   счётчик HUD), content-* новые
-- **Commit:** <hash>
+- **Commit:** 778daa9
 
 ## 2026-09-19 03:03 — Biome Presentation 1 выпущен в production
 

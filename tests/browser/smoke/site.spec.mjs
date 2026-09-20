@@ -661,7 +661,7 @@ test.describe('/proto/ modes', () => {
     for (const s of plan.slots) {
       const img = page.locator(`figure.key-art[data-id="${s.id}"] img[src]`);
       await expect(img).toHaveCount(1);
-      expect(await img.getAttribute('src')).toBe('../' + s.src);
+      expect(await img.getAttribute('src')).toBe('/' + s.src);      // root-absolute: the same markup serves /, /ru/ and /proto/
       expect(await img.getAttribute('alt')).toBe(s.alt.en);
       await img.scrollIntoViewIfNeeded();
       await expect.poll(() => img.evaluate((i) => i.complete && i.naturalWidth)).toBe(1536);

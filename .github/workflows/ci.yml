@@ -58,6 +58,8 @@ jobs:
         run: python tools/camera_choreography.py --check
       - name: key art is valid, WebPs and proto/index.html current
         run: python tools/key_art.py --check
+      - name: the three journey documents (/, /ru/, /proto/) are current
+        run: python tools/build_pages.py --check
       - name: audio config (asset contract) is valid
         run: python tools/audio_config.py --check
       - name: layout tests

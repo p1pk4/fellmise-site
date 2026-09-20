@@ -250,12 +250,12 @@ def region(data):
             + f' data-side="{att(s["side"])}" data-preload="{s["lazy"]["preload_ahead_m"]}"'
             f' data-supports="{att(s["supports"]["content_point"])}">')
         out.append(
-            f'    <img data-src="../{att(s["src"])}" width="{s["target_px"][0]}" height="{s["target_px"][1]}"'
+            f'    <img data-src="/{att(s["src"])}" width="{s["target_px"][0]}" height="{s["target_px"][1]}"'
             f' alt="{att(en)}" data-alt-ru="{att(ru)}" decoding="async">')
         # without JavaScript the picture is still there: <noscript> is inert text
         # when scripts run (no request, no duplicate image), a real <img> when not
         out.append(
-            f'    <noscript><img src="../{att(s["src"])}" width="{s["target_px"][0]}" height="{s["target_px"][1]}"'
+            f'    <noscript><img src="/{att(s["src"])}" width="{s["target_px"][0]}" height="{s["target_px"][1]}"'
             f' alt="{att(en)}" loading="lazy" decoding="async"></noscript>')
         out.append('  </figure>')
     out.append('</div>')

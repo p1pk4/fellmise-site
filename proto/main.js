@@ -21,9 +21,13 @@ const HUD = document.getElementById('hud');
    ошибку лучше показать, чем оставить пустой экран. */
 const DEBUG = new Set((new URLSearchParams(location.search).get('debug') || '').split(',').filter(Boolean));
 HUD.hidden = !DEBUG.has('hud');
-const ASSETS = '../assets/';
+/* Все ресурсы движка адресуются от URL МОДУЛЯ, а не от адреса документа:
+   один и тот же /proto/ engine работает и из /, и из /ru/, и из /proto/.
+   (import.meta.url — этот файл; '../assets/' от него это /assets/.) */
+const HERE = new URL('./', import.meta.url);                 // /proto/
+const ASSETS = new URL('../assets/', import.meta.url).href;  // общие ассеты сайта
 const LAYOUT = ASSETS + 'topdown/layout.runtime.json';
-const STRIPPED = './sprites_stripped/';
+const STRIPPED = new URL('sprites_stripped/', HERE).href;    // только движок
 
 /* Масштаб игры, выведенный из фактов, а не подобранный.
  *
@@ -412,7 +416,7 @@ function spriteFor(o) {
   if (!ov) return sprite(o.t);
   const key = 'override:' + o.id;
   if (!cache.has(key)) {
-    cache.set(key, tex('./' + ov.sprite).then((map) => ({
+    cache.set(key, tex(new URL(ov.sprite, HERE).href).then((map) => ({
       map,
       aspect: map.image.width / map.image.height,
       contact: CONTACT.sprites[ov.contact_from || o.t] || null,
@@ -553,6 +557,9 @@ function initContent(layout) {
   const have = sections.map((s) => s.dataset.locale);
   CONTENT_LOCALE = have.includes(q) ? q : (have[0] || 'en');
   for (const s of sections) s.hidden = s.dataset.locale !== CONTENT_LOCALE;
+  /* Язык документа = язык показанного текста. В статике это делает mode.js;
+     в живом режиме локаль выбирается здесь (в превью её меняет ?lang=). */
+  document.documentElement.lang = CONTENT_LOCALE;
 
   const where = new Map();
   Object.values(layout.biomes).forEach((b, bi) => {
@@ -878,9 +885,9 @@ async function main() {
     fetch(LAYOUT).then((r) => r.json()),
     fetch(ASSETS + 'road_spline.json').then((r) => r.json()),
     fetch(STRIPPED + 'index.json').then((r) => r.json()).catch(() => ({ stripped: [] })),
-    fetch('./sprite_contact.json').then((r) => r.json()),
+    fetch(new URL('sprite_contact.json', HERE)).then((r) => r.json()),
     fetch(ASSETS + 'topdown/camera_choreography.json').then((r) => r.json()),
-    fetch('./sprite_overrides.json').then((r) => r.json()),
+    fetch(new URL('sprite_overrides.json', HERE)).then((r) => r.json()),
   ]);
   strippedSet = new Set(index.stripped);
   CONTACT = contact;
@@ -931,13 +938,13 @@ async function main() {
   if (!PRES || PRES.biomes.length !== ids.length) throw new Error('в ' + LAYOUT + ' нет presentation');
   // звук: выключен, пока посетитель сам не включит; до этого ни одного запроса
   AUDIO = createAudio({ configUrl: ASSETS + 'topdown/audio.json', presentation: PRES, biomeAt,
-                        assetsBase: ASSETS.replace(/assets\/$/, ''), locale: CONTENT_LOCALE });
+                        assetsBase: new URL('../', import.meta.url).href, locale: CONTENT_LOCALE });
   const T = PRES.textures;
   /* Все текстуры грунта грузятся ДО первого кадра: state.ready/done ставятся
      только после них, и скриншот не может поймать землю без текстуры. */
   const [grass, grass2, road, moss, stone] = await Promise.all([
-    tex('./' + T.grass, true), tex('./' + T.grass, true),
-    tex('./' + T.road, true), tex('./' + T.moss, true), tex('./' + T.stone, true),
+    tex(new URL(T.grass, HERE).href, true), tex(new URL(T.grass, HERE).href, true),
+    tex(new URL(T.road, HERE).href, true), tex(new URL(T.moss, HERE).href, true), tex(new URL(T.stone, HERE).href, true),
   ]);
   /* Земля сейчас спорит с крышами — она фон, а не главный предмет кадра.
      Насыщенность снята на 28% и тон уведён в серо-коричневый. */

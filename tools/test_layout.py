@@ -565,7 +565,7 @@ class ContactShadow(unittest.TestCase):
         proto = read("proto/main.js")
         self.assertNotIn("LIGHT", proto)
         self.assertNotIn("baseWidth", proto)
-        self.assertIn("fetch('./sprite_contact.json')", proto)
+        self.assertIn("fetch(new URL('sprite_contact.json', HERE))", proto)   # module-owned, module-relative
         self.assertIn("PRES.contact_shadow", proto)
         self.assertIn("q.position.set(p.x, 0.5, p.z)", proto)
 
@@ -933,7 +933,7 @@ class KeyArt(unittest.TestCase):
         self.assertEqual(self.K.render(page, self.data), page)
         for s in self.data["slots"]:
             self.assertIn(f'data-id="{s["id"]}"', page)
-            self.assertIn(f'data-src="../{s["src"]}"', page)
+            self.assertIn(f'data-src="/{s["src"]}"', page)   # root-absolute: /, /ru/ and /proto/ share the markup
             self.assertIn(s["alt"]["ru"], page)
         proto = read("proto/main.js")
         self.assertIn("document.querySelectorAll('.key-art')", proto)

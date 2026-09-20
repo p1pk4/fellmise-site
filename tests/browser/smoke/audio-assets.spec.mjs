@@ -49,8 +49,8 @@ const clean = (w) => { expect(w.errors, 'console / page errors').toEqual([]); ex
 const open = async (page, q = '') => { await page.goto('/proto/' + q); await page.waitForFunction(READY, null, { timeout: TIMEOUT }); };
 const A = (page) => page.evaluate(() => {
   const s = window.__PROTO.audio();
-  // the page asks for its config as ../assets/...: report repo-relative paths
-  return { ...s, requested: s.requested.map((u) => u.replace(/^(\.\.\/)+/, '')) };
+  // the engine resolves its URLs from its module: report repo-relative paths
+  return { ...s, requested: s.requested.map((u) => u.replace(/^https?:\/\/[^/]+\//, '').replace(/^(\.\.\/)+/, '').replace(/^\/+/, '')) };
 });
 const go = (page, z) => page.evaluate((zz) => window.__PROTO.go(zz), z);
 const toggle = (page) => page.locator('button.audio-toggle');

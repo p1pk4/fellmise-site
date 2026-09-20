@@ -75,6 +75,35 @@ def main():
         if not any("noindex" in c for c in robots_of(read(rel))):
             bad.append(f"{rel}: превью без noindex — будет конкурировать с корнем")
 
+    # Путешествие: / и /ru/ — production-документы, /proto/ — превью того же журнала.
+    # Язык документа, одна локаль в документе и общий движок из /proto/ (копий нет).
+    for rel, lang, other in (("index.html", "en", "ru"), ("ru/index.html", "ru", "en")):
+        html = read(rel)
+        if f'<html lang="{lang}">' not in html:
+            bad.append(f"{rel}: нет <html lang=\"{lang}\">")
+        if f'data-locale="{other}"' in html:
+            bad.append(f"{rel}: в документе есть вторая локаль ({other}) — у продакшена один язык на URL")
+        if f'data-locale="{lang}"' not in html:
+            bad.append(f"{rel}: нет контента локали {lang}")
+        for want in ('<link rel="alternate" hreflang="en" href="https://fellmise.com/">',
+                     '<link rel="alternate" hreflang="ru" href="https://fellmise.com/ru/">',
+                     '<link rel="alternate" hreflang="x-default" href="https://fellmise.com/">'):
+            if want not in html:
+                bad.append(f"{rel}: нет {want}")
+        for want in ('src="/proto/mode.js"', 'src="/proto/boot.js"', 'href="/proto/fallback.css"'):
+            if want not in html:
+                bad.append(f"{rel}: движок подключается не из /proto/ ({want})")
+    for rel in ("index.html", "ru/index.html"):
+        if (ROOT / rel).with_name("main.js").exists() and rel != "index.html":
+            bad.append(f"{rel}: рядом лежит копия движка")
+    if (ROOT / "ru" / "main.js").exists() or (ROOT / "ru" / "sprites_stripped").exists():
+        bad.append("/ru/: копия движка — движок должен быть один, в /proto/")
+    proto = read("proto/index.html")
+    if '<link rel="canonical" href="https://fellmise.com/">' not in proto:
+        bad.append("proto/index.html: canonical должен указывать на корень")
+    if '<html lang="en">' not in proto:
+        bad.append("proto/index.html: без JS показывается EN — нужен <html lang=\"en\">")
+
     robots = read("robots.txt")
     for line in ("Disallow: /next/", "Disallow: /full/",
                  "Sitemap: https://fellmise.com/sitemap.xml"):

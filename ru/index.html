@@ -22,61 +22,164 @@
 <meta name="twitter:title" content="Fellmise — 2D-песочница MMO с видом сверху">
 <meta name="twitter:description" content="Хардкорная 2D-песочница MMO с видом сверху в духе Ultima Online: скиллы вместо уровней, играбельная фракция монстров, кроссплей PC и мобайл">
 <meta name="twitter:image" content="https://fellmise.com/assets/og.jpg">
-<meta name="theme-color" content="#a8cb53">
-<link rel="icon" href="../assets/favicon-32.png" sizes="32x32">
-<link rel="icon" href="../assets/icon-512.png" sizes="512x512">
-<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+<meta name="theme-color" content="#1a2216">
+<link rel="icon" href="/assets/favicon-32.png" sizes="32x32">
+<link rel="icon" href="/assets/icon-512.png" sizes="512x512">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"VideoGame","name":"Fellmise","url":"https://fellmise.com/ru/","description":"Качаешь то, чем играешь. Смерть уносит вещи. Мир живёт без тебя. Доната нет.","genre":["MMORPG","Sandbox"],"gamePlatform":["PC","iOS","Android"],"applicationCategory":"Game","inLanguage":"ru","image":"https://fellmise.com/assets/og.jpg","publisher":{"@type":"Organization","name":"Fellmise","url":"https://fellmise.com/","logo":"https://fellmise.com/assets/icon-512.png"}}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Fellmise","url":"https://fellmise.com/","logo":"https://fellmise.com/assets/icon-512.png"}</script>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Fellmise","url":"https://fellmise.com/ru/","inLanguage":"ru"}</script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" media="print" onload="this.media='all'"
-      href="https://fonts.googleapis.com/css2?family=Podkova:wght@700&family=Vollkorn:wght@400;600;700&family=PT+Mono&display=swap">
-<noscript><link rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Podkova:wght@700&family=Vollkorn:wght@400;600;700&family=PT+Mono&display=swap"></noscript>
-<link rel="stylesheet" href="../stub.css?v=1">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Fellmise","url":"https://fellmise.com/ru/","inLanguage":"ru"}</script><style>
+  html.mode-live, .mode-live body { margin: 0; height: 100%; background: #4d7a3a; overflow: hidden; }
+  .mode-live canvas { display: block; }
+  .mode-live #hud {
+    position: fixed; left: 12px; top: 12px; z-index: 10;
+    padding: 8px 12px; background: rgba(18,22,24,.86); color: #fdf6e0;
+    font: 12px/1.5 ui-monospace, monospace; white-space: pre;
+    pointer-events: none;
+  }
+  .mode-live #hud b { color: #ffc857; font-weight: 700; }
+  .mode-live #hud[hidden] { display: none; }   /* отладка: только с ?debug=hud */
+  /* затемнение перехода между биомами: не контент, без текста и событий */
+  .mode-live #biome-transition-overlay {
+    position: fixed; inset: 0; z-index: 5; background: #000; opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Content points: the words live here, in the DOM (generated from
+     assets/topdown/content_points.json); main.js only sets how present each
+     card is from the camera's z. The world stays the picture: one quiet
+     panel at the side, the road and the marker left in view. */
+  .mode-live #content-overlay { position: fixed; inset: 0; z-index: 8; pointer-events: none; }
+  .mode-live .content-point {
+    position: absolute; top: 50%; width: min(364px, calc(50vw - 150px));
+    transform: translateY(calc(-50% + var(--enter, 0px)));
+    box-sizing: border-box; padding: 24px 26px 26px 24px;
+    /* a veil, not a box: darker at the edge it hangs from, lighter inward */
+    background: linear-gradient(90deg, rgba(14, 16, 12, .74), rgba(14, 16, 12, .60));
+    color: #f3edda;
+    border-left: 2px solid rgba(255, 200, 87, .78); border-radius: 6px;
+    -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, .14);
+    opacity: 0;                  /* main.js: presence 0..1 from state.z */
+  }
+  .mode-live .content-point[data-side="left"] { left: 24px; }
+  .mode-live .content-point[data-side="right"] { right: 24px; }
+  .mode-live .content-point[data-side="right"] {
+    background: linear-gradient(270deg, rgba(14, 16, 12, .74), rgba(14, 16, 12, .60));
+  }
+  .mode-live .content-point__kicker {
+    margin: 0 0 10px; color: #ffc857;
+    font: 600 11px/1.3 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    letter-spacing: .16em; text-transform: uppercase;
+  }
+  .mode-live .content-point__title {
+    margin: 0 0 14px; color: #fdf6e0;
+    font: 700 24px/1.2 Georgia, "Iowan Old Style", "Palatino Linotype", "Times New Roman", serif;
+  }
+  .mode-live .content-point__body {
+    margin: 0; color: rgba(243, 237, 218, .92);
+    font: 400 16px/1.62 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  /* Key art: illustration windows over the world (tools/key_art.py writes the
+     figures). No frame, no card: the picture fades into the world at its edges
+     (an elliptical mask), so it reads as a window, not a pasted rectangle.
+     main.js sets presence (opacity) from the camera's z. */
+  .mode-live #keyart-overlay { position: fixed; inset: 0; z-index: 7; pointer-events: none; }
+  .mode-live .key-art {
+    position: absolute; top: 50%; width: 480px; height: 320px; margin: 0;
+    transform: translateY(calc(-50% + var(--enter, 0px)));
+    opacity: 0;
+    -webkit-mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 62%, rgba(0,0,0,.55) 82%, transparent 100%);
+            mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 62%, rgba(0,0,0,.55) 82%, transparent 100%);
+  }
+  .mode-live .key-art[data-side="left"] { left: 24px; }
+  .mode-live .key-art[data-side="right"] { right: 24px; }
+  .mode-live .key-art img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  /* Sound toggle (proto/audio.js creates it, live mode only): a small quiet
+     round button in the bottom-right corner, under nothing and over nothing —
+     cards and key art sit at mid-height, far from the corner. */
+  .mode-live .audio-toggle {
+    position: fixed; right: 16px; bottom: 16px; z-index: 9;
+    width: 36px; height: 36px; padding: 0; margin: 0;
+    display: grid; place-items: center;
+    border: 1px solid rgba(243, 237, 218, .28); border-radius: 50%;
+    background: rgba(14, 16, 12, .52); color: rgba(243, 237, 218, .72);
+    -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
+    cursor: pointer; transition: color .15s, border-color .15s, background-color .15s;
+  }
+  .mode-live .audio-toggle:hover { color: #f3edda; border-color: rgba(243, 237, 218, .5); }
+  .mode-live .audio-toggle:focus-visible { outline: 2px solid #ffc857; outline-offset: 3px; }
+  .mode-live .audio-toggle[aria-pressed="true"] { color: #ffc857; border-color: rgba(255, 200, 87, .6); }
+  .mode-live .audio-toggle .audio-toggle__on { display: none; }
+  .mode-live .audio-toggle[aria-pressed="true"] .audio-toggle__on { display: inline; }
+  .mode-live .audio-toggle[aria-pressed="true"] .audio-toggle__off { display: none; }
+  /* ?debug=keyart: outline the windows (review only) */
+  .mode-live .key-art.debug { -webkit-mask-image: none; mask-image: none; outline: 2px dashed rgba(255, 200, 87, .9); }
+  .mode-live .key-art.debug::after {
+    content: attr(data-id); position: absolute; left: 6px; top: 4px;
+    font: 600 12px ui-monospace, monospace; color: #ffc857; text-shadow: 0 1px 2px #000;
+  }
+  .content-visually-hidden {
+    position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+  }
+</style>
+<link rel="stylesheet" href="/proto/fallback.css">
+<script src="/proto/mode.js"></script>
 </head>
 <body>
-
-<header class="top">
-  <a class="logo" href="../">FELLMISE</a>
-  <nav class="lang" aria-label="Language">
-    <span aria-current="true">RU</span>
-    <a href="../" hreflang="en">EN</a>
-  </nav>
-</header>
-
-<div class="scene" aria-hidden="true">
-  <div class="scene__ground"></div>
-  <div class="scene__road"></div>
-    <div class="sp sp--house-b"><img src="../assets/hero_house_b.webp" alt="" loading="eager" decoding="async"></div>
-    <div class="sp sp--tree"><img src="../assets/hero_tree_a.webp" alt="" loading="eager" decoding="async"></div>
-    <div class="sp sp--house-a"><img src="../assets/hero_house_a.webp" alt="" loading="eager" decoding="async"></div>
+<div id="biome-transition-overlay" aria-hidden="true"></div>
+<div id="hud" hidden>загрузка…</div>
+<main id="journey">
+<!-- content-points:begin — generated by tools/build_proto_content.py from assets/topdown/content_points.json; do not edit -->
+<div id="content-overlay">
+  <section class="content-locale" lang="ru" data-locale="ru">
+    <h1 class="content-visually-hidden">Fellmise — путь через мир</h1>
+    <article class="content-point" id="cp-ru-village-world" data-id="village-world" data-order="1" data-biome="village" data-anchor="village/board/world_plays_itself" data-marker="village/board/world_plays_itself" data-side="left" data-core="12" data-range="30" aria-labelledby="cp-ru-village-world-title">
+      <p class="content-point__kicker">Деревня</p>
+      <h2 class="content-point__title" id="cp-ru-village-world-title">Мир играет сам</h2>
+      <p class="content-point__body">Вышел из игры — мир остался. NPC лезут в данжи, возят товар, торгуются и пьют в таверне. Ты приходишь не на пустую карту.</p>
+    </article>
+    <article class="content-point" id="cp-ru-forest-skills" data-id="forest-skills" data-order="2" data-biome="forest" data-anchor="forest/board/skills_no_levels" data-marker="forest/board/skills_no_levels" data-side="left" data-core="12" data-range="30" aria-labelledby="cp-ru-forest-skills-title">
+      <p class="content-point__kicker">Лес</p>
+      <h2 class="content-point__title" id="cp-ru-forest-skills-title">Скиллы вместо уровней</h2>
+      <p class="content-point__body">Уровня нет. Машешь мечом — растёт меч, лезешь по замкам — растёт взлом. Нужен другой персонаж — играй по-другому, а не создавай нового.</p>
+    </article>
+    <article class="content-point" id="cp-ru-mine-mining" data-id="mine-mining" data-order="3" data-biome="mine" data-anchor="mine/board/mining" data-marker="mine/board/mining" data-side="right" data-core="12" data-range="30" aria-labelledby="cp-ru-mine-mining-title">
+      <p class="content-point__kicker">Шахта</p>
+      <h2 class="content-point__title" id="cp-ru-mine-mining-title">Добыча</h2>
+      <p class="content-point__body">Руду, дерево, траву и рыбу кто-то вытащил руками. Жилы кончаются, лучшее лежит там, где убивают. Сколько дотащил — столько и твоё.</p>
+    </article>
+    <article class="content-point" id="cp-ru-spirit-death" data-id="spirit-death" data-order="4" data-biome="spirit" data-anchor="spirit/board/death_is_a_place" data-marker="spirit/board/death_is_a_place" data-side="right" data-core="12" data-range="30" aria-labelledby="cp-ru-spirit-death-title">
+      <p class="content-point__kicker">Мир духов</p>
+      <h2 class="content-point__title" id="cp-ru-spirit-death-title">Смерть — это место</h2>
+      <p class="content-point__body">Некромантию не учат живые. Умри, сядь духом на корабль мёртвых — и вернись другим.</p>
+    </article>
+    <article class="content-point" id="cp-ru-home-home" data-id="home-home" data-order="5" data-biome="home" data-anchor="home/board/a_home_to_come_back_to" data-marker="home/board/a_home_to_come_back_to" data-side="right" data-core="12" data-range="30" aria-labelledby="cp-ru-home-home-title">
+      <p class="content-point__kicker">Дом</p>
+      <h2 class="content-point__title" id="cp-ru-home-home-title">Дом, куда возвращаешься</h2>
+      <p class="content-point__body">Займи свободный клочок земли и строй слоями: фундамент, стены, дверь, крыша. В сундуках — всё нажитое. Ночью монстры проверят стены на прочность.</p>
+    </article>
+  </section>
 </div>
-
-<main>
-  <div class="sign">
-    <h1>Ты убивал их сотнями. Теперь они пришли за тобой.</h1>
-    <p>Качаешь то, чем играешь. Смерть уносит вещи. Мир живёт без тебя. Доната нет.</p>
-  </div>
-  <div class="cta">
-    <button class="btn btn--steam" disabled>Wishlist в Steam — скоро</button>
-    <!-- TODO: подставить инвайт, когда создан сервер Discord -->
-    <a class="btn btn--discord" href="#">Discord</a>
-  </div>
-  <p class="note">Игра в ранней разработке. Всё, что видишь, ещё поменяется.</p>
+<!-- content-points:end -->
+<!-- key-art:begin — generated by tools/key_art.py from assets/topdown/key_art.json; do not edit -->
+<div id="keyart-overlay">
+  <figure class="key-art" data-id="village-life" data-biome="village" data-anchor="village/tavern/tavern" data-peak-offset="-31.5" data-core="4" data-range="10" data-side="right" data-preload="120" data-supports="village-world">
+    <img data-src="/assets/keyart/village-life.webp" width="1536" height="1024" alt="Деревня живёт своей жизнью у таверны: один разгружает повозку, двое у полосатого прилавка, двое беседуют у двери таверны." decoding="async">
+    <noscript><img src="/assets/keyart/village-life.webp" width="1536" height="1024" alt="Деревня живёт своей жизнью у таверны: один разгружает повозку, двое у полосатого прилавка, двое беседуют у двери таверны." loading="lazy" decoding="async"></noscript>
+  </figure>
+  <figure class="key-art" data-id="mine-work" data-biome="mine" data-anchor="mine/deep-adit/cave" data-peak-offset="-5.4" data-core="5" data-range="16" data-side="left" data-preload="120" data-supports="mine-mining">
+    <img data-src="/assets/keyart/mine-work.webp" width="1536" height="1024" alt="Шахтёр с киркой у валуна с рыжей рудной жилой, рядом вход в штольню, жаровня и вагонетка с рудой." decoding="async">
+    <noscript><img src="/assets/keyart/mine-work.webp" width="1536" height="1024" alt="Шахтёр с киркой у валуна с рыжей рудной жилой, рядом вход в штольню, жаровня и вагонетка с рудой." loading="lazy" decoding="async"></noscript>
+  </figure>
+  <figure class="key-art" data-id="spirit-afterlife" data-biome="spirit" data-anchor="spirit/shipwreck/ship" data-peak-offset="40.592" data-core="8" data-range="17" data-exit-core="5" data-exit-range="13" data-side="left" data-preload="120" data-supports="spirit-death">
+    <img data-src="/assets/keyart/spirit-afterlife.webp" width="1536" height="1024" alt="Призрачный корабль мёртвых, бледно-голубой и полупрозрачный, плывёт в низком тумане над моховой землёй мира духов; рядом маленький призрак, мёртвые деревья и надгробия." decoding="async">
+    <noscript><img src="/assets/keyart/spirit-afterlife.webp" width="1536" height="1024" alt="Призрачный корабль мёртвых, бледно-голубой и полупрозрачный, плывёт в низком тумане над моховой землёй мира духов; рядом маленький призрак, мёртвые деревья и надгробия." loading="lazy" decoding="async"></noscript>
+  </figure>
+</div>
+<!-- key-art:end -->
 </main>
-
-<footer class="foot">
-  <span>fellmise.com</span>
-  <span>© 2026 Fellmise</span>
-  <nav aria-label="Links">
-    <a href="#">Discord</a> ·
-    <a href="#">Steam</a> ·
-    <a href="../">EN</a>
-  </nav>
-</footer>
-
+<script type="module" src="/proto/boot.js"></script>
 </body>
 </html>

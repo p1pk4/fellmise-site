@@ -1,14 +1,28 @@
-/* Слой контента маршрута. Облегчённый интерфейс Fellmise: почти чёрная
-   тёплая подложка, пергаментный оттенок текста, тонкая золотая линия. Матовый,
-   сдержанный; ни стекла, ни неона, ни попапов мобильной игры.
-
-   Подложка появляется только ТАМ, ГДЕ ТЕКСТ, и только в тех вариантах, где она
-   нужна: центральная дорога кадра не перекрывается никогда. */
+/* Типографика контента: гарнитуры самого проекта, а не редакционный шаблон.
+ *
+ * Alegreya убрана целиком. Заголовки — Podkova 700, текст и утверждения —
+ * Vollkorn 500: ровно те две гарнитуры, которыми набраны /, /next/ и /full/,
+ * из того же источника Google Fonts. Третьей здесь нет. Alegreya читалась
+ * нейтральной книжной антиквой и делала страницу похожей на типовой лендинг;
+ * Podkova с её плотными засечками — это уже голос Fellmise.
+ *
+ * Курсив как постоянный приём снят: утверждения о мире должны читаться
+ * короткими фактами, а не цитатами из фэнтези-романа.
+ *
+ * Кегль посценно, не единый: обычный заголовок 54 px, порог 67, ядро 71,
+ * дом 56. Тело 20 px при мере 36-42ch. Карточек по-прежнему нет: только
+ * текст, одна линия и мягкий скрим без различимых границ.
+ *
+ * Палитра — Fellmise UI: пергамент #DECA9E, блик заголовка #E7B999,
+ * тёплый акцент #CFA474, тёмная опора #1A1C21 / #291F12.
+ */
 :root {
-  --ink: #0d0a08;
-  --parchment: #ece0c8;
-  --parchment-dim: rgba(236, 224, 200, .72);
-  --gold: #c9a46a;
+  --parchment: #deca9e;
+  --headline: #e7b999;
+  --accent: #cfa474;
+  --dark: #1a1c21;
+  --dark-warm: #291f12;
+  --says: rgba(222, 202, 158, .78);
 }
 
 #content {
@@ -16,134 +30,191 @@
   inset: 0;
   z-index: 300;
   pointer-events: none;
-  /* поля держат текст подальше от центра кадра, где идёт дорога */
   padding: 7vh clamp(28px, 5vw, 92px);
-  font-family: Alegreya, Vollkorn, Georgia, 'Times New Roman', serif;
+  font-family: Vollkorn, Georgia, 'Times New Roman', serif;
 }
 
 .beat {
   position: absolute;
-  width: min(30rem, 34vw);
+  width: min(34rem, 38vw);
   opacity: 0;
-  transform: translateY(24px);
-  transition: opacity .52s cubic-bezier(.22, .61, .36, 1),
-              transform .52s cubic-bezier(.22, .61, .36, 1);
+  transform: translateY(14px);
+  transition: opacity .48s cubic-bezier(.22, .61, .36, 1),
+              transform .48s cubic-bezier(.22, .61, .36, 1);
 }
 .beat.is-on { opacity: 1; transform: none; }
+.beat--hero { width: min(38rem, 42vw); }
 
 .beat--left { left: clamp(28px, 5vw, 92px); }
 .beat--right { right: clamp(28px, 5vw, 92px); text-align: right; }
-.beat--center { top: 50%; transform: translateY(calc(-50% + 24px)); }
+.beat--center { top: 50%; transform: translateY(calc(-50% + 14px)); }
 .beat--center.is-on { transform: translateY(-50%); }
 .beat--lower { bottom: 12vh; }
 
-/* ------------------------------------------------------------ варианты */
-
-/* мягкая локальная подложка под текстом */
-.beat--panel {
-  padding: 26px 30px 28px;
-  background:
-    linear-gradient(180deg, rgba(13, 10, 8, .80), rgba(13, 10, 8, .66)),
-    linear-gradient(180deg, rgba(201, 164, 106, .07), rgba(201, 164, 106, .02));
-  border-left: 2px solid var(--gold);
-  box-shadow: 0 18px 48px rgba(0, 0, 0, .42);
-}
-.beat--panel.beat--right { border-left: 0; border-right: 2px solid var(--gold); }
-
-/* Без карточки: тонкая тёплая линия вдоль текста плюс мягкий скрим без
-   видимых границ. Одной тенью текст на светлом фоне не держится — в лесу он
-   ложился на освещённую тропу и не читался. */
-.beat--rule {
-  padding: 4px 0 4px 22px;
-  border-left: 1px solid rgba(201, 164, 106, .62);
-}
-.beat--rule::before {
+/* Скрим. Коробка много больше блока, радиусы заметно меньше её половины:
+   иначе градиент упирается в собственный край с ненулевой непрозрачностью и
+   даёт ровную линию поперёк кадра. Здесь он гаснет задолго до границы.
+   Плотность оставлена прежней: кегль вырос, усиливать нечего. */
+.beat::before {
   content: '';
   position: absolute;
-  inset: -28px -46px -30px -34px;
+  inset: -180px -210px;
   z-index: -1;
-  background: radial-gradient(120% 100% at 18% 50%,
-              rgba(13, 10, 8, .74), rgba(13, 10, 8, .42) 52%, transparent 78%);
+  pointer-events: none;
 }
-.beat--rule.beat--right::before {
-  background: radial-gradient(120% 100% at 82% 50%,
-              rgba(13, 10, 8, .74), rgba(13, 10, 8, .42) 52%, transparent 78%);
-}
-.beat--rule.beat--right { padding-left: 0; padding-right: 22px; border-left: 0; border-right: 1px solid rgba(201, 164, 106, .62); }
-.beat--rule .beat__headline,
-.beat--rule .beat__body,
-.beat--rule .beat__eyebrow { text-shadow: 0 2px 14px rgba(0, 0, 0, .85); }
 
-/* подложка с угловым акцентом */
-.beat--corner {
-  padding: 26px 30px 28px;
-  background: linear-gradient(180deg, rgba(13, 10, 8, .78), rgba(13, 10, 8, .62));
-  box-shadow: 0 18px 48px rgba(0, 0, 0, .42);
+.beat--grounded::before {
+  background: radial-gradient(52% 40% at 34% 50%,
+              rgba(26, 28, 33, .88), rgba(26, 28, 33, .52) 44%,
+              rgba(26, 28, 33, .18) 66%, transparent 84%);
 }
-.beat--corner::before,
-.beat--corner::after {
+/* Деревня сидит на уже тёмном переднем плане, поэтому скрим здесь только
+   поддерживает текст: слабее прочих и с меньшим радиусом, чтобы полностью
+   раствориться задолго до дороги, а не затемнять половину сцены. */
+.beat--quiet::before {
+  background: radial-gradient(46% 36% at 32% 50%,
+              rgba(26, 28, 33, .72), rgba(26, 28, 33, .40) 44%,
+              rgba(26, 28, 33, .13) 66%, transparent 82%);
+}
+.beat--air::before {
+  background: radial-gradient(50% 38% at 66% 50%,
+              rgba(26, 28, 33, .70), rgba(26, 28, 33, .38) 44%,
+              rgba(26, 28, 33, .12) 66%, transparent 84%);
+}
+.beat--air.beat--left::before {
+  background: radial-gradient(50% 38% at 34% 50%,
+              rgba(26, 28, 33, .70), rgba(26, 28, 33, .38) 44%,
+              rgba(26, 28, 33, .12) 66%, transparent 84%);
+}
+.beat--bare::before {
+  background: radial-gradient(50% 38% at 34% 50%,
+              rgba(26, 28, 33, .62), rgba(26, 28, 33, .32) 44%,
+              rgba(26, 28, 33, .10) 66%, transparent 84%);
+}
+.beat--caption::before {
+  background: radial-gradient(54% 42% at 64% 48%,
+              rgba(12, 18, 20, .84), rgba(12, 18, 20, .50) 44%,
+              rgba(12, 18, 20, .17) 66%, transparent 84%);
+}
+
+/* ----------------------------------------------------------- оформление */
+
+/* деревня: одна вертикальная тёплая линия, больше ничего. Линия — граница
+   самого блока, то есть ровно высота кластера: не самостоятельный штрих. */
+.beat--quiet {
+  width: min(28rem, 30vw);
+  padding-left: 22px;
+  border-left: 1px solid rgba(207, 164, 116, .5);
+}
+/* Кластер сидит на тёмном переднем плане — дубе и заборе. Выше остальных
+   нижних битов, чтобы остался воздух над chapter/progress. */
+.beat--village { bottom: 16vh; }
+
+/* лес и дом: короткая горизонтальная черта под заголовком */
+.beat--air .beat__headline::after {
+  content: '';
+  display: block;
+  width: 64px;
+  height: 1px;
+  margin: 20px 0 0 auto;
+  background: rgba(207, 164, 116, .58);
+}
+.beat--air.beat--left .beat__headline::after { margin-left: 0; margin-right: auto; }
+
+/* шахта: один незамкнутый угловой штрих, не рамка и не панель */
+.beat--grounded { padding: 6px 0 6px 28px; }
+.beat--grounded::after {
   content: '';
   position: absolute;
-  width: 26px; height: 26px;
-  border: 1px solid var(--gold);
+  top: -16px; left: 0;
+  width: 38px; height: 38px;
+  border-left: 1px solid rgba(207, 164, 116, .62);
+  border-top: 1px solid rgba(207, 164, 116, .62);
 }
-.beat--corner::before { top: 0; left: 0; border-right: 0; border-bottom: 0; }
-.beat--corner::after { bottom: 0; right: 0; border-left: 0; border-top: 0; }
 
-/* только текст: кадр важнее подписи */
-.beat--bare .beat__headline,
-.beat--bare .beat__body { text-shadow: 0 2px 18px rgba(0, 0, 0, .9); }
-.beat--bare { width: min(26rem, 30vw); }
+/* ------------------------------------------------------- мотив: спираль */
+/* Высеченная спираль стоит только на пороге и в ядре, то есть строго на слое
+   духов. В деревне она была снята: там знак читался случайным декоративным
+   глифом. Так спираль означает death layer, а не украшает весь маршрут. */
+.beat--mark-spiral .beat__headline::before {
+  content: '';
+  display: block;
+  width: 32px; height: 32px;
+  margin: 0 0 16px;
+  background: no-repeat center / contain
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2396d6ce' stroke-width='1.5' stroke-linecap='round'%3E%3Cpath d='M12 12.4c0-1 .8-1.8 1.8-1.8 1.5 0 2.7 1.2 2.7 2.7 0 2.2-1.8 4-4 4-2.9 0-5.3-2.4-5.3-5.3 0-3.7 3-6.7 6.7-6.7'/%3E%3C/svg%3E");
+}
+.beat--right.beat--mark-spiral .beat__headline::before { margin-left: auto; }
+/* в ядре знак тёплый: на бирюзовой воде холодная бирюза просто пропадает,
+   а тёплый акцент читается и перекликается с огнями корабля */
+.beat--core.beat--mark-spiral .beat__headline::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23cfa474' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M12 12.4c0-1 .8-1.8 1.8-1.8 1.5 0 2.7 1.2 2.7 2.7 0 2.2-1.8 4-4 4-2.9 0-5.3-2.4-5.3-5.3 0-3.7 3-6.7 6.7-6.7'/%3E%3C/svg%3E");
+}
 
 /* ------------------------------------------------------------ типографика */
-.beat__eyebrow {
-  margin: 0 0 12px;
-  font-size: 11px;
-  letter-spacing: .3em;
-  text-transform: uppercase;
-  color: var(--gold);
-  font-family: ui-sans-serif, system-ui, sans-serif;
-}
-
 .beat__headline {
   margin: 0;
-  font-size: clamp(28px, 2.5vw, 40px);
-  line-height: 1.12;
-  font-weight: 500;
-  color: var(--parchment);
+  font-family: Podkova, Georgia, serif;
+  font-weight: 700;
+  font-size: clamp(42px, 2.8vw, 58px);
+  line-height: .96;
+  letter-spacing: -.015em;
+  color: var(--headline);
+  text-shadow: 0 2px 26px rgba(0, 0, 0, .68);
 }
-.beat--lead .beat__headline { font-size: clamp(34px, 3.1vw, 50px); }
+/* посценный кегль: два бита слоя духов крупнее всего маршрута, дом тише их,
+   но всё ещё крупнее обычного */
+.beat--threshold .beat__headline { font-size: clamp(56px, 3.5vw, 70px); }
+.beat--core .beat__headline { font-size: clamp(58px, 3.7vw, 74px); }
+.beat--home .beat__headline { font-size: clamp(44px, 2.9vw, 60px); }
 
 .beat__body {
-  margin: 14px 0 0;
-  font-size: clamp(15px, 1.08vw, 17px);
-  line-height: 1.55;
-  color: var(--parchment-dim);
+  margin: 18px 0 0;
+  font-family: Vollkorn, Georgia, serif;
+  font-weight: 500;
+  font-style: normal;
+  font-size: clamp(18px, 1.05vw, 20px);
+  line-height: 1.42;
+  letter-spacing: 0;
+  max-width: 42ch;
+  color: var(--parchment);
+  text-shadow: 0 1px 18px rgba(0, 0, 0, .66);
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity .46s ease, transform .46s ease;
 }
-.beat--bare .beat__body { margin-top: 10px; font-size: clamp(14px, 1vw, 16px); }
+.beat--right .beat__body { margin-left: auto; }
+.beat.is-on .beat__body { opacity: 1; transform: none; }
 
-.beat__tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin: 20px 0 0;
+/* мера строки посценно; у порога и дома она снята, чтобы тело осталось
+   одной строкой, как требует постановка этих двух битов */
+.beat--village .beat__body { max-width: 34ch; }
+.beat--mine .beat__body { max-width: 38ch; }
+.beat--core .beat__body { max-width: 40ch; }
+.beat--threshold .beat__body,
+.beat--home .beat__body { max-width: none; }
+.beat--home { width: min(40rem, 42vw); }
+
+/* Короткие утверждения о мире вместо плашек-тегов. Курсива нет: это факты
+   мира, а не цитаты. Отличает их от тела только кегль и приглушённый тон. */
+.beat__says {
+  margin: 16px 0 0;
   padding: 0;
   list-style: none;
 }
-.beat--right .beat__tags { justify-content: flex-end; }
-.beat__tags li {
-  padding: 5px 11px;
-  font-family: ui-sans-serif, system-ui, sans-serif;
-  font-size: 10.5px;
-  letter-spacing: .16em;
-  text-transform: uppercase;
-  color: rgba(236, 224, 200, .86);
-  border: 1px solid rgba(201, 164, 106, .42);
-  background: rgba(13, 10, 8, .42);
+.beat__says li {
+  margin-top: 7px;
+  font-family: Vollkorn, Georgia, serif;
+  font-weight: 500;
+  font-style: normal;
+  font-size: clamp(15px, .9vw, 17px);
+  line-height: 1.35;
+  color: var(--says);
+  text-shadow: 0 1px 14px rgba(0, 0, 0, .7);
   opacity: 0;
-  transform: translateY(10px);
-  transition: opacity .42s ease, transform .42s ease;
+  transform: translateY(14px);
+  transition: opacity .44s ease, transform .44s ease;
 }
-.beat.is-on .beat__tags li { opacity: 1; transform: none; }
+.beat.is-on .beat__says li { opacity: 1; transform: none; }
 
 @media (max-width: 1279px) { #content { display: none; } }

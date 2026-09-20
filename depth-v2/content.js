@@ -16,12 +16,25 @@
  *   core      раскрытие с 0.721  -> текст до 0.716
  *   home      раскрытия дальше нет, текст живёт до конца
  *
- * variant — разная композиция при общем языке, чтобы шесть биомов не читались
- * одинаковыми карточками на одном и том же месте:
- *   panel  — мягкая локальная подложка только под текстом
- *   rule   — без подложки, тонкая тёплая линия вдоль текста
- *   corner — подложка с угловым акцентом
- *   bare   — только текст, вообще без подложки
+ * variant — разная подача при общем языке, чтобы шесть биомов не читались
+ * одинаковыми карточками на одном и том же месте. Карточек нет ни в одном:
+ * везде текст, одна линия и мягкий скрим без границ.
+ *   quiet    — вертикальная тёплая линия слева от текста
+ *   air      — почти голый текст и короткая горизонтальная черта
+ *   grounded — дымный скрим и один незамкнутый угловой штрих
+ *   bare     — оформления почти нет, эталон деликатности (порог духов)
+ *   caption  — редакционная подпись к кадру: градиент уходит в воду
+ *
+ * Категорийные eyebrow сняты: «THE VILLAGE» над кадром деревни ничего не
+ * сообщает — биом уже назван самим изображением и маршрутом. Плашки-теги
+ * заменены короткими утверждениями о мире: формула
+ * eyebrow -> заголовок -> мелкий абзац -> мелкие теги читалась типовым
+ * лендингом, а не языком Fellmise.
+ *
+ * mark: 'spiral' — высеченная спираль из символики проекта. Стоит ровно на
+ * двух битах слоя духов: у порога и в ядре. В деревне знак сняли — там он
+ * читался случайным декоративным глифом, а не принадлежностью. Так спираль
+ * означает spirit/death layer, а не украшает сайт.
  */
 export const LOCALE = 'en';
 
@@ -29,41 +42,40 @@ export const BEATS = [
   {
     id: 'village',
     range: [0.030, 0.085],
-    side: 'left', y: 'center', variant: 'panel',
+    // низ слева: там тёмный дуб и забор переднего плана. По центру блок
+    // ложился на красные крыши и светлую стену и переставал читаться
+    side: 'left', y: 'lower', variant: 'quiet',
     en: {
-      eyebrow: 'The village',
       headline: 'A world that plays itself',
-      body: 'Log off and the world stays. NPC adventurers run dungeons, traders haul goods, craftsmen work the anvil. You are not arriving at an empty map.',
-      tags: ['Living NPCs', 'Player economy', 'No empty map'],
+      body: 'Log off and the world stays. NPCs run dungeons, haul goods and drink in taverns without you.',
     },
   },
   {
     id: 'forest',
     range: [0.185, 0.240],
-    side: 'right', y: 'lower', variant: 'rule',
+    side: 'right', y: 'lower', variant: 'air',
     en: {
-      eyebrow: 'The wilds',
       headline: 'Beyond the safe roads',
-      body: 'Danger grows with distance from the walls, and night rewrites the rules. The deep woods keep places that are not on any map.',
-      tags: ['Night changes the rules', 'Hidden places'],
+      body: 'Danger grows with distance from the walls.',
+      statements: ['Night changes the rules.', 'Some places are on no map.'],
     },
   },
   {
     id: 'mine',
     range: [0.350, 0.400],
-    side: 'left', y: 'center', variant: 'corner',
+    side: 'left', y: 'center', variant: 'grounded',
     en: {
-      eyebrow: 'The mine',
       headline: 'Depth has a price',
-      body: 'Every ore and every ingot was pulled out by somebody’s hands. The better the material, the deeper it sits and the worse the company.',
-      tags: ['Gathering', 'Crafting', 'Risk for reward'],
+      body: 'Every ore was pulled out by somebody’s hands.',
+      statements: ['The deeper the seam, the worse the company.'],
     },
   },
   {
     id: 'threshold',
-    // Здесь намеренно почти ничего: стела остаётся главным объектом кадра
+    // Самый крупный заголовок маршрута при полном отсутствии оформления:
+    // стела остаётся абсолютным центром кадра
     range: [0.500, 0.535],
-    side: 'left', y: 'lower', variant: 'bare',
+    side: 'left', y: 'lower', variant: 'bare', mark: 'spiral', hero: true,
     en: {
       headline: 'The dead see more.',
       body: 'Death reveals another layer of the same world.',
@@ -72,25 +84,20 @@ export const BEATS = [
   {
     id: 'core',
     range: [0.638, 0.716],
-    // ниже и правее: корабль и его след должны остаться полностью видимыми,
-    // при центральной посадке панель задевала корму
-    side: 'right', y: 'lower', variant: 'panel', lead: true,
+    side: 'right', y: 'lower', variant: 'caption', mark: 'spiral', hero: true,
     en: {
-      eyebrow: 'The spirit world',
       headline: 'Death is a place',
-      body: 'Dying is not a respawn screen. You go on as a spirit, reading traces the living cannot see, and you come back changed.',
-      tags: ['Spirit sight', 'Ghost ship', 'Secrets of the dead'],
+      body: 'Dying is not a respawn screen. You go on as a spirit and come back changed.',
+      statements: ['The living leave traces only the dead can read.'],
     },
   },
   {
     id: 'home',
     range: [0.880, 1.000],
-    side: 'left', y: 'lower', variant: 'rule',
+    side: 'left', y: 'lower', variant: 'air',
     en: {
-      eyebrow: 'Home',
       headline: 'A place to return to',
-      body: 'Claim a patch of land and build it in layers. Your chests, your workshop, your crops, your trophies — kept safe inside a shared world.',
-      tags: ['Building', 'Storage', 'Trophies'],
+      body: 'One patch of land that nothing in the world can take from you.',
     },
   },
 ];
@@ -107,18 +114,22 @@ function node(tag, cls, text) {
 export function mountContent(root, locale = LOCALE) {
   const blocks = BEATS.map((b) => {
     const c = b[locale] || b[LOCALE];
-    const el = node('article', `beat beat--${b.variant} beat--${b.side} beat--${b.y}`);
-    if (b.lead) el.classList.add('beat--lead');
+    // id-класс нужен стилям: кегль заголовка и мера строки заданы посценно
+    const el = node('article', `beat beat--${b.id} beat--${b.variant} beat--${b.side} beat--${b.y}`);
+    if (b.hero) el.classList.add('beat--hero');
+    if (b.mark) el.classList.add(`beat--mark-${b.mark}`);
     el.setAttribute('aria-hidden', 'true');
-    if (c.eyebrow) el.appendChild(node('p', 'beat__eyebrow', c.eyebrow));
     el.appendChild(node('h2', 'beat__headline', c.headline));
-    if (c.body) el.appendChild(node('p', 'beat__body', c.body));
-    if (c.tags && c.tags.length) {
-      const ul = node('ul', 'beat__tags');
-      c.tags.forEach((t, i) => {
+    if (c.body) {
+      const p = node('p', 'beat__body', c.body);
+      p.style.transitionDelay = '90ms';        // тело идёт следом за заголовком
+      el.appendChild(p);
+    }
+    if (c.statements && c.statements.length) {
+      const ul = node('ul', 'beat__says');
+      c.statements.forEach((t, i) => {
         const li = node('li', null, t);
-        // теги подхватываются после заголовка, с небольшим запаздыванием
-        li.style.transitionDelay = `${150 + i * 90}ms`;
+        li.style.transitionDelay = `${170 + i * 80}ms`;
         ul.appendChild(li);
       });
       el.appendChild(ul);

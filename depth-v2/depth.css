@@ -1,0 +1,102 @@
+/* Depth journey PoC v2. Всё движение — transform/opacity/mask на GPU;
+   раскладка не пересчитывается ни разу за прокрутку. */
+:root { color-scheme: dark; }
+html, body { margin: 0; height: 100%; overflow: hidden; background: #10140f; }
+body { font: 13px/1.45 ui-sans-serif, system-ui, sans-serif; color: #efe6d2; }
+
+#stage { position: fixed; inset: 0; overflow: hidden; }
+
+/* Держатель не двигается: на нём живёт окно, сквозь которое видно сцену.
+   Если повесить маску на сам план, она поедет вместе с его масштабом и
+   обрежет кадр по своей же уменьшенной рамке — так было в PoC v1. */
+.holder {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  will-change: opacity;
+}
+.holder[hidden] { display: none; }
+
+/* Слой сцены: цельная картина во весь кадр. Масштабируется от точки схода
+   своей секции — её задаёт transform-origin, проставленный из журнала. */
+.sheet {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  will-change: transform;
+  backface-visibility: hidden;
+}
+.sheet[hidden] { display: none; }
+
+/* Затемнение краёв на самых быстрых участках: тоннель, но не чёрная труба */
+#vignette {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(ellipse 72% 64% at var(--vx, 50%) var(--vy, 40%),
+              transparent 34%, rgba(6, 10, 8, .55) 86%, rgba(4, 7, 5, .82) 100%);
+}
+
+/* Холодный слой: бирюза приходит локально на пороге и уходит к дому */
+#chill {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  mix-blend-mode: screen;
+  background: radial-gradient(ellipse 58% 52% at var(--vx, 50%) var(--vy, 40%),
+              rgba(96, 232, 226, .30), rgba(96, 232, 226, .06) 62%, transparent 100%);
+}
+
+/* ------------------------------------------------------------------- UI */
+/* Системный UI (знак, язык, звук, глава, нить маршрута) переехал в
+   chrome.css и chrome.js: здесь остались только сцена и её слои. */
+
+#debug[hidden] { display: none; }
+#debug {
+  position: fixed;
+  left: 26px; top: 56px;
+  z-index: 600;
+  padding: 8px 12px;
+  background: rgba(14, 18, 20, .84);
+  color: #fdf6e0;
+  font: 12px/1.5 ui-monospace, monospace;
+  white-space: pre;
+  pointer-events: none;
+}
+
+/* Узкий экран: PoC десктопный, здесь честная заглушка вместо сломанного опыта */
+#narrow { display: none; }
+#narrow .narrow__narrow, #narrow .narrow__calm { display: none; }
+#narrow[data-why='narrow'] .narrow__narrow,
+#narrow[data-why='calm'] .narrow__calm { display: block; }
+/* Одна заглушка на два случая: узкий экран и просьба не двигать картинку.
+   Второго fallback-сайта не заводим. Те же два условия стоят в boot.js,
+   который в статике вовсе не грузит живой маршрут. */
+@media (max-width: 1279px), (prefers-reduced-motion: reduce) {
+  #stage, #ui, #vignette, #chill { display: none; }
+  /* Колонка ограничена по ширине и центрируется по обеим осям: раньше
+     заглушка встречалась только на узком экране, а теперь приходит и на
+     1920, где растянутая на всю ширину строка расходилась с картинкой. */
+  #narrow {
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 18px;
+    height: 100%;
+    padding: 0 32px;
+    text-align: center;
+  }
+  #narrow img { width: min(100%, 520px); border-radius: 2px; }
+  #narrow p {
+    max-width: 30rem;
+    margin: 0;
+    font-family: Vollkorn, Georgia, serif;
+    font-size: 17px;
+    line-height: 1.45;
+    color: rgba(243, 234, 214, .74);
+  }
+}

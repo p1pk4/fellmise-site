@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Fellmise — depth journey prototype v2</title>
+<!--
+  Экспериментальный маршрут: проверяется только ощущение движения внутрь мира.
+  Ни контента, ни звука, ни SEO. Продакшен (/, /ru/, /proto/) не участвует.
+  Картинки — принятые master scenes из out/scene_batch1/final/, читаются как
+  есть и не меняются: ни перегенерации, ни цветокоррекции.
+-->
+<!-- Тот же набор иконок, что и в корне: своего бренд-арта прототип не заводит.
+     Без этих строк браузер сам просит /favicon.ico и получает 404. -->
+<link rel="icon" href="/assets/favicon-32.png" sizes="32x32">
+<link rel="icon" href="/assets/icon-512.png" sizes="512x512">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Те же две гарнитуры, что и в остальном проекте (/, /next/, /full/):
+     Podkova для заголовков, Vollkorn для текста. Третьей здесь нет. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Podkova:wght@700&family=Vollkorn:wght@500&display=swap">
+<link rel="stylesheet" href="./depth.css">
+<link rel="stylesheet" href="./content.css">
+<link rel="stylesheet" href="./chrome.css">
+</head>
+<body>
+<div id="stage"></div>
+<div id="content"></div>
+<div id="vignette"></div>
+<div id="chill"></div>
+
+<!-- системный UI собирает chrome.js: знак, язык, глава и нить маршрута -->
+<div id="ui"></div>
+
+<div id="debug" hidden></div>
+
+<div id="narrow">
+  <img src="/out/depth-v2/h2f/hero_plate_clean.webp" alt="">
+  <p class="narrow__narrow">Прототип десктопный: нужен экран от 1280&nbsp;px и колесо мыши.</p>
+  <p class="narrow__calm">Маршрут целиком построен на непрерывном движении внутрь мира,
+    поэтому при включённом «уменьшить движение» он не запускается.</p>
+</div>
+
+<!-- boot.js решает, грузить ли живой маршрут: в статике journey.js,
+     chrome.js и движок звука не запрашиваются вовсе -->
+<script type="module" src="./boot.js"></script>
+</body>
+</html>

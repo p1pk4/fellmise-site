@@ -1,0 +1,216 @@
+/* Системный UI маршрута.
+ *
+ * Он обязан быть тише контента биомов и почти исчезать рядом с артом, поэтому
+ * здесь нет ни одной подложки, рамки, скругления и свечения: только текст,
+ * одна линия толщиной в пиксель и мягкая тень под ними. Там, где кадр светлый,
+ * читаемость держит тень, а не прямоугольник.
+ *
+ * Гарнитуры те же, что у контента: Podkova для знака и названия главы,
+ * Vollkorn для служебных подписей. Прописные допущены только здесь — это
+ * служебный слой, а не голос мира.
+ *
+ * Палитра: пергамент #DECA9E, блик #E7B999, тёплый акцент #CFA474.
+ */
+#ui {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  pointer-events: none;
+  font-family: Vollkorn, Georgia, serif;
+}
+
+/* ------------------------------------------------------ знак, левый верх */
+.mark {
+  position: absolute;
+  top: 30px; left: 38px;
+  font-family: Podkova, Georgia, serif;
+  font-weight: 700;
+  font-size: 33px;
+  line-height: 1;
+  letter-spacing: .005em;
+  color: var(--parchment, #deca9e);
+  opacity: .94;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, .72), 0 2px 16px rgba(0, 0, 0, .6);
+}
+
+/* --------------------------------------------- язык и звук, правый верх */
+.tools {
+  position: absolute;
+  top: 34px; right: 38px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  pointer-events: auto;
+}
+
+.lang { display: flex; gap: 16px; }
+.lang__it {
+  position: relative;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-decoration: none;
+  color: rgba(222, 202, 158, .6);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, .72), 0 2px 16px rgba(0, 0, 0, .6);
+  transition: color .2s ease;
+}
+.lang__it:hover { color: rgba(222, 202, 158, .8); }
+/* активный язык помечен короткой тёплой чертой, а не плашкой и не рамкой */
+.lang__it.is-on { color: #e7b999; }
+.lang__it.is-on::after {
+  content: '';
+  position: absolute;
+  left: 50%; bottom: -7px;
+  width: 18px; margin-left: -9px;
+  height: 1px;
+  background: rgba(207, 164, 116, .85);
+}
+
+.tools__sep {
+  width: 1px; height: 13px;
+  background: rgba(222, 202, 158, .26);
+}
+
+/* Кнопку создаёт движок Audio 1; здесь с неё снимается его круглая рамка из
+   /proto/ и остаётся то же, что у языка: иконка и подпись, без плашки. */
+.audio-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  width: auto; height: auto;
+  background: none;
+  font-family: Vollkorn, Georgia, serif;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: rgba(222, 202, 158, .6);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, .72), 0 2px 16px rgba(0, 0, 0, .6);
+  cursor: pointer;
+  transition: color .2s ease;
+}
+.audio-toggle:hover { color: rgba(222, 202, 158, .82); }
+/* включённый звук отмечен так же, как активный язык: тёплым тоном */
+.audio-toggle[data-state='on'] { color: #e7b999; }
+.audio-toggle[aria-disabled='true'] { color: rgba(222, 202, 158, .3); cursor: default; }
+.audio-toggle svg { width: 17px; height: 17px; display: block; }
+/* перечёркнутый динамик, пока звук выключен, и дуги, когда включён */
+.audio-toggle[data-state='on'] .audio-toggle__off,
+.audio-toggle[data-state='off'] .audio-toggle__on { display: none; }
+
+/* ---------------------------------------- глава и маршрут, низ по центру */
+.route {
+  position: absolute;
+  left: 50%; bottom: 28px;
+  width: 400px;
+  margin-left: -200px;
+  text-align: center;
+}
+
+.route__name {
+  margin-bottom: 9px;
+  font-family: Podkova, Georgia, serif;
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 1;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: rgba(231, 185, 153, .88);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, .72), 0 2px 16px rgba(0, 0, 0, .6);
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity .22s ease, transform .22s ease;
+}
+.route__name.is-on { opacity: 1; transform: none; }
+
+/* Нить маршрута: ровно один пиксель. Пройденная часть тёплая, остальная —
+   почти незаметный пергамент. Крупной точки-бегунка нет намеренно: она бы
+   превратила указатель в элемент интерфейса поверх кадра. */
+.route__line {
+  height: 1px;
+  background: rgba(222, 202, 158, .24);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .55);
+}
+.route__line i {
+  display: block;
+  height: 100%;
+  width: 100%;
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  background: linear-gradient(90deg, #cfa474, #e7b999);
+}
+
+.hint {
+  position: absolute;
+  left: 50%; bottom: 82px;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  letter-spacing: .3em;
+  text-indent: .3em;                 /* трекинг не должен сдвигать центр */
+  text-transform: uppercase;
+  color: rgba(222, 202, 158, .78);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, .72), 0 2px 16px rgba(0, 0, 0, .6);
+  transition: opacity .4s;
+}
+/* Маленький шеврон вниз, собранный двумя границами: он показывает, куда
+   ведёт маршрут, и при этом не выглядит кнопкой. */
+.hint::after {
+  content: '';
+  width: 7px; height: 7px;
+  border-right: 1px solid rgba(222, 202, 158, .6);
+  border-bottom: 1px solid rgba(222, 202, 158, .6);
+  transform: translateY(-1px) rotate(45deg);
+}
+/* Собственная мягкая поддержка: подсказка стоит выше скрима указателя и на
+   освещённой дороге иначе теряется. */
+.hint::before {
+  content: '';
+  position: absolute;
+  inset: -38px -84px -30px;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(44% 38% at 50% 50%,
+              rgba(12, 14, 17, .5), rgba(12, 14, 17, .28) 46%,
+              rgba(12, 14, 17, .09) 68%, transparent 84%);
+}
+
+/* Локальная поддержка читаемости. Над деревней небо почти белое, и светлый
+   пергамент на нём пропадает даже с плотной тенью. Это не подложка: коробка
+   заметно больше элемента, радиусы много меньше её половины, поэтому градиент
+   гаснет задолго до собственного края и прямых линий не даёт. */
+.mark::before,
+.tools::before,
+.route::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+}
+.mark::before {
+  inset: -46px -66px -44px -56px;
+  background: radial-gradient(50% 38% at 42% 52%,
+              rgba(12, 14, 17, .5), rgba(12, 14, 17, .28) 46%,
+              rgba(12, 14, 17, .09) 68%, transparent 84%);
+}
+.tools::before {
+  inset: -48px -62px -46px -76px;
+  background: radial-gradient(50% 38% at 58% 52%,
+              rgba(12, 14, 17, .7), rgba(12, 14, 17, .38) 46%,
+              rgba(12, 14, 17, .11) 68%, transparent 84%);
+}
+.route::before {
+  inset: -44px -120px -34px;
+  background: radial-gradient(46% 40% at 50% 54%,
+              rgba(12, 14, 17, .52), rgba(12, 14, 17, .3) 46%,
+              rgba(12, 14, 17, .1) 68%, transparent 84%);
+}
+
+@media (max-width: 1279px), (prefers-reduced-motion: reduce) { #ui { display: none; } }

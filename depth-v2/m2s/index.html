@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Fellmise — mine to spirit threshold, forward travel</title>
+<!--
+  Изолированный тест одного перехода. Ни одна сцена не режется на зоны:
+  деревня и лес — цельные картины, двигаются только настоящие вырезанные
+  объекты переднего плана. Мастера только читаются и не меняются.
+-->
+<style>
+:root { color-scheme: dark; }
+html, body { margin: 0; height: 100%; overflow: hidden; background: #10140f; }
+body { font: 13px/1.45 ui-sans-serif, system-ui, sans-serif; color: #efe6d2; }
+#stage { position: fixed; inset: 0; overflow: hidden; }
+.holder { position: absolute; inset: 0; overflow: hidden; }
+.holder[hidden] { display: none; }
+.sheet {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  will-change: transform;
+  backface-visibility: hidden;
+}
+#debug[hidden] { display: none; }
+#debug {
+  position: fixed; left: 24px; top: 22px; z-index: 60;
+  padding: 8px 12px; background: rgba(14,18,20,.84); color: #fdf6e0;
+  font: 12px/1.5 ui-monospace, monospace; white-space: pre; pointer-events: none;
+}
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<div id="debug" hidden></div>
+<script type="module" src="./m2s.js"></script>
+</body>
+</html>

@@ -17,19 +17,18 @@ body { font: 13px/1.45 ui-sans-serif, system-ui, sans-serif; color: #efe6d2; }
 }
 .holder[hidden] { display: none; }
 
-/* План — та же картина, но видна только своя кольцевая зона.
-   Маска едет вместе с планом: кусок картинки остаётся приклеен к своему
-   месту, пока план растёт. */
-.plane {
+/* Слой сцены: цельная картина во весь кадр. Масштабируется от точки схода
+   своей секции — её задаёт transform-origin, проставленный из журнала. */
+.sheet {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transform-origin: var(--gx) var(--gy);
   will-change: transform;
   backface-visibility: hidden;
 }
+.sheet[hidden] { display: none; }
 
 /* Затемнение краёв на самых быстрых участках: тоннель, но не чёрная труба */
 #vignette {

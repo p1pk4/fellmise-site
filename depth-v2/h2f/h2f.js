@@ -104,7 +104,11 @@ function apply(now) {
       lastMask = m;
     }
     // лес приближается по дороге от той же точки схода
-    forest.style.transform = `scale(${(0.72 + 0.62 * smooth(seg(p, GATE_IN, 1))).toFixed(4)})`;
+    // к GATE_MID плита покрывает кадр целиком: иначе диафрагма перерастает
+    // её края и показывает прямой край плиты
+    const fk = 0.72 + 0.28 * smooth(seg(p, GATE_IN, GATE_MID))
+      + 0.34 * smooth(seg(p, GATE_MID, 1));
+    forest.style.transform = `scale(${fk.toFixed(4)})`;
   }
 
   hero.style.opacity = (1 - smooth(seg(p, GATE_OUT, 0.99))).toFixed(3);

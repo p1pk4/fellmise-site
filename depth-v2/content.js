@@ -1,8 +1,9 @@
 /* Контент маршрута: тексты и их постановка. Логики движения здесь нет, и
  * наоборот — в journey.js нет ни одной строки копирайта.
  *
- * Структура готова к RU: копия лежит под ключом локали, и добавление второго
- * языка не требует трогать разметку или стили. LOCALE пока один.
+ * Копия лежит под ключом локали, по одному объекту на язык. Разметка и стили
+ * от языка не зависят: /depth-v2/ открывается по-английски, /depth-v2/?lang=ru
+ * — по-русски. Язык браузера не определяется, выбор только явный.
  *
  * range — окно ПО ОБЩЕМУ ПРОГРЕССУ, не по колесу. Обе границы подобраны под
  * принятую хореографию и не меняют её: текст появляется после того, как биом
@@ -36,7 +37,12 @@
  * читался случайным декоративным глифом, а не принадлежностью. Так спираль
  * означает spirit/death layer, а не украшает сайт.
  */
-export const LOCALE = 'en';
+/* Локаль выбирается ТОЛЬКО явно, через ?lang=ru. Язык браузера не смотрим:
+   маршрут показывают на review, и он должен открываться предсказуемо. По
+   умолчанию и при любом незнакомом значении — английский. */
+const SUPPORTED = ['en', 'ru'];
+const asked = new URLSearchParams(location.search).get('lang');
+export const LOCALE = SUPPORTED.includes(asked) ? asked : 'en';
 
 export const BEATS = [
   {
@@ -50,6 +56,11 @@ export const BEATS = [
       body: 'The world does not wait for you. NPC adventurers raid dungeons, return with loot and end the day at the tavern.',
       statements: ['Life goes on without the player.'],
     },
+    ru: {
+      headline: 'Мир играет в себя',
+      body: 'Мир не ждёт игрока. NPC-авантюристы ходят в подземелья, возвращаются с добычей и заканчивают день в таверне.',
+      statements: ['Жизнь идёт и без игрока.'],
+    },
   },
   {
     id: 'forest',
@@ -60,6 +71,11 @@ export const BEATS = [
       body: 'The farther you travel from civilization, the greater the danger. At night, the wilderness changes — and some places reveal what daylight hides.',
       statements: ['Night changes the rules.'],
     },
+    ru: {
+      headline: 'За пределами безопасных дорог',
+      body: 'Чем дальше от цивилизации, тем выше риск. Ночью дикая местность меняется — и некоторые места открывают то, что скрывает дневной свет.',
+      statements: ['Ночь меняет правила.'],
+    },
   },
   {
     id: 'mine',
@@ -69,6 +85,11 @@ export const BEATS = [
       headline: 'Depth has a price',
       body: 'The deeper you go, the richer the resources — and the greater the risk. What you bring back feeds crafting and trade above ground.',
       statements: ['Better resources. Greater danger.'],
+    },
+    ru: {
+      headline: 'У глубины есть цена',
+      body: 'Чем глубже спускаешься, тем богаче ресурсы — и выше риск. Всё, что вынесешь наверх, идёт в ремесло и торговлю.',
+      statements: ['Лучше ресурсы. Выше опасность.'],
     },
   },
   {
@@ -81,6 +102,10 @@ export const BEATS = [
       headline: 'The dead see more.',
       body: 'Death does not remove you from the world. It reveals another layer of the same place.',
     },
+    ru: {
+      headline: 'Мёртвые видят больше.',
+      body: 'Смерть не выводит тебя из мира. Она открывает другой слой того же места.',
+    },
   },
   {
     id: 'core',
@@ -91,6 +116,11 @@ export const BEATS = [
       body: 'The dead can follow traces the living cannot see, uncover echoes of what happened here and find paths that exist only beyond death.',
       statements: ['Spirit Sight reveals what life conceals.', 'Some journeys begin after you die.'],
     },
+    ru: {
+      headline: 'Смерть — это место',
+      body: 'Мёртвые видят следы, недоступные живым, находят отголоски произошедшего и пути, существующие только по ту сторону смерти.',
+      statements: ['Духовное зрение открывает то, что скрыто от живых.', 'Некоторые пути начинаются после смерти.'],
+    },
   },
   {
     id: 'home',
@@ -100,6 +130,11 @@ export const BEATS = [
       headline: 'A place to return to',
       body: 'Build a home that belongs only to you — part workshop, part storage, part sanctuary inside a shared world.',
       statements: ['Build. Craft. Store. Grow.'],
+    },
+    ru: {
+      headline: 'Место, куда можно вернуться',
+      body: 'Построй дом, который принадлежит только тебе — мастерскую, склад и убежище внутри общего мира.',
+      statements: ['Строй. Создавай. Храни. Выращивай.'],
     },
   },
 ];
@@ -114,6 +149,8 @@ function node(tag, cls, text) {
 }
 
 export function mountContent(root, locale = LOCALE) {
+  document.documentElement.lang = locale;
+  root.dataset.lang = locale;
   const blocks = BEATS.map((b) => {
     const c = b[locale] || b[LOCALE];
     // id-класс нужен стилям: кегль заголовка и мера строки заданы посценно

@@ -20,6 +20,8 @@
  * вылезающим прямым краем плиты; здесь распространён на все секции, включая
  * те, где в изолированном виде покрытие держалось подобранным таймингом.
  */
+import { mountContent } from './content.js';
+
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 const smooth = (t) => t * t * (3 - 2 * t);
 const seg = (p, a, b) => clamp((p - a) / (b - a), 0, 1);
@@ -90,6 +92,9 @@ const SECTIONS = [
 const ARRIVAL = { id: 'home', title: 'A home to come back to', at: 0.82 };
 
 const stage = document.getElementById('stage');
+/* Тексты живут в content.js: здесь нет ни одной строки копирайта, а там нет
+   ни одной строки хореографии. updateContent ведётся общим прогрессом. */
+const updateContent = mountContent(document.getElementById('content'));
 const rail = document.querySelector('#rail i');
 const chapter = document.getElementById('chapter');
 const hint = document.getElementById('hint');
@@ -218,6 +223,7 @@ function apply(now) {
     : SECTIONS.reduce((a, s) => (p >= s.band[0] ? s : a), SECTIONS[0]);
   if (chapter.textContent !== cur.title) chapter.textContent = cur.title;
   rail.style.width = `${(p * 100).toFixed(2)}%`;
+  updateContent(p);
   hint.style.opacity = p > 0.02 ? '0' : '1';
 
   if (debug) {

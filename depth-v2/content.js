@@ -47,7 +47,8 @@ export const BEATS = [
     side: 'left', y: 'lower', variant: 'quiet',
     en: {
       headline: 'A world that plays itself',
-      body: 'Log off and the world stays. NPCs run dungeons, haul goods and drink in taverns without you.',
+      body: 'The world does not wait for you. NPC adventurers raid dungeons, return with loot and end the day at the tavern.',
+      statements: ['Life goes on without the player.'],
     },
   },
   {
@@ -56,8 +57,8 @@ export const BEATS = [
     side: 'right', y: 'lower', variant: 'air',
     en: {
       headline: 'Beyond the safe roads',
-      body: 'Danger grows with distance from the walls.',
-      statements: ['Night changes the rules.', 'Some places are on no map.'],
+      body: 'The farther you travel from civilization, the greater the danger. At night, the wilderness changes — and some places reveal what daylight hides.',
+      statements: ['Night changes the rules.'],
     },
   },
   {
@@ -66,8 +67,8 @@ export const BEATS = [
     side: 'left', y: 'center', variant: 'grounded',
     en: {
       headline: 'Depth has a price',
-      body: 'Every ore was pulled out by somebody’s hands.',
-      statements: ['The deeper the seam, the worse the company.'],
+      body: 'The deeper you go, the richer the resources — and the greater the risk. What you bring back feeds crafting and trade above ground.',
+      statements: ['Better resources. Greater danger.'],
     },
   },
   {
@@ -78,7 +79,7 @@ export const BEATS = [
     side: 'left', y: 'lower', variant: 'bare', mark: 'spiral', hero: true,
     en: {
       headline: 'The dead see more.',
-      body: 'Death reveals another layer of the same world.',
+      body: 'Death does not remove you from the world. It reveals another layer of the same place.',
     },
   },
   {
@@ -87,8 +88,8 @@ export const BEATS = [
     side: 'right', y: 'lower', variant: 'caption', mark: 'spiral', hero: true,
     en: {
       headline: 'Death is a place',
-      body: 'Dying is not a respawn screen. You go on as a spirit and come back changed.',
-      statements: ['The living leave traces only the dead can read.'],
+      body: 'The dead can follow traces the living cannot see, uncover echoes of what happened here and find paths that exist only beyond death.',
+      statements: ['Spirit Sight reveals what life conceals.', 'Some journeys begin after you die.'],
     },
   },
   {
@@ -97,7 +98,8 @@ export const BEATS = [
     side: 'left', y: 'lower', variant: 'air',
     en: {
       headline: 'A place to return to',
-      body: 'One patch of land that nothing in the world can take from you.',
+      body: 'Build a home that belongs only to you — part workshop, part storage, part sanctuary inside a shared world.',
+      statements: ['Build. Craft. Store. Grow.'],
     },
   },
 ];

@@ -52,66 +52,8 @@ body { font: 13px/1.45 ui-sans-serif, system-ui, sans-serif; color: #efe6d2; }
 }
 
 /* ------------------------------------------------------------------- UI */
-#ui { position: fixed; inset: 0; pointer-events: none; z-index: 500; }
-
-.wordmark {
-  position: absolute;
-  left: 26px; top: 22px;
-  font: 600 15px/1 ui-sans-serif, system-ui, sans-serif;
-  letter-spacing: .34em;
-  text-transform: uppercase;
-  color: #f3ead6;
-  text-shadow: 0 1px 6px rgba(0, 0, 0, .7);
-}
-
-#rail {
-  position: absolute;
-  left: 26px; right: 26px; bottom: 22px;
-  height: 2px;
-  background: rgba(243, 234, 214, .16);
-}
-#rail i {
-  display: block;
-  height: 100%;
-  width: 0;
-  background: #f3ead6;
-  box-shadow: 0 0 10px rgba(243, 234, 214, .5);
-}
-#chapter {
-  position: absolute;
-  left: 26px; bottom: 34px;
-  font-size: 11px;
-  letter-spacing: .22em;
-  text-transform: uppercase;
-  color: rgba(243, 234, 214, .72);
-  text-shadow: 0 1px 6px rgba(0, 0, 0, .7);
-}
-
-/* заглушка звука: кнопка есть, движка звука в PoC нет */
-#sound {
-  position: absolute;
-  right: 26px; top: 20px;
-  pointer-events: auto;
-  width: 34px; height: 34px;
-  border: 1px solid rgba(243, 234, 214, .28);
-  border-radius: 50%;
-  background: rgba(10, 14, 12, .42);
-  color: #f3ead6;
-  font-size: 13px;
-  cursor: not-allowed;
-}
-
-#hint {
-  position: absolute;
-  left: 50%; bottom: 58px;
-  transform: translateX(-50%);
-  font-size: 11px;
-  letter-spacing: .24em;
-  text-transform: uppercase;
-  color: rgba(243, 234, 214, .66);
-  text-shadow: 0 1px 6px rgba(0, 0, 0, .7);
-  transition: opacity .4s;
-}
+/* Системный UI (знак, язык, звук, глава, нить маршрута) переехал в
+   chrome.css и chrome.js: здесь остались только сцена и её слои. */
 
 #debug[hidden] { display: none; }
 #debug {

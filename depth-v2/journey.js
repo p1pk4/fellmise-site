@@ -21,6 +21,7 @@
  * те, где в изолированном виде покрытие держалось подобранным таймингом.
  */
 import { mountContent } from './content.js';
+import { mountChrome } from './chrome.js';
 
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 const smooth = (t) => t * t * (3 - 2 * t);
@@ -35,7 +36,7 @@ const WARM = ' #000 0 42%, rgba(0,0,0,.9) 60%, rgba(0,0,0,.56) 77%, rgba(0,0,0,.
    заканчивает входящую плиту; по нему считается нормализация стыка. */
 const SECTIONS = [
   {
-    id: 'hero', title: 'The village', band: [0.00, 0.16], from: '/out/depth-v2/h2f/',
+    id: 'hero', band: [0.00, 0.16], from: '/out/depth-v2/h2f/',
     plate: 'hero_plate_clean.webp', next: 'forest_plate.webp',
     vp: [0.472, 0.462], camK: 1.32, endScale: 1.34,
     cuts: ['hero_fg_oak.webp', 'hero_fg_fence_l.webp', 'hero_fg_fence_r.webp'],
@@ -44,7 +45,7 @@ const SECTIONS = [
     nextScale: (l) => 0.72 + 0.28 * smooth(seg(l, 0.58, 0.70)) + 0.34 * smooth(seg(l, 0.70, 1)),
   },
   {
-    id: 'forest', title: 'The forest', band: [0.16, 0.32], from: '/out/depth-v2/h2f/',
+    id: 'forest', band: [0.16, 0.32], from: '/out/depth-v2/h2f/',
     // ТОТ ЖЕ файл, на котором заканчивается hero -> forest: сырой мастер леса.
     // Раньше секция брала forest_plate_clean — плиту с ВЫРЕЗАННЫМИ стволами,
     // а сами стволы возвращались оверлеями поверх, с +10% параллакса. Замер
@@ -59,7 +60,7 @@ const SECTIONS = [
     nextScale: (l) => 0.58 + 0.72 * smooth(seg(l, 0.55, 1)),
   },
   {
-    id: 'mine', title: 'The mine', band: [0.32, 0.47], from: '/out/depth-v2/m2s/',
+    id: 'mine', band: [0.32, 0.47], from: '/out/depth-v2/m2s/',
     plate: 'mine_plate.webp', next: 'spirit_plate.webp',
     vp: [0.625, 0.50], camK: 1.26, endScale: 1.30, plateOut: 0.94,
     gate: [0.58, 0.94], ap: { r0: 58, r1: 1880, pow: 1.45, aspect: 1.12, stops: SOFT },
@@ -67,7 +68,7 @@ const SECTIONS = [
     nextScale: (l) => 0.66 + 0.34 * smooth(seg(l, 0.58, 0.72)) + 0.30 * smooth(seg(l, 0.72, 1)),
   },
   {
-    id: 'threshold', title: 'The threshold', band: [0.47, 0.60], from: '/out/depth-v2/s2c/',
+    id: 'threshold', band: [0.47, 0.60], from: '/out/depth-v2/s2c/',
     plate: 'threshold_plate.webp', next: 'core_plate.webp',
     vp: [0.552, 0.500], camK: 1.22, endScale: 1.12, plateOut: 0.94,
     gate: [0.55, 0.96], ap: { r0: 54, r1: 2700, pow: 2.6, ry0: 74, ry1: 520, ryPow: 1.7, stops: SOFT },
@@ -75,7 +76,7 @@ const SECTIONS = [
     nextScale: (l) => 0.60 + 0.80 * smooth(seg(l, 0.55, 0.86)) - 0.28 * smooth(seg(l, 0.86, 1)),
   },
   {
-    id: 'core', title: 'Death is a place', band: [0.60, 1.00], from: '/out/depth-v2/c2h/',
+    id: 'core', band: [0.60, 1.00], from: '/out/depth-v2/c2h/',
     plate: 'core_plate.webp', next: 'home_plate.webp',
     // секция живёт до конца прокрутки, но её локальный прогресс кончается на
     // 0.82: дальше идёт полоса прибытия, где всё заморожено и дом просто стоит
@@ -89,15 +90,15 @@ const SECTIONS = [
 
 // Полоса прибытия существует только как подпись главы: слоёв у неё нет,
 // в кадре к этому моменту стоит замороженный дом из секции core.
-const ARRIVAL = { id: 'home', title: 'A home to come back to', at: 0.82 };
+const ARRIVAL = { id: 'home', at: 0.82 };
 
 const stage = document.getElementById('stage');
 /* Тексты живут в content.js: здесь нет ни одной строки копирайта, а там нет
    ни одной строки хореографии. updateContent ведётся общим прогрессом. */
 const updateContent = mountContent(document.getElementById('content'));
-const rail = document.querySelector('#rail i');
-const chapter = document.getElementById('chapter');
-const hint = document.getElementById('hint');
+/* Системный UI собирает chrome.js: знак, язык, глава и нить маршрута.
+   Здесь не осталось ни одной строки об интерфейсе, там — ни одной о движении. */
+const updateChrome = mountChrome(document.getElementById('ui'));
 const panel = document.getElementById('debug');
 const debug = new URLSearchParams(location.search).get('debug') === '1';
 if (debug) panel.hidden = false;
@@ -221,10 +222,8 @@ function apply(now) {
 
   const cur = p >= ARRIVAL.at ? ARRIVAL
     : SECTIONS.reduce((a, s) => (p >= s.band[0] ? s : a), SECTIONS[0]);
-  if (chapter.textContent !== cur.title) chapter.textContent = cur.title;
-  rail.style.width = `${(p * 100).toFixed(2)}%`;
   updateContent(p);
-  hint.style.opacity = p > 0.02 ? '0' : '1';
+  updateChrome(p, cur.id);
 
   if (debug) {
     const [b0, b1] = cur.band;

@@ -709,6 +709,8 @@ class ContentPoints(unittest.TestCase):
         two cards at once, and each point reaches full presence at its anchor."""
         pts = [(self.B.anchor_z(self.runtime, p["anchor"]["object"]), p["activation"]) for p in self.data["points"]]
 
+        floor = float(re.search(r"const PRESENCE_FLOOR = ([\d.]+);", read("proto/main.js")).group(1))
+
         def w(z, az, a):
             d = abs(z - az)
             if d <= a["core"]:
@@ -716,13 +718,19 @@ class ContentPoints(unittest.TestCase):
             if d >= a["range"]:
                 return 0.0
             u = (d - a["core"]) / (a["range"] - a["core"])
-            return 1 - u * u * (3 - 2 * u)
+            v = 1 - u * u * (3 - 2 * u)
+            return 0.0 if v < floor else v
         z = 20.0
         while z > -720:
             self.assertLessEqual(sum(1 for az, a in pts if w(z, az, a) > 0), 1, z)
             z -= 0.5
         for az, a in pts:
             self.assertEqual(w(az, az, a), 1.0)
+        # the route ends inside the home card's range (28.8 m from its anchor):
+        # nothing may linger on the last frame the visitor sees
+        e = json.loads(read("assets/topdown/camera_choreography.json"))["route_end"]
+        end = self.B.anchor_z(self.runtime, e["anchor"]) + e.get("offset", 0)
+        self.assertEqual([az for az, a in pts if w(end, az, a) > 0], [], "a card is still visible at the route end")
 
     def test_proto_only_activates_never_writes_copy(self):
         """main.js reads the articles; it does not create, fill or remove them."""

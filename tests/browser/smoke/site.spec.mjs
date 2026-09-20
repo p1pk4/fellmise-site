@@ -407,6 +407,23 @@ test.describe('/proto/', () => {
     clean(watch);
   });
 
+  test('finale: the last frame is the house alone — no card left over it', async ({ page, watch }) => {
+    await page.goto('/proto/');
+    await page.waitForFunction(PROTO_READY, null, { timeout: CONFIG.routes['/proto/'].readyTimeoutMs });
+    // the route ends inside the home card's range: its tail must be gone, not faint
+    await page.evaluate(() => window.__PROTO.go(window.__PROTO.state.routeEnd));
+    const seen = await page.evaluate(() => ({
+      z: window.__PROTO.state.z,
+      weights: window.__PROTO.content().points.map((p) => p.weight),
+      opacity: [...document.querySelectorAll('#content-overlay .content-point, #keyart-overlay .key-art')]
+        .map((e) => +getComputedStyle(e).opacity),
+    }));
+    expect(seen.z).toBeCloseTo(-661.974, 2);
+    expect(seen.weights.every((w) => w === 0), `card weights at the route end: ${seen.weights}`).toBe(true);
+    expect(seen.opacity.every((o) => o === 0), `opacities at the route end: ${seen.opacity}`).toBe(true);
+    clean(watch);
+  });
+
   test('key art: three windows in plain /proto/, lazy, loaded at peak, clear of cards', async ({ page, watch }) => {
     const art = [];
     page.on('response', (r) => { if (/\/assets\/keyart\/[^/]+\.webp$/.test(r.url())) art.push([r.url().split('/').pop(), r.status()]); });

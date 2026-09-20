@@ -1,4 +1,4 @@
-/* Системный UI маршрута: знак, выбор языка и указатель главы.
+/* Системный UI маршрута: знак, выбор языка, звук и указатель главы.
  *
  * Вынесен из journey.js целиком. Там теперь нет ни одной строки об интерфейсе,
  * здесь — ни одной строки хореографии: модуль получает общий прогресс и id
@@ -12,6 +12,7 @@
  * и переключался в одном месте.
  */
 import { LOCALE } from './content.js';
+import { mountSound } from './sound.js';
 
 const CHAPTERS = {
   hero:      { en: 'Village',        ru: 'Деревня' },
@@ -58,7 +59,7 @@ export function mountChrome(root, locale = LOCALE) {
   // Существующее текстовое начертание проекта, без нового ассета и подложки.
   root.appendChild(node('div', 'mark', 'Fellmise'));
 
-  /* --------------------------------------------------- язык, правый верх */
+  /* --------------------------------------------- язык и звук, правый верх */
   const tools = node('div', 'tools');
 
   const langs = node('div', 'lang');
@@ -73,12 +74,14 @@ export function mountChrome(root, locale = LOCALE) {
     langs.appendChild(a);
   }
   tools.appendChild(langs);
-  root.appendChild(tools);
 
-  /* Управления звуком здесь намеренно нет. Движка в прототипе тоже нет, а
-     кнопка, которая выглядит рабочей и ничего не делает, читается как
-     недоделанный сайт. Вернём вместе с настоящим audio engine отдельным
-     проходом: точка подключения — этот модуль и класс is-on на контроле. */
+  /* Звук — принятый Audio 1 из /proto/, подключённый через sound.js. Контрол
+     рисует сам движок, здесь он только переезжает из body в этот кластер:
+     состояние включено/выключено остаётся за движком и его data-state. */
+  const sound = mountSound(locale);
+  tools.appendChild(node('span', 'tools__sep'));
+  tools.appendChild(sound.control);
+  root.appendChild(tools);
 
   /* ------------------------------------------ глава и маршрут, низ по центру */
   const route = node('div', 'route');
@@ -108,7 +111,10 @@ export function mountChrome(root, locale = LOCALE) {
     }, 220);
   }
 
+  window.__SOUND = sound;    // только для smoke-проверок звука
+
   return function update(p, sectionId) {
+    sound.update(p);          // звук подписан на маршрут, а не наоборот
     setChapter(sectionId);
     run.style.transform = `scaleX(${p.toFixed(4)})`;
     hint.style.opacity = p > 0.02 ? '0' : '1';

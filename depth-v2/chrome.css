@@ -66,6 +66,42 @@
   background: rgba(207, 164, 116, .85);
 }
 
+.tools__sep {
+  width: 1px; height: 13px;
+  background: rgba(222, 202, 158, .26);
+}
+
+/* Кнопку создаёт движок Audio 1; здесь с неё снимается его круглая рамка из
+   /proto/ и остаётся то же, что у языка: иконка и подпись, без плашки. */
+.audio-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  width: auto; height: auto;
+  background: none;
+  font-family: Vollkorn, Georgia, serif;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: rgba(222, 202, 158, .6);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, .72), 0 2px 16px rgba(0, 0, 0, .6);
+  cursor: pointer;
+  transition: color .2s ease;
+}
+.audio-toggle:hover { color: rgba(222, 202, 158, .82); }
+/* включённый звук отмечен так же, как активный язык: тёплым тоном */
+.audio-toggle[data-state='on'] { color: #e7b999; }
+.audio-toggle[aria-disabled='true'] { color: rgba(222, 202, 158, .3); cursor: default; }
+.audio-toggle svg { width: 17px; height: 17px; display: block; }
+/* перечёркнутый динамик, пока звук выключен, и дуги, когда включён */
+.audio-toggle[data-state='on'] .audio-toggle__off,
+.audio-toggle[data-state='off'] .audio-toggle__on { display: none; }
+
 /* ---------------------------------------- глава и маршрут, низ по центру */
 .route {
   position: absolute;

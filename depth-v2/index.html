@@ -11,6 +11,11 @@
   Картинки — принятые master scenes из out/scene_batch1/final/, читаются как
   есть и не меняются: ни перегенерации, ни цветокоррекции.
 -->
+<!-- Тот же набор иконок, что и в корне: своего бренд-арта прототип не заводит.
+     Без этих строк браузер сам просит /favicon.ico и получает 404. -->
+<link rel="icon" href="/assets/favicon-32.png" sizes="32x32">
+<link rel="icon" href="/assets/icon-512.png" sizes="512x512">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- Те же две гарнитуры, что и в остальном проекте (/, /next/, /full/):
@@ -33,9 +38,13 @@
 
 <div id="narrow">
   <img src="/out/depth-v2/h2f/hero_plate_clean.webp" alt="">
-  <p>Прототип десктопный: нужен экран от 1280&nbsp;px и колесо мыши.</p>
+  <p class="narrow__narrow">Прототип десктопный: нужен экран от 1280&nbsp;px и колесо мыши.</p>
+  <p class="narrow__calm">Маршрут целиком построен на непрерывном движении внутрь мира,
+    поэтому при включённом «уменьшить движение» он не запускается.</p>
 </div>
 
-<script type="module" src="./journey.js"></script>
+<!-- boot.js решает, грузить ли живой маршрут: в статике journey.js,
+     chrome.js и движок звука не запрашиваются вовсе -->
+<script type="module" src="./boot.js"></script>
 </body>
 </html>

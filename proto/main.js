@@ -575,12 +575,19 @@ function initContent(layout) {
   CONTENT_MARKERS = new Set(CONTENT.map((p) => p.marker));
 }
 
+/* Ниже FLOOR вуаль уже не видна как вуаль, но текст на светлой земле ещё
+   читается призраком. Конец маршрута (−661.97) лежит в 28.8 м от якоря
+   карточки home, то есть внутри её range: без этого порога последний кадр
+   путешествия навсегда остаётся с 3.5% текста поверх дома. */
+const PRESENCE_FLOOR = 0.06;
+
 function presence(p, z) {
   const d = Math.abs(z - p.z);
   if (d <= p.core) return 1;
   if (d >= p.range) return 0;
   const u = (d - p.core) / (p.range - p.core);
-  return 1 - u * u * (3 - 2 * u);
+  const v = 1 - u * u * (3 - 2 * u);
+  return v < PRESENCE_FLOOR ? 0 : v;
 }
 
 const _proj = new THREE.Vector3();

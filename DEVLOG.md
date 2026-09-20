@@ -5,6 +5,23 @@
 
 ---
 
+## 2026-09-20 04:55 — Audio 1 выпущен в production
+
+- **Что:** в main влиты PR #18 (production-ассеты) и PR #17 (движок); production
+  baseline `7e45abf5378a724971070e8da210b43a24997edd`. У /proto/ появился звук:
+  5 эмбиентов (village, forest, mine, spirit, home) и 4 SFX переходов, все
+  `live` в `assets/topdown/audio.json`. По умолчанию выключено — до нажатия
+  кнопки нет ни AudioContext, ни одного запроса. Формат выбирается один на
+  сессию по `canPlayType`: WebM/Opus, иначе M4A/AAC; бесшовные петли в обоих.
+  Статика, reduced motion и отсутствие WebGL — без звука и без кнопки.
+- **Тип:** docs
+- **Проверка:** n/a (релиз проверен: CI PR #17 и main success, Pages built
+  7e45abf; на fellmise.com — muted 0 запросов/0 байт, включение 678 KB WebM,
+  маршрут 10 запросов 3.4 MB, все 4 перехода по одному SFX, обратный путь без
+  SFX, persistence обе стороны, static/reduced/no-WebGL молчат, AAC-fallback
+  по capability; visual production == main)
+- **Commit:** d623b29 (PR #18), 7e45abf (PR #17 → main)
+
 ## 2026-09-20 00:03 — audio-assets-1: production-звук в /proto/
 
 - **Что:** 9 принятых звуков стали runtime-ассетами: `assets/audio/ambient/*` и

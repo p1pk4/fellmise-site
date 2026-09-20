@@ -42,12 +42,17 @@ const SECTIONS = [
     nextScale: (l) => 0.72 + 0.28 * smooth(seg(l, 0.58, 0.70)) + 0.34 * smooth(seg(l, 0.70, 1)),
   },
   {
-    id: 'forest', title: 'The forest', band: [0.16, 0.32], from: '/out/depth-v2/f2m/',
-    plate: 'forest_plate_clean.webp', next: 'mine_plate.webp',
-    vp: [0.5143, 0.4813], camK: 1.45, endScale: 1.30,
-    cuts: ['forest_fg_trunk_l.webp', 'forest_fg_trunk_r.webp'],
-    cutLead: 0.10, cutFade: [0.58, 0.74], plateOut: 0.96,
-    gate: [0.55, 0.96], matte: 'road_matte.png', matteOpen: (g) => 0.12 + 3.6 * (g ** 1.5),
+    id: 'forest', title: 'The forest', band: [0.16, 0.32], from: '/out/depth-v2/h2f/',
+    // ТОТ ЖЕ файл, на котором заканчивается hero -> forest: сырой мастер леса.
+    // Раньше секция брала forest_plate_clean — плиту с ВЫРЕЗАННЫМИ стволами,
+    // а сами стволы возвращались оверлеями поверх, с +10% параллакса. Замер
+    // показал, что эти оверлеи и есть 46% кадра, а по краю их растушёванной
+    // альфы просвечивал дорисованный фон — те самые светлые дуги на стволах и
+    // корнях. Ход вперёд и так несёт цельная плита, поэтому оверлеи убраны
+    // совсем: лес остаётся одной картиной от начала участка и до конца.
+    plate: 'forest_plate.webp', next: '../f2m/mine_plate.webp',
+    vp: [0.5143, 0.4813], camK: 1.45, endScale: 1.30, plateOut: 0.96,
+    gate: [0.55, 0.96], ap: { r0: 58, r1: 1900, pow: 1.5, aspect: 1.10, stops: SOFT },
     aim: [0.61, 0.43], aimOut: [0.70, 0.99],
     nextScale: (l) => 0.58 + 0.72 * smooth(seg(l, 0.55, 1)),
   },
@@ -184,25 +189,18 @@ function apply(now) {
     }
 
     const g = seg(l, d.gate[0], d.gate[1]);
-    let rx, ry, mask;
-    if (d.matte) {
-      const open = d.matteOpen(g);
-      rx = open / 2; ry = open / 2;
-      const size = q(open * 100, 0.5);
-      const mx = Math.round(d.vp[0] * W * (1 - open));
-      const my = Math.round(d.vp[1] * H * (1 - open));
-      mask = `url("${d.from}${d.matte}") ${mx}px ${my}px / ${size}% ${size}% no-repeat`;
-    } else {
-      const a = d.ap;
-      const px = (a.r0 + a.r1 * (g ** a.pow)) * k;
-      const py = a.ry0 !== undefined ? (a.ry0 + a.ry1 * (g ** a.ryPow)) * k : px * a.aspect;
-      rx = px / W; ry = py / H;
-      mask = `radial-gradient(ellipse ${q(px, 4)}px ${q(py, 4)}px at ${(d.vp[0] * 100).toFixed(1)}% ${(d.vp[1] * 100).toFixed(1)}%,`
-        + a.stops;
-    }
+    // Диафрагма у всех секций одна по природе: мягкий радиальный градиент с
+    // длинным спадом. Полигонная маска-коридор снята — она читалась замочной
+    // скважиной: широкий верх и узкое горло вниз.
+    const a = d.ap;
+    const px = (a.r0 + a.r1 * (g ** a.pow)) * k;
+    const py = a.ry0 !== undefined ? (a.ry0 + a.ry1 * (g ** a.ryPow)) * k : px * a.aspect;
+    const rx = px / W, ry = py / H;
+    const mask = `radial-gradient(ellipse ${q(px, 4)}px ${q(py, 4)}px at ${(d.vp[0] * 100).toFixed(1)}% ${(d.vp[1] * 100).toFixed(1)}%,`
+      + a.stops;
     if (mask !== S.lastMask) {
-      if (d.matte) { S.holder.style.webkitMask = mask; S.holder.style.mask = mask; }
-      else { S.holder.style.webkitMaskImage = mask; S.holder.style.maskImage = mask; }
+      S.holder.style.webkitMaskImage = mask;
+      S.holder.style.maskImage = mask;
       S.lastMask = mask;
     }
 

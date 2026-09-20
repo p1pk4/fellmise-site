@@ -92,34 +92,27 @@ function apply(now) {
   const cam = 1 + 1.45 * travel;
   forest.style.transform = `scale(${cam.toFixed(4)})`;
 
-  // стволы: тот же центр, чуть быстрее плиты — слабый ближний параллакс.
-  // Уходят до того, как шахта становится центром маршрута.
-  const fgFade = 1 - smooth(seg(p, 0.58, C_IN + 0.04));
-  for (const f of FG) {
-    f.im.style.transform = `scale(${(cam * (1 + 0.10 * travel)).toFixed(4)})`;
-    f.im.style.opacity = fgFade.toFixed(3);
-    const off = fgFade < 0.004;
-    if (f.im.hidden !== off) f.im.hidden = off;
-  }
-
   const shown = p >= B_IN - 0.01;
   if (mineHolder.hidden === shown) mineHolder.hidden = !shown;
   if (shown) {
     // окно и плита шахты растут ОТ ТОЙ ЖЕ точки схода: шахта приближается
     // как объект на дороге, а не раскрывается вставкой
-    const g = seg(p, B_IN, 1);
-    const open = 0.12 + 3.6 * (g ** 1.5);
-    const size = q(open * 100, 0.5);
-    const mx = Math.round(VP[0] * innerWidth * (1 - open));
-    const my = Math.round(VP[1] * innerHeight * (1 - open));
-    const m = `url("${BASE}road_matte.png") ${mx}px ${my}px / ${size}% ${size}% no-repeat`;
+    // мягкая диафрагма вместо полигонного коридора: коридор читался замочной
+    // скважиной — широкий верх и узкое горло вниз. Язык тот же, что принят в
+    // hero -> forest v7.
+    const g = seg(p, B_IN, 0.96);
+    const k = innerWidth / 1920;
+    const r = q((58 + 1900 * (g ** 1.5)) * k, 4);
+    const ry = q(r * 1.10, 4);
+    const m = `radial-gradient(ellipse ${r}px ${ry}px at ${(VP[0] * 100).toFixed(1)}% ${(VP[1] * 100).toFixed(1)}%,`
+      + ' #000 0 46%, rgba(0,0,0,.92) 62%, rgba(0,0,0,.6) 78%, rgba(0,0,0,.22) 90%, transparent 100%)';
     if (m !== lastMask) {
-      mineHolder.style.webkitMask = m;
-      mineHolder.style.mask = m;
+      mineHolder.style.webkitMaskImage = m;
+      mineHolder.style.maskImage = m;
       lastMask = m;
     }
     const aim = 1 - smooth(seg(p, C_IN, 0.99));
-    const mk = 0.58 + 0.72 * smooth(g);
+    const mk = 0.58 + 0.72 * smooth(seg(p, B_IN, 1));
     mine.style.transform =
       `translate3d(${(AIM[0] * aim).toFixed(2)}%, ${(AIM[1] * aim).toFixed(2)}%, 0) scale(${mk.toFixed(4)})`;
   }

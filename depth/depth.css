@@ -1,0 +1,92 @@
+/* Depth dive PoC. Вся глубина — слои и transform; камера остаётся
+   fellmise-овской: взгляд сверху, спрайты фронтальные, никакого горизонта. */
+:root { color-scheme: dark; }
+html, body { margin: 0; height: 100%; overflow: hidden; background: #16210f; }
+
+#stage {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  /* точка схода: центр прохода в лес. Все слои растут ОТ неё */
+  --fx: 50%;
+  --fy: 33%;
+}
+
+.scene {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  will-change: opacity;
+}
+.scene-body {
+  position: absolute;
+  inset: 0;
+  transform-origin: var(--fx) var(--fy);
+  will-change: transform;
+}
+.scene--forest { opacity: 0; }
+
+.layer {
+  position: absolute;
+  inset: 0;
+  transform-origin: var(--fx) var(--fy);
+  will-change: transform, filter;
+}
+
+/* земля: тайл травы; чуть темнее к краям кадра, чтобы центр читался проходом */
+.ground {
+  position: absolute;
+  inset: -60%;
+  background-repeat: repeat;
+  background-size: 360px 360px;
+  filter: saturate(1.05);
+}
+.ground-tint { position: absolute; inset: -60%; }
+
+/* дорога — вертикальная ось кадра и та же ось в обеих сценах */
+.road {
+  position: absolute;
+  top: -60%;
+  bottom: -60%;
+  background-repeat: repeat;
+  background-size: 300px 300px;
+  filter: saturate(0.95) brightness(1.02);
+  mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
+}
+
+/* спрайт стоит на земле: якорь — низ-центр */
+.sprite {
+  position: absolute;
+  transform: translate(-50%, -100%) scaleX(var(--flip, 1));
+  image-rendering: auto;
+  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, .35));
+}
+
+/* лёгкое затемнение краёв во время нырка: тоннель, но не чёрная труба */
+#vignette {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(ellipse 70% 62% at var(--fx) var(--fy),
+              transparent 38%, rgba(8, 14, 6, .55) 88%, rgba(6, 10, 4, .8) 100%);
+}
+
+#debug[hidden] { display: none; }
+#debug {
+  position: fixed;
+  left: 12px;
+  top: 12px;
+  z-index: 20;
+  padding: 8px 12px;
+  background: rgba(18, 22, 24, .86);
+  color: #fdf6e0;
+  font: 12px/1.5 ui-monospace, monospace;
+  white-space: pre;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scene, .layer { transition: none; }
+}

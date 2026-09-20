@@ -1,0 +1,144 @@
+/* Depth journey PoC v2. Всё движение — transform/opacity/mask на GPU;
+   раскладка не пересчитывается ни разу за прокрутку. */
+:root { color-scheme: dark; }
+html, body { margin: 0; height: 100%; overflow: hidden; background: #10140f; }
+body { font: 13px/1.45 ui-sans-serif, system-ui, sans-serif; color: #efe6d2; }
+
+#stage { position: fixed; inset: 0; overflow: hidden; }
+
+/* Держатель не двигается: на нём живёт окно, сквозь которое видно сцену.
+   Если повесить маску на сам план, она поедет вместе с его масштабом и
+   обрежет кадр по своей же уменьшенной рамке — так было в PoC v1. */
+.holder {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  will-change: opacity;
+}
+.holder[hidden] { display: none; }
+
+/* План — та же картина, но видна только своя кольцевая зона.
+   Маска едет вместе с планом: кусок картинки остаётся приклеен к своему
+   месту, пока план растёт. */
+.plane {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform-origin: var(--gx) var(--gy);
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+/* Затемнение краёв на самых быстрых участках: тоннель, но не чёрная труба */
+#vignette {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(ellipse 72% 64% at var(--vx, 50%) var(--vy, 40%),
+              transparent 34%, rgba(6, 10, 8, .55) 86%, rgba(4, 7, 5, .82) 100%);
+}
+
+/* Холодный слой: бирюза приходит локально на пороге и уходит к дому */
+#chill {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  mix-blend-mode: screen;
+  background: radial-gradient(ellipse 58% 52% at var(--vx, 50%) var(--vy, 40%),
+              rgba(96, 232, 226, .30), rgba(96, 232, 226, .06) 62%, transparent 100%);
+}
+
+/* ------------------------------------------------------------------- UI */
+#ui { position: fixed; inset: 0; pointer-events: none; z-index: 500; }
+
+.wordmark {
+  position: absolute;
+  left: 26px; top: 22px;
+  font: 600 15px/1 ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: .34em;
+  text-transform: uppercase;
+  color: #f3ead6;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, .7);
+}
+
+#rail {
+  position: absolute;
+  left: 26px; right: 26px; bottom: 22px;
+  height: 2px;
+  background: rgba(243, 234, 214, .16);
+}
+#rail i {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: #f3ead6;
+  box-shadow: 0 0 10px rgba(243, 234, 214, .5);
+}
+#chapter {
+  position: absolute;
+  left: 26px; bottom: 34px;
+  font-size: 11px;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: rgba(243, 234, 214, .72);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, .7);
+}
+
+/* заглушка звука: кнопка есть, движка звука в PoC нет */
+#sound {
+  position: absolute;
+  right: 26px; top: 20px;
+  pointer-events: auto;
+  width: 34px; height: 34px;
+  border: 1px solid rgba(243, 234, 214, .28);
+  border-radius: 50%;
+  background: rgba(10, 14, 12, .42);
+  color: #f3ead6;
+  font-size: 13px;
+  cursor: not-allowed;
+}
+
+#hint {
+  position: absolute;
+  left: 50%; bottom: 58px;
+  transform: translateX(-50%);
+  font-size: 11px;
+  letter-spacing: .24em;
+  text-transform: uppercase;
+  color: rgba(243, 234, 214, .66);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, .7);
+  transition: opacity .4s;
+}
+
+#debug[hidden] { display: none; }
+#debug {
+  position: fixed;
+  left: 26px; top: 56px;
+  z-index: 600;
+  padding: 8px 12px;
+  background: rgba(14, 18, 20, .84);
+  color: #fdf6e0;
+  font: 12px/1.5 ui-monospace, monospace;
+  white-space: pre;
+  pointer-events: none;
+}
+
+/* Узкий экран: PoC десктопный, здесь честная заглушка вместо сломанного опыта */
+#narrow { display: none; }
+@media (max-width: 1279px) {
+  #stage, #ui, #vignette, #chill { display: none; }
+  #narrow {
+    display: grid;
+    place-content: center;
+    gap: 14px;
+    height: 100%;
+    padding: 0 32px;
+    text-align: center;
+  }
+  #narrow img { width: min(100%, 520px); border-radius: 2px; }
+  #narrow p { color: rgba(243, 234, 214, .74); }
+}

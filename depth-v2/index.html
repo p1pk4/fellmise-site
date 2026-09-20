@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Fellmise — depth journey prototype v2</title>
+<!--
+  Экспериментальный маршрут: проверяется только ощущение движения внутрь мира.
+  Ни контента, ни звука, ни SEO. Продакшен (/, /ru/, /proto/) не участвует.
+  Картинки — принятые master scenes из out/scene_batch1/final/, читаются как
+  есть и не меняются: ни перегенерации, ни цветокоррекции.
+-->
+<link rel="stylesheet" href="./depth.css">
+</head>
+<body>
+<div id="stage"></div>
+<div id="vignette"></div>
+<div id="chill"></div>
+
+<div id="ui">
+  <div class="wordmark">Fellmise</div>
+  <button id="sound" type="button" disabled aria-label="Sound (not in this prototype)">♪</button>
+  <div id="chapter">The village</div>
+  <div id="rail"><i></i></div>
+  <div id="hint">scroll</div>
+</div>
+
+<div id="debug" hidden></div>
+
+<div id="narrow">
+  <img src="/out/scene_batch1/final/hero_start.png" alt="">
+  <p>Прототип десктопный: нужен экран от 1280&nbsp;px и колесо мыши.</p>
+</div>
+
+<script type="module" src="./journey.js"></script>
+</body>
+</html>

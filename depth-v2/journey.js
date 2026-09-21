@@ -21,6 +21,7 @@
  * те, где в изолированном виде покрытие держалось подобранным таймингом.
  */
 import { mountContent } from './content.js';
+import { BEATS } from './content-data.js';
 import { mountChrome } from './chrome.js';
 
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
@@ -283,6 +284,53 @@ function coverScale(want, vp, rx, ry, ax, ay) {
 
 buildTrajectories(innerWidth, innerHeight);
 
+/* ------------------------------------------------ задержка взгляда на тексте
+ *
+ * Прогресса два, как и было: target — куда пользователь хочет попасть колесом,
+ * p — что сейчас нарисовано; p догоняет target экспоненциально. Колесо не
+ * блокируется никогда: target копится свободно.
+ *
+ * Меняется только скорость догона вперёд, и только при ПЕРВОМ проходе вперёд
+ * через окно текста биома:
+ *   • перед окном p плавно тормозит — v ≤ vRead + √(2·BRAKE·d), где d —
+ *     расстояние до начала окна: удара о зону нет;
+ *   • в окне скорость не больше vRead = (длина окна) / dwell — сцена не
+ *     замирает, а медленно едет вперёд и проходит окно не быстрее чем за dwell;
+ *   • после окна скорость растёт с ограниченным ускорением RECOVER — догон
+ *     плавный, без рывка.
+ * При возврате назад и при повторном проходе ограничения нет. Назад камера из-за
+ * этого не едет никогда: ограничивается только скорость вперёд.
+ */
+const BRAKE = 3.0;     // торможение перед окном, прогресс/с²
+const RECOVER = 3.0;   // разгон после окна, прогресс/с²
+const ZONES = BEATS.filter((b) => b.dwell).map((b) => ({
+  id: b.id, a: b.range[0], z: b.range[1], dwell: b.dwell,
+  vRead: (b.range[1] - b.range[0]) / (b.dwell / 1000), visited: false, t0: 0, t1: 0,
+}));
+const lim = { v: 0, recovering: false };
+
+function limitForward(step, sec, now) {
+  const v = step / sec;
+  let vmax = Infinity;
+  for (const Z of ZONES) {
+    if (Z.visited) {
+      if (p >= Z.a && p <= Z.z && now - Z.t0 < Z.dwell) vmax = Math.min(vmax, Z.vRead);
+    } else if (p < Z.a) {
+      vmax = Math.min(vmax, Z.vRead + Math.sqrt(2 * BRAKE * (Z.a - p)));
+    }
+  }
+  if (lim.recovering) vmax = Math.min(vmax, lim.v + RECOVER * sec);
+  const v2 = Math.min(v, vmax);
+  const pn = p + v2 * sec;
+  for (const Z of ZONES) {
+    if (!Z.visited && p < Z.a && pn >= Z.a) { Z.visited = true; Z.t0 = now; }
+    if (Z.visited && !Z.t1 && pn > Z.z) Z.t1 = now;
+  }
+  lim.recovering = v2 < v - 1e-9;
+  lim.v = v2;
+  return v2 * sec;
+}
+
 let p = 0, target = 0, raf = 0, last = performance.now();
 const frames = [];
 
@@ -290,8 +338,11 @@ function apply(now) {
   raf = 0;
   const dt = Math.min(64, now - last);
   last = now;
-  p += (target - p) * (1 - Math.pow(0.0012, dt / 1000));
-  if (Math.abs(target - p) < 0.0003) p = target;
+  let step = (target - p) * (1 - Math.pow(0.0012, dt / 1000));
+  if (step > 0 && dt > 0) step = limitForward(step, dt / 1000, now);
+  else { lim.recovering = false; lim.v = 0; }
+  p += step;
+  if (Math.abs(target - p) < 0.0003 && !lim.recovering) p = target;
 
   const W = innerWidth, H = innerHeight, k = W / 1920;
   let live = 0;
@@ -406,12 +457,27 @@ addEventListener('resize', () => {
   schedule();
 });
 
+// плиты крупные (до ~5K по ширине): декодировать их заранее, а не в момент,
+// когда слой впервые появляется в кадре, — иначе первый показ сцены стоил бы
+// пропущенных кадров
 await Promise.all([...stage.querySelectorAll('img')]
-  .map((im) => (im.complete ? Promise.resolve() : new Promise((r) => { im.onload = im.onerror = r; }))));
+  .map((im) => im.decode().catch(() => (im.complete ? null : new Promise((r) => { im.onload = im.onerror = r; })))));
+// прогрев: декодированная картинка ещё не лежит в GPU — текстура заливается
+// при первом показе слоя, и первое появление новой сцены стоило кадра-двух.
+// Поэтому до старта все слои на два кадра показываются почти прозрачными
+// (0.002 — ниже одного уровня яркости): заливка проходит здесь, а не в маршруте
+{
+  const layers = [...stage.children];
+  for (const n of layers) { n.hidden = false; n.style.opacity = '0.002'; }
+  await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+  for (const n of layers) n.style.opacity = '';
+}
 schedule();
 
 window.__JOURNEY = {
   get progress() { return p; },
+  get target() { return target; },
+  reading: () => ZONES.map((Z) => ({ id: Z.id, visited: Z.visited, t0: Z.t0, t1: Z.t1 })),
   set(v, { instant = false } = {}) { target = clamp(v, 0, 1); if (instant) p = target; schedule(); },
   sections: () => SECTIONS.map((s) => ({ id: s.id, band: s.band })),
   fps: () => {

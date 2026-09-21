@@ -95,18 +95,22 @@ export function mountContent(root, locale = LOC) {
      за доли секунды — текст появлялся и сразу гас. Теперь бит, однажды
      показанный, держится не меньше своего dwell, даже если прогресс уже ушёл
      за range вперёд. Правила, по старшинству:
-       1. за hardExit (45% раскрытия следующей сцены) — уйти сразу: старый
+       1. за hardExit (72% раскрытия следующей сцены) — уйти сразу: старый
           текст не должен лежать поверх почти открывшейся новой сцены;
        2. на экране не больше одного бита: как только начинается следующий,
           удерживаемый уходит;
        3. при прокрутке назад, раньше начала range, — уйти сразу;
-       4. иначе держать, пока не истечёт dwell.
+       4. иначе держать, пока не истечёт dwell, — только при первом показе.
+     Основной механизм задержки теперь в journey.js: нарисованный прогресс сам
+     проходит окно текста не быстрее dwell. Удержание здесь — запасное.
      Если быстрый рывок перескочил range целиком за один кадр, бит всё равно
      показывается — прогресс уже в его сцене, до hardExit. */
   const set = (b, on, now) => {
     if (on === b.on) return;
     b.on = on;
-    if (on) b.shownAt = now;
+    // удержание — только при первом показе за сессию; при возврате назад и
+    // повторном проходе текст живёт по обычному окну range
+    if (on) { b.shownAt = now; b.first = !b.seen; b.seen = true; }
     b.el.classList.toggle('is-on', on);
     b.el.setAttribute('aria-hidden', String(!on));
   };
@@ -126,7 +130,7 @@ export function mountContent(root, locale = LOC) {
     for (const b of blocks) {
       if (b === active) { set(b, true, now); continue; }
       const [a] = b.def.range;
-      const held = b.on && !active && p > a && p < (b.def.hardExit ?? 1)
+      const held = b.on && b.first && !active && p > a && p < (b.def.hardExit ?? 1)
         && now - b.shownAt < (b.def.dwell || 0);
       if (held) wait = Math.min(wait, b.def.dwell - (now - b.shownAt));
       set(b, held, now);

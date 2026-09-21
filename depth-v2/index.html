@@ -28,6 +28,19 @@
   if (new URLSearchParams(location.search).get('lang') === 'ru')
     document.querySelector('link[rel=canonical]').href = 'https://fellmise.com/ru/';
 </script>
+<script>
+  /* Режим решается здесь, до первой отрисовки: статическая разметка уже лежит
+     в документе, и без этого на десктопе она мелькнула бы до загрузки модулей.
+     Те же два условия — в boot.js и в depth.css. Без JavaScript этот скрипт не
+     выполняется, режим не отмечается, и документ остаётся статическим. */
+  (function () {
+    var d = document.documentElement;
+    var q = new URLSearchParams(location.search).get('lang');
+    if (location.pathname.indexOf('/depth-v2/') >= 0 && (q === 'en' || q === 'ru')) d.lang = q;
+    var calm = matchMedia('(max-width: 1279px)').matches || matchMedia('(prefers-reduced-motion: reduce)').matches;
+    d.dataset.mode = calm ? 'static' : 'live';
+  })();
+</script>
 </head>
 <body>
 <!-- Живой маршрут. В статике эти узлы скрыты стилями, а их модули не грузятся. -->
@@ -37,8 +50,80 @@
 <div id="chill"></div>
 <div id="ui"></div>
 
-<!-- Статическая версия: то же содержание без движения, собирается static.js -->
-<div id="static" hidden></div>
+<!-- Статическая версия: тот же маршрут без движения. Готовый HTML вписывает
+     сборка depth-v2/build_static_content.mjs из content-data.js — руками не править.
+     Виден без JavaScript, на узком экране и при reduced-motion; в живом режиме
+     boot.js убирает его из документа. -->
+<!-- STATIC_CONTENT_START -->
+<div id="static" data-lang="en">
+<header class="st__top">
+<h1 class="st__mark">Fellmise</h1>
+<a class="st__lang" href="./?lang=ru" hreflang="ru" aria-label="Русский">RU</a>
+</header>
+<section class="st__beat">
+<img src="/out/depth-v2/h2f/hero_plate_clean.webp" alt="" width="1536" height="960" loading="eager" decoding="async">
+<div class="st__text">
+<h2 class="st__headline">A world that plays itself</h2>
+<p class="st__body">The world does not wait for you. NPC adventurers raid dungeons, return with loot and end the day at the tavern.</p>
+<ul class="st__says">
+<li>Life goes on without the player.</li>
+</ul>
+</div>
+</section>
+<section class="st__beat">
+<img src="/out/depth-v2/h2f/forest_plate.webp" alt="" width="1536" height="960" loading="lazy" decoding="async">
+<div class="st__text">
+<h2 class="st__headline">Beyond the safe roads</h2>
+<p class="st__body">The farther you travel from civilization, the greater the danger. At night, the wilderness changes — and some places reveal what daylight hides.</p>
+<ul class="st__says">
+<li>Night changes the rules.</li>
+</ul>
+</div>
+</section>
+<section class="st__beat">
+<img src="/out/depth-v2/m2s/mine_plate.webp" alt="" width="1536" height="960" loading="lazy" decoding="async">
+<div class="st__text">
+<h2 class="st__headline">Depth has a price</h2>
+<p class="st__body">The deeper you go, the richer the resources — and the greater the risk. What you bring back feeds crafting and trade above ground.</p>
+<ul class="st__says">
+<li>Better resources. Greater danger.</li>
+</ul>
+</div>
+</section>
+<section class="st__beat">
+<img src="/out/depth-v2/s2c/threshold_plate.webp" alt="" width="1536" height="960" loading="lazy" decoding="async">
+<div class="st__text">
+<h2 class="st__headline">The dead see more.</h2>
+<p class="st__body">Death does not remove you from the world. It reveals another layer of the same place.</p>
+</div>
+</section>
+<section class="st__beat">
+<img src="/out/depth-v2/s2c/core_plate.webp" alt="" width="1536" height="960" loading="lazy" decoding="async">
+<div class="st__text">
+<h2 class="st__headline">Death is a place</h2>
+<p class="st__body">The dead can follow traces the living cannot see, uncover echoes of what happened here and find paths that exist only beyond death.</p>
+<ul class="st__says">
+<li>Spirit Sight reveals what life conceals.</li>
+<li>Some journeys begin after you die.</li>
+</ul>
+</div>
+</section>
+<section class="st__beat">
+<img src="/out/depth-v2/c2h/home_plate.webp" alt="" width="1536" height="960" loading="lazy" decoding="async">
+<div class="st__text">
+<h2 class="st__headline">A place to return to</h2>
+<p class="st__body">Build a home that belongs only to you — part workshop, part storage, part sanctuary inside a shared world.</p>
+<ul class="st__says">
+<li>Build. Craft. Store. Grow.</li>
+</ul>
+</div>
+</section>
+<footer class="st__foot">
+<p class="st__note">Fellmise is in early development. Everything here is still being built and will change.</p>
+<p class="st__copy">© 2026 Fellmise</p>
+</footer>
+</div>
+<!-- STATIC_CONTENT_END -->
 
 <div id="debug" hidden></div>
 

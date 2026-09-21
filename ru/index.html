@@ -37,6 +37,19 @@
 <link rel="stylesheet" href="/depth-v2/content.css">
 <link rel="stylesheet" href="/depth-v2/chrome.css">
 <link rel="stylesheet" href="/depth-v2/static.css">
+<script>
+  /* Режим решается здесь, до первой отрисовки: статическая разметка уже лежит
+     в документе, и без этого на десктопе она мелькнула бы до загрузки модулей.
+     Те же два условия — в boot.js и в depth.css. Без JavaScript этот скрипт не
+     выполняется, режим не отмечается, и документ остаётся статическим. */
+  (function () {
+    var d = document.documentElement;
+    var q = new URLSearchParams(location.search).get('lang');
+    if (location.pathname.indexOf('/depth-v2/') >= 0 && (q === 'en' || q === 'ru')) d.lang = q;
+    var calm = matchMedia('(max-width: 1279px)').matches || matchMedia('(prefers-reduced-motion: reduce)').matches;
+    d.dataset.mode = calm ? 'static' : 'live';
+  })();
+</script>
 </head>
 <body>
 <!-- Живой маршрут. В статике эти узлы скрыты стилями, а их модули не грузятся. -->
@@ -46,8 +59,80 @@
 <div id="chill"></div>
 <div id="ui"></div>
 
-<!-- Статическая версия: то же содержание без движения, собирается static.js -->
-<div id="static" hidden></div>
+<!-- Статическая версия: тот же маршрут без движения. Готовый HTML вписывает
+     сборка depth-v2/build_static_content.mjs из content-data.js — руками не править.
+     Виден без JavaScript, на узком экране и при reduced-motion; в живом режиме
+     boot.js убирает его из документа. -->
+<!-- STATIC_CONTENT_START -->
+<div id="static" data-lang="ru">
+<header class="st__top">
+<h1 class="st__mark">Fellmise</h1>
+<a class="st__lang" href="/" hreflang="en" aria-label="English">EN</a>
+</header>
+<section class="st__beat">
+<img src="/out/depth-v2/h2f/hero_plate_clean.webp" alt="" width="1536" height="960" loading="eager" decoding="async">
+<div class="st__text">
+<h2 class="st__headline">Мир играет в себя</h2>
+<p class="st__body">Мир не ждёт игрока. NPC-авантюристы ходят в подземелья, возвращаются с добычей и заканчивают день в таверне.</p>
+<ul class="st__says">
+<li>Жизнь идёт и без игрока.</li>
+</ul>
+</div>
+</section>
+<section class="st__beat">
+<img src="/out/depth-v2/h2f/forest_plate.webp" alt="" width="1536" height="960" loading="lazy" decoding="async">
+<div class="st__text">
+<h2 class="st__headline">За пределами безопасных дорог</h2>
+<p class="st__body">Чем дальше от цивилизации, тем выше риск. Ночью дикая местность меняется — и некоторые места открывают то, что скрывает дневной свет.</p>
+<ul class="st__says">
+<li>Ночь меняет правила.</li>
+</ul>
+</div>
+</section>
+<section class="st__beat">
+<img src="/out/depth-v2/m2s/mine_plate.webp" alt="" width="1536" height="960" loading="lazy" decoding="async">
+<div class="st__text">
+<h2 class="st__headline">У глубины есть цена</h2>
+<p class="st__body">Чем глубже спускаешься, тем богаче ресурсы — и выше риск. Всё, что вынесешь наверх, идёт в ремесло и торговлю.</p>
+<ul class="st__says">
+<li>Лучше ресурсы. Выше опасность.</li>
+</ul>
+</div>
+</section>
+<section class="st__beat">
+<img src="/out/depth-v2/s2c/threshold_plate.webp" alt="" width="1536" height="960" loading="lazy" decoding="async">
+<div class="st__text">
+<h2 class="st__headline">Мёртвые видят больше.</h2>
+<p class="st__body">Смерть не выводит тебя из мира. Она открывает другой слой того же места.</p>
+</div>
+</section>
+<section class="st__beat">
+<img src="/out/depth-v2/s2c/core_plate.webp" alt="" width="1536" height="960" loading="lazy" decoding="async">
+<div class="st__text">
+<h2 class="st__headline">Смерть — это место</h2>
+<p class="st__body">Мёртвые видят следы, недоступные живым, находят отголоски произошедшего и пути, существующие только по ту сторону смерти.</p>
+<ul class="st__says">
+<li>Духовное зрение открывает то, что скрыто от живых.</li>
+<li>Некоторые пути начинаются после смерти.</li>
+</ul>
+</div>
+</section>
+<section class="st__beat">
+<img src="/out/depth-v2/c2h/home_plate.webp" alt="" width="1536" height="960" loading="lazy" decoding="async">
+<div class="st__text">
+<h2 class="st__headline">Место, куда можно вернуться</h2>
+<p class="st__body">Построй дом, который принадлежит только тебе — мастерскую, склад и убежище внутри общего мира.</p>
+<ul class="st__says">
+<li>Строй. Создавай. Храни. Выращивай.</li>
+</ul>
+</div>
+</section>
+<footer class="st__foot">
+<p class="st__note">Игра в ранней разработке. Всё, что видишь, ещё поменяется.</p>
+<p class="st__copy">© 2026 Fellmise</p>
+</footer>
+</div>
+<!-- STATIC_CONTENT_END -->
 
 <div id="debug" hidden></div>
 

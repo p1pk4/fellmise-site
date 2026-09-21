@@ -1,14 +1,20 @@
 /* Статическая версия маршрута. Тот же язык оформления, что и у живого:
    Podkova для заголовков, Vollkorn для текста, та же палитра. Движения нет
    нигде — эту страницу видят в том числе те, кто просил его убрать. */
-#static { display: none; }
-#static:not([hidden]) { display: block; }
+/* Статическая разметка лежит в документе всегда. Прячется она только в живом
+   режиме — а его отмечает ранний скрипт в <head>. Поэтому без JavaScript,
+   на узком экране и при reduced-motion работает один и тот же готовый HTML. */
+html[data-mode='live'] #static { display: none; }
+
+/* Всё, что не живой режим: узлы сцены пусты и не нужны, а виньетка с холодной
+   дымкой — это полноэкранные наложения, они легли бы поверх статики. */
+html:not([data-mode='live']) :is(#stage, #content, #ui, #vignette, #chill) { display: none; }
 
 /* Живой режим держит страницу неподвижной (overflow: hidden в depth.css),
    потому что прокрутка там — это ход камеры. Статике нужна обычная прокрутка
-   документа; boot.js отмечает режим на <html> до загрузки чего бы то ни было. */
-html[data-mode='static'],
-html[data-mode='static'] body { height: auto; overflow: auto; }
+   документа, в том числе без JavaScript, когда режим вовсе не отмечен. */
+html:not([data-mode='live']),
+html:not([data-mode='live']) body { height: auto; overflow: auto; }
 
 #static {
   max-width: 62rem;

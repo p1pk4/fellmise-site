@@ -44,6 +44,10 @@ jobs:
       - run: pip install -r requirements.txt
       - name: static site sanity
         run: python tools/check_site_static.py
+      # статический HTML корня собирается из depth-v2/content-data.js;
+      # правка текста без пересборки должна падать здесь, а не на сайте
+      - name: depth journey static HTML is current
+        run: node depth-v2/build_static_content.mjs --check
       - name: generate layout (dry, both targets)
         run: python tools/generate_layout.py --dry
       - name: committed layouts are current

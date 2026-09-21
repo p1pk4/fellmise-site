@@ -14,7 +14,7 @@
  * В узкую вертикальную щель он не попадает физически и проявляется только
  * когда раскрыв пошёл вширь и вниз.
  */
-const BASE = '/out/depth-v2/s2c/';
+const BASE = '/assets/depth/s2c/';
 const stage = document.getElementById('stage');
 const panel = document.getElementById('debug');
 const debug = new URLSearchParams(location.search).get('debug') === '1';

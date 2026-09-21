@@ -16,7 +16,7 @@
  * Диафрагма — мягкая круглая, чуть вытянутая по вертикали, с длинным
  * многоступенчатым спадом: ни кромки, ни контура, ни замочной скважины.
  */
-const BASE = '/out/depth-v2/m2s/';
+const BASE = '/assets/depth/m2s/';
 const stage = document.getElementById('stage');
 const panel = document.getElementById('debug');
 const debug = new URLSearchParams(location.search).get('debug') === '1';

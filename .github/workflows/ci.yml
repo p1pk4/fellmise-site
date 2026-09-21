@@ -44,6 +44,12 @@ jobs:
       - run: pip install -r requirements.txt
       - name: static site sanity
         run: python tools/check_site_static.py
+      # сайт не должен зависеть от файлов вне git: ни ссылок в игнорируемый out/,
+      # ни абсолютных URL на неотслеживаемые файлы
+      - name: runtime references are shipped
+        run: python tools/check_runtime_refs.py
+      - name: depth journey runtime assets are published and tracked
+        run: python depth-v2/publish_runtime_assets.py --check
       # статический HTML корня собирается из depth-v2/content-data.js;
       # правка текста без пересборки должна падать здесь, а не на сайте
       - name: depth journey static HTML is current

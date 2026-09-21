@@ -15,13 +15,14 @@
  */
 import { BEATS, STATIC_UI } from './content-data.js';
 
+// те же опубликованные плиты, что и у живого маршрута (assets/depth/, в git)
 const SCENES = {
-  village:   '/out/depth-v2/h2f/hero_plate_clean.webp',
-  forest:    '/out/depth-v2/h2f/forest_plate.webp',
-  mine:      '/out/depth-v2/m2s/mine_plate.webp',
-  threshold: '/out/depth-v2/s2c/threshold_plate.webp',
-  core:      '/out/depth-v2/s2c/core_plate.webp',
-  home:      '/out/depth-v2/c2h/home_plate.webp',
+  village:   '/assets/depth/h2f/hero_plate_clean.webp',
+  forest:    '/assets/depth/h2f/forest_plate.webp',
+  mine:      '/assets/depth/m2s/mine_plate.webp',
+  threshold: '/assets/depth/s2c/threshold_plate.webp',
+  core:      '/assets/depth/s2c/core_plate.webp',
+  home:      '/assets/depth/c2h/home_plate.webp',
 };
 
 const esc = (s) => String(s)

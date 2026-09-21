@@ -1,0 +1,12 @@
+{
+ "plate": "core_plate.webp",
+ "next": "home_plate.webp",
+ "vp": [
+  0.47,
+  0.2
+ ],
+ "light": [
+  0.565,
+  0.505
+ ]
+}

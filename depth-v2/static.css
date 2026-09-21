@@ -1,0 +1,107 @@
+/* Статическая версия маршрута. Тот же язык оформления, что и у живого:
+   Podkova для заголовков, Vollkorn для текста, та же палитра. Движения нет
+   нигде — эту страницу видят в том числе те, кто просил его убрать. */
+/* Статическая разметка лежит в документе всегда. Прячется она только в живом
+   режиме — а его отмечает ранний скрипт в <head>. Поэтому без JavaScript,
+   на узком экране и при reduced-motion работает один и тот же готовый HTML. */
+html[data-mode='live'] #static { display: none; }
+
+/* Всё, что не живой режим: узлы сцены пусты и не нужны, а виньетка с холодной
+   дымкой — это полноэкранные наложения, они легли бы поверх статики. */
+html:not([data-mode='live']) :is(#stage, #content, #ui, #vignette, #chill) { display: none; }
+
+/* Живой режим держит страницу неподвижной (overflow: hidden в depth.css),
+   потому что прокрутка там — это ход камеры. Статике нужна обычная прокрутка
+   документа, в том числе без JavaScript, когда режим вовсе не отмечен. */
+html:not([data-mode='live']),
+html:not([data-mode='live']) body { height: auto; overflow: auto; }
+
+#static {
+  max-width: 62rem;
+  margin: 0 auto;
+  padding: 0 clamp(16px, 4vw, 40px) 8vh;
+  font-family: Vollkorn, Georgia, serif;
+  color: #deca9e;
+}
+
+.st__top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding: clamp(20px, 4vw, 34px) 0 clamp(18px, 4vw, 30px);
+}
+.st__mark {
+  margin: 0;
+  font-family: Podkova, Georgia, serif;
+  font-weight: 700;
+  font-size: clamp(24px, 5vw, 30px);
+  line-height: 1;
+  opacity: .94;
+}
+.st__lang {
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: .12em;
+  text-decoration: none;
+  color: #e7b999;
+  border-bottom: 1px solid rgba(207, 164, 116, .6);
+  padding-bottom: 2px;
+}
+
+.st__beat { margin: 0 0 clamp(40px, 8vw, 72px); }
+.st__beat img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 2px;
+  background: #1a1c21;         /* пока плита не пришла, дыры в странице нет */
+}
+.st__text { padding-top: clamp(16px, 3vw, 24px); }
+
+.st__headline {
+  margin: 0;
+  font-family: Podkova, Georgia, serif;
+  font-weight: 700;
+  font-size: clamp(30px, 5.4vw, 44px);
+  line-height: 1.02;
+  letter-spacing: -.015em;
+  color: #e7b999;
+}
+.st__body {
+  margin: clamp(12px, 2.4vw, 18px) 0 0;
+  max-width: 42ch;
+  font-weight: 500;
+  font-size: clamp(17px, 2.2vw, 19px);
+  line-height: 1.45;
+}
+.st__says {
+  margin: clamp(10px, 2vw, 16px) 0 0;
+  padding: 0;
+  list-style: none;
+  max-width: 42ch;
+}
+.st__says li {
+  margin-top: 6px;
+  font-weight: 500;
+  font-size: clamp(15px, 2vw, 17px);
+  line-height: 1.35;
+  color: rgba(222, 202, 158, .78);
+}
+
+.st__foot {
+  padding-top: clamp(20px, 4vw, 32px);
+  border-top: 1px solid rgba(222, 202, 158, .18);
+}
+.st__note {
+  margin: 0;
+  max-width: 44ch;
+  font-size: 15px;
+  line-height: 1.45;
+  color: rgba(222, 202, 158, .66);
+}
+.st__copy {
+  margin: 12px 0 0;
+  font-size: 14px;
+  color: rgba(222, 202, 158, .46);
+}

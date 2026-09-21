@@ -50,6 +50,10 @@ jobs:
         run: python tools/check_runtime_refs.py
       - name: depth journey runtime assets are published and tracked
         run: python depth-v2/publish_runtime_assets.py --check
+      # статический HTML корня собирается из depth-v2/content-data.js;
+      # правка текста без пересборки должна падать здесь, а не на сайте
+      - name: depth journey static HTML is current
+        run: node depth-v2/build_static_content.mjs --check
       - name: generate layout (dry, both targets)
         run: python tools/generate_layout.py --dry
       - name: committed layouts are current

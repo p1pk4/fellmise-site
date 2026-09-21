@@ -1,26 +1,32 @@
-/* Загрузка /depth-v2/: живой маршрут грузится ТОЛЬКО там, где он уместен.
+/* Развилка маршрута: живой он или статический. Один и тот же код обслуживает
+ * три входа — /, /ru/ и превью /depth-v2/.
  *
- * Тот же принцип, что и в /proto/boot.js: в статике модули живого режима не
- * запрашиваются вовсе. Здесь их два — journey.js со всей хореографией и, через
- * него, chrome.js с контролом звука. Поэтому ранний выход отсюда сразу даёт всё,
- * что требуется от статики: ни диафрагм, ни масштабирования, ни прокрутки,
- * ни кнопки звука, ни AudioContext — не потому что они выключены, а потому что
- * этот код просто не исполняется.
+ * Режим уже отметил ранний скрипт в <head> (data-mode на <html>), до первой
+ * отрисовки: статическая разметка лежит в документе с самого начала, и без
+ * этого на десктопе она бы мелькнула. Здесь режим только читается; если
+ * раннего скрипта почему-то нет, решение принимается заново по тем же двум
+ * условиям — узкий экран или prefers-reduced-motion.
  *
- * Условие одно на два случая, и второго fallback-сайта не заводится:
- *   • узкий экран — маршрут рассчитан на 1280+ и колесо;
- *   • prefers-reduced-motion — человек попросил не двигать картинку, а весь
- *     смысл этого маршрута в непрерывном движении внутрь мира.
- *
- * Те же два условия продублированы в depth.css, который показывает заглушку и
- * прячет сцену. CSS и этот гейт обязаны сходиться: правило там записано ровно
- * тем же медиавыражением.
+ * Тот же принцип, что и в /proto/boot.js: лишняя ветка не запрашивается вовсе.
+ * В статике не грузятся ни journey.js со всей хореографией, ни chrome.js, ни
+ * движок звука — там физически нет ни прокрутки камерой, ни кнопки звука, ни
+ * AudioContext. В живом режиме, наоборот, статическая разметка удаляется из
+ * документа: она не нужна, её картинки не должны грузиться, а заголовок h1 на
+ * странице должен остаться один — знак Fellmise в системном UI.
  */
 const NARROW = '(max-width: 1279px)';
 const CALM = '(prefers-reduced-motion: reduce)';
 
-const live = !matchMedia(NARROW).matches && !matchMedia(CALM).matches;
-document.documentElement.dataset.mode = live ? 'live' : 'static';
-if (!live) document.getElementById('narrow').dataset.why = matchMedia(NARROW).matches ? 'narrow' : 'calm';
+const d = document.documentElement;
+if (!d.dataset.mode) {
+  const asked = new URLSearchParams(location.search).get('lang');
+  if (location.pathname.includes('/depth-v2/') && (asked === 'en' || asked === 'ru')) d.lang = asked;
+  d.dataset.mode = matchMedia(NARROW).matches || matchMedia(CALM).matches ? 'static' : 'live';
+}
 
-if (live) import('./journey.js');
+if (d.dataset.mode === 'live') {
+  document.getElementById('static')?.remove();
+  import('./journey.js');
+} else {
+  import('./static.js').then((m) => m.mountStatic(document.getElementById('static')));
+}

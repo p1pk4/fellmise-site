@@ -68,35 +68,9 @@ body { font: 13px/1.45 ui-sans-serif, system-ui, sans-serif; color: #efe6d2; }
   pointer-events: none;
 }
 
-/* Узкий экран: PoC десктопный, здесь честная заглушка вместо сломанного опыта */
-#narrow { display: none; }
-#narrow .narrow__narrow, #narrow .narrow__calm { display: none; }
-#narrow[data-why='narrow'] .narrow__narrow,
-#narrow[data-why='calm'] .narrow__calm { display: block; }
-/* Одна заглушка на два случая: узкий экран и просьба не двигать картинку.
-   Второго fallback-сайта не заводим. Те же два условия стоят в boot.js,
-   который в статике вовсе не грузит живой маршрут. */
+/* Статическая версия: сцена и хром живого режима скрыты, страницу собирает
+   static.js. Те же два условия стоят в boot.js, который в статике вовсе не
+   грузит живой маршрут. */
 @media (max-width: 1279px), (prefers-reduced-motion: reduce) {
   #stage, #ui, #vignette, #chill { display: none; }
-  /* Колонка ограничена по ширине и центрируется по обеим осям: раньше
-     заглушка встречалась только на узком экране, а теперь приходит и на
-     1920, где растянутая на всю ширину строка расходилась с картинкой. */
-  #narrow {
-    display: grid;
-    place-content: center;
-    justify-items: center;
-    gap: 18px;
-    height: 100%;
-    padding: 0 32px;
-    text-align: center;
-  }
-  #narrow img { width: min(100%, 520px); border-radius: 2px; }
-  #narrow p {
-    max-width: 30rem;
-    margin: 0;
-    font-family: Vollkorn, Georgia, serif;
-    font-size: 17px;
-    line-height: 1.45;
-    color: rgba(243, 234, 214, .74);
-  }
 }

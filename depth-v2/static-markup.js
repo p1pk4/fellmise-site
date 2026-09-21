@@ -37,11 +37,12 @@ export function renderStatic(locale, links) {
   out.push('<h1 class="st__mark">Fellmise</h1>');
   out.push(`<a class="st__lang" href="${esc(links[other])}" hreflang="${other}" aria-label="${esc(t.otherLabel)}">${esc(t.other)}</a>`);
   out.push('</header>');
-  BEATS.forEach((b, i) => {
+  BEATS.forEach((b) => {
     const c = b[locale] || b.en;
     out.push('<section class="st__beat">');
-    // первая плита нужна сразу, остальные — по мере прокрутки
-    out.push(`<img src="${SCENES[b.id]}" alt="" width="1536" height="960" loading="${i === 0 ? 'eager' : 'lazy'}" decoding="async">`);
+    // все плиты lazy: в живом режиме статика скрыта, и первая картинка с eager
+    // качалась бы впустую; в статике она у верхнего края и грузится сразу
+    out.push(`<img src="${SCENES[b.id]}" alt="" width="1536" height="960" loading="lazy" decoding="async">`);
     out.push('<div class="st__text">');
     out.push(`<h2 class="st__headline">${esc(c.headline)}</h2>`);
     if (c.body) out.push(`<p class="st__body">${esc(c.body)}</p>`);

@@ -87,18 +87,36 @@ export function mountContent(root, locale = LOC) {
     return { def: b, el, on: null };
   });
 
-  /* Видимость решает общий прогресс; сама анимация — временная, на CSS.
+  /* Видимость решает нарисованный прогресс; сама анимация — временная, на CSS.
      Так текст не скрабится вместе с колесом и всегда идёт своей мягкой
-     дорожкой 400-650 мс, как задумано. */
-  return function update(p) {
+     дорожкой 400-650 мс, как задумано.
+
+     Сколько текст висит на экране, решает не этот модуль, а journey.js: при
+     первом проходе вперёд нарисованный прогресс идёт через окно range не
+     быстрее, чем за dwell выбранного режима. Здесь только правила показа:
+       • бит виден, пока прогресс в его range;
+       • если range перескочен целиком за один кадр — бит всё равно показан,
+         но только до hardExit (72% раскрытия следующей сцены);
+       • на экране не больше одного бита. */
+  const set = (b, on) => {
+    if (on === b.on) return;
+    b.on = on;
+    b.el.classList.toggle('is-on', on);
+    b.el.setAttribute('aria-hidden', String(!on));
+  };
+  let prevP = null;
+
+  function update(p) {
+    let active = null;
     for (const b of blocks) {
       const [a, z] = b.def.range;
-      const on = p >= a && p <= z;
-      if (on !== b.on) {
-        b.on = on;
-        b.el.classList.toggle('is-on', on);
-        b.el.setAttribute('aria-hidden', String(!on));
-      }
+      if (p >= a && p <= z) { active = b; b.crossed = false; continue; }
+      if (prevP !== null && prevP < a && p > z) b.crossed = true;   // range перескочен за кадр
+      if (p < a || p >= (b.def.hardExit ?? 1)) b.crossed = false;
+      if (b.crossed && !active) active = b;
     }
-  };
+    for (const b of blocks) set(b, b === active);
+    prevP = p;
+  }
+  return update;
 }

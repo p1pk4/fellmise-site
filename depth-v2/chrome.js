@@ -11,7 +11,7 @@
  * Локаль берётся из content.js, чтобы язык у контента и у интерфейса был один
  * и переключался в одном месте.
  */
-import { LOCALE } from './content.js';
+import { LOCALE, LINKS } from './route.js';
 import { mountSound } from './sound.js';
 
 const CHAPTERS = {
@@ -57,7 +57,8 @@ export function mountChrome(root, locale = LOCALE) {
 
   /* ----------------------------------------------------------- знак */
   // Существующее текстовое начертание проекта, без нового ассета и подложки.
-  root.appendChild(node('div', 'mark', 'Fellmise'));
+  // Это и есть заголовок страницы: единственный h1, заголовки битов — h2.
+  root.appendChild(node('h1', 'mark', 'Fellmise'));
 
   /* --------------------------------------------- язык и звук, правый верх */
   const tools = node('div', 'tools');
@@ -65,7 +66,7 @@ export function mountChrome(root, locale = LOCALE) {
   const langs = node('div', 'lang');
   for (const code of ['en', 'ru']) {
     const a = node('a', `lang__it${code === locale ? ' is-on' : ''}`, code.toUpperCase());
-    a.href = code === 'en' ? './' : './?lang=ru';
+    a.href = LINKS[code];          // продакшен — чистые адреса, превью — ?lang=
     a.setAttribute('aria-current', code === locale ? 'true' : 'false');
     a.addEventListener('click', () => {
       // сохранить место в маршруте, чтобы язык менялся без возврата в начало

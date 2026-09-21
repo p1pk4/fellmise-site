@@ -12,6 +12,7 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Fellmise">
 <meta property="og:locale" content="ru_RU">
+<meta property="og:locale:alternate" content="en_US">
 <meta property="og:title" content="Fellmise — 2D-песочница MMO с видом сверху">
 <meta property="og:description" content="Хардкорная 2D-песочница MMO с видом сверху в духе Ultima Online: скиллы вместо уровней, играбельная фракция монстров, кроссплей PC и мобайл">
 <meta property="og:url" content="https://fellmise.com/ru/">
@@ -22,61 +23,35 @@
 <meta name="twitter:title" content="Fellmise — 2D-песочница MMO с видом сверху">
 <meta name="twitter:description" content="Хардкорная 2D-песочница MMO с видом сверху в духе Ultima Online: скиллы вместо уровней, играбельная фракция монстров, кроссплей PC и мобайл">
 <meta name="twitter:image" content="https://fellmise.com/assets/og.jpg">
-<meta name="theme-color" content="#a8cb53">
-<link rel="icon" href="../assets/favicon-32.png" sizes="32x32">
-<link rel="icon" href="../assets/icon-512.png" sizes="512x512">
-<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+<meta name="theme-color" content="#1a1c21">
+<link rel="icon" href="/assets/favicon-32.png" sizes="32x32">
+<link rel="icon" href="/assets/icon-512.png" sizes="512x512">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"VideoGame","name":"Fellmise","url":"https://fellmise.com/ru/","description":"Качаешь то, чем играешь. Смерть уносит вещи. Мир живёт без тебя. Доната нет.","genre":["MMORPG","Sandbox"],"gamePlatform":["PC","iOS","Android"],"applicationCategory":"Game","inLanguage":"ru","image":"https://fellmise.com/assets/og.jpg","publisher":{"@type":"Organization","name":"Fellmise","url":"https://fellmise.com/","logo":"https://fellmise.com/assets/icon-512.png"}}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Fellmise","url":"https://fellmise.com/","logo":"https://fellmise.com/assets/icon-512.png"}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Fellmise","url":"https://fellmise.com/ru/","inLanguage":"ru"}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" media="print" onload="this.media='all'"
-      href="https://fonts.googleapis.com/css2?family=Podkova:wght@700&family=Vollkorn:wght@400;600;700&family=PT+Mono&display=swap">
-<noscript><link rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Podkova:wght@700&family=Vollkorn:wght@400;600;700&family=PT+Mono&display=swap"></noscript>
-<link rel="stylesheet" href="../stub.css?v=1">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Podkova:wght@700&family=Vollkorn:wght@500&display=swap">
+<link rel="stylesheet" href="/depth-v2/depth.css">
+<link rel="stylesheet" href="/depth-v2/content.css">
+<link rel="stylesheet" href="/depth-v2/chrome.css">
+<link rel="stylesheet" href="/depth-v2/static.css">
 </head>
 <body>
+<!-- Живой маршрут. В статике эти узлы скрыты стилями, а их модули не грузятся. -->
+<div id="stage"></div>
+<div id="content"></div>
+<div id="vignette"></div>
+<div id="chill"></div>
+<div id="ui"></div>
 
-<header class="top">
-  <a class="logo" href="../">FELLMISE</a>
-  <nav class="lang" aria-label="Language">
-    <span aria-current="true">RU</span>
-    <a href="../" hreflang="en">EN</a>
-  </nav>
-</header>
+<!-- Статическая версия: то же содержание без движения, собирается static.js -->
+<div id="static" hidden></div>
 
-<div class="scene" aria-hidden="true">
-  <div class="scene__ground"></div>
-  <div class="scene__road"></div>
-    <div class="sp sp--house-b"><img src="../assets/hero_house_b.webp" alt="" loading="eager" decoding="async"></div>
-    <div class="sp sp--tree"><img src="../assets/hero_tree_a.webp" alt="" loading="eager" decoding="async"></div>
-    <div class="sp sp--house-a"><img src="../assets/hero_house_a.webp" alt="" loading="eager" decoding="async"></div>
-</div>
+<div id="debug" hidden></div>
 
-<main>
-  <div class="sign">
-    <h1>Ты убивал их сотнями. Теперь они пришли за тобой.</h1>
-    <p>Качаешь то, чем играешь. Смерть уносит вещи. Мир живёт без тебя. Доната нет.</p>
-  </div>
-  <div class="cta">
-    <button class="btn btn--steam" disabled>Wishlist в Steam — скоро</button>
-    <!-- TODO: подставить инвайт, когда создан сервер Discord -->
-    <a class="btn btn--discord" href="#">Discord</a>
-  </div>
-  <p class="note">Игра в ранней разработке. Всё, что видишь, ещё поменяется.</p>
-</main>
-
-<footer class="foot">
-  <span>fellmise.com</span>
-  <span>© 2026 Fellmise</span>
-  <nav aria-label="Links">
-    <a href="#">Discord</a> ·
-    <a href="#">Steam</a> ·
-    <a href="../">EN</a>
-  </nav>
-</footer>
-
+<!-- boot.js решает, какую из двух версий грузить; движок один на / , /ru/ и /depth-v2/ -->
+<script type="module" src="/depth-v2/boot.js"></script>
 </body>
 </html>

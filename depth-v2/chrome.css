@@ -23,6 +23,7 @@
 .mark {
   position: absolute;
   top: 30px; left: 38px;
+  margin: 0;
   font-family: Podkova, Georgia, serif;
   font-weight: 700;
   font-size: 33px;

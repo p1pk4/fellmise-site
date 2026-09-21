@@ -2,8 +2,9 @@
  * наоборот — в journey.js нет ни одной строки копирайта.
  *
  * Копия лежит под ключом локали, по одному объекту на язык. Разметка и стили
- * от языка не зависят: /depth-v2/ открывается по-английски, /depth-v2/?lang=ru
- * — по-русски. Язык браузера не определяется, выбор только явный.
+ * от языка не зависят: / открывается по-английски, /ru/ — по-русски, а превью
+ * /depth-v2/ переключается запросом ?lang=. Какой именно вход открыт, решает
+ * route.js; язык браузера не определяется нигде.
  *
  * range — окно ПО ОБЩЕМУ ПРОГРЕССУ, не по колесу. Обе границы подобраны под
  * принятую хореографию и не меняют её: текст появляется после того, как биом
@@ -37,12 +38,11 @@
  * читался случайным декоративным глифом, а не принадлежностью. Так спираль
  * означает spirit/death layer, а не украшает сайт.
  */
-/* Локаль выбирается ТОЛЬКО явно, через ?lang=ru. Язык браузера не смотрим:
-   маршрут показывают на review, и он должен открываться предсказуемо. По
-   умолчанию и при любом незнакомом значении — английский. */
-const SUPPORTED = ['en', 'ru'];
-const asked = new URLSearchParams(location.search).get('lang');
-export const LOCALE = SUPPORTED.includes(asked) ? asked : 'en';
+/* Локаль решает route.js: на продакшене её задаёт сам адрес (/ и /ru/), на
+   превью — запрос ?lang=. Язык браузера не смотрим ни в одном случае. Здесь
+   она только переэкспортируется, чтобы у модуля остался прежний интерфейс. */
+export { LOCALE } from './route.js';
+import { LOCALE as LOC } from './route.js';
 
 export const BEATS = [
   {
@@ -148,11 +148,11 @@ function node(tag, cls, text) {
   return n;
 }
 
-export function mountContent(root, locale = LOCALE) {
+export function mountContent(root, locale = LOC) {
   document.documentElement.lang = locale;
   root.dataset.lang = locale;
   const blocks = BEATS.map((b) => {
-    const c = b[locale] || b[LOCALE];
+    const c = b[locale] || b[LOC];
     // id-класс нужен стилям: кегль заголовка и мера строки заданы посценно
     const el = node('article', `beat beat--${b.id} beat--${b.variant} beat--${b.side} beat--${b.y}`);
     if (b.hero) el.classList.add('beat--hero');

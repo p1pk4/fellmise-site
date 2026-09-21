@@ -14,7 +14,7 @@
  * документа: она не нужна, её картинки не должны грузиться, а заголовок h1 на
  * странице должен остаться один — знак Fellmise в системном UI.
  */
-const NARROW = '(max-width: 1279px)';
+const NARROW = '(max-width: 1023px)';
 const CALM = '(prefers-reduced-motion: reduce)';
 
 const d = document.documentElement;

@@ -37,7 +37,7 @@
     var d = document.documentElement;
     var q = new URLSearchParams(location.search).get('lang');
     if (location.pathname.indexOf('/depth-v2/') >= 0 && (q === 'en' || q === 'ru')) d.lang = q;
-    var calm = matchMedia('(max-width: 1279px)').matches || matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var calm = matchMedia('(max-width: 1023px)').matches || matchMedia('(prefers-reduced-motion: reduce)').matches;
     d.dataset.mode = calm ? 'static' : 'live';
   })();
 </script>

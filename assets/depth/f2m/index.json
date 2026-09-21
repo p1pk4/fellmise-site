@@ -1,0 +1,57 @@
+{
+ "plate": "forest_plate_clean.webp",
+ "next": "mine_plate.webp",
+ "cutouts": [
+  {
+   "id": "trunk_l",
+   "file": "forest_fg_trunk_l.webp",
+   "note": "крупный ствол слева с корневым наплывом",
+   "origin": [
+    0.22,
+    0.4
+   ],
+   "k": 3.1,
+   "coverage": 15.1
+  },
+  {
+   "id": "trunk_r",
+   "file": "forest_fg_trunk_r.webp",
+   "note": "крупный ствол справа с корневым наплывом",
+   "origin": [
+    0.78,
+    0.4
+   ],
+   "k": 3.1,
+   "coverage": 14.34
+  },
+  {
+   "id": "rock_l",
+   "file": "forest_fg_rock_l.webp",
+   "note": "валун у левого края",
+   "origin": [
+    0.08,
+    0.66
+   ],
+   "k": 2.7,
+   "coverage": 4.83
+  },
+  {
+   "id": "stump_r",
+   "file": "forest_fg_stump_r.webp",
+   "note": "пень и камни справа у тропы",
+   "origin": [
+    0.86,
+    0.8
+   ],
+   "k": 2.7,
+   "coverage": 4.92
+  }
+ ],
+ "passage": {
+  "matte": "passage_matte.png",
+  "anchor": [
+   0.5143229166666666,
+   0.48125
+  ]
+ }
+}

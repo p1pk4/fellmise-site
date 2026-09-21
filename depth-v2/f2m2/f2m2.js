@@ -18,7 +18,7 @@
  * (слабый ближний параллакс) и уходят ДО того, как шахта становится центром,
  * чтобы не спорить с ней отдельной анимацией.
  */
-const BASE = '/out/depth-v2/f2m/';
+const BASE = '/assets/depth/f2m/';
 const stage = document.getElementById('stage');
 const panel = document.getElementById('debug');
 const debug = new URLSearchParams(location.search).get('debug') === '1';

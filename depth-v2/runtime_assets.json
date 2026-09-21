@@ -1,0 +1,91 @@
+{
+ "_doc": [
+  "Runtime-ассеты Depth Journey: ровно то, что браузер запрашивает на /depth-v2/ и",
+  "в изолированных роутах h2f, f2m2, m2s, s2c, c2h. Список снят записью реальных",
+  "запросов при полном проходе каждого роута, а не составлен вручную.",
+  "src — рабочий вывод билдеров в out/ (игнорируется git), dst — опубликованная",
+  "копия в assets/depth/ (в git). Переносит publish_runtime_assets.py."
+ ],
+ "assets": [
+  {
+   "src": "out/depth-v2/c2h/core_plate.webp",
+   "dst": "assets/depth/c2h/core_plate.webp"
+  },
+  {
+   "src": "out/depth-v2/c2h/home_plate.webp",
+   "dst": "assets/depth/c2h/home_plate.webp"
+  },
+  {
+   "src": "out/depth-v2/c2h/index.json",
+   "dst": "assets/depth/c2h/index.json"
+  },
+  {
+   "src": "out/depth-v2/f2m/forest_fg_trunk_l.webp",
+   "dst": "assets/depth/f2m/forest_fg_trunk_l.webp"
+  },
+  {
+   "src": "out/depth-v2/f2m/forest_fg_trunk_r.webp",
+   "dst": "assets/depth/f2m/forest_fg_trunk_r.webp"
+  },
+  {
+   "src": "out/depth-v2/f2m/forest_plate_clean.webp",
+   "dst": "assets/depth/f2m/forest_plate_clean.webp"
+  },
+  {
+   "src": "out/depth-v2/f2m/index.json",
+   "dst": "assets/depth/f2m/index.json"
+  },
+  {
+   "src": "out/depth-v2/f2m/mine_plate.webp",
+   "dst": "assets/depth/f2m/mine_plate.webp"
+  },
+  {
+   "src": "out/depth-v2/h2f/forest_plate.webp",
+   "dst": "assets/depth/h2f/forest_plate.webp"
+  },
+  {
+   "src": "out/depth-v2/h2f/hero_fg_fence_l.webp",
+   "dst": "assets/depth/h2f/hero_fg_fence_l.webp"
+  },
+  {
+   "src": "out/depth-v2/h2f/hero_fg_fence_r.webp",
+   "dst": "assets/depth/h2f/hero_fg_fence_r.webp"
+  },
+  {
+   "src": "out/depth-v2/h2f/hero_fg_oak.webp",
+   "dst": "assets/depth/h2f/hero_fg_oak.webp"
+  },
+  {
+   "src": "out/depth-v2/h2f/hero_plate_clean.webp",
+   "dst": "assets/depth/h2f/hero_plate_clean.webp"
+  },
+  {
+   "src": "out/depth-v2/h2f/index.json",
+   "dst": "assets/depth/h2f/index.json"
+  },
+  {
+   "src": "out/depth-v2/m2s/index.json",
+   "dst": "assets/depth/m2s/index.json"
+  },
+  {
+   "src": "out/depth-v2/m2s/mine_plate.webp",
+   "dst": "assets/depth/m2s/mine_plate.webp"
+  },
+  {
+   "src": "out/depth-v2/m2s/spirit_plate.webp",
+   "dst": "assets/depth/m2s/spirit_plate.webp"
+  },
+  {
+   "src": "out/depth-v2/s2c/core_plate.webp",
+   "dst": "assets/depth/s2c/core_plate.webp"
+  },
+  {
+   "src": "out/depth-v2/s2c/index.json",
+   "dst": "assets/depth/s2c/index.json"
+  },
+  {
+   "src": "out/depth-v2/s2c/threshold_plate.webp",
+   "dst": "assets/depth/s2c/threshold_plate.webp"
+  }
+ ]
+}

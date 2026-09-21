@@ -16,7 +16,7 @@
  * встаёт, и последние 0.97-1.00 в кадре не меняется уже ничего. Дальше нет ни
  * прохода, ни следующей цели.
  */
-const BASE = '/out/depth-v2/c2h/';
+const BASE = '/assets/depth/c2h/';
 const stage = document.getElementById('stage');
 const panel = document.getElementById('debug');
 const debug = new URLSearchParams(location.search).get('debug') === '1';

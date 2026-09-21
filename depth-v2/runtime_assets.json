@@ -4,7 +4,10 @@
   "в изолированных роутах h2f, f2m2, m2s, s2c, c2h. Список снят записью реальных",
   "запросов при полном проходе каждого роута, а не составлен вручную.",
   "src — рабочий вывод билдеров в out/ (игнорируется git), dst — опубликованная",
-  "копия в assets/depth/ (в git). Переносит publish_runtime_assets.py."
+  "копия в assets/depth/ (в git). Переносит publish_runtime_assets.py.",
+  "assets/depth/hi/ — те же сцены после super-resolution (upscale_plates.py по",
+  "hires_plates.json); их грузит единый маршрут. Плиты 1536 остаются для",
+  "изолированных переходов и статической версии."
  ],
  "assets": [
   {
@@ -86,6 +89,42 @@
   {
    "src": "out/depth-v2/s2c/threshold_plate.webp",
    "dst": "assets/depth/s2c/threshold_plate.webp"
+  },
+  {
+   "src": "out/depth-v2/hi/hero_plate_clean.webp",
+   "dst": "assets/depth/hi/hero_plate_clean.webp"
+  },
+  {
+   "src": "out/depth-v2/hi/forest_plate.webp",
+   "dst": "assets/depth/hi/forest_plate.webp"
+  },
+  {
+   "src": "out/depth-v2/hi/mine_plate.webp",
+   "dst": "assets/depth/hi/mine_plate.webp"
+  },
+  {
+   "src": "out/depth-v2/hi/threshold_plate.webp",
+   "dst": "assets/depth/hi/threshold_plate.webp"
+  },
+  {
+   "src": "out/depth-v2/hi/core_plate.webp",
+   "dst": "assets/depth/hi/core_plate.webp"
+  },
+  {
+   "src": "out/depth-v2/hi/home_plate.webp",
+   "dst": "assets/depth/hi/home_plate.webp"
+  },
+  {
+   "src": "out/depth-v2/hi/hero_fg_oak.webp",
+   "dst": "assets/depth/hi/hero_fg_oak.webp"
+  },
+  {
+   "src": "out/depth-v2/hi/hero_fg_fence_l.webp",
+   "dst": "assets/depth/hi/hero_fg_fence_l.webp"
+  },
+  {
+   "src": "out/depth-v2/hi/hero_fg_fence_r.webp",
+   "dst": "assets/depth/hi/hero_fg_fence_r.webp"
   }
  ]
 }

@@ -1,0 +1,71 @@
+{
+ "_doc": [
+  "Цели super-resolution для рантайм-плит Depth Journey.",
+  "width выбран по замеру: плотность >= 0.85 пикселя источника на экранный пиксель",
+  "на максимальном видимом масштабе плиты (max_scale, снят телеметрией на 1920x1080),",
+  "с округлением вверх до 128 и не меньше 1920. Дом дальше 1.0 не приближается.",
+  "Модель — RealESRGAN_x4plus (верность исходнику выше, чем у anime_6B)."
+ ],
+ "model": "RealESRGAN_x4plus.pth",
+ "quality": 88,
+ "out_dir": "out/depth-v2/hi",
+ "items": [
+  {
+   "name": "hero_plate_clean",
+   "src": "assets/depth/h2f/hero_plate_clean.webp",
+   "width": 3712,
+   "max_scale": 2.24
+  },
+  {
+   "name": "forest_plate",
+   "src": "out/scene_batch1/final/forest_transition.png",
+   "width": 3968,
+   "max_scale": 2.362
+  },
+  {
+   "name": "mine_plate",
+   "src": "out/scene_batch1/final/mine_approach.png",
+   "width": 3584,
+   "max_scale": 2.179
+  },
+  {
+   "name": "threshold_plate",
+   "src": "out/scene_batch1/final/spirit_threshold.png",
+   "width": 3584,
+   "max_scale": 2.129
+  },
+  {
+   "name": "core_plate",
+   "src": "out/scene_batch1/final/spirit_core.png",
+   "width": 3328,
+   "max_scale": 2.038
+  },
+  {
+   "name": "home_plate",
+   "src": "out/scene_batch1/final/home_finale.png",
+   "width": 1920,
+   "max_scale": 1.0
+  },
+  {
+   "name": "hero_fg_oak",
+   "src": "assets/depth/h2f/hero_fg_oak.webp",
+   "width": 3712,
+   "max_scale": 2.24,
+   "note": "лежит поверх плиты деревни — размер совпадает с ней"
+  },
+  {
+   "name": "hero_fg_fence_l",
+   "src": "assets/depth/h2f/hero_fg_fence_l.webp",
+   "width": 3712,
+   "max_scale": 2.24,
+   "note": "лежит поверх плиты деревни — размер совпадает с ней"
+  },
+  {
+   "name": "hero_fg_fence_r",
+   "src": "assets/depth/h2f/hero_fg_fence_r.webp",
+   "width": 3712,
+   "max_scale": 2.24,
+   "note": "лежит поверх плиты деревни — размер совпадает с ней"
+  }
+ ]
+}

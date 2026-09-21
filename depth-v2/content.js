@@ -89,16 +89,53 @@ export function mountContent(root, locale = LOC) {
 
   /* Видимость решает общий прогресс; сама анимация — временная, на CSS.
      Так текст не скрабится вместе с колесом и всегда идёт своей мягкой
-     дорожкой 400-650 мс, как задумано. */
-  return function update(p) {
+     дорожкой 400-650 мс, как задумано.
+
+     Минимальное время показа. При энергичной прокрутке окно range пролетается
+     за доли секунды — текст появлялся и сразу гас. Теперь бит, однажды
+     показанный, держится не меньше своего dwell, даже если прогресс уже ушёл
+     за range вперёд. Правила, по старшинству:
+       1. за hardExit (45% раскрытия следующей сцены) — уйти сразу: старый
+          текст не должен лежать поверх почти открывшейся новой сцены;
+       2. на экране не больше одного бита: как только начинается следующий,
+          удерживаемый уходит;
+       3. при прокрутке назад, раньше начала range, — уйти сразу;
+       4. иначе держать, пока не истечёт dwell.
+     Если быстрый рывок перескочил range целиком за один кадр, бит всё равно
+     показывается — прогресс уже в его сцене, до hardExit. */
+  const set = (b, on, now) => {
+    if (on === b.on) return;
+    b.on = on;
+    if (on) b.shownAt = now;
+    b.el.classList.toggle('is-on', on);
+    b.el.setAttribute('aria-hidden', String(!on));
+  };
+  let prevP = null, lastP = 0, timer = 0;
+
+  function update(p) {
+    const now = performance.now();
+    lastP = p;
+    // бит, в чей range попал прогресс или чей range перескочен вперёд за кадр
+    let active = null;
     for (const b of blocks) {
       const [a, z] = b.def.range;
-      const on = p >= a && p <= z;
-      if (on !== b.on) {
-        b.on = on;
-        b.el.classList.toggle('is-on', on);
-        b.el.setAttribute('aria-hidden', String(!on));
-      }
+      const crossed = prevP !== null && prevP < a && p > z;
+      if ((p >= a && p <= z) || (crossed && p < (b.def.hardExit ?? 1))) active = b;
     }
-  };
+    let wait = Infinity;
+    for (const b of blocks) {
+      if (b === active) { set(b, true, now); continue; }
+      const [a] = b.def.range;
+      const held = b.on && !active && p > a && p < (b.def.hardExit ?? 1)
+        && now - b.shownAt < (b.def.dwell || 0);
+      if (held) wait = Math.min(wait, b.def.dwell - (now - b.shownAt));
+      set(b, held, now);
+    }
+    prevP = p;
+    // удерживаемый бит должен уйти и тогда, когда прокрутка уже остановилась
+    // и кадры больше не рисуются
+    clearTimeout(timer);
+    if (wait < Infinity) timer = setTimeout(() => update(lastP), wait + 16);
+  }
+  return update;
 }

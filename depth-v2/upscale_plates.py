@@ -14,6 +14,12 @@
 остаются теми же. Альфа (у вырезок переднего плана) не проходит через сеть —
 она масштабируется Lanczos отдельно, чтобы край вырезки не «поплыл».
 
+Вырезки переднего плана (crop: true) — полнокадровые слои с альфой, почти
+целиком прозрачные: полный кадр 4288x2680 в памяти стоит 44 МБ, а сам дуб
+занимает половину. Поэтому они обрезаются по альфе (+ запас PAD_CROP), а рамка в
+долях полного кадра пишется в cuts.json рядом — по ней маршрут кладёт обрезок
+ровно туда, где он лежал в полном кадре. Плотность не меняется.
+
 Пакетный режим читает цели из hires_plates.json (ширина каждой плиты выбрана по
 замеру плотности пикселей) и пишет WebP в out/depth-v2/hi/ — рабочий вывод. В
 assets/depth/ его байт в байт переносит publish_runtime_assets.py.
@@ -27,6 +33,7 @@ from PIL import Image
 from spandrel import ModelLoader
 
 TILE, PAD = 384, 32
+PAD_CROP = 8          # запас вокруг альфы при обрезке вырезок, px
 
 
 def sr(model, rgb, scale):
@@ -60,6 +67,18 @@ def upscale(model, src, width):
     return im.size, up
 
 
+def crop_alpha(im):
+    """Обрезка RGBA по альфе; рамка — в долях полного кадра (для раскладки)."""
+    a = np.asarray(im.getchannel("A"))
+    ys, xs = np.nonzero(a > 0)
+    x0, y0 = max(0, xs.min() - PAD_CROP), max(0, ys.min() - PAD_CROP)
+    x1, y1 = min(im.width, xs.max() + 1 + PAD_CROP), min(im.height, ys.max() + 1 + PAD_CROP)
+    box = {"full": [im.width, im.height],
+           "box": [round(x0 / im.width, 6), round(y0 / im.height, 6), round(x1 / im.width, 6), round(y1 / im.height, 6)],
+           "px": [int(x0), int(y0), int(x1), int(y1)]}
+    return im.crop((x0, y0, x1, y1)), box
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--batch")
@@ -68,6 +87,7 @@ def main():
     ap.add_argument("--src")
     ap.add_argument("--out")
     ap.add_argument("--width", type=int, default=0, help="итоговая ширина; 0 — оставить x4")
+    ap.add_argument("--only", help="только эти имена из --batch, через запятую")
     a = ap.parse_args()
 
     if a.batch:
@@ -76,11 +96,21 @@ def main():
         model = ModelLoader().load_from_file(str(pathlib.Path(a.models) / spec["model"])).cuda().eval()
         out_dir = root / spec["out_dir"]
         out_dir.mkdir(parents=True, exist_ok=True)
+        only = set(a.only.split(",")) if a.only else None
+        cuts_path = out_dir / "cuts.json"
+        cuts = json.loads(cuts_path.read_text(encoding="utf-8")) if cuts_path.exists() else {}
         for it in spec["items"]:
+            if only and it["name"] not in only:
+                continue
             size, up = upscale(model, root / it["src"], it["width"])
+            if it.get("crop"):
+                up, box = crop_alpha(up)
+                cuts[it["name"]] = box
             dst = out_dir / f"{it['name']}.webp"
             up.save(dst, "WEBP", quality=spec["quality"], method=6)
             print(f"{it['name']:18s} {size} -> {up.size}  {dst.stat().st_size / 1024:6.0f} KB")
+        if cuts:
+            cuts_path.write_text(json.dumps(cuts, indent=1, sort_keys=True) + "\n", encoding="utf-8")
         return
 
     model = ModelLoader().load_from_file(a.model).cuda().eval()

@@ -87,59 +87,36 @@ export function mountContent(root, locale = LOC) {
     return { def: b, el, on: null };
   });
 
-  /* Видимость решает общий прогресс; сама анимация — временная, на CSS.
+  /* Видимость решает нарисованный прогресс; сама анимация — временная, на CSS.
      Так текст не скрабится вместе с колесом и всегда идёт своей мягкой
      дорожкой 400-650 мс, как задумано.
 
-     Минимальное время показа. При энергичной прокрутке окно range пролетается
-     за доли секунды — текст появлялся и сразу гас. Теперь бит, однажды
-     показанный, держится не меньше своего dwell, даже если прогресс уже ушёл
-     за range вперёд. Правила, по старшинству:
-       1. за hardExit (72% раскрытия следующей сцены) — уйти сразу: старый
-          текст не должен лежать поверх почти открывшейся новой сцены;
-       2. на экране не больше одного бита: как только начинается следующий,
-          удерживаемый уходит;
-       3. при прокрутке назад, раньше начала range, — уйти сразу;
-       4. иначе держать, пока не истечёт dwell, — только при первом показе.
-     Основной механизм задержки теперь в journey.js: нарисованный прогресс сам
-     проходит окно текста не быстрее dwell. Удержание здесь — запасное.
-     Если быстрый рывок перескочил range целиком за один кадр, бит всё равно
-     показывается — прогресс уже в его сцене, до hardExit. */
-  const set = (b, on, now) => {
+     Сколько текст висит на экране, решает не этот модуль, а journey.js: при
+     первом проходе вперёд нарисованный прогресс идёт через окно range не
+     быстрее, чем за dwell выбранного режима. Здесь только правила показа:
+       • бит виден, пока прогресс в его range;
+       • если range перескочен целиком за один кадр — бит всё равно показан,
+         но только до hardExit (72% раскрытия следующей сцены);
+       • на экране не больше одного бита. */
+  const set = (b, on) => {
     if (on === b.on) return;
     b.on = on;
-    // удержание — только при первом показе за сессию; при возврате назад и
-    // повторном проходе текст живёт по обычному окну range
-    if (on) { b.shownAt = now; b.first = !b.seen; b.seen = true; }
     b.el.classList.toggle('is-on', on);
     b.el.setAttribute('aria-hidden', String(!on));
   };
-  let prevP = null, lastP = 0, timer = 0;
+  let prevP = null;
 
   function update(p) {
-    const now = performance.now();
-    lastP = p;
-    // бит, в чей range попал прогресс или чей range перескочен вперёд за кадр
     let active = null;
     for (const b of blocks) {
       const [a, z] = b.def.range;
-      const crossed = prevP !== null && prevP < a && p > z;
-      if ((p >= a && p <= z) || (crossed && p < (b.def.hardExit ?? 1))) active = b;
+      if (p >= a && p <= z) { active = b; b.crossed = false; continue; }
+      if (prevP !== null && prevP < a && p > z) b.crossed = true;   // range перескочен за кадр
+      if (p < a || p >= (b.def.hardExit ?? 1)) b.crossed = false;
+      if (b.crossed && !active) active = b;
     }
-    let wait = Infinity;
-    for (const b of blocks) {
-      if (b === active) { set(b, true, now); continue; }
-      const [a] = b.def.range;
-      const held = b.on && b.first && !active && p > a && p < (b.def.hardExit ?? 1)
-        && now - b.shownAt < (b.def.dwell || 0);
-      if (held) wait = Math.min(wait, b.def.dwell - (now - b.shownAt));
-      set(b, held, now);
-    }
+    for (const b of blocks) set(b, b === active);
     prevP = p;
-    // удерживаемый бит должен уйти и тогда, когда прокрутка уже остановилась
-    // и кадры больше не рисуются
-    clearTimeout(timer);
-    if (wait < Infinity) timer = setTimeout(() => update(lastP), wait + 16);
   }
   return update;
 }

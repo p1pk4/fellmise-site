@@ -125,6 +125,10 @@
   {
    "src": "out/depth-v2/hi/hero_fg_fence_r.webp",
    "dst": "assets/depth/hi/hero_fg_fence_r.webp"
+  },
+  {
+   "src": "out/depth-v2/hi/cuts.json",
+   "dst": "assets/depth/hi/cuts.json"
   }
  ]
 }

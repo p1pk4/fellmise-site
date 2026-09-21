@@ -239,15 +239,53 @@ const panel = document.getElementById('debug');
 const debug = new URLSearchParams(location.search).get('debug') === '1';
 if (debug) panel.hidden = false;
 
-function img(src, z, origin) {
-  const n = document.createElement('img');
-  n.className = 'sheet';
-  n.src = src;
-  n.alt = '';
-  n.decoding = 'async';
+/* ------------------------------------------------------ резидентность плит
+ *
+ * Плиты крупные (до ~5K по ширине): все разом — это ~400 МБ декодированных
+ * текстур. Поэтому в памяти живёт скользящее окно: текущая сцена, следующая и
+ * предыдущая, пока она ещё участвует в переходе. Слои строятся без src; адрес
+ * им выдаёт менеджер ниже, и он же забирает его, когда сцена больше не нужна.
+ *
+ * Каждая сцена берётся в память в своей точке — в начале окна текста
+ * предыдущей сцены, то есть за целую секцию до собственного раскрытия, — и
+ * декодируется заранее (img.decode). Освобождается, когда кадр её уже не
+ * использует: с запасом по прогрессу, чтобы не декодировать заново от дрожания
+ * у границы, и с ранним повторным захватом при прокрутке назад.
+ *
+ * Если hi-res почему-то не готова к моменту показа, слой получает принятую
+ * плиту 1536 из assets/depth/<переход>/ — картинка та же, только мягче. Замена
+ * на hi-res делается, только пока слой скрыт или мал (масштаб <= 0.75, там 1536
+ * ещё плотнее экрана): скачка резкости в кадре нет.
+ *
+ * Готовая текстура на два кадра показывается почти прозрачной (0.002), пока слой
+ * ещё не в кадре: заливка в GPU проходит заранее, а не на первом кадре раскрытия.
+ */
+const LOW = {
+  hero: '/assets/depth/h2f/hero_plate_clean.webp', forest: '/assets/depth/h2f/forest_plate.webp',
+  mine: '/assets/depth/m2s/mine_plate.webp', threshold: '/assets/depth/s2c/threshold_plate.webp',
+  core: '/assets/depth/s2c/core_plate.webp', home: '/assets/depth/c2h/home_plate.webp',
+};
+const SCENE_OF = {
+  'hero_plate_clean.webp': 'hero', 'forest_plate.webp': 'forest', 'mine_plate.webp': 'mine',
+  'threshold_plate.webp': 'threshold', 'core_plate.webp': 'core', 'home_plate.webp': 'home',
+};
+const BEAT_OF = { hero: 'village', forest: 'forest', mine: 'mine', threshold: 'threshold', core: 'core' };
+const RELEASE = 0.06, REACQUIRE = 0.05;     // запас по прогрессу за концом участия сцены
+
+const RES = new Map();
+let started = false;
+const stats = { fallbacks: 0, peakBytes: 0, peakPlates: 0 };
+function resource(key, hi, lo) {
+  if (!RES.has(key)) RES.set(key, { key, hi, lo, acq: 0, end: 0, on: false, ready: false, img: null, els: [], bytes: 0, warm: 0 });
+  return RES.get(key);
+}
+
+function layer(tag, cls, z, origin) {
+  const n = document.createElement(tag);
+  n.className = cls;
+  if (tag === 'img') { n.alt = ''; n.decoding = 'async'; }
   n.style.zIndex = String(z);
   n.style.transformOrigin = origin;
-  stage.appendChild(n);
   return n;
 }
 
@@ -256,22 +294,125 @@ SECTIONS.forEach((s, i) => {
   if (s.hold) { built.push({ def: s }); return; }
   const origin = `${s.vp[0] * 100}% ${s.vp[1] * 100}%`;
   const z = i * 10;
-  const plate = img(s.from + s.plate, z, origin);
+  const plate = layer('img', 'sheet', z, origin);
+  stage.appendChild(plate);
   const holder = document.createElement('div');
   holder.className = 'holder';
   holder.style.zIndex = String(z + 5);
-  const next = document.createElement('img');
-  next.className = 'sheet';
-  next.src = s.from + s.next;
-  next.alt = '';
-  next.decoding = 'async';
-  next.style.transformOrigin = origin;
+  const next = layer('img', 'sheet', 0, origin);
   holder.appendChild(next);
   stage.appendChild(holder);
-  // вырезки лежат выше входящей сцены: они ещё идут мимо, пока она открывается
-  const cuts = (s.cuts || []).map((f) => img(s.from + f, z + 8, origin));
+  // вырезки лежат выше входящей сцены: они ещё идут мимо, пока она открывается.
+  // Каждая — обёртка во весь кадр (её масштабирует камера) с обрезком внутри,
+  // положенным ровно туда, где он был в полном кадре (рамки — cuts.json)
+  const cuts = (s.cuts || []).map((f) => {
+    const wrap = layer('div', 'sheet', z + 8, origin);
+    const im = layer('img', 'cut', 0, '0 0');
+    im.style.position = 'absolute';
+    im.style.maxWidth = 'none';
+    wrap.appendChild(im);
+    stage.appendChild(wrap);
+    const key = f.replace('.webp', '');
+    resource(key, s.from + f, null).els.push({ el: im, shown: () => !wrap.hidden, cut: key, box: wrap });
+    return wrap;
+  });
+  const sp = SCENE_OF[s.plate], sn = SCENE_OF[s.next];
+  resource(sp, s.from + s.plate, LOW[sp]).els.push({ el: plate, shown: () => !plate.hidden, box: plate });
+  resource(sn, s.from + s.next, LOW[sn]).els.push({ el: next, shown: () => !holder.hidden, holder, box: holder });
   built.push({ def: s, plate, holder, next, cuts, lastMask: '' });
 });
+
+let CUT_BOX = {};
+function layoutCuts() {
+  // cover для кадра 1.6:1 — так же, как object-fit: cover у полнокадровых плит
+  const W = innerWidth, H = innerHeight, Wr = Math.max(W, H * 1.6), Hr = Wr / 1.6;
+  const ox = (W - Wr) / 2, oy = (H - Hr) / 2;
+  for (const R of RES.values()) for (const e of R.els) {
+    if (!e.cut || !CUT_BOX[e.cut]) continue;
+    const [x0, y0, x1, y1] = CUT_BOX[e.cut].box;
+    Object.assign(e.el.style, { left: `${ox + x0 * Wr}px`, top: `${oy + y0 * Hr}px`,
+      width: `${(x1 - x0) * Wr}px`, height: `${(y1 - y0) * Hr}px` });
+  }
+}
+
+// окна участия сцен: захват — начало окна текста текущей сцены (для первой
+// сцены и вырезок — сразу), конец — последний кадр, где слой ещё в кадре
+function planResidency() {
+  const beat = (id) => BEATS.find((b) => b.id === id);
+  SECTIONS.forEach((s, i) => {
+    const sp = SCENE_OF[s.plate], sn = SCENE_OF[s.next];
+    const P = RES.get(sp), N = RES.get(sn);
+    P.end = Math.max(P.end, s.band[1] + 0.004);
+    if (i === 0) P.acq = 0;
+    N.acq = beat(BEAT_OF[sp]).range[0];
+    N.end = Math.max(N.end, sn === 'home' ? 1 : s.band[1] + 0.004);
+    for (const f of s.cuts || []) {
+      const C = RES.get(f.replace('.webp', ''));
+      C.acq = 0; C.end = globOf(s, s.cutFade[1]) + 0.004;
+    }
+  });
+}
+planResidency();
+
+function acquire(R) {
+  R.on = true; R.ready = false;
+  const im = new Image();
+  im.decoding = 'async';
+  im.src = R.hi;
+  R.img = im;
+  R.done = im.decode().then(() => {
+    if (R.img !== im) return;
+    R.ready = true; R.bytes = im.naturalWidth * im.naturalHeight * 4; R.warm = 2;
+    if (started) schedule();          // до конца старта кадры не рисуются
+  }).catch(() => {});
+}
+function release(R) {
+  R.on = false; R.ready = false; R.img = null; R.bytes = 0; R.warm = 0;
+  for (const e of R.els) { e.el.removeAttribute('src'); e.res = ''; }
+}
+
+function residency(pp) {
+  let bytes = 0, plates = 0, warming = false;
+  for (const R of RES.values()) {
+    const wantOn = pp >= R.acq && pp <= R.end + REACQUIRE;
+    const wantOff = pp > R.end + RELEASE || pp < R.acq - 0.02;
+    if (!R.on && wantOn) acquire(R);
+    else if (R.on && wantOff) release(R);
+    if (R.on) { bytes += R.bytes; if (R.lo && R.ready) plates++; }
+    if (!R.on) continue;
+    for (const e of R.els) {
+      const shown = e.shown();
+      if (R.ready) {
+        // замена на hi-res — только пока слой скрыт или мал: без скачка резкости
+        if (e.res !== 'hi' && (!shown || e.res !== 'lo' || (e.el._scale ?? 1) <= 0.75)) {
+          e.el.src = R.hi; e.res = 'hi';
+        }
+        // прогрев: пока слой не в кадре, два кадра показать его почти прозрачным
+        if (R.warm > 0 && !shown && e.res === 'hi') {
+          e.box.hidden = false;
+          if (e.holder) { e.holder.style.maskImage = 'none'; e.holder.style.webkitMaskImage = 'none'; }
+          e.el.style.opacity = '0.002';
+          e.warming = true;
+        }
+      } else if (shown && !e.res && R.lo) {
+        e.el.src = R.lo; e.res = 'lo'; stats.fallbacks++;
+      }
+    }
+    if (R.warm > 0) { R.warm--; warming = true; }
+  }
+  stats.peakBytes = Math.max(stats.peakBytes, bytes);
+  stats.peakPlates = Math.max(stats.peakPlates, plates);
+  return warming;
+}
+// после прогрева вернуть слоям обычное состояние: видимость и маску заново
+// выставит apply() на следующем кадре
+function coolDown() {
+  let any = false;
+  for (const R of RES.values()) for (const e of R.els) {
+    if (e.warming && R.warm === 0) { e.el.style.opacity = ''; e.warming = false; any = true; }
+  }
+  if (any) for (const S of built) S.lastMask = '';
+}
 
 function coverScale(want, vp, rx, ry, ax, ay) {
   const l = Math.max(0, vp[0] - rx), r = Math.min(1, vp[0] + rx);
@@ -287,43 +428,96 @@ buildTrajectories(innerWidth, innerHeight);
 /* ------------------------------------------------ задержка взгляда на тексте
  *
  * Прогресса два, как и было: target — куда пользователь хочет попасть колесом,
- * p — что сейчас нарисовано; p догоняет target экспоненциально. Колесо не
+ * p — что нарисовано; p догоняет target экспоненциально. Колесо не
  * блокируется никогда: target копится свободно.
  *
- * Меняется только скорость догона вперёд, и только при ПЕРВОМ проходе вперёд
- * через окно текста биома:
- *   • перед окном p плавно тормозит — v ≤ vRead + √(2·BRAKE·d), где d —
- *     расстояние до начала окна: удара о зону нет;
- *   • в окне скорость не больше vRead = (длина окна) / dwell — сцена не
- *     замирает, а медленно едет вперёд и проходит окно не быстрее чем за dwell;
- *   • после окна скорость растёт с ограниченным ускорением RECOVER — догон
- *     плавный, без рывка.
- * При возврате назад и при повторном проходе ограничения нет. Назад камера из-за
- * этого не едет никогда: ограничивается только скорость вперёд.
+ * При ПЕРВОМ проходе вперёд через окно текста биома скорость догона
+ * ограничивается так, чтобы окно длилось dwell выбранного режима. Режим — по
+ * намерению пользователя, из того же target:
+ *   read — обычная прокрутка: полное время чтения;
+ *   fast — ввод быстрее FAST_RATE прогресса/с: короче, но текст не мелькает;
+ *   skip — рывок (за 400 мс target ушёл вперёд на FLING и больше) или
+ *          пользователь ушёл далеко вперёд и ждёт (отставание >= SKIP_LEAD,
+ *          колесо не крутится IDLE мс). Короткая
+ *          задержка только на биоме, где рывок застал; дальше биомы проходятся
+ *          без обязательных остановок (pass) плавным догоном не быстрее VSKIP,
+ *          пока отставание не упадёт ниже SKIP_END — тогда чтение снова работает.
+ * Перед окном — плавное торможение, после — разгон с ограниченным ускорением:
+ * ни остановки, ни рывка, ни движения назад. Назад и при повторном проходе
+ * ограничения нет.
  */
-const BRAKE = 3.0;     // торможение перед окном, прогресс/с²
-const RECOVER = 3.0;   // разгон после окна, прогресс/с²
+const BRAKE = 3.0;       // торможение перед окном, прогресс/с²
+const RECOVER = 3.0;     // разгон после окна, прогресс/с²
+const FAST_RATE = 0.30;  // прирост target за последнюю секунду — порог быстрой прокрутки
+const FLING = 0.30;      // прирост target за 400 мс — рывок
+const SKIP_END = 0.16;   // отставание, ниже которого рывок считается отработанным
+const VSKIP = 0.22;      // потолок скорости догона после рывка, прогресс/с
+const SKIP_LEAD = 0.35;  // отставание, при котором ожидание впереди — тоже пропуск
+const IDLE = 350;        // мс без ввода, после которых отставание читается как ожидание
 const ZONES = BEATS.filter((b) => b.dwell).map((b) => ({
-  id: b.id, a: b.range[0], z: b.range[1], dwell: b.dwell,
-  vRead: (b.range[1] - b.range[0]) / (b.dwell / 1000), visited: false, t0: 0, t1: 0,
+  id: b.id, a: b.range[0], z: b.range[1], dw: b.dwell,
+  visited: false, t0: 0, t1: 0, mode: '', dwell: 0,
 }));
 const lim = { v: 0, recovering: false };
+const skip = { on: false, used: false };
+const input = [];        // [время, target] последних 1.5 с
+
+function noteInput(now) {
+  input.push([now, target]);
+  while (input.length && now - input[0][0] > 1500) input.shift();
+}
+function gain(now, ms) {
+  let lo = target;
+  for (const [t, v] of input) if (now - t <= ms) lo = Math.min(lo, v);
+  return target - lo;
+}
+function modeNow(now) {
+  if (skip.on) return skip.used ? 'pass' : 'skip';
+  return gain(now, 1000) >= FAST_RATE ? 'fast' : 'read';
+}
+const dwellOf = (Z, mode) => (mode === 'pass' ? 0 : Z.dw[mode]);
 
 function limitForward(step, sec, now) {
   const v = step / sec;
-  let vmax = Infinity;
+  // рывок начинает эпизод пропуска; эпизод кончается, когда отставание сошло
+  const idle = !input.length || now - input[input.length - 1][0] > IDLE;
+  if (!skip.on && (gain(now, 400) >= FLING || (idle && target - p >= SKIP_LEAD))) {
+    skip.on = true; skip.used = false;
+  }
+  if (skip.on && target - p < SKIP_END) skip.on = false;
+  let vmax = Infinity, inWindow = false;
   for (const Z of ZONES) {
     if (Z.visited) {
-      if (p >= Z.a && p <= Z.z && now - Z.t0 < Z.dwell) vmax = Math.min(vmax, Z.vRead);
+      if (p >= Z.a && p <= Z.z && now - Z.t0 < Z.dwell) {
+        // рывок посреди окна укорачивает его до skip, быстрый ввод — до fast
+        const m = modeNow(now);
+        if (m === 'skip' || m === 'pass') {
+          Z.dwell = Math.max(now - Z.t0, Math.min(Z.dwell, Z.dw.skip)); Z.mode = 'skip'; skip.used = true;
+        } else if (m === 'fast' && Z.mode === 'read') {
+          Z.dwell = Math.max(now - Z.t0, Math.min(Z.dwell, Z.dw.fast)); Z.mode = 'fast';
+        }
+        const left = Math.max(0.001, (Z.t0 + Z.dwell - now) / 1000);
+        vmax = Math.min(vmax, Math.max(0.004, (Z.z - p) / left));
+        inWindow = true;
+      }
     } else if (p < Z.a) {
-      vmax = Math.min(vmax, Z.vRead + Math.sqrt(2 * BRAKE * (Z.a - p)));
+      const m = modeNow(now);
+      if (m !== 'pass') {
+        const vEntry = (Z.z - Z.a) / (dwellOf(Z, m) / 1000);
+        vmax = Math.min(vmax, vEntry + Math.sqrt(2 * BRAKE * (Z.a - p)));
+      }
     }
   }
+  if (skip.on && !inWindow) vmax = Math.min(vmax, VSKIP);
   if (lim.recovering) vmax = Math.min(vmax, lim.v + RECOVER * sec);
   const v2 = Math.min(v, vmax);
   const pn = p + v2 * sec;
   for (const Z of ZONES) {
-    if (!Z.visited && p < Z.a && pn >= Z.a) { Z.visited = true; Z.t0 = now; }
+    if (!Z.visited && p < Z.a && pn >= Z.a) {
+      Z.visited = true; Z.t0 = now;
+      Z.mode = modeNow(now); Z.dwell = dwellOf(Z, Z.mode);
+      if (Z.mode === 'skip') skip.used = true;
+    }
     if (Z.visited && !Z.t1 && pn > Z.z) Z.t1 = now;
   }
   lim.recovering = v2 < v - 1e-9;
@@ -376,6 +570,7 @@ function apply(now) {
       const prev = TRAJ[idx - 1];
       const ps = prev && p < prev.pj ? prev.scale(p) : 1 + d.camK * travel;
       S.plate.style.transform = `scale(${ps.toFixed(4)})`;
+      S.plate._scale = ps;
       // гаснет полностью ДО конца полосы: иначе на стыке остаётся 5-12%
       // непрозрачности, и она пропадает скачком — заметная ступенька яркости
       S.plate.style.opacity = (1 - smooth(seg(l, d.plateOut, 0.97))).toFixed(3);
@@ -417,7 +612,11 @@ function apply(now) {
     const sk = coverScale(want, d.vp, rx, ry, ax, ay);
     S.next.style.transform =
       `translate3d(${(ax * 100).toFixed(2)}%, ${(ay * 100).toFixed(2)}%, 0) scale(${sk.toFixed(4)})`;
+    S.next._scale = sk;
   }
+
+  coolDown();
+  const warming = residency(p);
 
   const cur = p >= ARRIVAL.at ? ARRIVAL
     : SECTIONS.reduce((a, s) => (p >= s.band[0] ? s : a), SECTIONS[0]);
@@ -432,13 +631,14 @@ function apply(now) {
 
   frames.push(now);
   if (frames.length > 240) frames.shift();
-  if (p !== target) schedule();
+  if (p !== target || warming) schedule();
 }
 
 function schedule() { if (!raf) raf = requestAnimationFrame(apply); }
 
 addEventListener('wheel', (e) => {
   target = clamp(target + e.deltaY * 0.00022, 0, 1);
+  noteInput(performance.now());
   schedule();
 }, { passive: true });
 
@@ -449,35 +649,34 @@ addEventListener('keydown', (e) => {
   else if (e.key === 'Home') target = 0;
   else if (e.key === 'End') target = 1;
   else return;
+  noteInput(performance.now());
   schedule();
 });
 addEventListener('resize', () => {
   buildTrajectories(innerWidth, innerHeight);      // покрытие зависит от пропорций окна
   for (const S of built) S.lastMask = '';
+  layoutCuts();
   schedule();
 });
 
-// плиты крупные (до ~5K по ширине): декодировать их заранее, а не в момент,
-// когда слой впервые появляется в кадре, — иначе первый показ сцены стоил бы
-// пропущенных кадров
-await Promise.all([...stage.querySelectorAll('img')]
-  .map((im) => im.decode().catch(() => (im.complete ? null : new Promise((r) => { im.onload = im.onerror = r; })))));
-// прогрев: декодированная картинка ещё не лежит в GPU — текстура заливается
-// при первом показе слоя, и первое появление новой сцены стоило кадра-двух.
-// Поэтому до старта все слои на два кадра показываются почти прозрачными
-// (0.002 — ниже одного уровня яркости): заливка проходит здесь, а не в маршруте
-{
-  const layers = [...stage.children];
-  for (const n of layers) { n.hidden = false; n.style.opacity = '0.002'; }
-  await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
-  for (const n of layers) n.style.opacity = '';
-}
+// старт: раскладка вырезок и первая сцена. Ждём только то, что в кадре сразу, —
+// деревню и её вырезки; остальное подтягивает окно резидентности по ходу
+CUT_BOX = await fetch('/assets/depth/hi/cuts.json').then((r) => r.json()).catch(() => ({}));
+layoutCuts();
+// до готовности первой сцены слои скрыты: иначе менеджер счёл бы их видимыми и
+// поставил запасную 1536, а заменить видимый крупный слой потом он не вправе
+for (const n of stage.children) n.hidden = true;
+residency(0);
+await Promise.all([...RES.values()].filter((R) => R.on).map((R) => R.done));
+started = true;
 schedule();
 
 window.__JOURNEY = {
   get progress() { return p; },
   get target() { return target; },
-  reading: () => ZONES.map((Z) => ({ id: Z.id, visited: Z.visited, t0: Z.t0, t1: Z.t1 })),
+  reading: () => ZONES.map((Z) => ({ id: Z.id, visited: Z.visited, t0: Z.t0, t1: Z.t1, mode: Z.mode, dwell: Z.dwell })),
+  residency: () => ({ ...stats, resident: [...RES.values()].filter((R) => R.on)
+    .map((R) => ({ key: R.key, ready: R.ready, mb: +(R.bytes / 2 ** 20).toFixed(1) })) }),
   set(v, { instant = false } = {}) { target = clamp(v, 0, 1); if (instant) p = target; schedule(); },
   sections: () => SECTIONS.map((s) => ({ id: s.id, band: s.band })),
   fps: () => {

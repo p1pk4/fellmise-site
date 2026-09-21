@@ -5,7 +5,8 @@
   "на максимальном видимом масштабе плиты (max_scale, снят телеметрией на 1920x1080;",
   "для вырезок деревни — по их собственному зуму до угасания), с округлением",
   "вверх до 64 и не меньше 1920. Дом дальше 1.0 не приближается.",
-  "Модель — RealESRGAN_x4plus (верность исходнику выше, чем у anime_6B)."
+  "Модель — RealESRGAN_x4plus (верность исходнику выше, чем у anime_6B).",
+  "crop: true — вырезка обрезается по альфе, рамка пишется в cuts.json."
  ],
  "model": "RealESRGAN_x4plus.pth",
  "quality": 88,
@@ -52,21 +53,21 @@
    "src": "assets/depth/h2f/hero_fg_oak.webp",
    "width": 4288,
    "max_scale": 2.004,
-   "note": "лежит поверх плиты деревни — размер совпадает с ней"
+   "crop": true
   },
   {
    "name": "hero_fg_fence_l",
    "src": "assets/depth/h2f/hero_fg_fence_l.webp",
    "width": 4288,
    "max_scale": 2.004,
-   "note": "лежит поверх плиты деревни — размер совпадает с ней"
+   "crop": true
   },
   {
    "name": "hero_fg_fence_r",
    "src": "assets/depth/h2f/hero_fg_fence_r.webp",
    "width": 4288,
    "max_scale": 2.004,
-   "note": "лежит поверх плиты деревни — размер совпадает с ней"
+   "crop": true
   }
  ]
 }

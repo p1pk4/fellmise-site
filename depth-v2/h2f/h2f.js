@@ -12,7 +12,7 @@
  *   * лес и его диафрагма масштабируются от той же точки схода, поэтому лес
  *     читается глубиной впереди по дороге, а не подставленной картинкой.
  */
-const BASE = '/out/depth-v2/h2f/';
+const BASE = '/assets/depth/h2f/';
 const stage = document.getElementById('stage');
 const panel = document.getElementById('debug');
 const debug = new URLSearchParams(location.search).get('debug') === '1';

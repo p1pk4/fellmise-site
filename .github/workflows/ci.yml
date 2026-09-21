@@ -44,6 +44,12 @@ jobs:
       - run: pip install -r requirements.txt
       - name: static site sanity
         run: python tools/check_site_static.py
+      # сайт не должен зависеть от файлов вне git: ни ссылок в игнорируемый out/,
+      # ни абсолютных URL на неотслеживаемые файлы
+      - name: runtime references are shipped
+        run: python tools/check_runtime_refs.py
+      - name: depth journey runtime assets are published and tracked
+        run: python depth-v2/publish_runtime_assets.py --check
       - name: generate layout (dry, both targets)
         run: python tools/generate_layout.py --dry
       - name: committed layouts are current

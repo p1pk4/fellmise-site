@@ -1,0 +1,49 @@
+{
+ "plate": "hero_plate_clean.webp",
+ "cutouts": [
+  {
+   "id": "oak",
+   "file": "hero_fg_oak.webp",
+   "note": "дуб слева: ствол, крона по верху кадра и свисающая ветка",
+   "coverage": 17.07,
+   "bbox": [
+    2,
+    2,
+    797,
+    703
+   ]
+  },
+  {
+   "id": "fence_l",
+   "file": "hero_fg_fence_l.webp",
+   "note": "ближний забор слева со столбом калитки",
+   "coverage": 9.83,
+   "bbox": [
+    2,
+    507,
+    578,
+    811
+   ]
+  },
+  {
+   "id": "fence_r",
+   "file": "hero_fg_fence_r.webp",
+   "note": "ближний забор справа со столбом калитки и тёмный ближний план",
+   "coverage": 8.74,
+   "bbox": [
+    1012,
+    507,
+    1533,
+    811
+   ]
+  }
+ ],
+ "forest": "forest_plate.webp",
+ "passage": {
+  "matte": "passage_matte.png",
+  "anchor": [
+   0.5,
+   0.4708333333333333
+  ]
+ }
+}

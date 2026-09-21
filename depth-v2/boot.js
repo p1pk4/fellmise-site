@@ -52,6 +52,9 @@ if (d.dataset.mode === 'live') {
   }
   const limit = setTimeout(() => toStatic('timeout'), START_LIMIT);
   import('./journey.js').then(() => clearTimeout(limit), () => { clearTimeout(limit); toStatic('error'); });
+  // живой режим сам сообщает об отказе после старта (например, перестроение
+  // траекторий под новое окно не удалось)
+  addEventListener('depth:live-failed', () => toStatic('error'));
   for (const [q, reason] of [[NARROW, 'narrow'], [CALM, 'reduced-motion']]) {
     matchMedia(q).addEventListener('change', (e) => { if (e.matches) toStatic(reason); });
   }

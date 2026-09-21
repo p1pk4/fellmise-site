@@ -183,7 +183,103 @@ function frozenTravel(F, l) {
 }
 
 const TRAJ = [];   // TRAJ[i]: траектория сцены назначения секции i (i >= 1)
-function buildTrajectories(W, H) {
+const TRAJ_REPORT = [];
+
+// прицел под траекторию: не больше принятого и не больше, чем позволяет
+// покрытие; только отпускается
+function aimFor(d, scale, W, H) {
+  const N = 1000, aimT = new Float32Array(N + 1);
+  let run = 1;
+  for (let s = 0; s <= N; s++) {
+    const l = s / N, [rx, ry] = radii(d, l, W, H), [fx, fy] = aimFull(d, l), sk = scale(globOf(d, l));
+    let lo = 0, hi = 1;
+    if (coverScale(0, d.vp, rx, ry, fx, fy) <= sk) lo = 1;
+    else for (let it = 0; it < 30; it++) {
+      const m = (lo + hi) / 2;
+      if (coverScale(0, d.vp, rx, ry, fx * m, fy * m) <= sk) lo = m; else hi = m;
+    }
+    run = Math.min(run, lo);
+    aimT[s] = run;
+  }
+  // значения проверены только в узлах сетки. Прицел только отпускается, поэтому
+  // берётся на шаг вперёд: между узлами он не больше допустимого. Линейная
+  // интерполяция по тем же узлам у точки касания давала лишний прицел, и
+  // страховка покрытия на один шаг поднимала масштаб на ~0.14% — микрооткат
+  return (l) => { const x = Math.min(N, l * N + 1), s = Math.min(N - 1, Math.floor(x)), t = x - s; return aimT[s] * (1 - t) + aimT[s + 1] * t; };
+}
+
+/* Кандидат стыковки в точке x. Обязательные условия проверяются на том
+ * масштабе, который реально рисует apply(): траектория, прицел и страховка
+ * покрытия поверх (coverScale). Каждая причина отказа отдельно:
+ *   A — значения конечные, масштаб положительный;
+ *   B — плита закрывает раскрытую часть диафрагмы;
+ *   C — масштаб не уменьшается по ходу вперёд;
+ *   D — непрерывность: в стыке рисуемый масштаб равен масштабу плиты,
+ *       которая дальше ведёт сцену (у неё страховки нет) — без скачка кадра;
+ *   E — желательное: скорость в стыке равна скорости принятой кривой (C1).
+ * mismatch — |скорость траектории в стыке − скорость принятой кривой|. */
+function joinCandidate(d, nxt, pa, w0, pt, x) {
+  const A = plateA(nxt, x), A1 = plateA1(nxt, x);
+  const r = pchip3([pa, w0], [pt, 1], [x, A], 0, A1);
+  let vmin = Infinity;
+  for (let s = 1; s < 100; s++) {
+    const a = pt + (x - pt) * s / 100, b = pt + (x - pt) * (s + 1) / 100;
+    vmin = Math.min(vmin, (r.f(b) - r.f(a)) / (b - a));
+  }
+  const mismatch = Math.abs(r.mEnd - A1);
+  return { f: r.f, r, pj: x, A, vmin, mismatch, rel: mismatch / A1, c1: mismatch <= 1e-9, fail: null, aimK: null };
+}
+// обязательные условия кандидата (дорого: прицел и рисуемый масштаб по сетке)
+function checkCandidate(c, d, nxt, pa, w0, W, H) {
+  const { r, pj: x, A } = c;
+  const scale = (pp) => (pp <= pa ? w0 : pp >= x ? plateA(nxt, pp) : r.f(pp));
+  const aimK = aimFor(d, scale, W, H);
+  const eff = (l) => {
+    const [rx, ry] = radii(d, l, W, H), [fx, fy] = aimFull(d, l), m = aimK(l);
+    return { v: coverScale(scale(globOf(d, l)), d.vp, rx, ry, fx * m, fy * m), need: coverScale(0, d.vp, rx, ry, fx * m, fy * m) };
+  };
+  // пока сцена назначения — окно секции d (до конца её полосы), рисуется
+  // eff; с конца полосы её ведёт уже плита следующей секции — чистый scale
+  // без страховки. Стык слоёв — конец полосы, стыковка кривых — x (позже)
+  const fail = new Set();
+  const l0 = locOf(d, pa), N = 400, pEnd = globOf(d, 1);
+  let prev = -Infinity;
+  for (let s = 0; s <= N; s++) {
+    const { v, need } = eff(l0 + (1 - l0) * s / N);
+    if (!Number.isFinite(v) || v <= 0) fail.add('A');
+    if (v < need - 1e-9) fail.add('B');
+    if (v < prev - 1e-6) fail.add('C');
+    prev = v;
+  }
+  for (let s = 0; s <= N; s++) {
+    const v = scale(pEnd + (x + 0.02 - pEnd) * s / N);
+    if (!Number.isFinite(v) || v <= 0) fail.add('A');
+    if (v < 1 - 1e-9) fail.add('B');                  // плита во весь кадр закрывает его при масштабе ≥ 1
+    if (s > 0 && v < prev - 1e-6) fail.add('C');
+    prev = v;
+  }
+  if (!Number.isFinite(r.mEnd)) fail.add('A');
+  // непрерывность: в появлении, в смене слоя (страховка не должна быть поверх
+  // траектории — иначе кадр прыгнет, когда её не станет) и в стыковке
+  if (Math.abs(r.f(pa) - w0) > 1e-9 || Math.abs(eff(1).v - scale(pEnd)) > 1e-6
+    || Math.abs(r.f(x) - A) > 1e-9) fail.add('D');
+  c.fail = [...fail].sort(); c.aimK = aimK;
+  return !c.fail.length;
+}
+
+/* Траектории для окна W×H — без побочных эффектов. Выбор стыковки:
+ *   1) есть кандидаты с точным C1, прошедшие обязательные условия, — берётся
+ *      тот, у которого после касания меньше всего проседает скорость (как
+ *      раньше);
+ *   2) иначе — из прошедших обязательные условия (A–D) тот, у кого меньше
+ *      рассогласование скорости в стыке; при равенстве — больший vmin, затем
+ *      более ранний x. Монотонность сохраняется (Fritsch–Carlson ограничивает
+ *      наклон), камера назад не идёт; в стыке остаётся излом скорости — в
+ *      отчёте это fallback, не C1;
+ *   3) обязательным условиям не отвечает никто — ошибка с перечнем причин
+ *      (boot.js переведёт страницу в статику). */
+function computeTrajectories(W, H, full = false) {
+  const traj = [], report = [];
   for (let i = 1; i < SECTIONS.length; i++) {
     const d = SECTIONS[i], nxt = SECTIONS[i + 1];
     const la = d.gate[0], pa = globOf(d, la), w0 = d.nextScale(la) / d.endScale;
@@ -193,47 +289,54 @@ function buildTrajectories(W, H) {
       if (coverScale(0, d.vp, rx, ry, 0, 0) >= 1 - 1e-9) { lt = l; break; }
     }
     const pt = globOf(d, lt);
-    let f, pj;
+    let f, pj, rep, aimK = null;
     if (nxt) {
-      // стыковка: не позже начала окна текста; из вариантов, где скорость
-      // принятой кривой достижима без нарушения монотонности (C1), берётся тот,
-      // у которого после касания меньше всего проседает скорость — иначе ход
-      // заметно замедлялся бы между раскрытием и следующей секцией
-      let best = null;
+      // стыковка: не позже начала окна текста следующей сцены
+      const cands = [];
       for (let j = 0.05; j <= 0.4001; j += 0.005) {
         const x = globOf(nxt, j);
         if (x > JOIN_BEFORE[nxt.id] + 1e-9) break;
-        const r = pchip3([pa, w0], [pt, 1], [x, plateA(nxt, x)], 0, plateA1(nxt, x));
-        if (Math.abs(r.mEnd - plateA1(nxt, x)) > 1e-9) continue;
-        let vmin = Infinity;
-        for (let s = 1; s < 100; s++) {
-          const a = pt + (x - pt) * s / 100, b = pt + (x - pt) * (s + 1) / 100;
-          vmin = Math.min(vmin, (r.f(b) - r.f(a)) / (b - a));
-        }
-        if (!best || vmin > best.vmin) best = { f: r.f, pj: x, vmin };
+        if (x <= pt + 1e-9) continue;
+        cands.push(joinCandidate(d, nxt, pa, w0, pt, x));
       }
-      ({ f, pj } = best);
+      // порядок предпочтения: сначала точный C1 по убыванию vmin (как раньше),
+      // затем остальные по возрастанию рассогласования, при равенстве — больший
+      // vmin, затем более ранний x. Берётся первый, прошедший обязательные
+      // условия; обычно это первый же кандидат
+      const order = [...cands].sort((p, q) => (q.c1 - p.c1)
+        || (p.c1 ? q.vmin - p.vmin : (p.mismatch - q.mismatch) || (q.vmin - p.vmin)) || (p.pj - q.pj));
+      let best = null;
+      for (const c of order) {
+        if (checkCandidate(c, d, nxt, pa, w0, W, H)) { best = c; break; }
+      }
+      if (full) for (const c of cands) if (!c.fail) checkCandidate(c, d, nxt, pa, w0, W, H);
+      if (!best) {
+        const why = cands.map((c) => c.fail.join('')).join(',');
+        throw new Error(`depth-v2: no valid ${d.id} -> ${nxt.id} trajectory at ${W}x${H} (${cands.length} candidates: ${why})`);
+      }
+      ({ f, pj, aimK } = best);
+      const count = (k) => cands.filter((c) => c.fail?.includes(k)).length;
+      rep = { id: `${d.id}->${nxt.id}`, mode: best.c1 ? 'c1' : 'fallback', pj: +pj.toFixed(4), pt: +pt.toFixed(4),
+        mismatch: +best.mismatch.toFixed(4), rel: +best.rel.toFixed(4), candidates: cands.length,
+        c1Candidates: cands.filter((c) => c.c1).length,
+        ...(full ? { rejected: { A: count('A'), B: count('B'), C: count('C'), D: count('D'),
+          E: cands.filter((c) => c.fail && !c.fail.length && !c.c1).length } } : {}) };
     } else {
       f = hermite(pa, w0, 0, pt, 1, 0); pj = pt;                     // прибытие
+      rep = { id: `${d.id}->home`, mode: 'arrival', pj: +pj.toFixed(4), pt: +pt.toFixed(4), mismatch: 0, rel: 0 };
     }
     const scale = (p) => (p <= pa ? w0 : p >= pj ? (nxt ? plateA(nxt, p) : 1) : f(p));
-    // прицел: не больше принятого и не больше, чем позволяет покрытие
-    const N = 1000, aimT = new Float32Array(N + 1);
-    let run = 1;
-    for (let s = 0; s <= N; s++) {
-      const l = s / N, [rx, ry] = radii(d, l, W, H), [fx, fy] = aimFull(d, l), sk = scale(globOf(d, l));
-      let lo = 0, hi = 1;
-      if (coverScale(0, d.vp, rx, ry, fx, fy) <= sk) lo = 1;
-      else for (let it = 0; it < 30; it++) {
-        const m = (lo + hi) / 2;
-        if (coverScale(0, d.vp, rx, ry, fx * m, fy * m) <= sk) lo = m; else hi = m;
-      }
-      run = Math.min(run, lo);                                   // прицел только отпускается
-      aimT[s] = run;
-    }
-    const aimK = (l) => { const x = l * N, s = Math.min(N - 1, Math.floor(x)), t = x - s; return aimT[s] * (1 - t) + aimT[s + 1] * t; };
-    TRAJ[i] = { pa, pt, pj, scale, aimK };
+    traj[i] = { pa, pt, pj, scale, aimK: aimK || aimFor(d, scale, W, H) };
+    report.push(rep);
   }
+  return { traj, report };
+}
+
+// замена целиком: при отказе прежние траектории не смешиваются с новыми
+function buildTrajectories(W, H) {
+  const { traj, report } = computeTrajectories(W, H);
+  TRAJ.length = 0; traj.forEach((t, i) => { TRAJ[i] = t; });
+  TRAJ_REPORT.length = 0; TRAJ_REPORT.push(...report);
 }
 
 const stage = document.getElementById('stage');
@@ -674,7 +777,13 @@ addEventListener('keydown', (e) => {
   schedule();
 }, { signal: life.signal });
 addEventListener('resize', () => {
-  buildTrajectories(innerWidth, innerHeight);      // покрытие зависит от пропорций окна
+  try {
+    buildTrajectories(innerWidth, innerHeight);    // покрытие зависит от пропорций окна
+  } catch (e) {
+    // траектории другого окна здесь невалидны: живой режим уступает статике
+    window.dispatchEvent(new CustomEvent('depth:live-failed', { detail: String(e) }));
+    return;
+  }
   for (const S of built) S.lastMask = '';
   layoutCuts();
   schedule();
@@ -752,6 +861,10 @@ window.__JOURNEY = {
     .map((R) => ({ key: R.key, ready: R.ready, mb: +(R.bytes / 2 ** 20).toFixed(1) })) }),
   set(v, { instant = false } = {}) { target = clamp(v, 0, 1); if (instant) p = target; schedule(); },
   sections: () => SECTIONS.map((s) => ({ id: s.id, band: s.band })),
+  // отчёт о выборе траекторий: текущее окно или любое W×H (расчёт без побочных эффектов)
+  trajectories: (W, H) => (W ? computeTrajectories(W, H, true).report : TRAJ_REPORT.map((r) => ({ ...r }))),
+  // масштаб сцены назначения секции i в точке p для окна W×H — для геометрических тестов
+  trajectoryScale: (W, H, i, ps) => { const t = computeTrajectories(W, H).traj[i]; return ps.map((x) => t.scale(x)); },
   fps: () => {
     if (frames.length < 3) return null;
     const d = [];

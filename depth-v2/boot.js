@@ -24,9 +24,32 @@ if (!d.dataset.mode) {
   d.dataset.mode = matchMedia(NARROW).matches || matchMedia(CALM).matches ? 'static' : 'live';
 }
 
+/* Живой режим может не состояться: не пришёл модуль, первая сцена не
+   загрузилась, старт не уложился в предел, окно стало уже или включили
+   reduced-motion. Тогда страница переходит в ту же статическую версию — второй
+   запасной нет. Статика вынута из документа, но не выброшена: сюда она и
+   возвращается. Переход окончательный: живой модуль, пришедший позже,
+   страницу уже не забирает (journey.js проверяет режим и после каждого
+   ожидания), его слушатели, текстуры и звук освобождает __LIVE_STOP. */
+const START_LIMIT = 12000;        // мс до первого кадра живой сцены
+const staticRoot = document.getElementById('static');
+
+function toStatic(reason) {
+  if (d.dataset.mode !== 'live') return;
+  d.dataset.mode = 'static';
+  d.dataset.fallback = reason;
+  try { window.__LIVE_STOP?.(); } catch { /* живой режим уже не нужен */ }
+  if (staticRoot && !staticRoot.isConnected) document.body.insertBefore(staticRoot, document.getElementById('debug'));
+  import('./static.js').then((m) => m.mountStatic(staticRoot)).catch(() => {});
+}
+
 if (d.dataset.mode === 'live') {
-  document.getElementById('static')?.remove();
-  import('./journey.js');
+  staticRoot?.remove();
+  const limit = setTimeout(() => toStatic('timeout'), START_LIMIT);
+  import('./journey.js').then(() => clearTimeout(limit), () => { clearTimeout(limit); toStatic('error'); });
+  for (const [q, reason] of [[NARROW, 'narrow'], [CALM, 'reduced-motion']]) {
+    matchMedia(q).addEventListener('change', (e) => { if (e.matches) toStatic(reason); });
+  }
 } else {
-  import('./static.js').then((m) => m.mountStatic(document.getElementById('static')));
+  import('./static.js').then((m) => m.mountStatic(staticRoot));
 }

@@ -32,15 +32,19 @@ const HINT = { en: 'scroll', ru: 'крутите' };
 const KEEP = 'depth-v2:progress';
 
 function restoreProgress() {
-  const saved = sessionStorage.getItem(KEEP);
+  // хранилище может быть запрещено (cookies сайта заблокированы): тогда чтение
+  // бросает SecurityError, и без этой защиты падал весь живой модуль
+  let saved = null;
+  try { saved = sessionStorage.getItem(KEEP); sessionStorage.removeItem(KEEP); } catch { return; }
   if (saved === null) return;
-  sessionStorage.removeItem(KEEP);
   const v = Number(saved);
   if (!Number.isFinite(v) || v <= 0) return;
-  let tries = 0;
+  // ждём конца старта journey.js (он ограничен пределом в boot.js), а не
+  // фиксированное число кадров: на медленной сети старт длиннее трёх секунд
+  const until = performance.now() + 15000;
   const tick = () => {
     if (window.__JOURNEY) window.__JOURNEY.set(v, { instant: true });
-    else if (tries++ < 180) requestAnimationFrame(tick);
+    else if (performance.now() < until) requestAnimationFrame(tick);
   };
   requestAnimationFrame(tick);
 }
@@ -114,12 +118,15 @@ export function mountChrome(root, locale = LOCALE) {
 
   window.__SOUND = sound;    // только для smoke-проверок звука
 
-  return function update(p, sectionId) {
+  const update = function update(p, sectionId) {
     sound.update(p);          // звук подписан на маршрут, а не наоборот
     setChapter(sectionId);
     run.style.transform = `scaleX(${p.toFixed(4)})`;
     hint.style.opacity = p > 0.02 ? '0' : '1';
   };
+  // переход в статику: звук и его кнопка больше не нужны
+  update.stop = () => { clearTimeout(swap); sound.destroy(); };
+  return update;
 }
 
 restoreProgress();

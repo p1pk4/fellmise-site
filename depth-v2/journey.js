@@ -705,26 +705,37 @@ if (!alive()) throw new Error('depth-v2: live mode cancelled during start');
 layoutCuts();
 // до старта слои скрыты: кадр рисуется только после решения, чем его заполнить
 for (const n of stage.children) n.hidden = true;
-residency(0);
-const first = [...RES.values()].filter((R) => R.on);
-for (const R of first) R.boot = true;
-const hero = RES.get('hero');
-const allHi = Promise.all(first.map((R) => R.done));
 // true, как только хоть одно из двух дало true; false — если оба отказали
 const either = (a, b) => new Promise((ok) => {
   let n = 0;
   const f = (v) => { if (v) ok(true); else if (++n === 2) ok(false); };
   a.then(f); b.then(f);
 });
-if (!await Promise.race([allHi.then(() => hero.ready), wait(BOOT_HI).then(() => false)])) {
+const first = [...RES.values()].filter((R) => R.acq === 0);    // деревня и вырезки
+const hero = RES.get('hero');
+// деревню 1536 boot.js запросил ещё до модулей. Если она всё ещё в пути — сеть
+// медленная: hi-res первой сцены ждёт её, иначе делит с ней канал, и стартовый
+// кадр приходит вдвое позже. На быстрой сети 1536 к этому моменту уже в кэше.
+// Плита и вырезки ждутся вместе, чтобы вырезки не появлялись позже плиты
+const lo = Promise.all(first.map((R) => loaded(R.lo))).then((ok) => ok[first.indexOf(hero)]);
+const slow = !await Promise.race([lo.then(() => true), wait(150).then(() => false)]);
+if (slow) await lo;
+if (!alive()) throw new Error('depth-v2: live mode cancelled during start');
+residency(0);
+for (const R of first) R.boot = true;
+const allHi = Promise.all(first.map((R) => R.done));
+if (slow || !await Promise.race([allHi.then(() => hero.ready), wait(BOOT_HI).then(() => false)])) {
   // стартовый кадр 1536 (те же файлы, что у статики и прежнего старта)
-  if (!await either(loaded(hero.lo), allHi.then(() => hero.ready))) {
+  if (!await either(lo, allHi.then(() => hero.ready))) {
     throw new Error('depth-v2: first scene failed to load');
   }
 }
 if (!alive()) throw new Error('depth-v2: live mode cancelled during start');
 started = true;
 schedule();
+// постер старта (depth.css) снимается, когда первый кадр сцены уже декодирован
+requestAnimationFrame(() => Promise.all([...stage.querySelectorAll('img[src]')]
+  .map((im) => im.decode().catch(() => {}))).then(() => stage.classList.add('is-live')));
 
 window.__JOURNEY = {
   get progress() { return p; },

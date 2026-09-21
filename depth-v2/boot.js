@@ -45,6 +45,11 @@ function toStatic(reason) {
 
 if (d.dataset.mode === 'live') {
   staticRoot?.remove();
+  // деревню 1536 просим сразу, до модулей маршрута: на медленной сети она
+  // приходит раньше hi-res и становится стартовым кадром (journey.js, BOOT_HI)
+  for (const f of ['hero_plate_clean', 'hero_fg_oak', 'hero_fg_fence_l', 'hero_fg_fence_r']) {
+    new Image().src = `/assets/depth/h2f/${f}.webp`;
+  }
   const limit = setTimeout(() => toStatic('timeout'), START_LIMIT);
   import('./journey.js').then(() => clearTimeout(limit), () => { clearTimeout(limit); toStatic('error'); });
   for (const [q, reason] of [[NARROW, 'narrow'], [CALM, 'reduced-motion']]) {

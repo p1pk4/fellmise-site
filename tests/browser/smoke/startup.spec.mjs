@@ -83,6 +83,9 @@ for (const url of ['/', '/ru/']) {
     const page = await open(browser, baseURL, url, {
       route: (pg) => pg.route('**/assets/depth/hi/*.webp', async (r) => { await new Promise((ok) => setTimeout(ok, 8_000)); await r.continue(); }),
     });
+    // стартовый кадр (размытая деревня из depth.css) виден с первой отрисовки
+    await page.waitForLoadState('domcontentloaded');
+    expect(await page.evaluate(() => getComputedStyle(document.getElementById('stage'), '::before').backgroundImage)).toMatch(/^url\(/);
     await expect.poll(() => page.evaluate(shown), { timeout: 5_000 }).toMatchObject({ meaningful: true, mode: 'live' });
     // задержанная hi-res деревня всё-таки заменяет стартовый кадр
     await expect.poll(() => page.evaluate(shown), { timeout: 20_000 }).toMatchObject({ hiPlate: true });

@@ -121,4 +121,3 @@ export function mountChrome(root, locale = LOCALE) {
   update.stop = () => { clearTimeout(swap); sound.destroy(); };
   return update;
 }
-

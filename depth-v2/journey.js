@@ -22,7 +22,7 @@
  */
 import { mountContent } from './content.js';
 import { BEATS } from './content-data.js';
-import { mountChrome } from './chrome.js';
+import { mountChrome, takeSavedProgress } from './chrome.js';
 
 /* Живой режим может быть отменён в любой момент старта (boot.js: отказ,
    предел времени, узкое окно, reduced-motion). Тогда модуль ничего не
@@ -711,22 +711,29 @@ const either = (a, b) => new Promise((ok) => {
   const f = (v) => { if (v) ok(true); else if (++n === 2) ok(false); };
   a.then(f); b.then(f);
 });
-const first = [...RES.values()].filter((R) => R.acq === 0);    // деревня и вырезки
-const hero = RES.get('hero');
+// точка старта: начало маршрута или позиция, сохранённая при смене языка.
+// Первая сцена — та, что нужна в этой точке (обычно деревня и вырезки)
+const p0 = takeSavedProgress();
+p = target = p0;
+if (p0 > 0) stage.classList.add('is-live');     // размытая деревня — постер только для начала
+const first = [...RES.values()].filter((R) => p0 >= R.acq && p0 <= R.end + REACQUIRE);
+const plates = first.filter((R) => !R.els.some((e) => e.cut));
+const allPlatesHi = () => plates.every((R) => R.ready);
 // деревню 1536 boot.js запросил ещё до модулей. Если она всё ещё в пути — сеть
 // медленная: hi-res первой сцены ждёт её, иначе делит с ней канал, и стартовый
 // кадр приходит вдвое позже. На быстрой сети 1536 к этому моменту уже в кэше.
 // Плита и вырезки ждутся вместе, чтобы вырезки не появлялись позже плиты
-const lo = Promise.all(first.map((R) => loaded(R.lo))).then((ok) => ok[first.indexOf(hero)]);
+const lo = Promise.all(first.map((R) => loaded(R.lo)))
+  .then((ok) => first.every((R, i) => ok[i] || !plates.includes(R)));
 const slow = !await Promise.race([lo.then(() => true), wait(150).then(() => false)]);
 if (slow) await lo;
 if (!alive()) throw new Error('depth-v2: live mode cancelled during start');
-residency(0);
+residency(p0);
 for (const R of first) R.boot = true;
 const allHi = Promise.all(first.map((R) => R.done));
-if (slow || !await Promise.race([allHi.then(() => hero.ready), wait(BOOT_HI).then(() => false)])) {
+if (slow || !await Promise.race([allHi.then(allPlatesHi), wait(BOOT_HI).then(() => false)])) {
   // стартовый кадр 1536 (те же файлы, что у статики и прежнего старта)
-  if (!await either(lo, allHi.then(() => hero.ready))) {
+  if (!await either(lo, allHi.then(allPlatesHi))) {
     throw new Error('depth-v2: first scene failed to load');
   }
 }

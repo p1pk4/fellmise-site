@@ -166,9 +166,16 @@ test('G: language switch and re-entry start live and keep position', async ({ br
   await page.waitForFunction(() => window.__JOURNEY, null, { timeout: 30_000 });
   await page.evaluate(() => window.__JOURNEY.set(0.42, { instant: true }));
   await wait(page, 300);
+  // плиты сцены в точке 0.42 приходят с задержкой, как на медленном раннере CI:
+  // прежний старт с деревни и прыжок показывали здесь пустую сцену
+  await page.route(/(mine|threshold)_plate\.webp$/, async (r) => { await new Promise((ok) => setTimeout(ok, 2_500)); await r.continue(); });
   await page.click('a[href="/ru/"]');
   await page.waitForURL('**/ru/');
-  await page.waitForFunction(() => window.__JOURNEY && Math.abs(window.__JOURNEY.progress - 0.42) < 0.01, null, { timeout: 30_000 });
+  // сохранённая позиция берётся до старта: в первый же момент живого режима
+  // сцена уже в этой точке и видна, без кадра с пустой сценой после прыжка
+  await page.waitForFunction(() => window.__JOURNEY, null, { timeout: 30_000 });
+  const s = await page.evaluate(() => new Promise((ok) => requestAnimationFrame(() => requestAnimationFrame(() => ok(window.__JOURNEY.progress)))));
+  expect(Math.abs(s - 0.42), 'restored progress').toBeLessThan(0.01);
   expect(await page.evaluate(shown)).toMatchObject({ mode: 'live', meaningful: true });
   await page.goto('/', { waitUntil: 'commit' });
   await expect.poll(() => page.evaluate(shown), { timeout: 10_000 }).toMatchObject({ mode: 'live', meaningful: true });

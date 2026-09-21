@@ -213,5 +213,3 @@
               rgba(12, 14, 17, .52), rgba(12, 14, 17, .3) 46%,
               rgba(12, 14, 17, .1) 68%, transparent 84%);
 }
-
-@media (max-width: 1279px), (prefers-reduced-motion: reduce) { #ui { display: none; } }

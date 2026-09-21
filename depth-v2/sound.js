@@ -83,5 +83,6 @@ export function mountSound(locale) {
     update: (p) => audio.update(z(p)),
     state: () => audio.state(),
     hud: () => audio.hud(),
+    destroy: () => audio.destroy(),
   };
 }

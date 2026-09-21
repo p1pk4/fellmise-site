@@ -216,5 +216,3 @@
   transition: opacity .44s ease, transform .44s ease;
 }
 .beat.is-on .beat__says li { opacity: 1; transform: none; }
-
-@media (max-width: 1279px) { #content { display: none; } }

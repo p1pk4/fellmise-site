@@ -22,7 +22,15 @@
  */
 import { mountContent } from './content.js';
 import { BEATS } from './content-data.js';
-import { mountChrome } from './chrome.js';
+import { mountChrome, takeSavedProgress } from './chrome.js';
+
+/* Живой режим может быть отменён в любой момент старта (boot.js: отказ,
+   предел времени, узкое окно, reduced-motion). Тогда модуль ничего не
+   монтирует, а уже смонтированное освобождает stop(): слушатели, кадры,
+   текстуры, звук. Поздно пришедшая загрузка страницу обратно не забирает. */
+const alive = () => document.documentElement.dataset.mode === 'live';
+if (!alive()) throw new Error('depth-v2: live mode cancelled before start');
+const life = new AbortController();
 
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 const smooth = (t) => t * t * (3 - 2 * t);
@@ -264,6 +272,10 @@ const LOW = {
   hero: '/assets/depth/h2f/hero_plate_clean.webp', forest: '/assets/depth/h2f/forest_plate.webp',
   mine: '/assets/depth/m2s/mine_plate.webp', threshold: '/assets/depth/s2c/threshold_plate.webp',
   core: '/assets/depth/s2c/core_plate.webp', home: '/assets/depth/c2h/home_plate.webp',
+  // вырезки 1536 — во весь кадр, а не обрезки: раскладка у них своя (placeCut)
+  hero_fg_oak: '/assets/depth/h2f/hero_fg_oak.webp',
+  hero_fg_fence_l: '/assets/depth/h2f/hero_fg_fence_l.webp',
+  hero_fg_fence_r: '/assets/depth/h2f/hero_fg_fence_r.webp',
 };
 const SCENE_OF = {
   'hero_plate_clean.webp': 'hero', 'forest_plate.webp': 'forest', 'mine_plate.webp': 'mine',
@@ -313,7 +325,7 @@ SECTIONS.forEach((s, i) => {
     wrap.appendChild(im);
     stage.appendChild(wrap);
     const key = f.replace('.webp', '');
-    resource(key, s.from + f, null).els.push({ el: im, shown: () => !wrap.hidden, cut: key, box: wrap });
+    resource(key, s.from + f, LOW[key]).els.push({ el: im, shown: () => !wrap.hidden, cut: key, box: wrap });
     return wrap;
   });
   const sp = SCENE_OF[s.plate], sn = SCENE_OF[s.next];
@@ -323,16 +335,17 @@ SECTIONS.forEach((s, i) => {
 });
 
 let CUT_BOX = {};
-function layoutCuts() {
-  // cover для кадра 1.6:1 — так же, как object-fit: cover у полнокадровых плит
+function placeCut(e) {
+  // cover для кадра 1.6:1 — так же, как object-fit: cover у полнокадровых плит.
+  // Обрезок hi-res стоит в своей рамке из cuts.json, запасная 1536 — во весь кадр
   const W = innerWidth, H = innerHeight, Wr = Math.max(W, H * 1.6), Hr = Wr / 1.6;
   const ox = (W - Wr) / 2, oy = (H - Hr) / 2;
-  for (const R of RES.values()) for (const e of R.els) {
-    if (!e.cut || !CUT_BOX[e.cut]) continue;
-    const [x0, y0, x1, y1] = CUT_BOX[e.cut].box;
-    Object.assign(e.el.style, { left: `${ox + x0 * Wr}px`, top: `${oy + y0 * Hr}px`,
-      width: `${(x1 - x0) * Wr}px`, height: `${(y1 - y0) * Hr}px` });
-  }
+  const [x0, y0, x1, y1] = e.res === 'hi' ? CUT_BOX[e.cut].box : [0, 0, 1, 1];
+  Object.assign(e.el.style, { left: `${ox + x0 * Wr}px`, top: `${oy + y0 * Hr}px`,
+    width: `${(x1 - x0) * Wr}px`, height: `${(y1 - y0) * Hr}px` });
+}
+function layoutCuts() {
+  for (const R of RES.values()) for (const e of R.els) if (e.cut) placeCut(e);
 }
 
 // окна участия сцен: захват — начало окна текста текущей сцены (для первой
@@ -361,13 +374,14 @@ function acquire(R) {
   im.src = R.hi;
   R.img = im;
   R.done = im.decode().then(() => {
-    if (R.img !== im) return;
+    if (R.img !== im) return false;
     R.ready = true; R.bytes = im.naturalWidth * im.naturalHeight * 4; R.warm = 2;
     if (started) schedule();          // до конца старта кадры не рисуются
-  }).catch(() => {});
+    return true;
+  }).catch(() => false);
 }
 function release(R) {
-  R.on = false; R.ready = false; R.img = null; R.bytes = 0; R.warm = 0;
+  R.on = false; R.ready = false; R.img = null; R.bytes = 0; R.warm = 0; R.boot = false;
   for (const e of R.els) { e.el.removeAttribute('src'); e.res = ''; }
 }
 
@@ -383,9 +397,14 @@ function residency(pp) {
     for (const e of R.els) {
       const shown = e.shown();
       if (R.ready) {
-        // замена на hi-res — только пока слой скрыт или мал: без скачка резкости
-        if (e.res !== 'hi' && (!shown || e.res !== 'lo' || (e.el._scale ?? 1) <= 0.75)) {
+        // замена на hi-res — только пока слой скрыт или мал: без скачка резкости.
+        // Исключение — стартовый кадр (R.boot): первая сцена, показанная в 1536,
+        // пока hi-res ещё в пути, получает hi-res, как только та готова.
+        // Вырезке hi-res нужна её рамка из cuts.json; без неё остаётся 1536
+        if (e.res !== 'hi' && (!e.cut || CUT_BOX[e.cut])
+          && (!shown || e.res !== 'lo' || (e.el._scale ?? 1) <= 0.75 || R.boot)) {
           e.el.src = R.hi; e.res = 'hi';
+          if (e.cut) placeCut(e);
         }
         // прогрев: пока слой не в кадре, два кадра показать его почти прозрачным
         if (R.warm > 0 && !shown && e.res === 'hi') {
@@ -396,8 +415,10 @@ function residency(pp) {
         }
       } else if (shown && !e.res && R.lo) {
         e.el.src = R.lo; e.res = 'lo'; stats.fallbacks++;
+        if (e.cut) placeCut(e);
       }
     }
+    if (R.ready && R.boot && R.els.every((e) => e.res === 'hi')) R.boot = false;
     if (R.warm > 0) { R.warm--; warming = true; }
   }
   stats.peakBytes = Math.max(stats.peakBytes, bytes);
@@ -634,13 +655,13 @@ function apply(now) {
   if (p !== target || warming) schedule();
 }
 
-function schedule() { if (!raf) raf = requestAnimationFrame(apply); }
+function schedule() { if (!raf && started && !life.signal.aborted) raf = requestAnimationFrame(apply); }
 
 addEventListener('wheel', (e) => {
   target = clamp(target + e.deltaY * 0.00022, 0, 1);
   noteInput(performance.now());
   schedule();
-}, { passive: true });
+}, { passive: true, signal: life.signal });
 
 addEventListener('keydown', (e) => {
   const step = e.shiftKey ? 0.06 : 0.01;
@@ -651,25 +672,77 @@ addEventListener('keydown', (e) => {
   else return;
   noteInput(performance.now());
   schedule();
-});
+}, { signal: life.signal });
 addEventListener('resize', () => {
   buildTrajectories(innerWidth, innerHeight);      // покрытие зависит от пропорций окна
   for (const S of built) S.lastMask = '';
   layoutCuts();
   schedule();
-});
+}, { signal: life.signal });
+
+window.__LIVE_STOP = function stop() {
+  life.abort();
+  if (raf) cancelAnimationFrame(raf);
+  raf = 0;
+  for (const R of RES.values()) if (R.on) release(R);   // поздний decode отбрасывается (R.img)
+  updateChrome.stop();
+  delete window.__JOURNEY;
+};
 
 // старт: раскладка вырезок и первая сцена. Ждём только то, что в кадре сразу, —
-// деревню и её вырезки; остальное подтягивает окно резидентности по ходу
-CUT_BOX = await fetch('/assets/depth/hi/cuts.json').then((r) => r.json()).catch(() => ({}));
+// деревню и её вырезки; остальное подтягивает окно резидентности по ходу.
+// Раньше старт ждал hi-res деревни (~1.1 МБ и декодирование 4736 px) при
+// пустой сцене: на медленной сети это секунды тёмного экрана. Теперь hi-res
+// ждём недолго (BOOT_HI); не успела — первым кадром идёт принятая плита 1536,
+// а hi-res заменяет её, как только готова. Не пришла ни та, ни другая —
+// старт отказывает, и boot.js показывает статику.
+const BOOT_HI = 1200;
+const wait = (ms) => new Promise((ok) => setTimeout(ok, ms));
+const loaded = (src) => new Promise((ok) => { const im = new Image(); im.onload = () => ok(true); im.onerror = () => ok(false); im.src = src; });
+CUT_BOX = await Promise.race([fetch('/assets/depth/hi/cuts.json').then((r) => r.json()), wait(4000).then(() => ({}))])
+  .catch(() => ({}));
+if (!alive()) throw new Error('depth-v2: live mode cancelled during start');
 layoutCuts();
-// до готовности первой сцены слои скрыты: иначе менеджер счёл бы их видимыми и
-// поставил запасную 1536, а заменить видимый крупный слой потом он не вправе
+// до старта слои скрыты: кадр рисуется только после решения, чем его заполнить
 for (const n of stage.children) n.hidden = true;
-residency(0);
-await Promise.all([...RES.values()].filter((R) => R.on).map((R) => R.done));
+// true, как только хоть одно из двух дало true; false — если оба отказали
+const either = (a, b) => new Promise((ok) => {
+  let n = 0;
+  const f = (v) => { if (v) ok(true); else if (++n === 2) ok(false); };
+  a.then(f); b.then(f);
+});
+// точка старта: начало маршрута или позиция, сохранённая при смене языка.
+// Первая сцена — та, что нужна в этой точке (обычно деревня и вырезки)
+const p0 = takeSavedProgress();
+p = target = p0;
+if (p0 > 0) stage.classList.add('is-live');     // размытая деревня — постер только для начала
+const first = [...RES.values()].filter((R) => p0 >= R.acq && p0 <= R.end + REACQUIRE);
+const plates = first.filter((R) => !R.els.some((e) => e.cut));
+const allPlatesHi = () => plates.every((R) => R.ready);
+// деревню 1536 boot.js запросил ещё до модулей. Если она всё ещё в пути — сеть
+// медленная: hi-res первой сцены ждёт её, иначе делит с ней канал, и стартовый
+// кадр приходит вдвое позже. На быстрой сети 1536 к этому моменту уже в кэше.
+// Плита и вырезки ждутся вместе, чтобы вырезки не появлялись позже плиты
+const lo = Promise.all(first.map((R) => loaded(R.lo)))
+  .then((ok) => first.every((R, i) => ok[i] || !plates.includes(R)));
+const slow = !await Promise.race([lo.then(() => true), wait(150).then(() => false)]);
+if (slow) await lo;
+if (!alive()) throw new Error('depth-v2: live mode cancelled during start');
+residency(p0);
+for (const R of first) R.boot = true;
+const allHi = Promise.all(first.map((R) => R.done));
+if (slow || !await Promise.race([allHi.then(allPlatesHi), wait(BOOT_HI).then(() => false)])) {
+  // стартовый кадр 1536 (те же файлы, что у статики и прежнего старта)
+  if (!await either(lo, allHi.then(allPlatesHi))) {
+    throw new Error('depth-v2: first scene failed to load');
+  }
+}
+if (!alive()) throw new Error('depth-v2: live mode cancelled during start');
 started = true;
 schedule();
+// постер старта (depth.css) снимается, когда первый кадр сцены уже декодирован
+requestAnimationFrame(() => Promise.all([...stage.querySelectorAll('img[src]')]
+  .map((im) => im.decode().catch(() => {}))).then(() => stage.classList.add('is-live')));
 
 window.__JOURNEY = {
   get progress() { return p; },

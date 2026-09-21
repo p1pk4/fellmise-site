@@ -27,22 +27,19 @@ const HINT = { en: 'scroll', ru: 'крутите' };
 
 /* Переключение языка перезагружает страницу: это самый честный способ сменить
    локаль, не трогая ни хореографию, ни порядок монтирования. Чтобы человек не
-   оказался в начале маршрута, прогресс кладётся в sessionStorage и сразу после
-   старта возвращается через публичный API journey.js. */
+   оказался в начале маршрута, прогресс кладётся в sessionStorage, а journey.js
+   забирает его до старта (takeSavedProgress) и сразу готовит сцену в этой
+   точке, а не деревню с последующим прыжком — прыжок показывал на мгновение
+   пустую сцену, пока грузились её плиты. */
 const KEEP = 'depth-v2:progress';
 
-function restoreProgress() {
-  const saved = sessionStorage.getItem(KEEP);
-  if (saved === null) return;
-  sessionStorage.removeItem(KEEP);
+export function takeSavedProgress() {
+  // хранилище может быть запрещено (cookies сайта заблокированы): тогда чтение
+  // бросает SecurityError, и без этой защиты падал весь живой модуль
+  let saved = null;
+  try { saved = sessionStorage.getItem(KEEP); sessionStorage.removeItem(KEEP); } catch { return 0; }
   const v = Number(saved);
-  if (!Number.isFinite(v) || v <= 0) return;
-  let tries = 0;
-  const tick = () => {
-    if (window.__JOURNEY) window.__JOURNEY.set(v, { instant: true });
-    else if (tries++ < 180) requestAnimationFrame(tick);
-  };
-  requestAnimationFrame(tick);
+  return saved !== null && Number.isFinite(v) && v > 0 ? Math.min(v, 1) : 0;
 }
 
 function node(tag, cls, text) {
@@ -114,12 +111,13 @@ export function mountChrome(root, locale = LOCALE) {
 
   window.__SOUND = sound;    // только для smoke-проверок звука
 
-  return function update(p, sectionId) {
+  const update = function update(p, sectionId) {
     sound.update(p);          // звук подписан на маршрут, а не наоборот
     setChapter(sectionId);
     run.style.transform = `scaleX(${p.toFixed(4)})`;
     hint.style.opacity = p > 0.02 ? '0' : '1';
   };
+  // переход в статику: звук и его кнопка больше не нужны
+  update.stop = () => { clearTimeout(swap); sound.destroy(); };
+  return update;
 }
-
-restoreProgress();

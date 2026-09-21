@@ -6,6 +6,21 @@ body { font: 13px/1.45 ui-sans-serif, system-ui, sans-serif; color: #efe6d2; }
 
 #stage { position: fixed; inset: 0; overflow: hidden; }
 
+/* Стартовый кадр до первой живой отрисовки: принятая деревня 1536 (плита и
+   вырезки h2f), сжатая до 48×30 и размытая. Виден с первой отрисовки
+   документа, пока грузятся модули и плиты; journey.js снимает его классом
+   is-live, как только первый кадр сцены декодирован, — в самом маршруте
+   его нет. */
+html[data-mode='live'] #stage:not(.is-live)::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: url(data:image/webp;base64,UklGRvoBAABXRUJQVlA4IO4BAACQCACdASowAB4APrVQnkonJSKhsBVaqOAWiWwAnTNPaRBJtY8HcZ1OouMGy73vREqhpqa/61vE7TSaByC/cZr/6t8NhLCnAX7I1HJ+AAD++WcO3VkQ1PAOsN1gKHW6VTfz1VJn44m3cUtNUf/Vd6Us8JFkk39C817W4qhlmGW1aiKLVIYLuVVGEE8LoJrrtH8J/oRAJKIDUTWz4YIcq4vrNezaia+NmUukE6mXR38u32pfxG9AdTYCrawgEGCCv3a3NuOMW4hjkxWDK67BV4mlLC89Az3lql+27VqvxApWOZDgqRie5AgA247ph6Mnjznckvg0RairbyH8NeifsScGLT3Ol5DmL2ZArsCjn8Hovie2BFXVfUo0DeAf+bI6UJIkNWKia3Jn2LC9M/J3gefn5qY/vC0qVddnkM5L59FlZuS1aNOOOhs+bp5+UDxAhC1P2kAhxFyxE6wPNaAb8o/9G1XT1bCY7kaoV5ZNZ7MkjZRlVXhHwtOspdZiGylmFKRmV38QPCohrRtteCfLN7S04S6qkTOR6RFNuV/Je5vcG2nmvr/G7GD7c++wbiOywGxUAoq79S26egU+eVRhCg4PPxycTPb3Ksu/6UNigLX1h07FAgBy9UltE3tEQj5KqeoS9JGEDnKG8yOVDYAAAA==) center / cover no-repeat;
+  filter: blur(22px);
+  transform: scale(1.06);
+}
+
 /* Держатель не двигается: на нём живёт окно, сквозь которое видно сцену.
    Если повесить маску на сам план, она поедет вместе с его масштабом и
    обрежет кадр по своей же уменьшенной рамке — так было в PoC v1. */
@@ -68,9 +83,8 @@ body { font: 13px/1.45 ui-sans-serif, system-ui, sans-serif; color: #efe6d2; }
   pointer-events: none;
 }
 
-/* Статическая версия: сцена и хром живого режима скрыты, страницу собирает
-   static.js. Те же два условия стоят в boot.js, который в статике вовсе не
-   грузит живой маршрут. */
-@media (max-width: 1279px), (prefers-reduced-motion: reduce) {
-  #stage, #ui, #vignette, #chill { display: none; }
-}
+/* Статическая версия: сцену и хром живого режима прячет static.css по
+   data-mode. Отдельного условия по ширине здесь нет: режим решают ранний
+   скрипт и boot.js (он же переводит страницу в статику, если окно сузилось
+   после старта). Своё условие в CSS прятало живую сцену при data-mode=live,
+   и страница оставалась пустой. */

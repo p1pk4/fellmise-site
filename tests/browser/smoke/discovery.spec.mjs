@@ -105,6 +105,7 @@ test('discoveries: production routes load neither the module nor the images; ?po
   const page = await open(browser, baseURL, '/depth-v2/?poc=mine');
   await page.waitForFunction(() => document.querySelectorAll('.poc-find').length === 4);
   expect(await page.evaluate(() => [...new Set([...document.querySelectorAll('.poc-find')].map((f) => f.dataset.biome))])).toEqual(['mine']);
-  expect(page._requests.filter((u) => /\/assets\/depth\/discovery\/(?!mine\/)/.test(u))).toEqual([]);
+  // только находки шахты и общая подложка кластера
+  expect(page._requests.filter((u) => /\/assets\/depth\/discovery\/(?!mine\/|underlay\.webp)/.test(u))).toEqual([]);
   await page.context().close();
 });

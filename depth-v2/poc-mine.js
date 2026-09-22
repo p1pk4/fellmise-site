@@ -22,22 +22,23 @@ const ASSETS = '/assets/depth/discovery/mine/';
 /* at — локальный прогресс шахты, с которого находка лежит на странице;
    x, y — центр предмета в долях кадра; h — высота предмета в долях высоты
    кадра (мешок — самый тяжёлый, кристаллы — мелкий акцент); rot — постоянный
-   наклон; cap — с какой стороны подпись (below / left / right).
+   наклон; cap — с какой стороны подпись (below / above / left / right);
+   cx — собственный сдвиг подписи по горизонтали в долях кадра.
    Асимметричная группа в правой половине кадра: слева — основной текст
    шахты, по центру — устье, вагонетка и рельсы. */
 const ITEMS = [
-  { id: 'ore-sample', at: 0.10, x: 0.80, y: 0.215, h: 0.13, rot: -2, cap: 'below',
+  { id: 'ore-sample', at: 0.10, x: 0.815, y: 0.215, h: 0.13, rot: -2, cap: 'below', cx: 0.028,
     en: ['Ore sample', 'Depth changes what the rock gives back.'],
     ru: ['Образец руды', 'С глубиной меняется то, что отдаёт порода.'] },
-  { id: 'mining-pickaxe', at: 0.26, x: 0.905, y: 0.42, h: 0.15, rot: 1.5, cap: 'below',
-    en: ['Mining tools', 'The right tool decides what you can bring back.'],
-    ru: ['Инструменты', 'От инструмента зависит, что ты сможешь унести наверх.'] },
+  { id: 'mining-pickaxe', at: 0.26, x: 0.905, y: 0.42, h: 0.15, rot: 1.5, cap: 'below', cx: -0.022,
+    en: ['Mining Pick', 'The right tool decides what you can bring back.'],
+    ru: ['Кирка', 'От инструмента зависит, что ты сможешь унести наверх.'] },
   { id: 'ore-cargo', at: 0.43, x: 0.875, y: 0.79, h: 0.19, rot: -1, cap: 'above',
     en: ['The haul', 'What you extract feeds crafting and trade.'],
     ru: ['Добыча', 'То, что вынесешь наверх, идёт в ремесло и торговлю.'] },
-  { id: 'deep-material', at: 0.60, x: 0.745, y: 0.82, h: 0.11, rot: 2, cap: 'below',
-    en: ['Deep material', 'Richer materials wait where the risk is higher.'],
-    ru: ['Глубинный материал', 'Чем ценнее находка, тем опаснее путь к ней.'] },
+  { id: 'deep-material', at: 0.60, x: 0.745, y: 0.82, h: 0.11, rot: 2, cap: 'below', cx: 0.014,
+    en: ['Rare Crystal', 'Richer materials wait where the risk is higher.'],
+    ru: ['Редкий кристалл', 'Чем ценнее находка, тем опаснее путь к ней.'] },
 ];
 const EXIT = 0.90;          // группа уходит до захвата кадра порогом (m = 1)
 
@@ -64,6 +65,7 @@ const CSS = `
 /* мягкая тень только под буквами: растворяется к краям, границы не видно */
 .poc-find figcaption::before { content: ''; position: absolute; inset: -18px -36px; z-index: -1;
   background: radial-gradient(closest-side, rgba(10, 9, 8, .62), rgba(10, 9, 8, .34) 55%, transparent); }
+.poc-find b, .poc-find span { white-space: nowrap; }
 .poc-find b { display: block; font: 700 clamp(15px, .95vw, 19px)/1.05 Podkova, Georgia, serif; letter-spacing: .04em;
   text-transform: uppercase; color: #e7b999; }
 .poc-find span { display: block; margin-top: .35em; font: 500 clamp(13px, .8vw, 15.5px)/1.35 Vollkorn, Georgia, serif; }
@@ -89,6 +91,7 @@ export function mountMinePoc(parent) {
     img.decoding = 'async';
     const cap = document.createElement('figcaption');
     cap.innerHTML = '<b></b><span></span>';
+    if (d.cx) cap.style.transform = `translateX(${(d.cx * 100).toFixed(2)}vw)`;
     cap.querySelector('b').textContent = d[lang][0];
     cap.querySelector('span').textContent = d[lang][1];
     fig.append(img, cap);

@@ -643,10 +643,6 @@ function wheelGain(tp) {
 }
 let poc = null;
 if (POC_MINE) import('./poc-mine.js').then((m) => { poc = m.mountMinePoc(document.getElementById('content')); schedule(); });
-const mineLayer = () => {
-  const S = built[MINE];
-  return !S.plate.hidden && p >= SECTIONS[MINE].band[0] - 0.004 ? S.plate : built[MINE - 1].holder.hidden ? null : built[MINE - 1].next;
-};
 
 let p = 0, target = 0, raf = 0, last = performance.now();
 
@@ -754,7 +750,7 @@ function apply(now) {
   const cur = p >= ARRIVAL.at ? ARRIVAL
     : SECTIONS.reduce((a, s) => (p >= s.band[0] ? s : a), SECTIONS[0]);
   updateContent(p, dominantAt(p));
-  if (poc) poc(mineLocal(p), mineLayer());
+  if (poc) poc(mineLocal(p));
   updateChrome(p, cur.id);
 
   if (debug) {

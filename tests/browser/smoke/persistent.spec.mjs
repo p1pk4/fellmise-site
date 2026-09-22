@@ -101,33 +101,70 @@ for (const [w, h] of [[1920, 1080], [1920, 900]]) {
   });
 }
 
-test('Mine POC: three discoveries in order, one at a time, only inside Mine; base Mine copy stays', async ({ browser, baseURL }) => {
+const FINDS = ['ore-sample', 'pickaxe', 'ore-cargo', 'deep-material'];
+const findsOn = (page) => page.evaluate(() => [...document.querySelectorAll('.poc-find.is-on')].map((f) => f.dataset.find));
+const pOfMine = (span, m) => (m <= 0.78 ? span.m0 + (m / 0.78) * (span.rs - span.m0) : span.rs + ((m - 0.78) / 0.22) * (span.m1 - span.rs));
+
+test('Mine POC: finds accumulate 1 -> 2 -> 3 -> 4, leave together before Spirit; base Mine copy stays', async ({ browser, baseURL }) => {
   const page = await open(browser, baseURL, '/depth-v2/?poc=mine');
-  await page.waitForFunction(() => document.querySelector('.poc-disc'));
+  await page.waitForFunction(() => document.querySelectorAll('.poc-find').length === 4);
   const span = await page.evaluate(() => window.__JOURNEY.mine());
   expect(span.poc).toBe(true);
-  const seen = [];
-  for (let p = span.m0 - 0.03; p <= span.m1 + 0.03; p += 0.0025) {
+  // вперёд мелким шагом: число находок только растёт, по одной, в заданном порядке
+  const counts = [];
+  let prev = [];
+  for (let p = span.m0 - 0.02; p <= span.m1 + 0.02; p += 0.002) {
     await page.evaluate((v) => window.__JOURNEY.set(v, { instant: true }), p);
-    await page.waitForTimeout(60);
-    const s = await page.evaluate(() => ({
-      disc: [...document.querySelectorAll('.poc-disc .lab')].filter((l) => +l.style.opacity > 0.5).map((l) => l.querySelector('b').textContent),
-      m: window.__JOURNEY.mine().m,
-    }));
-    expect(s.disc.length, `discoveries at ${p.toFixed(4)}`).toBeLessThanOrEqual(1);
-    if (s.m == null) expect(s.disc, `outside Mine at ${p.toFixed(4)}`).toEqual([]);
-    if (s.disc[0] && seen.at(-1) !== s.disc[0]) seen.push(s.disc[0]);
+    await page.waitForTimeout(40);
+    const on = await findsOn(page), m = await page.evaluate(() => window.__JOURNEY.mine().m);
+    if (m == null) expect(on, `outside Mine at ${p.toFixed(4)}`).toEqual([]);
+    if (on.length) {
+      // накопление: видны ровно первые n находок, а не одна сменяющая другую
+      expect(on, `accumulated finds at m=${m?.toFixed(3)}`).toEqual(FINDS.slice(0, on.length));
+      expect(on.length, 'never more than one new find per step').toBeLessThanOrEqual(prev.length + 1);
+    }
+    if (on.length !== (counts.at(-1) ?? -1)) counts.push(on.length);
+    prev = on;
   }
-  expect(seen).toEqual(['Ore vein', 'Extraction', 'Depth']);
+  expect(counts, 'find count over Mine').toEqual([0, 1, 2, 3, 4, 0]);
+  // все четыре видны вместе перед уходом группы
+  await page.evaluate((v) => window.__JOURNEY.set(v, { instant: true }), pOfMine(span, 0.8));
+  await page.waitForTimeout(300);
+  expect(await findsOn(page)).toEqual(FINDS);
   // основной текст шахты на всём её протяжении
-  for (const m of [0.1, 0.3, 0.5, 0.69, 0.9]) {
-    const p = m <= 0.78 ? span.m0 + (m / 0.78) * (span.rs - span.m0) : span.rs + ((m - 0.78) / 0.22) * (span.m1 - span.rs);
-    await page.evaluate((v) => window.__JOURNEY.set(v, { instant: true }), p);
+  for (const m of [0.05, 0.2, 0.5, 0.75, 0.85]) {
+    await page.evaluate((v) => window.__JOURNEY.set(v, { instant: true }), pOfMine(span, m));
     await page.waitForTimeout(460);
     expect(await beatsOn(page), `base Mine copy at m=${m}`).toEqual(['mine']);
   }
+  // назад: находки убираются в обратном порядке
+  for (const [m, n] of [[0.65, 4], [0.5, 3], [0.3, 2], [0.15, 1], [0.05, 0]]) {
+    await page.evaluate((v) => window.__JOURNEY.set(v, { instant: true }), pOfMine(span, m));
+    await page.waitForTimeout(60);
+    expect(await findsOn(page), `back to m=${m}`).toEqual(FINDS.slice(0, n));
+  }
+  // старой системы выносок нет: ни линий, ни точек, ни svg
+  expect(await page.evaluate(() => document.querySelectorAll('.poc-disc, .poc-finds svg, .poc-finds line, .poc-finds circle').length)).toBe(0);
+  // картинки находок действительно пришли
+  expect(await page.evaluate(() => [...document.querySelectorAll('.poc-find img')].every((i) => i.complete && i.naturalWidth > 0))).toBe(true);
   expect(page._errors).toEqual([]);
   await page.context().close();
+});
+
+test('Mine POC assets load only with ?poc=mine', async ({ browser, baseURL }) => {
+  const hits = {};
+  for (const url of ['/depth-v2/?poc=mine', '/depth-v2/', '/', '/ru/']) {
+    const page = await open(browser, baseURL, url);
+    await page.evaluate(() => window.__JOURNEY.set(0.36, { instant: true }));
+    await page.waitForTimeout(800);
+    hits[url] = page._requests.filter((u) => /\/assets\/depth\/discovery\/|poc-mine\.js/.test(u)).length;
+    expect(page._errors, url).toEqual([]);
+    await page.context().close();
+  }
+  expect(hits['/depth-v2/?poc=mine']).toBeGreaterThanOrEqual(5);       // модуль + 4 находки
+  expect(hits['/depth-v2/']).toBe(0);
+  expect(hits['/']).toBe(0);
+  expect(hits['/ru/']).toBe(0);
 });
 
 test('Mine POC is longer to scroll; production routes do not load it', async ({ browser, baseURL }) => {

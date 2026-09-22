@@ -34,7 +34,12 @@ const biomesData = (page) => page.evaluate(async () => {
 });
 const pOf = (sp, m) => (sp.rs >= sp.m1 ? sp.m0 + m * (sp.m1 - sp.m0)
   : m <= 0.78 ? sp.m0 + (m / 0.78) * (sp.rs - sp.m0) : sp.rs + ((m - 0.78) / 0.22) * (sp.m1 - sp.rs));
-const set = (page, v) => page.evaluate((x) => window.__JOURNEY.set(x, { instant: true }), v);
+// установить прогресс и дождаться двух кадров: состояние находок обновляется в
+// кадре журнала, и на медленном раннере фиксированной паузы не хватает
+const set = (page, v) => page.evaluate((x) => new Promise((ok) => {
+  window.__JOURNEY.set(x, { instant: true });
+  requestAnimationFrame(() => requestAnimationFrame(ok));
+}), v);
 const onIn = (page, name) => page.evaluate((n) => [...document.querySelectorAll(`.poc-find.is-on[data-biome="${n}"]`)].map((f) => f.dataset.find), name);
 
 test('discoveries: every biome accumulates in order, leaves before takeover, keeps base copy', async ({ browser, baseURL }) => {

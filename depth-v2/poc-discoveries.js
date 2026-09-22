@@ -8,11 +8,15 @@
  * собрана маленькая коллекция. Не инвентарь, не HUD, не карточки: предмет без
  * рамки и плашки, под ним название и одна строка. Стрелок к окружению нет.
  *
- * Находки биома — не россыпь точек, а один кластер в одной тихой зоне кадра.
- * Под кластером лежит одна общая мягкая живописная подложка (under): неровное
- * пятно из маски underlay.webp, растворяется к краям, тон — у каждого биома
- * свой. Она проявляется с первой находкой, плотнеет по мере накопления и
- * уходит вместе с группой: предметы «садятся» в сцену, а не висят наклейками.
+ * Находки биома — один компактный кластер на одной физически правдоподобной
+ * опоре (земля у тележки, корни дерева, порода у стены, берег, двор). Предметы
+ * стоят вплотную и частично перекрывают друг друга: это одна композиция, а не
+ * список. Под всей группой — одно мягкое органическое пятно-тень (under) из
+ * маски underlay.webp, прижатое к основанию кластера; оно проявляется с первой
+ * находкой, плотнеет по мере накопления и уходит вместе с группой.
+ *
+ * Текст не дробит кластер: подпись есть только у последней найденной вещи —
+ * название и одна строка. У остальных текста нет, кластер читается целиком.
  *
  * Появление: opacity 0→1 и scale .88→1.025→1 за ~220 мс, у каждого предмета
  * свой постоянный наклон. После появления предмет неподвижен. Перед тем как
@@ -42,20 +46,20 @@ export const BIOMES = {
   // деревня — физические следы живого мира; текст слева внизу, находки справа,
   // в небе над крышами и на траве, дорога и дома открыты
   village: {
-    k: 0, stretch: [3.2, 1.5], exit: 0.84, zone: [0.55, 0.985],
-    under: { x: 0.775, y: 0.86, w: 0.5, h: 0.36, rot: -3, tone: '20, 13, 6', op: 0.78 },
+    k: 0, stretch: [3.2, 1.5], exit: 0.84, zone: [0.5, 0.985],
+    under: { x: 0.752, y: 0.912, w: 0.34, h: 0.17, rot: -2, tone: '18, 12, 5', op: 0.75 },
     keep: [[0.3, 0.6, 0.55, 1]],
     items: [
-      { id: 'sealed-letter', at: 0.30, x: 0.875, y: 0.962, h: 0.058, rot: -4, cap: 'left',
+      { id: 'sealed-letter', at: 0.30, x: 0.684, y: 0.905, h: 0.06, rot: -4, cap: 'left', z: 4,
         en: ['Sealed letter', 'Messages move through the world without you.'],
         ru: ['Письмо', 'Сообщения идут по миру и без тебя.'] },
-      { id: 'notice', at: 0.42, x: 0.868, y: 0.705, h: 0.1, rot: 1.5, cap: 'below',
+      { id: 'notice', at: 0.42, x: 0.845, y: 0.735, h: 0.115, rot: 1.5, cap: 'right', z: 1,
         en: ['Notice', 'Work appears whether a player is there to take it or not.'],
         ru: ['Объявление', 'Дела появляются независимо от того, рядом ли игрок.'] },
-      { id: 'adventurer-pack', at: 0.54, x: 0.7, y: 0.8, h: 0.15, rot: -1, cap: 'below',
+      { id: 'adventurer-pack', at: 0.54, x: 0.718, y: 0.83, h: 0.155, rot: -1, cap: 'left', z: 2,
         en: ["Adventurer's pack", 'Others leave town, return with loot, and spend it.'],
         ru: ['Ранец авантюриста', 'Другие уходят за добычей, возвращаются и тратят её.'] },
-      { id: 'field-book', at: 0.66, x: 0.935, y: 0.9, h: 0.082, rot: 2, cap: 'above',
+      { id: 'field-book', at: 0.66, x: 0.792, y: 0.888, h: 0.088, rot: 2, cap: 'right', z: 3,
         en: ['Field book', 'Knowledge is something you can carry.'],
         ru: ['Полевая книга', 'Знание здесь можно буквально носить с собой.'] },
     ],
@@ -63,36 +67,36 @@ export const BIOMES = {
   // лес — природные образцы и странности, не добыча; текст справа, находки
   // слева и снизу слева, центральная тропа открыта
   forest: {
-    k: 1, stretch: [2.8, 1.45], exit: 0.9, zone: [0.015, 0.42],
-    under: { x: 0.2, y: 0.79, w: 0.42, h: 0.42, rot: 3, tone: '8, 12, 7', op: 0.78 },
+    k: 1, stretch: [2.8, 1.45], exit: 0.9, zone: [0.015, 0.45],
+    under: { x: 0.175, y: 0.955, w: 0.3, h: 0.15, rot: 2, tone: '6, 10, 6', op: 0.8 },
     keep: [[0.4, 0.45, 0.62, 1]],
     items: [
-      { id: 'strange-bark', at: 0.20, x: 0.085, y: 0.63, h: 0.1, rot: -2, cap: 'right',
+      { id: 'strange-bark', at: 0.20, x: 0.115, y: 0.9, h: 0.1, rot: -2, cap: 'left', z: 1,
         en: ['Strange bark', 'Not every place worth finding is marked on a map.'],
         ru: ['Странная кора', 'Не каждое важное место отмечено на карте.'] },
-      { id: 'fresh-track', at: 0.38, x: 0.28, y: 0.93, h: 0.08, rot: 1, cap: 'above',
+      { id: 'fresh-track', at: 0.38, x: 0.235, y: 0.925, h: 0.09, rot: 1, cap: 'right', z: 3,
         en: ['Fresh track', 'The farther from safety, the less predictable the wilds.'],
         ru: ['Свежий след', 'Чем дальше от безопасности, тем непредсказуемее дикая местность.'] },
-      { id: 'night-growth', at: 0.56, x: 0.1, y: 0.8, h: 0.15, rot: -1.5, cap: 'right',
+      { id: 'night-growth', at: 0.56, x: 0.155, y: 0.845, h: 0.155, rot: -1.5, cap: 'right', z: 2,
         en: ['Night growth', 'Some things are easier to find after dark.'],
         ru: ['Ночная поросль', 'Некоторые вещи легче найти после наступления темноты.'] },
     ],
   },
   mine: {
-    k: 2, stretch: [3, 1.6], exit: 0.9, zone: [0.6, 0.985],
-    under: { x: 0.85, y: 0.6, w: 0.36, h: 0.72, rot: 0, tone: '22, 14, 7', op: 0.6 },
+    k: 2, stretch: [3, 1.6], exit: 0.9, zone: [0.58, 0.955],
+    under: { x: 0.826, y: 0.888, w: 0.32, h: 0.16, rot: 0, tone: '20, 13, 6', op: 0.72 },
     keep: [[0.46, 0.15, 0.715, 0.76], [0.52, 0.62, 0.68, 0.98]],
     items: [
-      { id: 'ore-sample', at: 0.10, x: 0.83, y: 0.3, h: 0.12, rot: -2, cap: 'below',
+      { id: 'ore-sample', at: 0.10, x: 0.748, y: 0.855, h: 0.11, rot: -2, cap: 'left', z: 3,
         en: ['Ore sample', 'Depth changes what the rock gives back.'],
         ru: ['Образец руды', 'С глубиной меняется то, что отдаёт порода.'] },
-      { id: 'mining-pickaxe', at: 0.26, x: 0.925, y: 0.47, h: 0.14, rot: 1.5, cap: 'below', cx: -0.02,
+      { id: 'mining-pickaxe', at: 0.26, x: 0.862, y: 0.7, h: 0.155, rot: 1.5, cap: 'right', z: 1,
         en: ['Mining Pick', 'The right tool decides what you can bring back.'],
         ru: ['Кирка', 'От инструмента зависит, что ты сможешь унести наверх.'] },
-      { id: 'ore-cargo', at: 0.43, x: 0.87, y: 0.79, h: 0.18, rot: -1, cap: 'above',
+      { id: 'ore-cargo', at: 0.43, x: 0.818, y: 0.79, h: 0.185, rot: -1, cap: 'right', z: 2,
         en: ['The haul', 'What you extract feeds crafting and trade.'],
         ru: ['Добыча', 'То, что вынесешь наверх, идёт в ремесло и торговлю.'] },
-      { id: 'deep-material', at: 0.60, x: 0.75, y: 0.84, h: 0.1, rot: 2, cap: 'below', cx: 0.012,
+      { id: 'deep-material', at: 0.60, x: 0.872, y: 0.868, h: 0.092, rot: 2, cap: 'right', z: 4,
         en: ['Rare Crystal', 'Richer materials wait where the risk is higher.'],
         ru: ['Редкий кристалл', 'Чем ценнее находка, тем опаснее путь к ней.'] },
     ],
@@ -100,18 +104,18 @@ export const BIOMES = {
   // ядро мира мёртвых — не добыча, а свидетельства другого слоя; текст справа
   // внизу, находки по левому краю; корабль, след на воде, пирс и стела открыты
   core: {
-    k: 4, stretch: [2.5, 1.45], exit: 0.9, zone: [0.015, 0.42],
-    under: { x: 0.15, y: 0.55, w: 0.32, h: 0.46, rot: -3, tone: '6, 22, 26', op: 0.36 },
+    k: 4, stretch: [2.5, 1.45], exit: 0.9, zone: [0.015, 0.45],
+    under: { x: 0.158, y: 0.928, w: 0.28, h: 0.13, rot: -2, tone: '5, 20, 24', op: 0.5 },
     props: 'saturate(.72) brightness(.86)',
     keep: [[0.42, 0.3, 0.82, 0.56], [0.44, 0.5, 0.8, 1]],
     items: [
-      { id: 'spirit-trace', at: 0.18, x: 0.085, y: 0.4, h: 0.14, rot: -1, cap: 'right', spectral: true,
+      { id: 'spirit-trace', at: 0.18, x: 0.078, y: 0.8, h: 0.125, rot: -1, cap: 'right', spectral: true, z: 1,
         en: ['Spirit trace', 'The dead see paths the living leave behind.'],
         ru: ['След духа', 'Мёртвые видят пути, оставленные живыми.'] },
-      { id: 'awakened-relic', at: 0.36, x: 0.155, y: 0.575, h: 0.11, rot: 1.5, cap: 'right',
+      { id: 'awakened-relic', at: 0.36, x: 0.142, y: 0.858, h: 0.1, rot: 1.5, cap: 'right', z: 2,
         en: ['Awakened relic', 'Some things reveal what they are only after death.'],
         ru: ['Пробуждённая реликвия', 'Некоторые вещи раскрывают себя только после смерти.'] },
-      { id: 'spiral-shard', at: 0.54, x: 0.085, y: 0.71, h: 0.1, rot: -2, cap: 'right',
+      { id: 'spiral-shard', at: 0.54, x: 0.212, y: 0.898, h: 0.088, rot: -2, cap: 'right', z: 3,
         en: ['Spiral shard', 'The same world reveals another layer.'],
         ru: ['Осколок спирали', 'Тот же мир открывает другой слой.'] },
     ],
@@ -119,20 +123,20 @@ export const BIOMES = {
   // дом — то, что остаётся; тихо по краям, дом и окна — главный финал;
   // коллекция остаётся до конца маршрута
   home: {
-    k: 5, stretch: [2, 2], exit: null, zone: [0.6, 0.985],
-    under: { x: 0.83, y: 0.76, w: 0.36, h: 0.46, rot: 2, tone: '10, 10, 8', op: 0.62 },
+    k: 5, stretch: [2, 2], exit: null, zone: [0.55, 0.96],
+    under: { x: 0.822, y: 0.882, w: 0.28, h: 0.15, rot: 2, tone: '8, 9, 7', op: 0.7 },
     keep: [[0.4, 0.15, 0.78, 0.6], [0.42, 0.62, 0.62, 1]],
     items: [
-      { id: 'storage-chest', at: 0.15, x: 0.925, y: 0.83, h: 0.115, rot: -1.5, cap: 'above',
+      { id: 'storage-chest', at: 0.15, x: 0.828, y: 0.79, h: 0.125, rot: -1.5, cap: 'left', z: 2,
         en: ['Storage', 'What you bring home stays yours.'],
         ru: ['Хранилище', 'То, что ты принёс домой, остаётся твоим.'] },
-      { id: 'workshop-kit', at: 0.3, x: 0.8, y: 0.74, h: 0.1, rot: 1, cap: 'below',
+      { id: 'workshop-kit', at: 0.3, x: 0.762, y: 0.845, h: 0.1, rot: 1, cap: 'left', z: 3,
         en: ['Workshop', 'Craft without leaving your own space.'],
         ru: ['Мастерская', 'Создавай вещи, не покидая своего пространства.'] },
-      { id: 'trophy', at: 0.45, x: 0.92, y: 0.5, h: 0.11, rot: -1, cap: 'below',
+      { id: 'trophy', at: 0.45, x: 0.862, y: 0.68, h: 0.105, rot: -1, cap: 'right', z: 1,
         en: ['Trophy', 'Bring pieces of your journey back with you.'],
         ru: ['Трофей', 'Возвращайся домой с памятью о пройденном пути.'] },
-      { id: 'seed-pouch', at: 0.6, x: 0.765, y: 0.9, h: 0.075, rot: 2, cap: 'right',
+      { id: 'seed-pouch', at: 0.6, x: 0.885, y: 0.872, h: 0.075, rot: 2, cap: 'right', z: 4,
         en: ['Grow', 'Your home can produce more than storage.'],
         ru: ['Выращивай', 'Дом — это больше, чем просто склад.'] },
     ],
@@ -163,13 +167,15 @@ const CSS = `
   65% { opacity: 1; transform: var(--at) scale(1.025); }
   100% { opacity: 1; transform: var(--at) scale(1); }
 }
-.poc-find figcaption { margin-top: 8px; text-align: center; color: #e8dbbd;
+.poc-find figcaption { display: none; margin-top: 8px; text-align: center; color: #e8dbbd;
   text-shadow: 0 1px 6px rgba(0, 0, 0, .85), 0 0 2px rgba(0, 0, 0, .7); }
 .poc-find b, .poc-find span { white-space: nowrap; }
 .poc-find b { display: block; font: 700 clamp(13px, .82vw, 16px)/1.05 Podkova, Georgia, serif; letter-spacing: .05em;
   text-transform: uppercase; color: #e2b594; }
 .poc-find span { display: block; margin-top: .3em; font: 500 clamp(12px, .74vw, 14.5px)/1.3 Vollkorn, Georgia, serif; }
-/* на узком окне строка описания не помещается рядом с соседями: остаётся название */
+/* подпись — только у последней находки */
+.poc-find.is-new figcaption { display: block; }
+/* на узком окне строка не помещается: остаётся название */
 @media (max-width: 1279px) { .poc-find span { display: none; } }
 `;
 
@@ -207,6 +213,7 @@ export function mountDiscoveries(parent, { only = null, stretch = null } = {}) {
       fig.className = `poc-find poc-find--${d.cap || 'below'}${d.spectral ? ' poc-find--spectral' : ''}`;
       fig.dataset.find = d.id;
       fig.dataset.biome = name;
+      fig.style.zIndex = String(d.z ?? 1);
       fig.style.setProperty('--rot', `${d.rot || 0}deg`);
       if (b.props) fig.style.setProperty('--props', b.props);
       const img = new Image();
@@ -260,6 +267,16 @@ export function mountDiscoveries(parent, { only = null, stretch = null } = {}) {
       f.on = on;
       f.fig.classList.toggle('is-on', on);
     }
+    // подпись показывает только последняя найденная вещь биома
+    let changed = false;
+    for (const u of unders) {
+      const on = finds.filter((f) => f.b === u.b && f.on);
+      for (const f of on) {
+        const isNew = f === on[on.length - 1];
+        if (f.fig.classList.contains('is-new') !== isNew) { f.fig.classList.toggle('is-new', isNew); changed = true; }
+      }
+    }
+    if (changed) layout();      // ширина блока меняется вместе с подписью
     // подложка проявляется с первой находкой и плотнеет к полной группе
     for (const u of unders) {
       const n = finds.filter((f) => f.b === u.b && f.on).length, N = u.b.items.length;

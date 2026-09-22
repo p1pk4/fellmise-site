@@ -23,6 +23,7 @@
 import { mountContent } from './content.js';
 import { BEATS } from './content-data.js';
 import { mountChrome, takeSavedProgress } from './chrome.js';
+import { IS_PREVIEW } from './route.js';
 
 /* Живой режим может быть отменён в любой момент старта (boot.js: отказ,
    предел времени, узкое окно, reduced-motion). Тогда модуль ничего не
@@ -408,6 +409,7 @@ const built = [];
 SECTIONS.forEach((s, i) => {
   if (s.hold) { built.push({ def: s }); return; }
   const origin = `${s.vp[0] * 100}% ${s.vp[1] * 100}%`;
+  s.origin = origin;
   const z = i * 10;
   const plate = layer('img', 'sheet', z, origin);
   stage.appendChild(plate);
@@ -549,118 +551,110 @@ function coverScale(want, vp, rx, ry, ax, ay) {
 
 buildTrajectories(innerWidth, innerHeight);
 
-/* ------------------------------------------------ задержка взгляда на тексте
+/* ------------------------------------------ доминирование сцены и тексты
  *
- * Прогресса два, как и было: target — куда пользователь хочет попасть колесом,
- * p — что нарисовано; p догоняет target экспоненциально. Колесо не
- * блокируется никогда: target копится свободно.
+ * Текст биома держится, пока сам биом визуально текущий. Источник истины —
+ * не граница секции, а доля кадра, которую уже заняла сцена назначения: её
+ * видно сквозь маску диафрагмы (радиальный градиент со спадом). Когда доля
+ * доходит до TAKEOVER, текущим становится следующий биом. Доля — функция
+ * нарисованного прогресса, поэтому правило при обратной прокрутке то же.
  *
- * При ПЕРВОМ проходе вперёд через окно текста биома скорость догона
- * ограничивается так, чтобы окно длилось dwell выбранного режима. Режим — по
- * намерению пользователя, из того же target:
- *   read — обычная прокрутка: полное время чтения;
- *   fast — ввод быстрее FAST_RATE прогресса/с: короче, но текст не мелькает;
- *   skip — рывок (за 400 мс target ушёл вперёд на FLING и больше) или
- *          пользователь ушёл далеко вперёд и ждёт (отставание >= SKIP_LEAD,
- *          колесо не крутится IDLE мс). Короткая
- *          задержка только на биоме, где рывок застал; дальше биомы проходятся
- *          без обязательных остановок (pass) плавным догоном не быстрее VSKIP,
- *          пока отставание не упадёт ниже SKIP_END — тогда чтение снова работает.
- * Перед окном — плавное торможение, после — разгон с ограниченным ускорением:
- * ни остановки, ни рывка, ни движения назад. Назад и при повторном проходе
- * ограничения нет.
+ * Прежнее трение чтения (read / fast / skip, торможение перед окнами текста)
+ * снято: оно было нужно, пока текст жил в коротком окне и его приходилось
+ * спасать задержкой. Траектории камеры от него не зависели — трение меняло
+ * только скорость, с которой нарисованный прогресс догонял колесо.
  */
-const BRAKE = 3.0;       // торможение перед окном, прогресс/с²
-const RECOVER = 3.0;     // разгон после окна, прогресс/с²
-const FAST_RATE = 0.30;  // прирост target за последнюю секунду — порог быстрой прокрутки
-const FLING = 0.30;      // прирост target за 400 мс — рывок
-const SKIP_END = 0.16;   // отставание, ниже которого рывок считается отработанным
-const VSKIP = 0.22;      // потолок скорости догона после рывка, прогресс/с
-const SKIP_LEAD = 0.35;  // отставание, при котором ожидание впереди — тоже пропуск
-const IDLE = 350;        // мс без ввода, после которых отставание читается как ожидание
-const ZONES = BEATS.filter((b) => b.dwell).map((b) => ({
-  id: b.id, a: b.range[0], z: b.range[1], dw: b.dwell,
-  visited: false, t0: 0, t1: 0, mode: '', dwell: 0,
-}));
-const lim = { v: 0, recovering: false };
-const skip = { on: false, used: false };
-const input = [];        // [время, target] последних 1.5 с
-
-function noteInput(now) {
-  input.push([now, target]);
-  while (input.length && now - input[0][0] > 1500) input.shift();
-}
-function gain(now, ms) {
-  let lo = target;
-  for (const [t, v] of input) if (now - t <= ms) lo = Math.min(lo, v);
-  return target - lo;
-}
-function modeNow(now) {
-  if (skip.on) return skip.used ? 'pass' : 'skip';
-  return gain(now, 1000) >= FAST_RATE ? 'fast' : 'read';
-}
-const dwellOf = (Z, mode) => (mode === 'pass' ? 0 : Z.dw[mode]);
-
-function limitForward(step, sec, now) {
-  const v = step / sec;
-  // рывок начинает эпизод пропуска; эпизод кончается, когда отставание сошло
-  const idle = !input.length || now - input[input.length - 1][0] > IDLE;
-  if (!skip.on && (gain(now, 400) >= FLING || (idle && target - p >= SKIP_LEAD))) {
-    skip.on = true; skip.used = false;
-  }
-  if (skip.on && target - p < SKIP_END) skip.on = false;
-  let vmax = Infinity, inWindow = false;
-  for (const Z of ZONES) {
-    if (Z.visited) {
-      if (p >= Z.a && p <= Z.z && now - Z.t0 < Z.dwell) {
-        // рывок посреди окна укорачивает его до skip, быстрый ввод — до fast
-        const m = modeNow(now);
-        if (m === 'skip' || m === 'pass') {
-          Z.dwell = Math.max(now - Z.t0, Math.min(Z.dwell, Z.dw.skip)); Z.mode = 'skip'; skip.used = true;
-        } else if (m === 'fast' && Z.mode === 'read') {
-          Z.dwell = Math.max(now - Z.t0, Math.min(Z.dwell, Z.dw.fast)); Z.mode = 'fast';
-        }
-        const left = Math.max(0.001, (Z.t0 + Z.dwell - now) / 1000);
-        vmax = Math.min(vmax, Math.max(0.004, (Z.z - p) / left));
-        inWindow = true;
-      }
-    } else if (p < Z.a) {
-      const m = modeNow(now);
-      if (m !== 'pass') {
-        const vEntry = (Z.z - Z.a) / (dwellOf(Z, m) / 1000);
-        vmax = Math.min(vmax, vEntry + Math.sqrt(2 * BRAKE * (Z.a - p)));
-      }
+const TAKEOVER = 0.75;
+const MASK_STOPS = new Map();
+function stopsOf(str) {
+  if (!MASK_STOPS.has(str)) {
+    const st = [];
+    for (const m of str.matchAll(/(?:#000 0|rgba\(0,0,0,([\d.]+)\)|transparent) (\d+)%/g)) {
+      st.push([+m[2] / 100, m[0].startsWith('#000') ? 1 : m[0].startsWith('transparent') ? 0 : +m[1]]);
     }
+    MASK_STOPS.set(str, st);
   }
-  if (skip.on && !inWindow) vmax = Math.min(vmax, VSKIP);
-  if (lim.recovering) vmax = Math.min(vmax, lim.v + RECOVER * sec);
-  const v2 = Math.min(v, vmax);
-  const pn = p + v2 * sec;
-  for (const Z of ZONES) {
-    if (!Z.visited && p < Z.a && pn >= Z.a) {
-      Z.visited = true; Z.t0 = now;
-      Z.mode = modeNow(now); Z.dwell = dwellOf(Z, Z.mode);
-      if (Z.mode === 'skip') skip.used = true;
-    }
-    if (Z.visited && !Z.t1 && pn > Z.z) Z.t1 = now;
-  }
-  lim.recovering = v2 < v - 1e-9;
-  lim.v = v2;
-  return v2 * sec;
+  return MASK_STOPS.get(str);
 }
+function alphaAt(st, r) {
+  if (r <= st[0][0]) return st[0][1];
+  for (let i = 1; i < st.length; i++) {
+    if (r <= st[i][0]) { const [r0, a0] = st[i - 1], [r1, a1] = st[i]; return a0 + (a1 - a0) * (r - r0) / (r1 - r0); }
+  }
+  return 0;
+}
+// доля кадра, занятая сценой назначения секции d в её локальной точке l
+function shareAt(d, l, W, H) {
+  if (l < d.gate[0] - 0.01) return 0;
+  const [rx, ry] = radii(d, l, W, H), st = stopsOf(d.ap.stops);
+  let sum = 0, n = 0;
+  for (let j = 0; j < 27; j++) for (let i = 0; i < 48; i++) {
+    const x = (i + 0.5) / 48, y = (j + 0.5) / 27;
+    const r = Math.hypot((x - d.vp[0]) / rx, (y - d.vp[1]) / ry);
+    sum += alphaAt(st, r); n++;
+  }
+  return sum / n;
+}
+// точки смены текущего биома: для каждой секции — прогресс, где сцена
+// назначения заняла TAKEOVER кадра (не позже конца полосы, где слой меняется)
+const TAKE = [];
+function computeTakeover(W, H) {
+  TAKE.length = 0;
+  for (const d of SECTIONS) {
+    let at = globOf(d, 1);
+    for (let s = 0; s <= 1000; s++) {
+      const l = s / 1000;
+      if (shareAt(d, l, W, H) >= TAKEOVER) { at = globOf(d, l); break; }
+    }
+    TAKE.push(Math.min(at, d.band[1]));
+  }
+}
+computeTakeover(innerWidth, innerHeight);
+// номер текущего биома: 0 деревня … 5 дом
+const dominantAt = (pp) => TAKE.filter((t) => pp >= t).length;
+
+/* POC «шахта с открытиями» — только превью /depth-v2/?poc=mine. Шахта
+   длиннее по прокрутке: внутри неё колесо двигает прогресс медленнее (ход
+   камеры тот же, только проходится дольше). Локальный прогресс шахты m:
+   0 — шахта заняла кадр (TAKE forest), 0.78 — начало раскрытия порога,
+   1 — порог занял кадр (TAKE mine). */
+const POC_MINE = IS_PREVIEW && new URLSearchParams(location.search).get('poc') === 'mine';
+const MINE = SECTIONS.findIndex((x) => x.id === 'mine');
+const mineSpan = () => {
+  const d = SECTIONS[MINE];
+  return { m0: TAKE[MINE - 1], rs: globOf(d, d.gate[0]), m1: TAKE[MINE] };
+};
+function mineLocal(pp) {
+  const { m0, rs, m1 } = mineSpan();
+  if (pp < m0 || pp > m1) return null;
+  return pp <= rs ? 0.78 * (pp - m0) / (rs - m0) : 0.78 + 0.22 * (pp - rs) / (m1 - rs);
+}
+// во сколько раз дольше прокручивается шахта (до раскрытия порога / после);
+// на превью можно сравнить другое значение: ?poc=mine&stretch=3
+const STRETCH = Number(new URLSearchParams(location.search).get('stretch')) || 3, STRETCH_EXIT = 1.6;
+function wheelGain(tp) {
+  if (!POC_MINE) return 1;
+  const { m0, rs, m1 } = mineSpan(), e = 0.012;
+  const k = (x) => smooth(Math.min(1, Math.max(0, x)));
+  // плавные края, чтобы скорость прокрутки не менялась скачком
+  const inMine = k((tp - (m0 - e)) / e) * (1 - k((tp - m1) / e));
+  const K = 1 + inMine * ((tp < rs ? STRETCH : STRETCH_EXIT) - 1);
+  return 1 / K;
+}
+let poc = null;
+if (POC_MINE) import('./poc-mine.js').then((m) => { poc = m.mountMinePoc(document.getElementById('content')); schedule(); });
 
 let p = 0, target = 0, raf = 0, last = performance.now();
+
 const frames = [];
 
 function apply(now) {
   raf = 0;
   const dt = Math.min(64, now - last);
   last = now;
-  let step = (target - p) * (1 - Math.pow(0.0012, dt / 1000));
-  if (step > 0 && dt > 0) step = limitForward(step, dt / 1000, now);
-  else { lim.recovering = false; lim.v = 0; }
+  const step = (target - p) * (1 - Math.pow(0.0012, dt / 1000));
   p += step;
-  if (Math.abs(target - p) < 0.0003 && !lim.recovering) p = target;
+  if (Math.abs(target - p) < 0.0003) p = target;
 
   const W = innerWidth, H = innerHeight, k = W / 1920;
   let live = 0;
@@ -693,6 +687,17 @@ function apply(now) {
       // ни по скорости
       const prev = TRAJ[idx - 1];
       const ps = prev && p < prev.pj ? prev.scale(p) : 1 + d.camK * travel;
+      // точка масштабирования: сцена назначения росла вокруг точки схода
+      // ПРЕДЫДУЩЕЙ секции (так построено её окно), плита — вокруг своей. При
+      // масштабе ~1.06–1.09 резкая смена точки сдвигала кадр на 12–18 px ровно
+      // в момент смены слоя (и главы). Точка переходит плавно (smooth, C1) от
+      // прежней к своей между сменой слоя и стыковкой траекторий
+      let org = d.origin;
+      if (prev && p < prev.pj) {
+        const pv = SECTIONS[idx - 1].vp, w = smooth(seg(p, b0 - 0.004, prev.pj));
+        org = `${((pv[0] + (d.vp[0] - pv[0]) * w) * 100).toFixed(3)}% ${((pv[1] + (d.vp[1] - pv[1]) * w) * 100).toFixed(3)}%`;
+      }
+      if (S.plate._origin !== org) { S.plate.style.transformOrigin = org; S.plate._origin = org; }
       S.plate.style.transform = `scale(${ps.toFixed(4)})`;
       S.plate._scale = ps;
       // гаснет полностью ДО конца полосы: иначе на стыке остаётся 5-12%
@@ -744,7 +749,8 @@ function apply(now) {
 
   const cur = p >= ARRIVAL.at ? ARRIVAL
     : SECTIONS.reduce((a, s) => (p >= s.band[0] ? s : a), SECTIONS[0]);
-  updateContent(p);
+  updateContent(p, dominantAt(p));
+  if (poc) poc(mineLocal(p));
   updateChrome(p, cur.id);
 
   if (debug) {
@@ -761,19 +767,17 @@ function apply(now) {
 function schedule() { if (!raf && started && !life.signal.aborted) raf = requestAnimationFrame(apply); }
 
 addEventListener('wheel', (e) => {
-  target = clamp(target + e.deltaY * 0.00022, 0, 1);
-  noteInput(performance.now());
+  target = clamp(target + e.deltaY * 0.00022 * wheelGain(target), 0, 1);
   schedule();
 }, { passive: true, signal: life.signal });
 
 addEventListener('keydown', (e) => {
-  const step = e.shiftKey ? 0.06 : 0.01;
+  const step = (e.shiftKey ? 0.06 : 0.01) * wheelGain(target);
   if (e.key === 'ArrowDown' || e.key === 'PageDown') target = clamp(target + step, 0, 1);
   else if (e.key === 'ArrowUp' || e.key === 'PageUp') target = clamp(target - step, 0, 1);
   else if (e.key === 'Home') target = 0;
   else if (e.key === 'End') target = 1;
   else return;
-  noteInput(performance.now());
   schedule();
 }, { signal: life.signal });
 addEventListener('resize', () => {
@@ -785,6 +789,7 @@ addEventListener('resize', () => {
     return;
   }
   for (const S of built) S.lastMask = '';
+  computeTakeover(innerWidth, innerHeight);
   layoutCuts();
   schedule();
 }, { signal: life.signal });
@@ -856,7 +861,11 @@ requestAnimationFrame(() => Promise.all([...stage.querySelectorAll('img[src]')]
 window.__JOURNEY = {
   get progress() { return p; },
   get target() { return target; },
-  reading: () => ZONES.map((Z) => ({ id: Z.id, visited: Z.visited, t0: Z.t0, t1: Z.t1, mode: Z.mode, dwell: Z.dwell })),
+  // точки смены текущего биома по доле кадра и сама доля — для проверок
+  takeover: () => [...TAKE],
+  share: (i, pp) => shareAt(SECTIONS[i], locOf(SECTIONS[i], pp), innerWidth, innerHeight),
+  dominant: () => dominantAt(p),
+  mine: () => ({ ...mineSpan(), m: mineLocal(p), poc: POC_MINE }),
   residency: () => ({ ...stats, resident: [...RES.values()].filter((R) => R.on)
     .map((R) => ({ key: R.key, ready: R.ready, mb: +(R.bytes / 2 ** 20).toFixed(1) })) }),
   set(v, { instant = false } = {}) { target = clamp(v, 0, 1); if (instant) p = target; schedule(); },

@@ -629,7 +629,9 @@ function mineLocal(pp) {
   if (pp < m0 || pp > m1) return null;
   return pp <= rs ? 0.78 * (pp - m0) / (rs - m0) : 0.78 + 0.22 * (pp - rs) / (m1 - rs);
 }
-const STRETCH = 4, STRETCH_EXIT = 1.6;
+// во сколько раз дольше прокручивается шахта (до раскрытия порога / после);
+// на превью можно сравнить другое значение: ?poc=mine&stretch=3
+const STRETCH = Number(new URLSearchParams(location.search).get('stretch')) || 3, STRETCH_EXIT = 1.6;
 function wheelGain(tp) {
   if (!POC_MINE) return 1;
   const { m0, rs, m1 } = mineSpan(), e = 0.012;

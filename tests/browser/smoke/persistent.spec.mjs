@@ -118,7 +118,7 @@ test('Mine POC: three discoveries in order, one at a time, only inside Mine; bas
     if (s.m == null) expect(s.disc, `outside Mine at ${p.toFixed(4)}`).toEqual([]);
     if (s.disc[0] && seen.at(-1) !== s.disc[0]) seen.push(s.disc[0]);
   }
-  expect(seen).toEqual(['Ore vein', 'Extraction', 'Rare vein']);
+  expect(seen).toEqual(['Ore vein', 'Extraction', 'Depth']);
   // основной текст шахты на всём её протяжении
   for (const m of [0.1, 0.3, 0.5, 0.69, 0.9]) {
     const p = m <= 0.78 ? span.m0 + (m / 0.78) * (span.rs - span.m0) : span.rs + ((m - 0.78) / 0.22) * (span.m1 - span.rs);

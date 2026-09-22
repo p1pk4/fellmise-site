@@ -613,36 +613,50 @@ computeTakeover(innerWidth, innerHeight);
 // номер текущего биома: 0 деревня … 5 дом
 const dominantAt = (pp) => TAKE.filter((t) => pp >= t).length;
 
-/* POC «шахта с открытиями» — только превью /depth-v2/?poc=mine. Шахта
-   длиннее по прокрутке: внутри неё колесо двигает прогресс медленнее (ход
-   камеры тот же, только проходится дольше). Локальный прогресс шахты m:
-   0 — шахта заняла кадр (TAKE forest), 0.78 — начало раскрытия порога,
-   1 — порог занял кадр (TAKE mine). */
-const POC_MINE = IS_PREVIEW && new URLSearchParams(location.search).get('poc') === 'mine';
-const MINE = SECTIONS.findIndex((x) => x.id === 'mine');
-const mineSpan = () => {
-  const d = SECTIONS[MINE];
-  return { m0: TAKE[MINE - 1], rs: globOf(d, d.gate[0]), m1: TAKE[MINE] };
+/* POC «находки биомов» — только превью: /depth-v2/?poc=discoveries (все
+   биомы) и /depth-v2/?poc=mine (только шахта, принятый эталон). Биом с
+   находками длиннее по прокрутке: внутри него колесо двигает прогресс
+   медленнее (ход камеры тот же, только проходится дольше). Во сколько раз —
+   данные движка находок (poc-discoveries.js), не этого файла.
+   Локальный прогресс биома k: 0 — биом занял кадр (TAKE[k-1]), 0.78 — начало
+   раскрытия следующей сцены, 1 — следующая сцена заняла кадр (TAKE[k]). У
+   дома раскрытия дальше нет: прогресс линейный до конца маршрута. */
+const POC_MODE = IS_PREVIEW ? new URLSearchParams(location.search).get('poc') : null;
+const POC_ON = POC_MODE === 'discoveries' || POC_MODE === 'mine';
+const biomeSpan = (k) => {
+  const m0 = k > 0 ? TAKE[k - 1] : 0, m1 = k < TAKE.length ? TAKE[k] : 1;
+  const d = SECTIONS[k];
+  return { m0, m1, rs: d && k < TAKE.length ? globOf(d, d.gate[0]) : 1 };
 };
-function mineLocal(pp) {
-  const { m0, rs, m1 } = mineSpan();
+function biomeLocal(k, pp) {
+  const { m0, rs, m1 } = biomeSpan(k);
   if (pp < m0 || pp > m1) return null;
+  if (rs >= m1) return (pp - m0) / Math.max(1e-6, m1 - m0);
   return pp <= rs ? 0.78 * (pp - m0) / (rs - m0) : 0.78 + 0.22 * (pp - rs) / (m1 - rs);
 }
-// во сколько раз дольше прокручивается шахта (до раскрытия порога / после);
-// на превью можно сравнить другое значение: ?poc=mine&stretch=3
-const STRETCH = Number(new URLSearchParams(location.search).get('stretch')) || 3, STRETCH_EXIT = 1.6;
+// растяжение по биомам: { k: [до раскрытия, после] }; приходит с модулем находок
+let STRETCH_BY = {};
 function wheelGain(tp) {
-  if (!POC_MINE) return 1;
-  const { m0, rs, m1 } = mineSpan(), e = 0.012;
-  const k = (x) => smooth(Math.min(1, Math.max(0, x)));
-  // плавные края, чтобы скорость прокрутки не менялась скачком
-  const inMine = k((tp - (m0 - e)) / e) * (1 - k((tp - m1) / e));
-  const K = 1 + inMine * ((tp < rs ? STRETCH : STRETCH_EXIT) - 1);
-  return 1 / K;
+  const e = 0.012, k = (x) => smooth(Math.min(1, Math.max(0, x)));
+  let over = 0;
+  for (const [key, [S, X]] of Object.entries(STRETCH_BY)) {
+    const { m0, rs, m1 } = biomeSpan(+key);
+    // плавные края, чтобы скорость прокрутки не менялась скачком
+    const inside = k((tp - (m0 - e)) / e) * (1 - k((tp - m1) / e));
+    over = Math.max(over, inside * ((tp < rs ? S : X) - 1));
+  }
+  return 1 / (1 + over);
 }
 let poc = null;
-if (POC_MINE) import('./poc-mine.js').then((m) => { poc = m.mountMinePoc(document.getElementById('content')); schedule(); });
+if (POC_ON) {
+  import('./poc-discoveries.js').then((m) => {
+    const only = POC_MODE === 'mine' ? ['mine'] : null;
+    const eng = m.mountDiscoveries(document.getElementById('content'), { only, stretch: new URLSearchParams(location.search).get('stretch') });
+    STRETCH_BY = eng.stretch;
+    poc = eng.update;
+    schedule();
+  });
+}
 
 let p = 0, target = 0, raf = 0, last = performance.now();
 
@@ -750,7 +764,7 @@ function apply(now) {
   const cur = p >= ARRIVAL.at ? ARRIVAL
     : SECTIONS.reduce((a, s) => (p >= s.band[0] ? s : a), SECTIONS[0]);
   updateContent(p, dominantAt(p));
-  if (poc) poc(mineLocal(p));
+  if (poc) poc((k) => biomeLocal(k, p));
   updateChrome(p, cur.id);
 
   if (debug) {
@@ -865,7 +879,9 @@ window.__JOURNEY = {
   takeover: () => [...TAKE],
   share: (i, pp) => shareAt(SECTIONS[i], locOf(SECTIONS[i], pp), innerWidth, innerHeight),
   dominant: () => dominantAt(p),
-  mine: () => ({ ...mineSpan(), m: mineLocal(p), poc: POC_MINE }),
+  // локальный прогресс биома k (0 деревня … 5 дом) и его границы — для проверок POC
+  biome: (k) => ({ ...biomeSpan(k), m: biomeLocal(k, p), poc: POC_MODE }),
+  mine: () => ({ ...biomeSpan(2), m: biomeLocal(2, p), poc: POC_ON }),
   residency: () => ({ ...stats, resident: [...RES.values()].filter((R) => R.on)
     .map((R) => ({ key: R.key, ready: R.ready, mb: +(R.bytes / 2 ** 20).toFixed(1) })) }),
   set(v, { instant = false } = {}) { target = clamp(v, 0, 1); if (instant) p = target; schedule(); },

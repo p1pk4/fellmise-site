@@ -146,5 +146,6 @@ test('Mine POC is longer to scroll; production routes do not load it', async ({ 
   expect(poc.loaded).toBe(true);
   expect(plain.loaded).toBe(false);
   expect(root.loaded).toBe(false);
-  expect(poc.n, `wheel ticks through Mine: POC ${poc.n} vs ${plain.n}`).toBeGreaterThanOrEqual(plain.n * 3);
+  // растяжение 3x до раскрытия порога и 1.6x после: в сумме ~2.6x тиков колеса
+  expect(poc.n, `wheel ticks through Mine: POC ${poc.n} vs ${plain.n}`).toBeGreaterThanOrEqual(plain.n * 2.2);
 });

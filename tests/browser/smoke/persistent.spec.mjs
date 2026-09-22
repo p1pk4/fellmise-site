@@ -101,7 +101,7 @@ for (const [w, h] of [[1920, 1080], [1920, 900]]) {
   });
 }
 
-const FINDS = ['ore-sample', 'pickaxe', 'ore-cargo', 'deep-material'];
+const FINDS = ['ore-sample', 'mining-pickaxe', 'ore-cargo', 'deep-material'];
 const findsOn = (page) => page.evaluate(() => [...document.querySelectorAll('.poc-find.is-on')].map((f) => f.dataset.find));
 const pOfMine = (span, m) => (m <= 0.78 ? span.m0 + (m / 0.78) * (span.rs - span.m0) : span.rs + ((m - 0.78) / 0.22) * (span.m1 - span.rs));
 

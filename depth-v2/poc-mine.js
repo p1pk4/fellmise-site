@@ -21,19 +21,21 @@ import { LOCALE } from './route.js';
 const ASSETS = '/assets/depth/discovery/mine/';
 /* at — локальный прогресс шахты, с которого находка лежит на странице;
    x, y — центр предмета в долях кадра; h — высота предмета в долях высоты
-   кадра; rot — постоянный наклон, градусы. Правая часть кадра: слева —
-   основной текст шахты, в центре — устье, вагонетка и рельсы. */
+   кадра (мешок — самый тяжёлый, кристаллы — мелкий акцент); rot — постоянный
+   наклон; cap — с какой стороны подпись (below / left / right).
+   Асимметричная группа в правой половине кадра: слева — основной текст
+   шахты, по центру — устье, вагонетка и рельсы. */
 const ITEMS = [
-  { id: 'ore-sample', at: 0.10, x: 0.818, y: 0.19, h: 0.155, rot: -2,
+  { id: 'ore-sample', at: 0.10, x: 0.80, y: 0.215, h: 0.13, rot: -2, cap: 'below',
     en: ['Ore sample', 'Depth changes what the rock gives back.'],
     ru: ['Образец руды', 'С глубиной меняется то, что отдаёт порода.'] },
-  { id: 'pickaxe', at: 0.26, x: 0.9, y: 0.43, h: 0.165, rot: 1.5,
+  { id: 'mining-pickaxe', at: 0.26, x: 0.905, y: 0.42, h: 0.15, rot: 1.5, cap: 'below',
     en: ['Mining tools', 'The right tool decides what you can bring back.'],
     ru: ['Инструменты', 'От инструмента зависит, что ты сможешь унести наверх.'] },
-  { id: 'ore-cargo', at: 0.43, x: 0.808, y: 0.655, h: 0.16, rot: -1,
+  { id: 'ore-cargo', at: 0.43, x: 0.875, y: 0.79, h: 0.19, rot: -1, cap: 'above',
     en: ['The haul', 'What you extract feeds crafting and trade.'],
     ru: ['Добыча', 'То, что вынесешь наверх, идёт в ремесло и торговлю.'] },
-  { id: 'deep-material', at: 0.60, x: 0.915, y: 0.82, h: 0.155, rot: 2,
+  { id: 'deep-material', at: 0.60, x: 0.745, y: 0.82, h: 0.11, rot: 2, cap: 'below',
     en: ['Deep material', 'Richer materials wait where the risk is higher.'],
     ru: ['Глубинный материал', 'Чем ценнее находка, тем опаснее путь к ней.'] },
 ];
@@ -43,6 +45,12 @@ const CSS = `
 .poc-finds { position: fixed; inset: 0; pointer-events: none; z-index: 40; }
 .poc-find { position: absolute; left: 0; top: 0; margin: 0; display: flex; flex-direction: column; align-items: center;
   opacity: 0; transition: opacity .32s ease; }
+.poc-find--left { flex-direction: row-reverse; align-items: center; }
+.poc-find--right { flex-direction: row; align-items: center; }
+.poc-find--above { flex-direction: column-reverse; }
+.poc-find--left figcaption { margin: 0 14px 0 0; text-align: right; }
+.poc-find--right figcaption { margin: 0 0 0 14px; text-align: left; }
+.poc-find--above figcaption { margin: 0 0 10px; }
 .poc-find img { display: block; width: auto; transform: rotate(var(--rot));
   filter: drop-shadow(0 6px 9px rgba(8, 6, 4, .5)); }
 .poc-find.is-on { opacity: 1; transition: none; animation: poc-stick .22s cubic-bezier(.2, .7, .3, 1) both; }
@@ -51,7 +59,7 @@ const CSS = `
   65% { opacity: 1; transform: var(--at) scale(1.025); }
   100% { opacity: 1; transform: var(--at) scale(1); }
 }
-.poc-find figcaption { position: relative; margin-top: 12px; max-width: 24rem; text-align: center; color: #eadcbc;
+.poc-find figcaption { position: relative; margin-top: 12px; max-width: 19rem; text-align: center; color: #eadcbc;
   text-shadow: 0 1px 8px rgba(0, 0, 0, .8), 0 0 2px rgba(0, 0, 0, .6); }
 /* мягкая тень только под буквами: растворяется к краям, границы не видно */
 .poc-find figcaption::before { content: ''; position: absolute; inset: -18px -36px; z-index: -1;
@@ -72,7 +80,7 @@ export function mountMinePoc(parent) {
   const lang = LOCALE === 'ru' ? 'ru' : 'en';
   const finds = ITEMS.map((d) => {
     const fig = document.createElement('figure');
-    fig.className = 'poc-find';
+    fig.className = `poc-find poc-find--${d.cap}`;
     fig.dataset.find = d.id;
     fig.style.setProperty('--rot', `${d.rot}deg`);
     const img = new Image();
@@ -92,10 +100,16 @@ export function mountMinePoc(parent) {
     const W = innerWidth, H = innerHeight;
     for (const f of finds) {
       f.img.style.height = `${Math.round(f.d.h * H)}px`;
-      // позиция — центром предмета; подпись висит под ним
-      const x = f.d.x * W, y = f.d.y * H - (f.d.h * H) / 2;
-      const w = f.fig.offsetWidth || 0;
-      const at = `translate(${Math.round(Math.min(x - w / 2, W - w - 0.015 * W))}px, ${Math.round(y)}px)`;
+      // центр предмета — в (x, y); подпись сбоку или сверху/снизу от него
+      const fw = f.fig.offsetWidth, fh = f.fig.offsetHeight, iw = f.img.offsetWidth, ih = f.img.offsetHeight;
+      const cx = f.d.x * W, cy = f.d.y * H;
+      let left = cx - fw / 2, top = cy - fh / 2;
+      if (f.d.cap === 'below') top = cy - ih / 2;
+      if (f.d.cap === 'above') top = cy + ih / 2 - fh;
+      if (f.d.cap === 'left') left = cx + iw / 2 - fw;
+      if (f.d.cap === 'right') left = cx - iw / 2;
+      left = Math.min(Math.max(left, 0.52 * W), W - fw - 0.02 * W);
+      const at = `translate(${Math.round(left)}px, ${Math.round(top)}px)`;
       f.fig.style.setProperty('--at', at);
       f.fig.style.transform = at;
     }

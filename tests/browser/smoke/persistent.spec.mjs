@@ -157,7 +157,7 @@ test('Mine POC assets load only with ?poc=mine', async ({ browser, baseURL }) =>
     const page = await open(browser, baseURL, url);
     await page.evaluate(() => window.__JOURNEY.set(0.36, { instant: true }));
     await page.waitForTimeout(800);
-    hits[url] = page._requests.filter((u) => /\/assets\/depth\/discovery\/|poc-mine\.js/.test(u)).length;
+    hits[url] = page._requests.filter((u) => /\/assets\/depth\/discovery\/|poc-discoveries\.js/.test(u)).length;
     expect(page._errors, url).toEqual([]);
     await page.context().close();
   }
@@ -175,7 +175,7 @@ test('Mine POC is longer to scroll; production routes do not load it', async ({ 
     await page.mouse.move(960, 540);
     let n = 0;
     while ((await page.evaluate(() => window.__JOURNEY.target)) < span.m1 && n < 400) { await page.mouse.wheel(0, 100); n++; }
-    const loaded = page._requests.some((u) => /poc-mine\.js/.test(u));
+    const loaded = page._requests.some((u) => /poc-discoveries\.js/.test(u));
     await page.context().close();
     return { n, loaded };
   };

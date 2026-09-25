@@ -613,16 +613,16 @@ computeTakeover(innerWidth, innerHeight);
 // номер текущего биома: 0 деревня … 5 дом
 const dominantAt = (pp) => TAKE.filter((t) => pp >= t).length;
 
-/* POC «находки биомов» — только превью: /depth-v2/?poc=discoveries (все
-   биомы) и /depth-v2/?poc=mine (только шахта, принятый эталон). Биом с
+/* Находки биомов — часть живого маршрута на всех трёх входах. Биом с
    находками длиннее по прокрутке: внутри него колесо двигает прогресс
    медленнее (ход камеры тот же, только проходится дольше). Во сколько раз —
-   данные движка находок (poc-discoveries.js), не этого файла.
+   данные движка находок (poc-discoveries.js), не этого файла. Превью держит
+   один ключ: ?poc=mine оставляет находки одной шахты.
    Локальный прогресс биома k: 0 — биом занял кадр (TAKE[k-1]), 0.78 — начало
    раскрытия следующей сцены, 1 — следующая сцена заняла кадр (TAKE[k]). У
    дома раскрытия дальше нет: прогресс линейный до конца маршрута. */
-const POC_MODE = IS_PREVIEW ? new URLSearchParams(location.search).get('poc') : null;
-const POC_ON = POC_MODE === 'discoveries' || POC_MODE === 'mine';
+const QUERY = IS_PREVIEW ? new URLSearchParams(location.search) : new URLSearchParams();
+const FINDS_ONLY = QUERY.get('poc') === 'mine' ? ['mine'] : null;
 const biomeSpan = (k) => {
   const m0 = k > 0 ? TAKE[k - 1] : 0, m1 = k < TAKE.length ? TAKE[k] : 1;
   const d = SECTIONS[k];
@@ -647,15 +647,19 @@ function wheelGain(tp) {
   }
   return 1 / (1 + over);
 }
-let poc = null;
-if (POC_ON) {
-  import('./poc-discoveries.js').then((m) => {
-    const only = POC_MODE === 'mine' ? ['mine'] : null;
-    const eng = m.mountDiscoveries(document.getElementById('content'), { only, stretch: new URLSearchParams(location.search).get('stretch') });
-    STRETCH_BY = eng.stretch;
-    poc = eng.update;
-    schedule();
-  });
+/* Модуль находок (~19 КБ, без картинок) запрашивается сразу, параллельно со
+   стартом, а монтируется сразу после первого кадра: до этого момента у находок
+   нет ни DOM, ни растяжения прокрутки. Картинки приходят ещё позже — по ходу
+   маршрута (fetchGroup в poc-discoveries.js). Старт их не ждёт. */
+let finds = null, findsEngine = null;
+const findsModule = import('./poc-discoveries.js').catch(() => null);
+function mountFinds(m) {
+  if (!m || !alive()) return;
+  findsEngine = m.mountDiscoveries(document.getElementById('content'),
+    { only: FINDS_ONLY, stretch: QUERY.get('stretch') });
+  STRETCH_BY = findsEngine.stretch;
+  finds = findsEngine.update;
+  schedule();
 }
 
 let p = 0, target = 0, raf = 0, last = performance.now();
@@ -764,7 +768,7 @@ function apply(now) {
   const cur = p >= ARRIVAL.at ? ARRIVAL
     : SECTIONS.reduce((a, s) => (p >= s.band[0] ? s : a), SECTIONS[0]);
   updateContent(p, dominantAt(p));
-  if (poc) poc((k) => biomeLocal(k, p));
+  if (finds) finds((k) => biomeLocal(k, p));
   updateChrome(p, cur.id);
 
   if (debug) {
@@ -813,6 +817,7 @@ window.__LIVE_STOP = function stop() {
   if (raf) cancelAnimationFrame(raf);
   raf = 0;
   for (const R of RES.values()) if (R.on) release(R);   // поздний decode отбрасывается (R.img)
+  findsEngine?.stop();
   updateChrome.stop();
   delete window.__JOURNEY;
 };
@@ -871,6 +876,8 @@ schedule();
 // постер старта (depth.css) снимается, когда первый кадр сцены уже декодирован
 requestAnimationFrame(() => Promise.all([...stage.querySelectorAll('img[src]')]
   .map((im) => im.decode().catch(() => {}))).then(() => stage.classList.add('is-live')));
+// находки — после первого кадра: их DOM не участвует в старте
+findsModule.then(mountFinds);
 
 window.__JOURNEY = {
   get progress() { return p; },
@@ -879,9 +886,9 @@ window.__JOURNEY = {
   takeover: () => [...TAKE],
   share: (i, pp) => shareAt(SECTIONS[i], locOf(SECTIONS[i], pp), innerWidth, innerHeight),
   dominant: () => dominantAt(p),
-  // локальный прогресс биома k (0 деревня … 5 дом) и его границы — для проверок POC
-  biome: (k) => ({ ...biomeSpan(k), m: biomeLocal(k, p), poc: POC_MODE }),
-  mine: () => ({ ...biomeSpan(2), m: biomeLocal(2, p), poc: POC_ON }),
+  // локальный прогресс биома k (0 деревня … 5 дом) и его границы — для проверок
+  biome: (k) => ({ ...biomeSpan(k), m: biomeLocal(k, p), finds: !!finds }),
+  mine: () => ({ ...biomeSpan(2), m: biomeLocal(2, p), finds: !!finds }),
   residency: () => ({ ...stats, resident: [...RES.values()].filter((R) => R.on)
     .map((R) => ({ key: R.key, ready: R.ready, mb: +(R.bytes / 2 ** 20).toFixed(1) })) }),
   set(v, { instant = false } = {}) { target = clamp(v, 0, 1); if (instant) p = target; schedule(); },

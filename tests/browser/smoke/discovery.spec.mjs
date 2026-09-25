@@ -37,8 +37,16 @@ async function open(browser, baseURL, url, { width = 1920, height = 1080, ...res
 }
 const biomesData = (page) => page.evaluate(async () => {
   const { BIOMES } = await import('/depth-v2/poc-discoveries.js');
-  return Object.entries(BIOMES).map(([name, b]) => ({ name, k: b.k, exit: b.exit, keep: b.keep || [], ids: b.items.map((i) => i.id) }));
+  return Object.entries(BIOMES).map(([name, b]) => ({ name, k: b.k, exit: b.exit, keep: b.keep || [],
+    ids: b.items.map((i) => i.id), at: b.items.map((i) => i.at) }));
 });
+// главный объект биома задан в долях плиты; на экране он у каждого момента свой
+const keepNow = (page, rects) => page.evaluate((qs) => {
+  const i = [...document.querySelectorAll('#stage img')].filter((x) => !x.hidden && +getComputedStyle(x).opacity > 0.5)
+    .map((x) => x.getBoundingClientRect()).filter((r) => r.width > 10).sort((a, b) => b.width - a.width)[0];
+  return qs.map((q) => [(i.left + q[0] * i.width) / innerWidth, (i.top + q[1] * i.height) / innerHeight,
+    (i.left + q[2] * i.width) / innerWidth, (i.top + q[3] * i.height) / innerHeight]);
+}, rects);
 const pOf = (sp, m) => (sp.rs >= sp.m1 ? sp.m0 + m * (sp.m1 - sp.m0)
   : m <= 0.78 ? sp.m0 + (m / 0.78) * (sp.rs - sp.m0) : sp.rs + ((m - 0.78) / 0.22) * (sp.m1 - sp.rs));
 // установить прогресс и дождаться двух кадров: состояние находок обновляется в
@@ -55,7 +63,9 @@ const drawn = (page, name) => page.waitForFunction((n) => [...document.querySele
 
 // A. полный прогон по биомам — на продакшен-маршруте, без query
 test('/ discoveries: every biome accumulates in order, leaves before takeover, keeps base copy', async ({ browser, baseURL }) => {
-  test.setTimeout(240_000);
+  // плотный проход по пяти биомам плюс проверка главного объекта в момент
+  // появления каждой находки: на загруженном раннере это дольше двух минут
+  test.setTimeout(420_000);
   const page = await open(browser, baseURL, '/');
   const data = (await biomesData(page)).filter((b) => b.ids.length);
   expect(data.map((b) => b.name).sort()).toEqual(['core', 'forest', 'home', 'mine', 'village']);
@@ -89,11 +99,18 @@ test('/ discoveries: every biome accumulates in order, leaves before takeover, k
     await set(page, pOf(sp, Math.min(0.85, (b.exit ?? 1) - 0.05))); await page.waitForTimeout(460);
     const beat = await page.evaluate(() => [...document.querySelectorAll('.beat.is-on')].map((e) => [...e.classList].find((c) => /^beat--(village|forest|mine|threshold|core|home)$/.test(c)).slice(6)));
     expect(beat, `${b.name}: base copy`).toEqual([BEAT_OF[b.k]]);
-    // защищённые зоны центрального объекта в собранном состоянии
-    const boxes = await page.evaluate((n) => [...document.querySelectorAll(`.poc-find.is-on[data-biome="${n}"] img`)].map((i) => { const r = i.getBoundingClientRect(); return [r.left / innerWidth, r.top / innerHeight, r.right / innerWidth, r.bottom / innerHeight]; }), b.name);
-    for (const k of b.keep) for (const r of boxes) {
-      const hit = r[0] < k[2] && k[0] < r[2] && r[1] < k[3] && k[1] < r[3];
-      expect(hit, `${b.name}: find ${r.map((v) => v.toFixed(2))} overlaps protected ${k}`).toBe(false);
+    // главный объект биома: находка не заходит в него в свой момент появления
+    // (дальше предмет прибит к экрану, а сцена едет — пересечение по ходу биома
+    // неизбежно и не является дефектом)
+    for (const [i, id] of b.ids.entries()) {
+      await set(page, pOf(sp, Math.min(0.99, b.at[i] + 0.01)));
+      await page.waitForTimeout(80);
+      const box = await page.evaluate((x) => { const r = document.querySelector(`.poc-find[data-find="${x}"] img`).getBoundingClientRect();
+        return [r.left / innerWidth, r.top / innerHeight, r.right / innerWidth, r.bottom / innerHeight]; }, id);
+      for (const k of await keepNow(page, b.keep)) {
+        const hit = box[0] < k[2] && k[0] < box[2] && box[1] < k[3] && k[1] < box[3];
+        expect(hit, `${b.name}/${id} at reveal ${box.map((v) => v.toFixed(2))} overlaps the main object ${k.map((v) => v.toFixed(2))}`).toBe(false);
+      }
     }
     lines.push(`${b.name}: ${counts.join('→')}`);
   }
@@ -241,4 +258,138 @@ test('preview ?poc=mine keeps only Mine; production ignores the query', async ({
   expect(await prod.evaluate(() => [...new Set([...document.querySelectorAll('.poc-find')].map((f) => f.dataset.biome))].sort()))
     .toEqual(['core', 'forest', 'home', 'mine', 'village']);
   await prod.context().close();
+});
+
+/* Главное правило модели: находка появляется на своей опоре в кадре, а дальше
+   прибита к экрану. Карта едет — предмет стоит. Проверяем по всем биомам:
+   вперёд, назад, на resize и после смены языка. */
+const RECT = (page, id) => page.evaluate((x) => {
+  const f = document.querySelector(`.poc-find[data-find="${x}"] img`);
+  const r = f.getBoundingClientRect();
+  return { l: +r.left.toFixed(2), t: +r.top.toFixed(2), w: +r.width.toFixed(2), h: +r.height.toFixed(2) };
+}, id);
+const SCENE = (page) => page.evaluate(() => {
+  const i = [...document.querySelectorAll('#stage img')].filter((x) => !x.hidden && +getComputedStyle(x).opacity > 0.5)
+    .map((x) => x.getBoundingClientRect()).sort((a, b) => b.width - a.width)[0];
+  return { l: +i.left.toFixed(1), t: +i.top.toFixed(1), w: +i.width.toFixed(1) };
+});
+
+test('background moves, discovery item does not: every biome, forward and back', async ({ browser, baseURL }) => {
+  test.setTimeout(180_000);
+  const page = await open(browser, baseURL, '/');
+  const data = (await biomesData(page)).filter((b) => b.ids.length);
+  await mounted(page, 18);
+  const moved = [];
+  for (const b of data) {
+    const sp = await page.evaluate((k) => window.__JOURNEY.biome(k), b.k);
+    const at = await page.evaluate(async (n) => {
+      const { BIOMES } = await import('/depth-v2/poc-discoveries.js');
+      return BIOMES[n].items.map((i) => i.at);
+    }, b.name);
+    await set(page, pOf(sp, Math.max(0.01, at[0] - 0.05)));
+    await drawn(page, b.name);
+    // сразу после появления первой находки
+    await set(page, pOf(sp, at[0] + 0.01));
+    await page.waitForTimeout(300);
+    const first = await RECT(page, b.ids[0]);
+    const scene0 = await SCENE(page);
+    // дальше по биому: сцена уезжает и растёт, находка стоит
+    const last = (b.exit ?? 1) - 0.03;
+    for (const m of [at[0] + 0.1, (at[0] + last) / 2, last]) {
+      await set(page, pOf(sp, Math.min(last, m)));
+      await page.waitForTimeout(200);
+      const r = await RECT(page, b.ids[0]);
+      const d = Math.max(Math.abs(r.l - first.l), Math.abs(r.t - first.t), Math.abs(r.w - first.w), Math.abs(r.h - first.h));
+      expect(d, `${b.name}/${b.ids[0]} moved ${d.toFixed(2)}px at m=${m.toFixed(2)}`).toBeLessThanOrEqual(1);
+    }
+    const scene1 = await SCENE(page);
+    const sceneMoved = Math.max(Math.abs(scene1.l - scene0.l), Math.abs(scene1.w - scene0.w));
+    // у дома сцена прибытия заморожена и не движется — там сравнивать не с чем
+    if (b.k !== 5) expect(sceneMoved, `${b.name}: the scene itself must move`).toBeGreaterThan(40);
+    moved.push(`${b.name}: scene ${sceneMoved.toFixed(0)}px, find 0px`);
+    // назад: уходят по одной, оставшиеся не двигаются
+    const kept = await RECT(page, b.ids[0]);
+    for (let i = b.ids.length - 1; i > 0; i--) {
+      const gone = await page.evaluate(async (n) => {
+        const { BIOMES } = await import('/depth-v2/poc-discoveries.js');
+        return BIOMES[n].items.map((x) => x.at);
+      }, b.name);
+      await set(page, pOf(sp, gone[i] - 0.01));
+      await page.waitForTimeout(120);
+      expect(await onIn(page, b.name), `${b.name}: reverse to ${i}`).toEqual(b.ids.slice(0, i));
+      const still = await RECT(page, b.ids[0]);
+      const moved0 = Math.max(Math.abs(still.l - kept.l), Math.abs(still.t - kept.t), Math.abs(still.w - kept.w));
+      expect(moved0, `${b.name}: kept find moved ${moved0.toFixed(2)}px on reverse`).toBeLessThanOrEqual(1);
+    }
+  }
+  test.info().annotations.push({ type: 'pinned', description: moved.join(' · ') });
+  expect(page._errors).toEqual([]);
+  await page.context().close();
+});
+
+test('pinned finds keep their place in the viewport across a resize', async ({ browser, baseURL }) => {
+  const page = await open(browser, baseURL, '/');
+  await mounted(page, 18);
+  const sp = await page.evaluate(() => window.__JOURNEY.biome(0));
+  await set(page, pOf(sp, 0.7));
+  await drawn(page, 'village');
+  await page.waitForTimeout(300);
+  const before = await page.evaluate(() => [...document.querySelectorAll('.poc-find.is-on img')].map((i) => {
+    const r = i.getBoundingClientRect();
+    return { id: i.closest('.poc-find').dataset.find, x: +((r.left + r.right) / 2 / innerWidth).toFixed(3), y: +((r.top + r.bottom) / 2 / innerHeight).toFixed(3) };
+  }));
+  expect(before.length).toBeGreaterThan(1);
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.waitForTimeout(400);
+  const after = await page.evaluate(() => [...document.querySelectorAll('.poc-find.is-on img')].map((i) => {
+    const r = i.getBoundingClientRect();
+    return { id: i.closest('.poc-find').dataset.find, x: +((r.left + r.right) / 2 / innerWidth).toFixed(3), y: +((r.top + r.bottom) / 2 / innerHeight).toFixed(3) };
+  }));
+  expect(after.map((a) => a.id)).toEqual(before.map((b) => b.id));
+  for (const a of after) {
+    const b = before.find((q) => q.id === a.id);
+    expect(Math.abs(a.x - b.x), `${a.id}: x after resize`).toBeLessThanOrEqual(0.01);
+    expect(Math.abs(a.y - b.y), `${a.id}: y after resize`).toBeLessThanOrEqual(0.01);
+  }
+  // ничего не уехало за кадр
+  const out = await page.evaluate(() => [...document.querySelectorAll('.poc-find.is-on')].map((f) => f.getBoundingClientRect())
+    .filter((r) => r.left < -0.5 || r.top < -0.5 || r.right > innerWidth + 0.5 || r.bottom > innerHeight + 0.5).length);
+  expect(out, 'nothing leaves the viewport after resize').toBe(0);
+  expect(page._errors).toEqual([]);
+  await page.context().close();
+});
+
+test('language switch restores open finds in place, without replaying the reveal', async ({ browser, baseURL }) => {
+  const page = await open(browser, baseURL, '/');
+  await mounted(page, 18);
+  const sp = await page.evaluate(() => window.__JOURNEY.biome(0));
+  const at = pOf(sp, 0.7);
+  await set(page, at);
+  await drawn(page, 'village');
+  await page.waitForTimeout(300);
+  const before = await onIn(page, 'village');
+  const rects = {};
+  for (const id of before) rects[id] = await RECT(page, id);
+  await page.click('a[href="/ru/"]');
+  await page.waitForURL('**/ru/');
+  await page.waitForFunction(() => window.__JOURNEY, null, { timeout: 30_000 });
+  await mounted(page, 18);
+  await page.waitForFunction((n) => document.querySelectorAll(`.poc-find.is-on[data-biome="village"]`).length === n, before.length, { timeout: 30_000 });
+  const after = await onIn(page, 'village');
+  expect(after, 'the same finds are open after the switch').toEqual(before);
+  // восстановление, а не повторный показ: анимации шлепка нет
+  expect(await page.evaluate(() => [...document.querySelectorAll('.poc-find.is-on')]
+    .every((f) => f.classList.contains('is-restored') && getComputedStyle(f).animationName === 'none')), 'no reveal replay').toBe(true);
+  await drawn(page, 'village');
+  await page.waitForTimeout(200);
+  for (const id of before) {
+    const r = await RECT(page, id);
+    const d = Math.max(Math.abs(r.l - rects[id].l), Math.abs(r.t - rects[id].t));
+    expect(d, `${id}: pinned position after the language switch`).toBeLessThanOrEqual(1);
+  }
+  // копия — русская
+  const cap = await page.evaluate(() => document.querySelector('.poc-find[data-find="sealed-letter"] b').textContent);
+  expect(cap).toBe('Письмо');
+  expect(page._errors).toEqual([]);
+  await page.context().close();
 });

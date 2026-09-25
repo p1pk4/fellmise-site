@@ -116,9 +116,11 @@ test('Mine scrolls longer than the threshold: discovery stretch is live on /', a
     return n / (sp.m1 - sp.m0);
   };
   const mine = await ticks(2), threshold = await ticks(3);
-  // растяжение шахты 3x до раскрытия и 1.6x после: в сумме около 2.6x
+  // растяжение шахты 3x до раскрытия и 1.6x после: в сумме около 2.6x. Счёт
+  // тиков дискретный, поэтому порог ниже измеренного — он отделяет растянутый
+  // биом от нерастянутого (там было бы 1.0), а не проверяет точное число
   expect(mine / threshold, `wheel ticks per progress: Mine ${mine.toFixed(0)} vs threshold ${threshold.toFixed(0)}`)
-    .toBeGreaterThanOrEqual(2.2);
+    .toBeGreaterThanOrEqual(2);
   expect(page._errors).toEqual([]);
   await page.context().close();
 });

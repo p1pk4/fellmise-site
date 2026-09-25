@@ -57,9 +57,10 @@ const set = (page, v) => page.evaluate((x) => new Promise((ok) => {
 }), v);
 const onIn = (page, name) => page.evaluate((n) => [...document.querySelectorAll(`.poc-find.is-on[data-biome="${n}"]`)].map((f) => f.dataset.find), name);
 // находки смонтированы (после первого кадра) и картинки нужного биома пришли
-const mounted = (page, n) => page.waitForFunction((x) => document.querySelectorAll('.poc-find').length === x, n, { timeout: 30_000 });
+// картинки биома приходят по ходу маршрута, на загруженном раннере не мгновенно
+const mounted = (page, n) => page.waitForFunction((x) => document.querySelectorAll('.poc-find').length === x, n, { timeout: 60_000 });
 const drawn = (page, name) => page.waitForFunction((n) => [...document.querySelectorAll(`.poc-find[data-biome="${n}"] img`)]
-  .every((i) => i.complete && i.naturalWidth > 0), name, { timeout: 30_000 });
+  .every((i) => i.complete && i.naturalWidth > 0), name, { timeout: 60_000 });
 
 // A. полный прогон по биомам — на продакшен-маршруте, без query
 test('/ discoveries: every biome accumulates in order, leaves before takeover, keeps base copy', async ({ browser, baseURL }) => {

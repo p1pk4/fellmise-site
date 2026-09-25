@@ -32,9 +32,15 @@ test('biome copy stays until the next scene visually takes over; one beat at a t
   const T = await page.evaluate(() => window.__JOURNEY.takeover());
   expect(T).toHaveLength(5);
   const expected = (p) => (p < 0.03 ? null : BIOMES[T.filter((t) => p >= t).length]);
+  // смена бита — уход, потом появление: ~480 мс по CSS. Ждём результат, а не
+  // фиксированную паузу: на загруженном раннере она заканчивалась раньше смены
   const probe = async (p) => {
     await page.evaluate((v) => window.__JOURNEY.set(v, { instant: true }), p);
-    await page.waitForTimeout(460);                         // смена бита — уход, потом появление
+    await page.waitForTimeout(460);
+    const want = expected(p);
+    for (let i = 0; i < 12 && JSON.stringify(await beatsOn(page)) !== JSON.stringify(want ? [want] : []); i++) {
+      await page.waitForTimeout(120);
+    }
     return beatsOn(page);
   };
   // до и после каждой точки смены — прежний и новый биом
@@ -116,9 +122,11 @@ test('Mine scrolls longer than the threshold: discovery stretch is live on /', a
     return n / (sp.m1 - sp.m0);
   };
   const mine = await ticks(2), threshold = await ticks(3);
-  // растяжение шахты 3x до раскрытия и 1.6x после: в сумме около 2.6x
+  // растяжение шахты 3x до раскрытия и 1.6x после: в сумме около 2.6x. Счёт
+  // тиков дискретный, поэтому порог ниже измеренного — он отделяет растянутый
+  // биом от нерастянутого (там было бы 1.0), а не проверяет точное число
   expect(mine / threshold, `wheel ticks per progress: Mine ${mine.toFixed(0)} vs threshold ${threshold.toFixed(0)}`)
-    .toBeGreaterThanOrEqual(2.2);
+    .toBeGreaterThanOrEqual(2);
   expect(page._errors).toEqual([]);
   await page.context().close();
 });

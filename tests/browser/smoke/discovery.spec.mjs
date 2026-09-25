@@ -276,6 +276,23 @@ const revealRect = (page, v, id) => page.evaluate(([x, f]) => new Promise((ok) =
       x: (r.left + r.right) / 2 / innerWidth, y: (r.top + r.bottom) / 2 / innerHeight, h: r.height / innerHeight });
   }));
 }), [v, id]);
+// перелёт в коллекцию длится ~0.47 с, но на загруженном раннере дольше:
+// ждём, пока предмет встанет, а не фиксированную паузу
+async function settled(page, id) {
+  let prev = null;
+  for (let i = 0; i < 60; i++) {
+    const r = await page.evaluate((x) => {
+      const el = document.querySelector(`.poc-find[data-find="${x}"]`);
+      const q = el.querySelector('img').getBoundingClientRect();
+      return { world: el.classList.contains('is-world'), x: (q.left + q.right) / 2 / innerWidth,
+        y: (q.top + q.bottom) / 2 / innerHeight, h: q.height / innerHeight };
+    }, id);
+    if (prev && !r.world && Math.abs(r.x - prev.x) < 1e-4 && Math.abs(r.y - prev.y) < 1e-4) return r;
+    prev = r;
+    await page.waitForTimeout(120);
+  }
+  return prev;
+}
 const RECT = (page, id) => page.evaluate((x) => {
   const f = document.querySelector(`.poc-find[data-find="${x}"] img`);
   const r = f.getBoundingClientRect();
@@ -315,11 +332,7 @@ test('a find appears in the world, stamps into its slot and then stays: every bi
       // отношение «в мире / в коллекции» — наклон у обоих один и тот же
       const wantScale = spec[i].world[2] / spec[i].slot[2];
       // после перелёта — своё место в коллекции
-      await page.waitForTimeout(700);
-      const s2 = await page.evaluate((x) => { const el = document.querySelector(`.poc-find[data-find="${x}"]`);
-        const q = el.querySelector('img').getBoundingClientRect();
-        return { world: el.classList.contains('is-world'), x: (q.left + q.right) / 2 / innerWidth,
-          y: (q.top + q.bottom) / 2 / innerHeight, h: q.height / innerHeight }; }, id);
+      const s2 = await settled(page, id);
       expect(s2.world, `${b.name}/${id}: no longer in the world`).toBe(false);
       const [sx, sy] = spec[i].slot;
       expect(Math.abs(s2.x - sx), `${b.name}/${id}: slot x ${s2.x.toFixed(3)} vs ${sx}`).toBeLessThanOrEqual(0.004);
@@ -372,7 +385,7 @@ test('pinned finds keep their place in the viewport across a resize', async ({ b
   const sp = await page.evaluate(() => window.__JOURNEY.biome(0));
   await set(page, pOf(sp, 0.7));
   await drawn(page, 'village');
-  await page.waitForTimeout(300);
+  for (const id of await onIn(page, 'village')) await settled(page, id);
   const before = await page.evaluate(() => [...document.querySelectorAll('.poc-find.is-on img')].map((i) => {
     const r = i.getBoundingClientRect();
     return { id: i.closest('.poc-find').dataset.find, x: +((r.left + r.right) / 2 / innerWidth).toFixed(3), y: +((r.top + r.bottom) / 2 / innerHeight).toFixed(3) };
@@ -405,10 +418,9 @@ test('language switch restores open finds in place, without replaying the reveal
   const at = pOf(sp, 0.7);
   await set(page, at);
   await drawn(page, 'village');
-  await page.waitForTimeout(300);
   const before = await onIn(page, 'village');
   const rects = {};
-  for (const id of before) rects[id] = await RECT(page, id);
+  for (const id of before) { await settled(page, id); rects[id] = await RECT(page, id); }
   await page.click('a[href="/ru/"]');
   await page.waitForURL('**/ru/');
   await page.waitForFunction(() => window.__JOURNEY, null, { timeout: 30_000 });
@@ -420,8 +432,8 @@ test('language switch restores open finds in place, without replaying the reveal
   expect(await page.evaluate(() => [...document.querySelectorAll('.poc-find.is-on')]
     .every((f) => f.classList.contains('is-restored') && getComputedStyle(f).animationName === 'none')), 'no reveal replay').toBe(true);
   await drawn(page, 'village');
-  await page.waitForTimeout(200);
   for (const id of before) {
+    await settled(page, id);
     const r = await RECT(page, id);
     const d = Math.max(Math.abs(r.l - rects[id].l), Math.abs(r.t - rects[id].t));
     expect(d, `${id}: pinned position after the language switch`).toBeLessThanOrEqual(1);

@@ -156,14 +156,15 @@ const WORLD_HOLD = 190;
 
 const CSS = `
 .poc-finds { position: fixed; inset: 0; pointer-events: none; z-index: 40; }
-.poc-find { position: absolute; left: 0; top: 0; margin: 0; display: flex; flex-direction: column; align-items: center;
-  opacity: 0; transform: var(--at); transition: opacity .32s ease; }
-.poc-find--above { flex-direction: column-reverse; }
-.poc-find--above figcaption { margin: 0 0 8px; }
-.poc-find--left { flex-direction: row-reverse; }
-.poc-find--right { flex-direction: row; }
-.poc-find--left figcaption { margin: 0 12px 0 0; text-align: right; }
-.poc-find--right figcaption { margin: 0 0 0 12px; text-align: left; }
+.poc-find { position: absolute; left: 0; top: 0; margin: 0; opacity: 0; transform: var(--at);
+  transition: opacity .32s ease; }
+/* подпись висит рядом с предметом, но не входит в его коробку: длина строки
+   (и разница EN/RU) не должна двигать саму находку */
+.poc-find figcaption { position: absolute; }
+.poc-find--above figcaption { bottom: 100%; margin-bottom: 8px; left: 50%; transform: translateX(calc(-50% + var(--cx, 0px))); }
+.poc-find--below figcaption { top: 100%; margin-top: 8px; left: 50%; transform: translateX(calc(-50% + var(--cx, 0px))); }
+.poc-find--left figcaption { right: 100%; margin-right: 12px; top: 50%; transform: translateY(-50%); text-align: right; }
+.poc-find--right figcaption { left: 100%; margin-left: 12px; top: 50%; transform: translateY(-50%); text-align: left; }
 /* тень короткая и низкая: предмет лежит, а не парит */
 .poc-find img { display: block; width: auto; transform: rotate(var(--rot)); filter: var(--props, none) drop-shadow(0 3px 3px rgba(8, 6, 4, .45)); }
 .poc-find--spectral img { filter: var(--props, none); }
@@ -176,7 +177,7 @@ const CSS = `
 .poc-find.is-on.is-world { opacity: 1; transform: var(--at) var(--from); transition: opacity .12s ease; }
 /* возврат на сохранённую позицию (смена языка): находки уже в коллекции */
 .poc-find.is-restored { transition: none; }
-.poc-find figcaption { display: none; margin-top: 8px; text-align: center; color: #e8dbbd;
+.poc-find figcaption { display: none; text-align: center; color: #e8dbbd;
   text-shadow: 0 1px 6px rgba(0, 0, 0, .85), 0 0 2px rgba(0, 0, 0, .7); }
 .poc-find b, .poc-find span { white-space: nowrap; }
 .poc-find b { display: block; font: 700 clamp(13px, .82vw, 16px)/1.05 Podkova, Georgia, serif; letter-spacing: .05em;
@@ -229,7 +230,7 @@ export function mountDiscoveries(parent, { only = null, stretch = null } = {}) {
       cap.innerHTML = '<b></b><span></span>';
       cap.querySelector('b').textContent = d[lang][0];
       cap.querySelector('span').textContent = d[lang][1];
-      if (d.cx) cap.style.transform = `translateX(${(d.cx * 100).toFixed(2)}vw)`;
+      if (d.cx) fig.style.setProperty('--cx', `${(d.cx * 100).toFixed(2)}vw`);
       fig.append(img, cap);
       root.appendChild(fig);
       const f = { d, b, fig, img, on: false, src: `${ASSETS}${name}/${d.id}.webp` };
@@ -260,24 +261,13 @@ export function mountDiscoveries(parent, { only = null, stretch = null } = {}) {
     for (const f of finds) {
       const [sx, sy, sh] = f.d.slot, [wx, wy, wh] = f.d.world;
       f.img.style.height = `${Math.round(sh * H)}px`;
-      // центр предмета — в (sx, sy); подпись со своей стороны
-      const fw = f.fig.offsetWidth, fh = f.fig.offsetHeight, iw = f.img.offsetWidth, ih = f.img.offsetHeight;
-      const cx = sx * W, cy = sy * H, cap = f.d.cap || 'below';
-      let left = cx - fw / 2, top = cy - fh / 2;
-      if (cap === 'below') top = cy - ih / 2;
-      if (cap === 'above') top = cy + ih / 2 - fh;
-      if (cap === 'left') left = cx + iw / 2 - fw;
-      if (cap === 'right') left = cx - iw / 2;
-      left = Math.min(Math.max(left, f.b.zone[0] * W), f.b.zone[1] * W - fw);
+      const iw = f.img.offsetWidth, ih = f.img.offsetHeight;
+      const left = Math.min(Math.max(sx * W - iw / 2, f.b.zone[0] * W), f.b.zone[1] * W - iw);
+      const top = sy * H - ih / 2;
       f.fig.style.setProperty('--at', `translate(${Math.round(left)}px, ${Math.round(top)}px)`);
       // из слота — обратно в точку находки: масштаб сцены и её центр
-      const k = wh / sh;
-      const icx = left + (cap === 'left' ? fw - iw / 2 : cap === 'right' ? iw / 2 : fw / 2);
-      const icy = top + (cap === 'above' ? fh - ih / 2 : cap === 'below' ? ih / 2 : fh / 2);
-      f.fig.style.setProperty('--from',
-        `translate(${Math.round(wx * W - icx)}px, ${Math.round(wy * H - icy)}px) scale(${k.toFixed(3)})`);
-      // точка масштабирования — сам предмет, а не блок с подписью
-      f.fig.style.transformOrigin = `${Math.round(icx - left)}px ${Math.round(icy - top)}px`;
+      f.fig.style.setProperty('--from', `translate(${Math.round(wx * W - (left + iw / 2))}px, `
+        + `${Math.round(wy * H - (top + ih / 2))}px) scale(${(wh / sh).toFixed(3)})`);
     }
   }
   addEventListener('resize', layout, { signal: life.signal });
@@ -311,23 +301,16 @@ export function mountDiscoveries(parent, { only = null, stretch = null } = {}) {
         // находка: сначала в мире, на своей опоре, потом короткий перелёт в слот
         f.fig.classList.remove('is-restored');
         f.fig.classList.add('is-world', 'is-on');
-        f.timer = setTimeout(() => {
-          f.fig.classList.remove('is-world');
-          layout();     // подпись появляется вместе с коллекцией и меняет ширину блока
-        }, WORLD_HOLD);
+        f.timer = setTimeout(() => f.fig.classList.remove('is-world'), WORLD_HOLD);
       }
     }
     restoring = false;
-    // подпись показывает только последняя найденная вещь биома
-    let changed = false;
+    // подпись показывает только последняя найденная вещь биома; в коробку
+    // предмета она не входит, поэтому раскладку не трогает
     for (const g of groups) {
       const on = g.items.filter((f) => f.on);
-      for (const f of on) {
-        const isNew = f === on[on.length - 1];
-        if (f.fig.classList.contains('is-new') !== isNew) { f.fig.classList.toggle('is-new', isNew); changed = true; }
-      }
+      for (const f of on) f.fig.classList.toggle('is-new', f === on[on.length - 1]);
     }
-    if (changed) layout();      // ширина блока меняется вместе с подписью
   }
 
   // живой режим уступил статике: снять слушатели, DOM и ссылки на картинки

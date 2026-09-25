@@ -265,8 +265,18 @@ test('preview ?poc=mine keeps only Mine; production ignores the query', async ({
    движением уходит в своё место коллекции (slot) и дальше стоит в кадре.
    Карта едет — предмет стоит. Проверяем по всем биомам: появление, перелёт,
    ход вперёд и назад, resize и смену языка. */
-// рект и состояние сразу после появления: окно показа в мире короткое,
-// поэтому читаем в том же кадре, в котором выставили прогресс
+/* Показ в мире длится доли секунды, и на загруженном раннере тест не успевает
+   прочитать кадр раньше, чем предмет уйдёт в слот. Поэтому на время замера
+   выдержка в мире не заводится: подменяем короткий setTimeout, читаем реальный
+   рект, возвращаем всё на место и отпускаем предмет в коллекцию. */
+const holdWorld = (page) => page.evaluate(() => {
+  window.__st = window.setTimeout;
+  window.setTimeout = (fn, t, ...a) => (t > 80 && t < 500 ? 0 : window.__st(fn, t, ...a));
+});
+const releaseWorld = (page, id) => page.evaluate((f) => {
+  window.setTimeout = window.__st;
+  document.querySelector(`.poc-find[data-find="${f}"]`)?.classList.remove('is-world');
+}, id);
 const revealRect = (page, v, id) => page.evaluate(([x, f]) => new Promise((ok) => {
   window.__JOURNEY.set(x, { instant: true });
   requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -323,7 +333,9 @@ test('a find appears in the world, stamps into its slot and then stays: every bi
     for (const [i, id] of b.ids.entries()) {
       await set(page, pOf(sp, Math.max(0.01, at[i] - 0.02)));
       await page.waitForTimeout(120);
+      await holdWorld(page);
       const r = await revealRect(page, pOf(sp, at[i] + 0.005), id);
+      await releaseWorld(page, id);
       expect(r.world, `${b.name}/${id}: shown in the world first`).toBe(true);
       const [wx, wy, wh] = spec[i].world;
       expect(Math.abs(r.x - wx), `${b.name}/${id}: reveal x ${r.x.toFixed(3)} vs world ${wx}`).toBeLessThanOrEqual(0.004);

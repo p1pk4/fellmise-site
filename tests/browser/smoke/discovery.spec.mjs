@@ -261,9 +261,21 @@ test('preview ?poc=mine keeps only Mine; production ignores the query', async ({
   await prod.context().close();
 });
 
-/* Главное правило модели: находка появляется на своей опоре в кадре, а дальше
-   прибита к экрану. Карта едет — предмет стоит. Проверяем по всем биомам:
-   вперёд, назад, на resize и после смены языка. */
+/* Модель: находка появляется в мире, на своей опоре (world), коротким
+   движением уходит в своё место коллекции (slot) и дальше стоит в кадре.
+   Карта едет — предмет стоит. Проверяем по всем биомам: появление, перелёт,
+   ход вперёд и назад, resize и смену языка. */
+// рект и состояние сразу после появления: окно показа в мире короткое,
+// поэтому читаем в том же кадре, в котором выставили прогресс
+const revealRect = (page, v, id) => page.evaluate(([x, f]) => new Promise((ok) => {
+  window.__JOURNEY.set(x, { instant: true });
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    const el = document.querySelector(`.poc-find[data-find="${f}"]`);
+    const r = el.querySelector('img').getBoundingClientRect();
+    ok({ world: el.classList.contains('is-world'),
+      x: (r.left + r.right) / 2 / innerWidth, y: (r.top + r.bottom) / 2 / innerHeight, h: r.height / innerHeight });
+  }));
+}), [v, id]);
 const RECT = (page, id) => page.evaluate((x) => {
   const f = document.querySelector(`.poc-find[data-find="${x}"] img`);
   const r = f.getBoundingClientRect();
@@ -275,21 +287,47 @@ const SCENE = (page) => page.evaluate(() => {
   return { l: +i.left.toFixed(1), t: +i.top.toFixed(1), w: +i.width.toFixed(1) };
 });
 
-test('background moves, discovery item does not: every biome, forward and back', async ({ browser, baseURL }) => {
-  test.setTimeout(180_000);
+test('a find appears in the world, stamps into its slot and then stays: every biome', async ({ browser, baseURL }) => {
+  test.setTimeout(240_000);
   const page = await open(browser, baseURL, '/');
   const data = (await biomesData(page)).filter((b) => b.ids.length);
   await mounted(page, 18);
   const moved = [];
   for (const b of data) {
     const sp = await page.evaluate((k) => window.__JOURNEY.biome(k), b.k);
-    const at = await page.evaluate(async (n) => {
+    const spec = await page.evaluate(async (n) => {
       const { BIOMES } = await import('/depth-v2/poc-discoveries.js');
-      return BIOMES[n].items.map((i) => i.at);
+      return BIOMES[n].items.map((i) => ({ at: i.at, world: i.world, slot: i.slot }));
     }, b.name);
+    const at = spec.map((i) => i.at);
     await set(page, pOf(sp, Math.max(0.01, at[0] - 0.05)));
     await drawn(page, b.name);
-    // сразу после появления первой находки
+    // появление: предмет стоит в точке мира и в масштабе сцены
+    for (const [i, id] of b.ids.entries()) {
+      await set(page, pOf(sp, Math.max(0.01, at[i] - 0.02)));
+      await page.waitForTimeout(120);
+      const r = await revealRect(page, pOf(sp, at[i] + 0.005), id);
+      expect(r.world, `${b.name}/${id}: shown in the world first`).toBe(true);
+      const [wx, wy, wh] = spec[i].world;
+      expect(Math.abs(r.x - wx), `${b.name}/${id}: reveal x ${r.x.toFixed(3)} vs world ${wx}`).toBeLessThanOrEqual(0.004);
+      expect(Math.abs(r.y - wy), `${b.name}/${id}: reveal y ${r.y.toFixed(3)} vs world ${wy}`).toBeLessThanOrEqual(0.004);
+      // высота ректа включает наклон предмета, поэтому сверяем не её саму, а
+      // отношение «в мире / в коллекции» — наклон у обоих один и тот же
+      const wantScale = spec[i].world[2] / spec[i].slot[2];
+      // после перелёта — своё место в коллекции
+      await page.waitForTimeout(700);
+      const s2 = await page.evaluate((x) => { const el = document.querySelector(`.poc-find[data-find="${x}"]`);
+        const q = el.querySelector('img').getBoundingClientRect();
+        return { world: el.classList.contains('is-world'), x: (q.left + q.right) / 2 / innerWidth,
+          y: (q.top + q.bottom) / 2 / innerHeight, h: q.height / innerHeight }; }, id);
+      expect(s2.world, `${b.name}/${id}: no longer in the world`).toBe(false);
+      const [sx, sy] = spec[i].slot;
+      expect(Math.abs(s2.x - sx), `${b.name}/${id}: slot x ${s2.x.toFixed(3)} vs ${sx}`).toBeLessThanOrEqual(0.004);
+      expect(Math.abs(s2.y - sy), `${b.name}/${id}: slot y ${s2.y.toFixed(3)} vs ${sy}`).toBeLessThanOrEqual(0.006);
+      // рект включает наклон предмета, поэтому сверяем не высоту саму, а
+      // отношение «в мире / в коллекции»: наклон у обоих один и тот же
+      expect(Math.abs(r.h / s2.h - wantScale), `${b.name}/${id}: reveal scale ${(r.h / s2.h).toFixed(3)} vs ${wantScale.toFixed(3)}`).toBeLessThanOrEqual(0.03);
+    }
     await set(page, pOf(sp, at[0] + 0.01));
     await page.waitForTimeout(300);
     const first = await RECT(page, b.ids[0]);

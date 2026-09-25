@@ -1,5 +1,5 @@
 /* Depth Journey: текст биома держится, пока биом визуально текущий; смена
- * главы не дёргает картинку; POC шахты с открытиями живёт только на превью.
+ * главы не дёргает картинку; биом с находками проходится дольше.
  *
  * Появилась после двух замечаний владельца: текст уходил раньше самого
  * биома (короткие окна range), а на смене главы FOREST -> MINE картинка
@@ -101,88 +101,24 @@ for (const [w, h] of [[1920, 1080], [1920, 900]]) {
   });
 }
 
-const FINDS = ['ore-sample', 'mining-pickaxe', 'ore-cargo', 'deep-material'];
-const findsOn = (page) => page.evaluate(() => [...document.querySelectorAll('.poc-find.is-on')].map((f) => f.dataset.find));
-const pOfMine = (span, m) => (m <= 0.78 ? span.m0 + (m / 0.78) * (span.rs - span.m0) : span.rs + ((m - 0.78) / 0.22) * (span.m1 - span.rs));
-
-test('Mine POC: finds accumulate 1 -> 2 -> 3 -> 4, leave together before Spirit; base Mine copy stays', async ({ browser, baseURL }) => {
-  const page = await open(browser, baseURL, '/depth-v2/?poc=mine');
-  await page.waitForFunction(() => document.querySelectorAll('.poc-find').length === 4);
-  const span = await page.evaluate(() => window.__JOURNEY.mine());
-  expect(span.poc).toBe(true);
-  // вперёд мелким шагом: число находок только растёт, по одной, в заданном порядке
-  const counts = [];
-  let prev = [];
-  for (let p = span.m0 - 0.02; p <= span.m1 + 0.02; p += 0.002) {
-    await page.evaluate((v) => window.__JOURNEY.set(v, { instant: true }), p);
-    await page.waitForTimeout(40);
-    const on = await findsOn(page), m = await page.evaluate(() => window.__JOURNEY.mine().m);
-    if (m == null) expect(on, `outside Mine at ${p.toFixed(4)}`).toEqual([]);
-    if (on.length) {
-      // накопление: видны ровно первые n находок, а не одна сменяющая другую
-      expect(on, `accumulated finds at m=${m?.toFixed(3)}`).toEqual(FINDS.slice(0, on.length));
-      expect(on.length, 'never more than one new find per step').toBeLessThanOrEqual(prev.length + 1);
-    }
-    if (on.length !== (counts.at(-1) ?? -1)) counts.push(on.length);
-    prev = on;
-  }
-  expect(counts, 'find count over Mine').toEqual([0, 1, 2, 3, 4, 0]);
-  // все четыре видны вместе перед уходом группы
-  await page.evaluate((v) => window.__JOURNEY.set(v, { instant: true }), pOfMine(span, 0.8));
-  await page.waitForTimeout(300);
-  expect(await findsOn(page)).toEqual(FINDS);
-  // основной текст шахты на всём её протяжении
-  for (const m of [0.05, 0.2, 0.5, 0.75, 0.85]) {
-    await page.evaluate((v) => window.__JOURNEY.set(v, { instant: true }), pOfMine(span, m));
-    await page.waitForTimeout(460);
-    expect(await beatsOn(page), `base Mine copy at m=${m}`).toEqual(['mine']);
-  }
-  // назад: находки убираются в обратном порядке
-  for (const [m, n] of [[0.65, 4], [0.5, 3], [0.3, 2], [0.15, 1], [0.05, 0]]) {
-    await page.evaluate((v) => window.__JOURNEY.set(v, { instant: true }), pOfMine(span, m));
-    await page.waitForTimeout(60);
-    expect(await findsOn(page), `back to m=${m}`).toEqual(FINDS.slice(0, n));
-  }
-  // старой системы выносок нет: ни линий, ни точек, ни svg
-  expect(await page.evaluate(() => document.querySelectorAll('.poc-disc, .poc-finds svg, .poc-finds line, .poc-finds circle').length)).toBe(0);
-  // картинки находок действительно пришли
-  expect(await page.evaluate(() => [...document.querySelectorAll('.poc-find img')].every((i) => i.complete && i.naturalWidth > 0))).toBe(true);
-  expect(page._errors).toEqual([]);
-  await page.context().close();
-});
-
-test('Mine POC assets load only with ?poc=mine', async ({ browser, baseURL }) => {
-  const hits = {};
-  for (const url of ['/depth-v2/?poc=mine', '/depth-v2/', '/', '/ru/']) {
-    const page = await open(browser, baseURL, url);
-    await page.evaluate(() => window.__JOURNEY.set(0.36, { instant: true }));
-    await page.waitForTimeout(800);
-    hits[url] = page._requests.filter((u) => /\/assets\/depth\/discovery\/|poc-discoveries\.js/.test(u)).length;
-    expect(page._errors, url).toEqual([]);
-    await page.context().close();
-  }
-  expect(hits['/depth-v2/?poc=mine']).toBeGreaterThanOrEqual(5);       // модуль + 4 находки
-  expect(hits['/depth-v2/']).toBe(0);
-  expect(hits['/']).toBe(0);
-  expect(hits['/ru/']).toBe(0);
-});
-
-test('Mine POC is longer to scroll; production routes do not load it', async ({ browser, baseURL }) => {
-  const ticks = async (url) => {
-    const page = await open(browser, baseURL, url);
-    const span = await page.evaluate(() => window.__JOURNEY.mine());
-    await page.evaluate((v) => window.__JOURNEY.set(v, { instant: true }), span.m0);
+/* Находки живут на всех трёх входах; их поведение проверяет discovery.spec.
+   Здесь остаётся то, что видно только по прокрутке: биом с находками
+   проходится дольше, чем биом без них (wheelGain в journey.js). */
+test('Mine scrolls longer than the threshold: discovery stretch is live on /', async ({ browser, baseURL }) => {
+  const page = await open(browser, baseURL, '/');
+  await page.waitForFunction(() => document.querySelectorAll('.poc-find').length === 18, null, { timeout: 30_000 });
+  const ticks = async (k) => {
+    const sp = await page.evaluate((x) => window.__JOURNEY.biome(x), k);
+    await page.evaluate((v) => window.__JOURNEY.set(v, { instant: true }), sp.m0);
     await page.mouse.move(960, 540);
     let n = 0;
-    while ((await page.evaluate(() => window.__JOURNEY.target)) < span.m1 && n < 400) { await page.mouse.wheel(0, 100); n++; }
-    const loaded = page._requests.some((u) => /poc-discoveries\.js/.test(u));
-    await page.context().close();
-    return { n, loaded };
+    while ((await page.evaluate(() => window.__JOURNEY.target)) < sp.m1 && n < 800) { await page.mouse.wheel(0, 100); n++; }
+    return n / (sp.m1 - sp.m0);
   };
-  const poc = await ticks('/depth-v2/?poc=mine'), plain = await ticks('/depth-v2/'), root = await ticks('/');
-  expect(poc.loaded).toBe(true);
-  expect(plain.loaded).toBe(false);
-  expect(root.loaded).toBe(false);
-  // растяжение 3x до раскрытия порога и 1.6x после: в сумме ~2.6x тиков колеса
-  expect(poc.n, `wheel ticks through Mine: POC ${poc.n} vs ${plain.n}`).toBeGreaterThanOrEqual(plain.n * 2.2);
+  const mine = await ticks(2), threshold = await ticks(3);
+  // растяжение шахты 3x до раскрытия и 1.6x после: в сумме около 2.6x
+  expect(mine / threshold, `wheel ticks per progress: Mine ${mine.toFixed(0)} vs threshold ${threshold.toFixed(0)}`)
+    .toBeGreaterThanOrEqual(2.2);
+  expect(page._errors).toEqual([]);
+  await page.context().close();
 });

@@ -1,6 +1,8 @@
-/* POC: находки биомов. Только превью: /depth-v2/?poc=discoveries (все биомы)
- * и /depth-v2/?poc=mine (только шахта). / и /ru/ и обычный /depth-v2/ этот
- * модуль и его картинки не грузят вовсе.
+/* Находки биомов — часть живого маршрута на всех трёх входах (/, /ru/,
+ * /depth-v2/). Статика, reduced-motion, узкое окно и страница без JS этот
+ * модуль и его картинки не грузят вовсе: их подключает только journey.js,
+ * а его в этих режимах нет (boot.js). Превью оставляет один ключ:
+ * ?poc=mine показывает находки одной шахты.
  *
  * Один движок на все биомы, поведение задают данные. Пока пользователь идёт
  * глубже, в свободных местах кадра одна за другой «шлёпаются» отдельные
@@ -138,13 +140,12 @@ export const BIOMES = {
   },
 };
 const ASSETS = '/assets/depth/discovery/';
-const UNDERLAY = `${ASSETS}underlay.webp`;
+// картинки биома приходят по ходу маршрута: текущий биом, следующий с
+// середины текущего и предыдущий у его начала (ход назад не ждёт сети)
+const AHEAD = 0.45, BACK = 0.25;
 
 const CSS = `
 .poc-finds { position: fixed; inset: 0; pointer-events: none; z-index: 40; }
-/* общая подложка кластера: маска мягкого неровного пятна, цвет — у биома */
-.poc-under { position: absolute; left: 0; top: 0; opacity: 0; transition: opacity .6s ease;
-  -webkit-mask: url(${UNDERLAY}) center / 100% 100% no-repeat; mask: url(${UNDERLAY}) center / 100% 100% no-repeat; }
 .poc-find { position: absolute; left: 0; top: 0; margin: 0; display: flex; flex-direction: column; align-items: center;
   opacity: 0; transition: opacity .32s ease; }
 .poc-find--above { flex-direction: column-reverse; }
@@ -176,9 +177,10 @@ const CSS = `
 
 /* only — список биомов (null — все); stretch — переопределение растяжения шахты
    с превью (?stretch=), для сравнения. Возвращает растяжение по номерам биомов
-   для journey.js и update(localOf), где localOf(k) — локальный прогресс биома k
-   или null вне его. */
+   для journey.js, update(localOf), где localOf(k) — локальный прогресс биома k
+   или null вне его, и stop() — снять всё при отказе живого режима. */
 export function mountDiscoveries(parent, { only = null, stretch = null } = {}) {
+  const life = new AbortController();
   const style = document.createElement('style');
   style.textContent = CSS;
   document.head.appendChild(style);
@@ -191,20 +193,12 @@ export function mountDiscoveries(parent, { only = null, stretch = null } = {}) {
 
   const finds = [];
   const groups = [];
-  const unders = [];
   const stretchBy = {};
   for (const [name, b] of biomes) {
     const s = name === 'mine' && Number(stretch) > 0 ? [Number(stretch), b.stretch[1]] : b.stretch;
     stretchBy[b.k] = s;
-    groups.push(b);
-    if (b.under) {
-      const u = document.createElement('div');
-      u.className = 'poc-under';
-      u.dataset.biome = name;
-      u.style.background = `rgb(${b.under.tone})`;
-      root.appendChild(u);
-      unders.push({ b, el: u, n: 0 });
-    }
+    const group = { b, name, items: [], asked: false };
+    groups.push(group);
     for (const d of b.items) {
       const fig = document.createElement('figure');
       fig.className = `poc-find poc-find--${d.cap || 'below'}${d.spectral ? ' poc-find--spectral' : ''}`;
@@ -214,9 +208,10 @@ export function mountDiscoveries(parent, { only = null, stretch = null } = {}) {
       fig.style.setProperty('--rot', `${d.rot || 0}deg`);
       if (b.props) fig.style.setProperty('--props', b.props);
       const img = new Image();
-      img.src = `${ASSETS}${name}/${d.id}.webp`;
+      // src ставится в fetch(): к первому кадру картинок находок в сети нет
       img.alt = '';
       img.decoding = 'async';
+      img.fetchPriority = 'low';        // сцена и её hi-res важнее находок
       const cap = document.createElement('figcaption');
       cap.innerHTML = '<b></b><span></span>';
       cap.querySelector('b').textContent = d[lang][0];
@@ -224,18 +219,28 @@ export function mountDiscoveries(parent, { only = null, stretch = null } = {}) {
       if (d.cx) cap.style.transform = `translateX(${(d.cx * 100).toFixed(2)}vw)`;
       fig.append(img, cap);
       root.appendChild(fig);
-      finds.push({ d, b, fig, img, on: false });
+      const f = { d, b, fig, img, on: false, src: `${ASSETS}${name}/${d.id}.webp` };
+      group.items.push(f);
+      finds.push(f);
+    }
+  }
+
+  /* Картинки биома: запрашиваются один раз и остаются. Весь набор — 18 файлов
+     ~0.5 МБ, в декодированном виде это единицы мегабайт против сотен у плит,
+     поэтому выгрузки нет: ход назад не должен ждать повторной загрузки. */
+  function fetchGroup(i) {
+    const g = groups[i];
+    if (!g || g.asked) return;
+    g.asked = true;
+    for (const f of g.items) {
+      f.img.src = f.src;
+      // декодируем заранее: к моменту появления предмет уже готов к показу
+      f.img.decode?.().catch(() => {});
     }
   }
 
   function layout() {
     const W = innerWidth, H = innerHeight;
-    for (const u of unders) {
-      const { x, y, w, h, rot = 0 } = u.b.under;
-      u.el.style.width = `${Math.round(w * W)}px`;
-      u.el.style.height = `${Math.round(h * H)}px`;
-      u.el.style.transform = `translate(${Math.round((x - w / 2) * W)}px, ${Math.round((y - h / 2) * H)}px) rotate(${rot}deg)`;
-    }
     for (const f of finds) {
       f.img.style.height = `${Math.round(f.d.h * H)}px`;
       // центр предмета — в (x, y); подпись со своей стороны
@@ -252,11 +257,19 @@ export function mountDiscoveries(parent, { only = null, stretch = null } = {}) {
       f.fig.style.transform = at;
     }
   }
-  addEventListener('resize', layout);
-  for (const f of finds) f.img.addEventListener('load', layout);
+  addEventListener('resize', layout, { signal: life.signal });
+  for (const f of finds) f.img.addEventListener('load', layout, { signal: life.signal });
   layout();
 
   function update(localOf) {
+    // текущий биом, следующий с середины текущего, предыдущий у его начала
+    for (let i = 0; i < groups.length; i++) {
+      const m = localOf(groups[i].b.k);
+      if (m == null) continue;
+      fetchGroup(i);
+      if (m >= AHEAD) fetchGroup(i + 1);
+      if (m <= BACK) fetchGroup(i - 1);
+    }
     for (const f of finds) {
       const m = localOf(f.b.k);
       const on = m != null && m >= f.d.at && (f.b.exit == null || m < f.b.exit);
@@ -266,21 +279,23 @@ export function mountDiscoveries(parent, { only = null, stretch = null } = {}) {
     }
     // подпись показывает только последняя найденная вещь биома
     let changed = false;
-    for (const b of groups) {
-      const on = finds.filter((f) => f.b === b && f.on);
+    for (const g of groups) {
+      const on = g.items.filter((f) => f.on);
       for (const f of on) {
         const isNew = f === on[on.length - 1];
         if (f.fig.classList.contains('is-new') !== isNew) { f.fig.classList.toggle('is-new', isNew); changed = true; }
       }
     }
     if (changed) layout();      // ширина блока меняется вместе с подписью
-    // подложка проявляется с первой находкой и плотнеет к полной группе
-    for (const u of unders) {
-      const n = finds.filter((f) => f.b === u.b && f.on).length, N = u.b.items.length;
-      if (n === u.n) continue;
-      u.n = n;
-      u.el.style.opacity = n ? String((u.b.under.op ?? 0.6) * (0.55 + 0.45 * n / N)) : '0';
-    }
   }
-  return { stretch: stretchBy, update };
+
+  // живой режим уступил статике: снять слушатели, DOM и ссылки на картинки
+  function stop() {
+    life.abort();
+    for (const f of finds) f.img.removeAttribute('src');
+    root.remove();
+    style.remove();
+  }
+
+  return { stretch: stretchBy, update, stop };
 }

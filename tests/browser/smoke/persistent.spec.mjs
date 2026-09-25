@@ -32,9 +32,15 @@ test('biome copy stays until the next scene visually takes over; one beat at a t
   const T = await page.evaluate(() => window.__JOURNEY.takeover());
   expect(T).toHaveLength(5);
   const expected = (p) => (p < 0.03 ? null : BIOMES[T.filter((t) => p >= t).length]);
+  // смена бита — уход, потом появление: ~480 мс по CSS. Ждём результат, а не
+  // фиксированную паузу: на загруженном раннере она заканчивалась раньше смены
   const probe = async (p) => {
     await page.evaluate((v) => window.__JOURNEY.set(v, { instant: true }), p);
-    await page.waitForTimeout(460);                         // смена бита — уход, потом появление
+    await page.waitForTimeout(460);
+    const want = expected(p);
+    for (let i = 0; i < 12 && JSON.stringify(await beatsOn(page)) !== JSON.stringify(want ? [want] : []); i++) {
+      await page.waitForTimeout(120);
+    }
     return beatsOn(page);
   };
   // до и после каждой точки смены — прежний и новый биом

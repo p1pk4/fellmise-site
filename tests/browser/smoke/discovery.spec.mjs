@@ -431,8 +431,16 @@ test('language switch restores open finds in place, without replaying the reveal
   await set(page, at);
   await drawn(page, 'village');
   const before = await onIn(page, 'village');
-  const rects = {};
-  for (const id of before) { await settled(page, id); rects[id] = await RECT(page, id); }
+  const slots = await page.evaluate(async () => {
+    const { BIOMES } = await import('/depth-v2/poc-discoveries.js');
+    return Object.fromEntries(BIOMES.village.items.map((i) => [i.id, i.slot]));
+  });
+  // сверяемся со слотами из данных, а не с прошлым замером: если предмет
+  // почему-то остался в мире, тест назовёт именно это
+  for (const id of before) {
+    const r = await settled(page, id);
+    expect(Math.abs(r.x - slots[id][0]), `${id}: in its slot before the switch`).toBeLessThanOrEqual(0.004);
+  }
   await page.click('a[href="/ru/"]');
   await page.waitForURL('**/ru/');
   await page.waitForFunction(() => window.__JOURNEY, null, { timeout: 30_000 });
@@ -445,10 +453,10 @@ test('language switch restores open finds in place, without replaying the reveal
     .every((f) => f.classList.contains('is-restored') && getComputedStyle(f).animationName === 'none')), 'no reveal replay').toBe(true);
   await drawn(page, 'village');
   for (const id of before) {
-    await settled(page, id);
-    const r = await RECT(page, id);
-    const d = Math.max(Math.abs(r.l - rects[id].l), Math.abs(r.t - rects[id].t));
-    expect(d, `${id}: pinned position after the language switch`).toBeLessThanOrEqual(1);
+    const r = await settled(page, id);
+    expect(r.world, `${id}: restored straight into the collection`).toBe(false);
+    expect(Math.abs(r.x - slots[id][0]), `${id}: slot x after the switch ${r.x.toFixed(3)} vs ${slots[id][0]}`).toBeLessThanOrEqual(0.004);
+    expect(Math.abs(r.y - slots[id][1]), `${id}: slot y after the switch ${r.y.toFixed(3)} vs ${slots[id][1]}`).toBeLessThanOrEqual(0.006);
   }
   // копия — русская
   const cap = await page.evaluate(() => document.querySelector('.poc-find[data-find="sealed-letter"] b').textContent);
